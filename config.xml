@@ -1,0 +1,37 @@
+<Configuration>
+  <Algorithms>
+    <Algorithm name="FullPNG">
+      <Parameters>
+        <Parameter name="colors" value="rgb"/>
+        <Parameter name="maxWidth" value="1820"/>
+        <Parameter name="maxHeight" value="980"/>
+      </Parameters>
+    </Algorithm>
+    <Algorithm name="TextBlock">
+      <Parameters>
+        <Parameter name="blockSize" value="1024000"/>
+      </Parameters>
+    </Algorithm>
+  </Algorithms>
+  <Database>
+    <Path name="DatabaseFile" value="FileIndex.sqlite"/>
+  </Database>
+  <FileSystem>
+    <Path name="ProductStagingFolder" value="products"/>
+    <Path name="ExtractionFolder" value="extractions"/>
+    <Path name="LogFolder" value="logs"/>
+  </FileSystem>
+  <TrackingGroups>
+    <Group name="Untracked" isSecured="false" usesDatabase="false">
+      <Path value="testGroupInput\folder\untracked.txt"/>
+      <Path value="testGroupInput\folder\untracked"/>
+    </Group>
+    <Group name="Test" isSecured="false" usesDatabase="false">
+      <Path value="testGroupInput"/>
+      <Key name="potatoes">
+        <Path value="keys\key1.txt"/>
+      </Key>
+      <Algorithm name="FullPNG"/>
+    </Group>
+  </TrackingGroups>
+</Configuration>
