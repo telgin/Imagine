@@ -1,9 +1,6 @@
 package algorithms;
 
 import java.io.File;
-
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-
 import hibernate.Metadata;
 
 public class FileContents {

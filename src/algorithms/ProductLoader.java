@@ -2,32 +2,21 @@ package algorithms;
 
 import hibernate.Metadata;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.MessageDigest;
-import java.util.Arrays;
-
 import logging.LogLevel;
 import logging.Logger;
-
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-
 import config.Configuration;
-import database.Database;
 import database.DatabaseManager;
 import util.ByteConversion;
 import util.Constants;
-import util.Hashing;
 
 public class ProductLoader
 {
-	private final ProductFactory<? extends Product> factory;
+	//delete factory member? can the factory ever become null?
+	//do we ever need another product?
+	//private final ProductFactory<? extends Product> factory;
 	
 	private final byte PRODUCT_VERSION_NUMBER = ByteConversion.intToByte(1);
 	
@@ -43,7 +32,7 @@ public class ProductLoader
 	
 	public ProductLoader(ProductFactory<? extends Product> factory, String groupName)
 	{
-		this.factory = factory;
+		//this.factory = factory;
 		
 		streamUUID = ByteConversion.longToBytes(Clock.getUniqueTime());
 		sequenceNumber = 0;

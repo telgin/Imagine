@@ -24,6 +24,7 @@ public abstract class myUtilities {
 				osw.write(line + System.lineSeparator());
 				osw.flush();
 			}
+			osw.close();
 		} catch (FileNotFoundException e) {
 			return false;
 		} catch (IOException e) {
@@ -44,6 +45,8 @@ public abstract class myUtilities {
 				text.add(inLine);
 				inLine = br.readLine();
 			}
+			
+			br.close();
 		}catch(IOException e){
 			return null;
 		}
@@ -128,6 +131,4 @@ public abstract class myUtilities {
 			return false;
 		}
 	}
-	
-	
 }

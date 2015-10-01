@@ -1,28 +1,23 @@
 package algorithms;
 
-import hibernate.Metadata;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.apache.bsf.util.event.generator.ByteUtility;
-
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-
 import logging.LogLevel;
 import logging.Logger;
-
 import util.ByteConversion;
 import util.Constants;
 import config.Configuration;
 
 public class ProductReader {
 
-	private final ProductFactory<? extends Product> factory;
+	//delete factory member? can the factory ever become null?
+	//do we ever need another product?
+	//private final ProductFactory<? extends Product> factory;
+	
 	private Product product;
 	private boolean productEmpty;
 	private long curPartLengthRemaining;
@@ -31,7 +26,7 @@ public class ProductReader {
 	
 	public ProductReader(ProductFactory<? extends Product> factory)
 	{
-		this.factory = factory;
+		//this.factory = factory;
 		product = factory.create();
 		productEmpty = false;
 	}

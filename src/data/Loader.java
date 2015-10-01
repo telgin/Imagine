@@ -73,6 +73,8 @@ public class Loader extends Thread{
 		if(length > 0){
 			
 		}
+		
+		fis.close();
 	}
 
 }

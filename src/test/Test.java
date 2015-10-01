@@ -29,8 +29,6 @@ import algorithms.fullpng.FullPNG;
 import algorithms.fullpng.FullPNGFactory;
 import algorithms.fullpng.HeartRandom;
 import algorithms.fullpng.UniqueRandomRange;
-import image.CryptImage;
-import image.SecImage;
 
 public class Test {
 	public static void main(String args[]) throws IOException, InterruptedException{
@@ -306,30 +304,5 @@ public class Test {
 		{
 			img.setRGB(x, y, setBlue(img.getRGB(x, y), data));
 		}
-	}
-	
-	public static void test1() throws IOException
-	{
-		System.out.println(CryptImage.bytesToInt(CryptImage.intToBytes(50)));
-		
-		String pass = "tom";
-		
-		byte[] message = Files.readAllBytes(new File("C:\\TestArea\\backup\\swag.png").toPath());
-		
-		
-		CodeTimer ct = new CodeTimer();
-		ct.start();
-		
-		BufferedImage img = SecImage.secure(1920, 1080, message, pass);
-		ct.end();
-		ImageIO.write(img, "png", new File("C:\\TestArea\\backup\\test.png"));
-		
-		System.out.println("-------" + ct.getElapsedTime() + "-------");
-		ct.start();
-		byte[] bytes = SecImage.extract(img, pass);
-		ct.end();
-		Files.write(new File("C:\\TestArea\\backup\\test2.png").toPath(),bytes);
-		
-		System.out.println("Decrypt time: " + ct.getElapsedTime());
 	}
 }

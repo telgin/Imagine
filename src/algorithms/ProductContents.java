@@ -2,8 +2,6 @@ package algorithms;
 
 import java.util.ArrayList;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-
 public class ProductContents {
 
 	private int productVersionNumber;

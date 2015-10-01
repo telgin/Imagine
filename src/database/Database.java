@@ -3,8 +3,6 @@ package database;
 import hibernate.Metadata;
 
 import java.io.File;
-
-import util.Constants;
 import util.Hashing;
 
 public class Database {

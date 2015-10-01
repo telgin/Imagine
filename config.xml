@@ -1,37 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Configuration>
-  <Algorithms>
-    <Algorithm name="FullPNG">
-      <Parameters>
-        <Parameter name="colors" value="rgb"/>
-        <Parameter name="maxWidth" value="1820"/>
-        <Parameter name="maxHeight" value="980"/>
-      </Parameters>
-    </Algorithm>
-    <Algorithm name="TextBlock">
-      <Parameters>
-        <Parameter name="blockSize" value="1024000"/>
-      </Parameters>
-    </Algorithm>
-  </Algorithms>
-  <Database>
-    <Path name="DatabaseFile" value="FileIndex.sqlite"/>
-  </Database>
-  <FileSystem>
-    <Path name="ProductStagingFolder" value="products"/>
-    <Path name="ExtractionFolder" value="extractions"/>
-    <Path name="LogFolder" value="logs"/>
-  </FileSystem>
-  <TrackingGroups>
-    <Group name="Untracked" isSecured="false" usesDatabase="false">
-      <Path value="testGroupInput\folder\untracked.txt"/>
-      <Path value="testGroupInput\folder\untracked"/>
-    </Group>
-    <Group name="Test" isSecured="false" usesDatabase="false">
-      <Path value="testGroupInput"/>
-      <Key name="potatoes">
-        <Path value="keys\key1.txt"/>
-      </Key>
-      <Algorithm name="FullPNG"/>
-    </Group>
-  </TrackingGroups>
+    <SupportedAlgorithms>
+        <Algorithm name="FullPNG">
+            <Parameter name="colors" optional="false" value="rgb"/>
+            <Parameter name="maxWidth" optional="false" value="1820"/>
+            <Parameter name="maxHeight" optional="false" value="980"/>
+        </Algorithm>
+        <Algorithm name="TextBlock">
+            <Parameter name="blockSize" optional="false" value="102400"/>
+        </Algorithm>
+    </SupportedAlgorithms>
+    <Database>
+        <Path name="DatabaseFile" value="FileIndex.sqlite"/>
+    </Database>
+    <FileSystem>
+        <Path name="ProductStagingFolder" value="products"/>
+        <Path name="ExtractionFolder" value="extractions"/>
+        <Path name="LogFolder" value="logs"/>
+    </FileSystem>
+    <TrackingGroups>
+        <Group name="Untracked" securityLevel="Normal" usesDatabase="false">
+            <Path name="owned location" value="testGroupInput\folder\untracked.txt"/>
+            <Path name="owned location" value="testGroupInput\folder\untracked"/>
+        </Group>
+        <Group name="Test" securityLevel="Normal" usesDatabase="false">
+            <Path name="owned location" value="testGroupInput"/>
+            <Key name="potatoes">
+                <Parameter enabled="false" name="Key File" optional="true" value="keys\key1.txt"/>
+            </Key>
+            <Algorithm name="TextBlock">
+                <Parameter name="blockSize" optional="false" value="102400"/>
+            </Algorithm>
+        </Group>
+    </TrackingGroups>
 </Configuration>

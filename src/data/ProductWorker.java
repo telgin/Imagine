@@ -20,7 +20,7 @@ public class ProductWorker implements Runnable{
 
 	// would only need to store this if there's ever a reason to reset
 	//the product loader, which there might not be.
-	private final ProductFactory<? extends Product> factory;
+	//private final ProductFactory<? extends Product> factory;
 	
 	private boolean stopping = false;
 	private BlockingQueue<Metadata> queue;
@@ -30,7 +30,7 @@ public class ProductWorker implements Runnable{
 	{
 		this.queue = queue;
 		loader = new ProductLoader(factory, groupName);
-		this.factory = factory;
+		//this.factory = factory;
 	}
 	
 	@Override

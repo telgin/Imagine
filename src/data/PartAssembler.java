@@ -8,8 +8,6 @@ import java.nio.file.Files;
 import logging.LogLevel;
 import logging.Logger;
 
-import config.Configuration;
-
 public class PartAssembler {
 	
 	/**
@@ -35,6 +33,7 @@ public class PartAssembler {
 						//get the next part
 						curPart = getNextPartFile(curPart);
 					}
+					fos.close();
 					
 					break;
 				}

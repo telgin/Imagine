@@ -51,6 +51,11 @@ public class IndexFile {
 		return indexFile;
 	}
 
+	private void addFileRecord(FileRecord fileRecord) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private static File findIndexFile(File folder) {
 		File indexFolder = null;
 		File curFolder = new File(folder.getAbsolutePath());
