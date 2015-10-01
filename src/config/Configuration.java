@@ -12,8 +12,6 @@ import logging.LogLevel;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class Configuration {
 	private static Document doc;
@@ -38,11 +36,11 @@ public class Configuration {
 	{
 		if (databaseFile == null)
 		{
-			Element databaseNode = getFirstElement(getElementsByTagName(root, "Database"));
+			Element databaseNode = ConfigUtil.first(ConfigUtil.children(root, "Database"));
 			if (databaseNode != null)
 			{
-				Element databaseFileNode = getFirstElement(
-						filterByAttribute(getElementsByTagName(databaseNode, "Path"),
+				Element databaseFileNode = ConfigUtil.first(
+						ConfigUtil.filterByAttribute(ConfigUtil.children(databaseNode, "Path"),
 								"name", "DatabaseFile"));
 				
 				databaseFile = new File(databaseFileNode.getAttribute("value"));	
@@ -56,11 +54,11 @@ public class Configuration {
 	{
 		if (productStagingFolder == null)
 		{
-			Element fileSystemNode = getFirstElement(getElementsByTagName(root, "FileSystem"));
+			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(root, "FileSystem"));
 			if (fileSystemNode != null)
 			{
-				Element prodStagFoldNode = getFirstElement(
-						filterByAttribute(getElementsByTagName(fileSystemNode, "Path"),
+				Element prodStagFoldNode = ConfigUtil.first(
+						ConfigUtil.filterByAttribute(ConfigUtil.children(fileSystemNode, "Path"),
 								"name", "ProductStagingFolder"));
 				
 				productStagingFolder = new File(prodStagFoldNode.getAttribute("value"));	
@@ -74,11 +72,11 @@ public class Configuration {
 	{
 		if (extractionFolder == null)
 		{
-			Element fileSystemNode = getFirstElement(getElementsByTagName(root, "FileSystem"));
+			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(root, "FileSystem"));
 			if (fileSystemNode != null)
 			{
-				Element extrFoldNode = getFirstElement(
-						filterByAttribute(getElementsByTagName(fileSystemNode, "Path"),
+				Element extrFoldNode = ConfigUtil.first(
+						ConfigUtil.filterByAttribute(ConfigUtil.children(fileSystemNode, "Path"),
 								"name", "ExtractionFolder"));
 				
 				extractionFolder = new File(extrFoldNode.getAttribute("value"));	
@@ -92,11 +90,11 @@ public class Configuration {
 	{
 		if (logFolder == null)
 		{
-			Element fileSystemNode = getFirstElement(getElementsByTagName(root, "FileSystem"));
+			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(root, "FileSystem"));
 			if (fileSystemNode != null)
 			{
-				Element logFoldNode = getFirstElement(
-						filterByAttribute(getElementsByTagName(fileSystemNode, "Path"),
+				Element logFoldNode = ConfigUtil.first(
+						ConfigUtil.filterByAttribute(ConfigUtil.children(fileSystemNode, "Path"),
 								"name", "LogFolder"));
 				
 				logFolder = new File(logFoldNode.getAttribute("value"));	
@@ -128,15 +126,15 @@ public class Configuration {
 	private static void parseTrackingGroups()
 	{
 		trackingGroups = new ArrayList<TrackingGroup>();
-		Element trackingGroupsNode = getFirstElement(getElementsByTagName(root, "TrackingGroups"));
-		for (Element group:getElementsByTagName(trackingGroupsNode, "Group"))
+		Element trackingGroupsNode = ConfigUtil.first(ConfigUtil.children(root, "TrackingGroups"));
+		for (Element group:ConfigUtil.children(trackingGroupsNode, "Group"))
 		{
 			TrackingGroup tg = new TrackingGroup(group.getAttribute("name"));
 			
 			//add key
 			if (!group.getAttribute("SecurityLevel").equals("Normal"))
 			{
-				Element key = getFirstElement(getElementsByTagName(group, "Key"));
+				Element key = ConfigUtil.first(ConfigUtil.children(group, "Key"));
 				if (key == null)
 				{
 					Logger.log(LogLevel.k_error, "There was no key for the secured group: " + tg.getName());
@@ -144,7 +142,7 @@ public class Configuration {
 				else
 				{
 					tg.setKeyName(key.getAttribute("name"));
-					Element keyPath = getFirstElement(getElementsByTagName(key, "Path"));
+					Element keyPath = ConfigUtil.first(ConfigUtil.children(key, "Path"));
 					if (keyPath != null)
 					{
 						tg.setKeyLocation(new File(keyPath.getAttribute("value")));
@@ -153,7 +151,7 @@ public class Configuration {
 			}
 			
 			//add algorithm
-			Element algoNode = getFirstElement(getElementsByTagName(group, "Algorithm"));
+			Element algoNode = ConfigUtil.first(ConfigUtil.children(group, "Algorithm"));
 			if (algoNode == null)
 			{
 				Logger.log(LogLevel.k_error, "No algorithm node found for group: " + tg.getName());
@@ -167,7 +165,7 @@ public class Configuration {
 			tg.setUsingDatabase(Boolean.parseBoolean(group.getAttribute("usesDatabase")));
 			
 			//add paths
-			for (Element path:getElementsByTagName(group, "Path"))
+			for (Element path:ConfigUtil.children(group, "Path"))
 			{
 				tg.addPath(path.getAttribute("value"));
 			}
@@ -189,7 +187,7 @@ public class Configuration {
 		TrackingGroup tg = findTrackingGroup(groupName);
 		if (!tg.isSecure())
 		{
-			Logger.log(LogLevel.k_debug, "Trying to get key of group which isn't secured: " + groupName);
+			Logger.log(LogLevel.k_error, "Trying to get key of group which isn't secured: " + groupName);
 			return null;
 		}
 		else
@@ -204,14 +202,14 @@ public class Configuration {
 	
 	private static Element getAlgorithm(String name)
 	{
-		Element supportedAlgosNode = getFirstElement(getElementsByTagName(root, "SupportedAlgorithms"));
-		Element algoNode = getFirstElement(
-				filterByAttribute(
-						getElementsByTagName(supportedAlgosNode, "Algorithm"), "name", name));
+		Element supportedAlgosNode = ConfigUtil.first(ConfigUtil.children(root, "SupportedAlgorithms"));
+		Element algoNode = ConfigUtil.first(
+				ConfigUtil.filterByAttribute(
+						ConfigUtil.children(supportedAlgosNode, "Algorithm"), "name", name));
 		
 		if (algoNode == null)
 		{
-			Logger.log(LogLevel.k_debug, "Could not find algorithm: " + name);
+			Logger.log(LogLevel.k_error, "Could not find algorithm: " + name);
 			return null;
 		}
 			
@@ -220,12 +218,12 @@ public class Configuration {
 	
 	private static String getParameter(Element config, String name)
 	{
-		Element paramNode = getFirstElement(
-				filterByAttribute(getElementsByTagName(config, "Parameter"), "name", name));
+		Element paramNode = ConfigUtil.first(
+				ConfigUtil.filterByAttribute(ConfigUtil.children(config, "Parameter"), "name", name));
 		
 		if (paramNode == null)
 		{
-			Logger.log(LogLevel.k_debug, "Could not find parameter: " + name);
+			Logger.log(LogLevel.k_error, "Could not find parameter: " + name);
 			return null;
 		}
 			
@@ -236,39 +234,4 @@ public class Configuration {
 		String value = getParameter(getAlgorithm("TextBlock"), "blockSize");
 		return Integer.parseInt(value);
 	}
-	
-	
-	
-	//TODO: move to config util ----------------------------------------------------------
-	private static Element getFirstElement(ArrayList<Element> elements)
-	{
-		if (elements.isEmpty())
-			return null;
-		return elements.get(0);
-	}
-	
-	private static ArrayList<Element> filterByAttribute(ArrayList<Element> elements, String name, String value)
-	{
-		ArrayList<Element> filtered = new ArrayList<Element>();
-		for (Element e:elements)
-			if (e.hasAttribute(name) && e.getAttribute(name).equals(value))
-				filtered.add(e);
-				
-		return filtered;
-				
-	}
-	
-	private static ArrayList<Element> getElementsByTagName(Element parent, String tag)
-	{
-		ArrayList<Element> elements = new ArrayList<Element>();
-		NodeList nodes = parent.getElementsByTagName(tag);
-		
-		for (int i=0; i<nodes.getLength(); ++i)
-			if (nodes.item(i).getNodeType() == Node.ELEMENT_NODE)
-				elements.add((Element) nodes.item(i));
-		
-		return elements;
-	}
-	
-	
 }

@@ -7,6 +7,7 @@ import logging.Logger;
 
 import algorithms.fullpng.FullPNGFactory;
 import algorithms.textblock.TextBlockFactory;
+import data.TrackingGroup;
 
 public class ProductFactoryRegistry {
 	private static HashMap<String, ProductFactoryCreation> factories;
@@ -31,9 +32,9 @@ public class ProductFactoryRegistry {
 
 	}
 	
-	public static ProductFactory<? extends Product> getProductFactory(
-			String algorithmName, ProductMode mode, byte[] keyHash)
+	public static ProductFactory<? extends Product> getProductFactory(TrackingGroup group)
 	{
+		String algoName = group.getAlgorithm().getName();
 		if (!factories.containsKey(algorithmName))
 			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + algorithmName);
 		

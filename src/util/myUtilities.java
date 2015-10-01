@@ -13,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -130,5 +131,12 @@ public abstract class myUtilities {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	public static String formatPercent(double d, int decimals)
+	{
+		NumberFormat format = NumberFormat.getPercentInstance();
+		format.setMinimumFractionDigits(decimals);
+		return format.format(d);
 	}
 }

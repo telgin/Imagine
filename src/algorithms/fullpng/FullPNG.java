@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -13,6 +14,8 @@ import logging.Logger;
 import util.ByteConversion;
 import util.Constants;
 import config.Configuration;
+import algorithms.Algorithm;
+import algorithms.Parameter;
 import algorithms.Product;
 import algorithms.ProductMode;
 
@@ -31,7 +34,7 @@ public class FullPNG implements Product{
 	private byte[] uuid;
 	private static ProductMode productMode = ProductMode.SECURE;
 	
-	public FullPNG(ProductMode mode, byte[] keyHash)
+	public FullPNG(Algorithm algo, byte[] keyHash)
 	{
 		if (Arrays.asList(SUPPORTED_PRODUCT_MODES).contains(mode))
 			productMode = mode;
@@ -224,5 +227,17 @@ public class FullPNG implements Product{
 	@Override
 	public ProductMode getProductMode() {
 		return productMode;
+	}
+
+	@Override
+	public List<Parameter> getParameters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setParameter(String name, String value) {
+		// TODO Auto-generated method stub
+		
 	}
 }

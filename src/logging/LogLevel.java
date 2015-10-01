@@ -5,10 +5,11 @@ import java.util.HashMap;
 public enum LogLevel {
 	k_fatal(0),
 	k_error(1),
-	k_general(2),
-	k_info(3),
-	k_debug(4),
-	k_all(5);
+	k_warning(2),
+	k_general(3),
+	k_info(4),
+	k_debug(5),
+	k_all(6);
 	
 	private int num;
 	private static HashMap<LogLevel, String> logHeaders;
@@ -18,6 +19,7 @@ public enum LogLevel {
 		logHeaders = new HashMap<LogLevel, String>();
 		logHeaders.put(LogLevel.k_fatal, "[FATAL ERROR] : ");
 		logHeaders.put(LogLevel.k_error, "[ERROR] : ");
+		logHeaders.put(LogLevel.k_warning, "[WARNING] : ");
 		logHeaders.put(LogLevel.k_general, "");
 		logHeaders.put(LogLevel.k_info, "[INFO] : ");
 		logHeaders.put(LogLevel.k_debug, "[DEBUG] : ");
