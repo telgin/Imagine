@@ -10,21 +10,21 @@ import util.ByteConversion;
  * @author Tom
  * The random of my heart.
  */
-public class HeartRandom {
+public class HashRandom {
 	private byte[] curHash;
 	private MessageDigest md;
 	private final int STOP = ((512/8) / 2); //half way
 	private int index = 0;
 	
-	public HeartRandom(byte[] seed){
+	public HashRandom(byte[] seed){
 		init(seed);
 	}
 	
-	public HeartRandom(String seed){
+	public HashRandom(String seed){
 		init(seed.getBytes());
 	}
 	
-	public HeartRandom(Long seed){
+	public HashRandom(Long seed){
 		init(ByteConversion.longToBytes(seed));
 	}
 	
@@ -103,7 +103,7 @@ public class HeartRandom {
 		CodeTimer ct = new CodeTimer();
 		ct.start();
 		
-		HeartRandom random = new HeartRandom("seed");
+		HashRandom random = new HashRandom("seed");
 		long dump = 0;
 		for(int i=0; i<rotations; ++i)
 		{
@@ -126,7 +126,7 @@ public class HeartRandom {
 		CodeTimer ct = new CodeTimer();
 		ct.start();
 		
-		HeartRandom random = new HeartRandom("seed");
+		HashRandom random = new HashRandom("seed");
 		int[] ibuffer = new int[maxApplicationSize];
 		byte[] bbuffer = new byte[maxApplicationSize];
 		for(int i=0; i<maxApplicationSize; ++i)

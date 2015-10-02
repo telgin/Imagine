@@ -5,21 +5,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 
+import algorithms.Algorithm;
 import logging.LogLevel;
 import logging.Logger;
-
+import product.Product;
+import product.ProductMode;
 import config.Configuration;
 
-import algorithms.Product;
-import algorithms.ProductMode;
-
 public class TextBlock implements Product{
-	private static final String ALGORITHM_NAME = "TextBlock";
 	private static final int ALGORITHM_VERSION_NUMBER = 1;
-	private static final ProductMode[] SUPPORTED_PRODUCT_MODES = 
-			new ProductMode[]{ProductMode.NORMAL};
 	
 	private int blockSize = 1024 * 100;
+	private Algorithm algorithm;
 	
 	//TODO: create temporary file to write buffer to so this doesn't stay here.
 	private byte[] buffer;
@@ -28,11 +25,13 @@ public class TextBlock implements Product{
 	
 	private static ProductMode productMode = ProductMode.NORMAL;
 
-	public TextBlock(ProductMode mode) {
-		if (Arrays.asList(SUPPORTED_PRODUCT_MODES).contains(mode))
-			productMode = mode;
-		else
-			Logger.log(LogLevel.k_error, "TextBlock: Product mode " + mode + " not supported, running with default.");
+	public TextBlock(Algorithm algo) {
+		algorithm = algo;
+		
+		//if (Arrays.asList(SUPPORTED_PRODUCT_MODES).contains(mode))
+		//	productMode = mode;
+		//else
+		//	Logger.log(LogLevel.k_error, "TextBlock: Product mode " + mode + " not supported, running with default.");
 		
 		Integer configBlockSize = Configuration.getTextBlockBlockSize();
 		
@@ -57,7 +56,7 @@ public class TextBlock implements Product{
 
 	@Override
 	public String getAlgorithmName() {
-		return ALGORITHM_NAME;
+		return algorithm.getName();
 	}
 
 	@Override

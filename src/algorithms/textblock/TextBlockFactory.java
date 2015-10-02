@@ -1,20 +1,21 @@
 package algorithms.textblock;
 
-import algorithms.ProductFactory;
-import algorithms.ProductMode;
+import algorithms.Algorithm;
+import product.ProductFactory;
+import product.ProductMode;
 
 public class TextBlockFactory implements ProductFactory<TextBlock>{
 
-	private ProductMode mode;
+	private Algorithm algo;
 	
-	public TextBlockFactory(ProductMode mode)
+	public TextBlockFactory(Algorithm algo)
 	{
-		this.mode = mode;
+		this.algo = algo;
 	}
 	
 	@Override
 	public TextBlock create() {
-		return new TextBlock(mode);
+		return new TextBlock(algo);
 	}
 
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import logging.LogLevel;
 import logging.Logger;
 
-public class Parameter {
+public class Parameter {//TODO add type
 	private ArrayList<Option> options;
 	private String name;
 	private String value;
@@ -20,6 +20,11 @@ public class Parameter {
 		setValue(value);
 		setOptional(optional);
 		setEnabled(enabled);
+	}
+	
+	public Parameter(String name, String value, boolean optional)
+	{
+		this(name, value, optional, !optional);
 	}
 	
 	public void addOption(Option opt)

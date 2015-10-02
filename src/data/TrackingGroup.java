@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 
-import algorithms.ProductMode;
+import algorithms.Algorithm;
+import product.ProductMode;
 
 public class TrackingGroup {
 	private String name;
@@ -16,6 +17,7 @@ public class TrackingGroup {
 	private boolean usingDatabase;
 	private boolean secure;
 	private byte[] keyHash;
+	private Algorithm algorithm;
 	
 	public TrackingGroup(String name)
 	{
@@ -174,5 +176,13 @@ public class TrackingGroup {
 	 */
 	public void setKeyHash(byte[] keyHash) {
 		this.keyHash = keyHash;
+	}
+
+	public Algorithm getAlgorithm() {
+		return algorithm;
+	}
+
+	public void setAlgorithm(Algorithm algorithm) {
+		this.algorithm = algorithm;
 	}
 }

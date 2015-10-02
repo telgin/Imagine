@@ -10,9 +10,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import logging.LogLevel;
 import logging.Logger;
-import algorithms.Product;
-import algorithms.ProductFactory;
-import algorithms.ProductFactoryRegistry;
+import product.Product;
+import product.ProductFactory;
+import product.ProductFactoryRegistry;
 import data.IndexWorker;
 import data.ProductWorker;
 import data.TrackingGroup;
@@ -62,8 +62,7 @@ public class BackupJob implements Runnable{
 	private ProductWorker setupNewProductWorker() {
 		Logger.log(LogLevel.k_debug, "Adding new Product Worker");
 		ProductFactory<? extends Product> factory = 
-				ProductFactoryRegistry.getProductFactory(group.getAlgorithmName(),
-						group.getProductSecurityLevel(), group.getKeyHash());
+				ProductFactoryRegistry.getProductFactory(group);
 		
 		return new ProductWorker(queue, group.getName(), factory);
 	}

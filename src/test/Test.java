@@ -22,12 +22,12 @@ import data.FileSystemUtil;
 import data.IndexWorker;
 import data.ProductWorker;
 import data.TrackingGroup;
-import algorithms.ProductContents;
-import algorithms.ProductLoader;
-import algorithms.ProductReader;
+import product.ProductContents;
+import product.ProductLoader;
+import product.ProductReader;
 import algorithms.fullpng.FullPNG;
 import algorithms.fullpng.FullPNGFactory;
-import algorithms.fullpng.HeartRandom;
+import algorithms.fullpng.HashRandom;
 import algorithms.fullpng.UniqueRandomRange;
 
 public class Test {
@@ -167,7 +167,7 @@ public class Test {
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		//System.out.println("number of bytes: " + range);
 		
-		HeartRandom ht = new HeartRandom("hey");
+		HashRandom ht = new HashRandom("hey");
 
 		UniqueRandomRange urr = new UniqueRandomRange(ht, range);
 		

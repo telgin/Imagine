@@ -7,10 +7,9 @@ import java.util.concurrent.BlockingQueue;
 
 import logging.LogLevel;
 import logging.Logger;
-
-import algorithms.Product;
-import algorithms.ProductFactory;
-import algorithms.ProductLoader;
+import product.Product;
+import product.ProductFactory;
+import product.ProductLoader;
 
 /**
  * Dequeues from the given queue and loads files to the ProductLoader

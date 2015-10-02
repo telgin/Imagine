@@ -6,17 +6,14 @@ import config.Configuration;
 
 import logging.LogLevel;
 import logging.Logger;
-
+import product.Product;
+import product.ProductContents;
+import product.ProductFactory;
+import product.ProductFactoryRegistry;
+import product.ProductReader;
 import util.Hashing;
 
 import data.TrackingGroup;
-
-import algorithms.Product;
-import algorithms.ProductContents;
-import algorithms.ProductFactory;
-import algorithms.ProductFactoryRegistry;
-import algorithms.ProductReader;
-
 import gui.GUI;
 
 
@@ -64,9 +61,7 @@ public class ControlPanelRunner extends Runner{
 		{
 			updateKeyHash(trackingGroup);
 		}
-		ProductFactory<? extends Product> factory = ProductFactoryRegistry.getProductFactory(
-						trackingGroup.getName(), trackingGroup.getProductSecurityLevel(), 
-						trackingGroup.getKeyHash());
+		ProductFactory<? extends Product> factory = ProductFactoryRegistry.getProductFactory(trackingGroup);
 		ProductReader reader = new ProductReader(factory);
 		
 		ProductContents productContents = reader.extractAll(productFile);

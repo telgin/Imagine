@@ -1,4 +1,4 @@
-package algorithms;
+package product;
 
 import hibernate.Metadata;
 

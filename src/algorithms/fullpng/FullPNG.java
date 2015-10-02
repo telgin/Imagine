@@ -10,36 +10,36 @@ import javax.imageio.ImageIO;
 
 import logging.LogLevel;
 import logging.Logger;
-
+import product.Product;
+import product.ProductMode;
 import util.ByteConversion;
 import util.Constants;
 import config.Configuration;
 import algorithms.Algorithm;
 import algorithms.Parameter;
-import algorithms.Product;
-import algorithms.ProductMode;
 
 public class FullPNG implements Product{
 	
-	private static final String ALGORITHM_NAME = "FullPNG";
+	private Algorithm algorithm;
 	private static final int ALGORITHM_VERSION_NUMBER = 1;
-	private static final ProductMode[] SUPPORTED_PRODUCT_MODES = 
+	private static final ProductMode[] SUPPORTED_PRODUCT_MODES = //TODO: remove, integrate into algo param opts
 			new ProductMode[]{ProductMode.SECURE};
 	private BufferedImage img;
 	private UniqueRandomRange randOrder;
 	private int maxWriteSize;
-	private HeartRandom random;
+	private HashRandom random;
 	private byte[] keyHash;
 	private boolean skippedAll = false;
 	private byte[] uuid;
-	private static ProductMode productMode = ProductMode.SECURE;
 	
 	public FullPNG(Algorithm algo, byte[] keyHash)
 	{
-		if (Arrays.asList(SUPPORTED_PRODUCT_MODES).contains(mode))
-			productMode = mode;
-		else
-			System.err.println("FullPNG: Product mode not supported, running with default.");
+		this.algorithm = algo;
+		
+		//if (Arrays.asList(SUPPORTED_PRODUCT_MODES).contains(mode))
+		//	productMode = mode;
+		//else
+		//	System.err.println("FullPNG: Product mode not supported, running with default.");
 		
 		
 		this.keyHash = keyHash;
@@ -58,16 +58,15 @@ public class FullPNG implements Product{
 	
 	private void reset()
 	{
-		random = new HeartRandom(1337l);//any constant seed
+		random = new HashRandom(1337l);//any constant seed
 		randOrder = new UniqueRandomRange(random, maxWriteSize);
 	}
 
 	@Override
 	public void write(byte b) {
-		//15.7.4 Argument Lists are Evaluated Left-to-Right
-		//"It is recommended that code not rely crucially on this specification."
-		//... :(
-		setImageByte(randOrder.next(), ByteConversion.intToByte(b ^ random.nextByte()));
+		int index = randOrder.next();
+		byte toSet = ByteConversion.intToByte(b ^ random.nextByte());
+		setImageByte(index, toSet);
 	}
 
 	@Override
@@ -182,7 +181,7 @@ public class FullPNG implements Product{
 
 	@Override
 	public byte[] readUUID() {		
-		random = new HeartRandom(1337l);//any constant seed
+		random = new HashRandom(1337l);//any constant seed
 		randOrder = new UniqueRandomRange(random, maxWriteSize);
 		byte[] uuid = new byte[Constants.PRODUCT_UUID_SIZE];
 		read(uuid);
@@ -206,7 +205,7 @@ public class FullPNG implements Product{
 
 	@Override
 	public String getAlgorithmName() {
-		return ALGORITHM_NAME;
+		return algorithm.getName();
 	}
 
 	@Override
@@ -226,18 +225,6 @@ public class FullPNG implements Product{
 
 	@Override
 	public ProductMode getProductMode() {
-		return productMode;
-	}
-
-	@Override
-	public List<Parameter> getParameters() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setParameter(String name, String value) {
-		// TODO Auto-generated method stub
-		
+		return ProductMode.getMode(algorithm.getParameterValue("productMode"));
 	}
 }

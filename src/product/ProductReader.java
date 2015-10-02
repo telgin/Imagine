@@ -1,4 +1,4 @@
-package algorithms;
+package product;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

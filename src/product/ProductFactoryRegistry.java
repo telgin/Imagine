@@ -1,10 +1,10 @@
-package algorithms;
+package product;
 
 import java.util.HashMap;
 
 import logging.LogLevel;
 import logging.Logger;
-
+import algorithms.Algorithm;
 import algorithms.fullpng.FullPNGFactory;
 import algorithms.textblock.TextBlockFactory;
 import data.TrackingGroup;
@@ -18,15 +18,15 @@ public class ProductFactoryRegistry {
 		
 		factories.put("FullPNG", new ProductFactoryCreation() {
 		    @Override
-		    public FullPNGFactory create(ProductMode mode, byte[] keyHash) {
-		        return new FullPNGFactory(mode, keyHash);
+		    public FullPNGFactory create(Algorithm algo, byte[] keyHash) {
+		        return new FullPNGFactory(algo, keyHash);
 		    }
 		});
 		
 		factories.put("TextBlock", new ProductFactoryCreation() {
 		    @Override
-		    public TextBlockFactory create(ProductMode mode, byte[] keyHash) {
-		        return new TextBlockFactory(mode);
+		    public TextBlockFactory create(Algorithm algo, byte[] keyHash) {
+		        return new TextBlockFactory(algo);
 		    }
 		});
 
@@ -34,10 +34,10 @@ public class ProductFactoryRegistry {
 	
 	public static ProductFactory<? extends Product> getProductFactory(TrackingGroup group)
 	{
-		String algoName = group.getAlgorithm().getName();
+		String algorithmName = group.getAlgorithm().getName();
 		if (!factories.containsKey(algorithmName))
 			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + algorithmName);
 		
-		return factories.get(algorithmName).create(mode, keyHash);
+		return factories.get(algorithmName).create(group.getAlgorithm(), group.getKeyHash());
 	}
 }

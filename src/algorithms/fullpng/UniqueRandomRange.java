@@ -5,9 +5,9 @@ public class UniqueRandomRange
 {
 	private int index;
 	private int[] array;
-	private HeartRandom random;
+	private HashRandom random;
 	
-	public UniqueRandomRange(HeartRandom random, int range)
+	public UniqueRandomRange(HashRandom random, int range)
 	{
 		this.random = random;
 		
@@ -20,7 +20,7 @@ public class UniqueRandomRange
 	
 	public void reseed(byte[] seed)
 	{
-		random = new HeartRandom(seed);
+		random = new HashRandom(seed);
 	}
 	
 	public int remainingNumbers()

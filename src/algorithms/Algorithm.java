@@ -8,26 +8,14 @@ import logging.LogLevel;
 import logging.Logger;
 
 public class Algorithm {
-	
-	//static storage variables
-	private static HashMap<String, Algorithm> defaults;
-	
-	//instance variables
 	private String name;
-	private ProductMode securityLevel;
-	private boolean usesDatabase;
-	private HashMap<String, Parameter> parameters; 
+	private HashMap<String, Parameter> parameters;
 	
-	//define algorithm defaults
-	static
+	public Algorithm(String name)
 	{
-		defaults = new HashMap<String, Algorithm>();
-		
-		//TODO: get default algorithm / get algorithm definition
-		//pull defaults and definitions from package specific Definition class
+		this.name = name;
 	}
-	
-	
+
 	public List<Parameter> getParameters()
 	{
 		return new ArrayList<Parameter>(parameters.values());
@@ -50,17 +38,24 @@ public class Algorithm {
 		else
 			param.setEnabled(enabled);
 	}
-	
-	
-	private Algorithm(){}
-	
-	private void addParameter(Parameter param)
+
+	public void addParameter(Parameter param)
 	{
 		parameters.put(param.getName(), param);
 	}
-	
-	public Algorithm getDefaultAlgorithm(String name)
-	{
-		return defaults.get(name);
+
+	public String getName() {
+		return name;
+	}
+
+	public String getParameterValue(String string) {
+		Parameter param = parameters.get(name);
+		if (param == null)
+		{
+			Logger.log(LogLevel.k_error, "No such parameter '" + name + "' in algorithm '" + this.name + "'");
+			return null;
+		}
+
+		return param.getValue();
 	}
 }
