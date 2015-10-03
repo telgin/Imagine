@@ -21,9 +21,6 @@ import algorithms.Parameter;
 public class FullPNG implements Product{
 	
 	private Algorithm algorithm;
-	private static final int ALGORITHM_VERSION_NUMBER = 1;
-	private static final ProductMode[] SUPPORTED_PRODUCT_MODES = //TODO: remove, integrate into algo param opts
-			new ProductMode[]{ProductMode.SECURE};
 	private BufferedImage img;
 	private UniqueRandomRange randOrder;
 	private int maxWriteSize;
@@ -35,13 +32,6 @@ public class FullPNG implements Product{
 	public FullPNG(Algorithm algo, byte[] keyHash)
 	{
 		this.algorithm = algo;
-		
-		//if (Arrays.asList(SUPPORTED_PRODUCT_MODES).contains(mode))
-		//	productMode = mode;
-		//else
-		//	System.err.println("FullPNG: Product mode not supported, running with default.");
-		
-		
 		this.keyHash = keyHash;
 		maxWriteSize = Configuration.getFullPNGMaxWidth() * Configuration.getFullPNGMaxHeight() * 3;
 	}
@@ -210,7 +200,7 @@ public class FullPNG implements Product{
 
 	@Override
 	public int getAlgorithmVersionNumber() {
-		return ALGORITHM_VERSION_NUMBER;
+		return algorithm.getVersion();
 	}
 
 	@Override

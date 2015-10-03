@@ -7,11 +7,12 @@ import algorithms.Parameter;
 
 public class Definition implements algorithms.Definition{
 	private static final String NAME = "TextBlock";
+	private static final int VERSION_NUMBER = 1;
 	private static Definition self;
 	
 	private Definition(){}
-	
-	static
+
+	public static void init()
 	{
 		self = new Definition();
 		AlgorithmRegistry.registerDefinition(NAME, self);
@@ -33,24 +34,26 @@ public class Definition implements algorithms.Definition{
 	
 	private Algorithm construct(boolean includeOptions)
 	{
-		Algorithm algo = new Algorithm(NAME);
+		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER);
 		
 		{
 			//product mode
-			Parameter param = new Parameter("ProductMode", "Normal", false);
+			Parameter param = new Parameter("ProductMode", "string", "Normal", false);
 			if (includeOptions)
 			{
-				param.addOption(new Option("Text", "Normal"));
+				param.addOption(new Option("Normal"));
 			}
+			algo.addParameter(param);
 		}
-		
+
 		{
-			//usesDatabase //TODO this was a tracking group field, not an algo field
-			Parameter param = new Parameter("usesDatabase", "true", false);
+			//blockSize
+			Parameter param = new Parameter("blockSize", "int", "102400", false);
 			if (includeOptions)
 			{
-				param.addOption(new Option("boolean", "t/f"));
+				param.addOption(new Option("500", Integer.toString(Integer.MAX_VALUE)));
 			}
+			algo.addParameter(param);
 		}
 		
 		return algo;

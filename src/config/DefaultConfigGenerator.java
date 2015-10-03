@@ -3,13 +3,16 @@ package config;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
+import algorithms.AlgorithmRegistry;
+import runner.Initialization;
 import util.ConfigUtil;
 import util.Constants;
 
 class DefaultConfigGenerator {
 	private static Document doc;
 	public static void main(String[] args) {
+		Initialization.init();
+		
 		//create new doc
 		doc = ConfigUtil.getNewDocument();
 		Element root = mkElement("Configuration");
@@ -23,6 +26,8 @@ class DefaultConfigGenerator {
 		
 		//save doc
 		ConfigUtil.saveConfig(doc, Constants.configFile);
+		
+		//TODO: use json or sax to preserve attribute order for readability
 	}
 	
 	private static Element mkElement(String tagName)
@@ -54,8 +59,8 @@ class DefaultConfigGenerator {
 	private static Element mkSupportedAlgorithmsNode()
 	{
 		Element algorithms = mkElement("SupportedAlgorithms");
-		algorithms.appendChild(mkFullPNGAlgorithm());
-		algorithms.appendChild(mkTextBlockAlgorithm());
+		for (String algoName : AlgorithmRegistry.getAlgorithmNames())
+			algorithms.appendChild(AlgorithmRegistry.getAlgorithmSpec(algoName).toElement(doc));
 		return algorithms;
 	}
 	
@@ -118,7 +123,7 @@ class DefaultConfigGenerator {
 		key.appendChild(mkParameterNode("Key File", "keys\\key1.txt", true));
 		testGroup.appendChild(key);
 		
-		testGroup.appendChild(mkTextBlockAlgorithm());
+		testGroup.appendChild(AlgorithmRegistry.getDefaultAlgorithm("TextBlock").toElement(doc));
 		
 		trackingGroups.appendChild(testGroup);
 		return trackingGroups;

@@ -1,29 +1,26 @@
 package algorithms;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class AlgorithmRegistry {
-	//static storage variables
-	private static HashMap<String, Algorithm> defaults;
-	private static HashMap<String, Definition> definitions;
+	private static HashMap<String, Definition> definitions = 
+			new HashMap<String, Definition>();
 	
+	/**
+	 * No need for instance
+	 */
 	private AlgorithmRegistry(){}
-	
-	public static AlgorithmRegistry getInstance()
-	{
-		return new AlgorithmRegistry();
-	}
-	
-	
-	//define algorithm defaults
-	static
-	{	
-		definitions = new HashMap<String, Definition>();
-	}	
 
 	public static void registerDefinition(String name, Definition def)
 	{
 		definitions.put(name, def);
+	}
+	
+	public static List<String> getAlgorithmNames()
+	{
+		return new ArrayList<String>(definitions.keySet());
 	}
 	
 	public static Algorithm getDefaultAlgorithm(String name)
@@ -35,6 +32,4 @@ public class AlgorithmRegistry {
 	{
 		return definitions.get(name).getAlgorithmSpec();
 	}
-	
-
 }

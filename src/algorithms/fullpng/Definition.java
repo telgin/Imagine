@@ -7,11 +7,12 @@ import algorithms.Parameter;
 
 public class Definition implements algorithms.Definition{
 	private static final String NAME = "FullPNG";
+	private static final int VERSION_NUMBER = 1;
 	private static Definition self;
 	
 	private Definition(){}
 	
-	static
+	public static void init()
 	{
 		self = new Definition();
 		AlgorithmRegistry.registerDefinition(NAME, self);
@@ -34,24 +35,47 @@ public class Definition implements algorithms.Definition{
 	
 	private Algorithm construct(boolean includeOptions)
 	{
-		Algorithm algo = new Algorithm(NAME);
+		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER);
 		
 		{
 			//product mode
-			Parameter param = new Parameter("ProductMode", "Secure", false);
+			Parameter param = new Parameter("ProductMode", "string", "Secure", false);
 			if (includeOptions)
 			{
-				param.addOption(new Option("Text", "Secure"));
+				param.addOption(new Option("Secure"));
 			}
+			algo.addParameter(param);
 		}
 		
 		{
-			//usesDatabase
-			Parameter param = new Parameter("usesDatabase", "Secure", false);
+			//colors
+			Parameter param = new Parameter("colors", "string", "rgb", false);
 			if (includeOptions)
 			{
-				param.addOption(new Option("boolean", "t/f"));
+				param.addOption(new Option("rgb"));
+				param.addOption(new Option("rgba"));
 			}
+			algo.addParameter(param);
+		}
+
+		{
+			//width
+			Parameter param = new Parameter("width", "int", "1820", false);
+			if (includeOptions)
+			{
+				param.addOption(new Option("0", "10000"));
+			}
+			algo.addParameter(param);
+		}
+
+		{
+			//height
+			Parameter param = new Parameter("height", "int", "980", false);
+			if (includeOptions)
+			{
+				param.addOption(new Option("0", "10000"));
+			}
+			algo.addParameter(param);
 		}
 		
 		return algo;

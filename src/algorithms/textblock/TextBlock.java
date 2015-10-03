@@ -3,7 +3,6 @@ package algorithms.textblock;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
 
 import algorithms.Algorithm;
 import logging.LogLevel;
@@ -13,33 +12,16 @@ import product.ProductMode;
 import config.Configuration;
 
 public class TextBlock implements Product{
-	private static final int ALGORITHM_VERSION_NUMBER = 1;
-	
-	private int blockSize = 1024 * 100;
 	private Algorithm algorithm;
-	
-	//TODO: create temporary file to write buffer to so this doesn't stay here.
 	private byte[] buffer;
 	private int index;
-	
+	private int blockSize;
 	
 	private static ProductMode productMode = ProductMode.NORMAL;
 
 	public TextBlock(Algorithm algo) {
 		algorithm = algo;
-		
-		//if (Arrays.asList(SUPPORTED_PRODUCT_MODES).contains(mode))
-		//	productMode = mode;
-		//else
-		//	Logger.log(LogLevel.k_error, "TextBlock: Product mode " + mode + " not supported, running with default.");
-		
-		Integer configBlockSize = Configuration.getTextBlockBlockSize();
-		
-		if (configBlockSize != null && configBlockSize > 500)
-			blockSize = configBlockSize;
-		else
-			Logger.log(LogLevel.k_error, "TextBlock: invalid block size, using default: " + blockSize);
-		
+		blockSize = Integer.parseInt(algorithm.getParameterValue("blockSize"));
 		Logger.log(LogLevel.k_debug, "TextBlock Created");
 	}
 
@@ -61,7 +43,7 @@ public class TextBlock implements Product{
 
 	@Override
 	public int getAlgorithmVersionNumber() {
-		return ALGORITHM_VERSION_NUMBER;
+		return algorithm.getVersion();
 	}
 
 	@Override

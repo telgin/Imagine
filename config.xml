@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Configuration>
     <SupportedAlgorithms>
-        <Algorithm name="FullPNG">
-            <Parameter name="colors" optional="false" value="rgb"/>
-            <Parameter name="maxWidth" optional="false" value="1820"/>
-            <Parameter name="maxHeight" optional="false" value="980"/>
+        <Algorithm name="FullPNG" version="1">
+            <Parameter name="width" optional="false" type="int" value="1820">
+                <Option valueEndRange="10000" valueStartRange="0"/>
+            </Parameter>
+            <Parameter name="ProductMode" optional="false" type="string" value="Secure">
+                <Option value="Secure"/>
+            </Parameter>
+            <Parameter name="colors" optional="false" type="string" value="rgb">
+                <Option value="rgb"/>
+                <Option value="rgba"/>
+            </Parameter>
+            <Parameter name="height" optional="false" type="int" value="980">
+                <Option valueEndRange="10000" valueStartRange="0"/>
+            </Parameter>
         </Algorithm>
-        <Algorithm name="TextBlock">
-            <Parameter name="blockSize" optional="false" value="102400"/>
+        <Algorithm name="TextBlock" version="1">
+            <Parameter name="ProductMode" optional="false" type="string" value="Normal">
+                <Option value="Normal"/>
+            </Parameter>
+            <Parameter name="blockSize" optional="false" type="int" value="102400">
+                <Option valueEndRange="2147483647" valueStartRange="500"/>
+            </Parameter>
         </Algorithm>
     </SupportedAlgorithms>
     <Database>
@@ -28,8 +43,9 @@
             <Key name="potatoes">
                 <Parameter enabled="false" name="Key File" optional="true" value="keys\key1.txt"/>
             </Key>
-            <Algorithm name="TextBlock">
-                <Parameter name="blockSize" optional="false" value="102400"/>
+            <Algorithm name="TextBlock" version="1">
+                <Parameter name="ProductMode" optional="false" type="string" value="Normal"/>
+                <Parameter name="blockSize" optional="false" type="int" value="102400"/>
             </Algorithm>
         </Group>
     </TrackingGroups>
