@@ -34,14 +34,16 @@
         <Path name="LogFolder" value="logs"/>
     </FileSystem>
     <TrackingGroups>
-        <Group name="Untracked" securityLevel="Normal" usesDatabase="false">
-            <Path name="owned location" value="testGroupInput\folder\untracked.txt"/>
-            <Path name="owned location" value="testGroupInput\folder\untracked"/>
-        </Group>
         <Group name="Test" securityLevel="Normal" usesDatabase="false">
-            <Path name="owned location" value="testGroupInput"/>
+            <Tracked>
+                <Path value="testGroupInput"/>
+            </Tracked>
+            <Untracked>
+                <Path value="testGroupInput/folder/untracked.txt"/>
+                <Path value="testGroupInput/folder/untracked"/>
+            </Untracked>
             <Key name="potatoes">
-                <Parameter enabled="false" name="Key File" optional="true" value="keys\key1.txt"/>
+                <Parameter enabled="true" name="Key File" optional="true" value="keys/key1.txt"/>
             </Key>
             <Algorithm name="TextBlock" version="1">
                 <Parameter name="ProductMode" optional="false" type="string" value="Normal"/>

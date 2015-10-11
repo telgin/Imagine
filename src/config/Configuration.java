@@ -1,5 +1,9 @@
 package config;
 
+import data.FileKey;
+import data.Key;
+import data.NullKey;
+import data.PasswordKey;
 import data.TrackingGroup;
 import util.ConfigUtil;
 import util.Constants;
@@ -8,10 +12,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import logging.Logger;
+import product.ProductMode;
 import logging.LogLevel;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import algorithms.Algorithm;
 
 public class Configuration {
 	private static Document doc;
@@ -103,18 +110,6 @@ public class Configuration {
 
 		return logFolder;
 	}
-	
-	public static int getFullPNGMaxWidth()
-	{
-		String value = getParameter(getAlgorithm("FullPNG"), "maxWidth");
-		return Integer.parseInt(value);
-	}
-	
-	public static int getFullPNGMaxHeight()
-	{
-		String value = getParameter(getAlgorithm("FullPNG"), "maxHeight");
-		return Integer.parseInt(value);
-	}
 
 	public static List<TrackingGroup> getTrackingGroups() {
 		if (trackingGroups == null)
@@ -127,49 +122,77 @@ public class Configuration {
 	{
 		trackingGroups = new ArrayList<TrackingGroup>();
 		Element trackingGroupsNode = ConfigUtil.first(ConfigUtil.children(root, "TrackingGroups"));
-		for (Element group:ConfigUtil.children(trackingGroupsNode, "Group"))
+		for (Element groupNode:ConfigUtil.children(trackingGroupsNode, "Group"))
 		{
-			TrackingGroup tg = new TrackingGroup(group.getAttribute("name"));
+			String groupName = groupNode.getAttribute("name");
+
+			//add algorithm
+			Element algoNode = ConfigUtil.first(ConfigUtil.children(groupNode, "Algorithm"));
+			if (algoNode == null)
+			{
+				Logger.log(LogLevel.k_fatal, "No algorithm node found for group: " + groupName);
+			}
+			
+			Algorithm groupAlgo = new Algorithm(algoNode);
 			
 			//add key
-			if (!group.getAttribute("SecurityLevel").equals("Normal"))
+			Key groupKey;
+			if (groupAlgo.getProductSecurityLevel().equals(ProductMode.NORMAL))
 			{
-				Element key = ConfigUtil.first(ConfigUtil.children(group, "Key"));
-				if (key == null)
+				groupKey = new NullKey();
+			}
+			else
+			{
+				Element keyNode = ConfigUtil.first(ConfigUtil.children(groupNode, "Key"));
+				if (keyNode == null)
 				{
-					Logger.log(LogLevel.k_error, "There was no key for the secured group: " + tg.getName());
+					Logger.log(LogLevel.k_error, "There was no key for the secured group: " + groupName);
+					Logger.log(LogLevel.k_warning, "Using default password key for group: " + groupName);
+					groupKey = new PasswordKey("default", groupName);
 				}
 				else
 				{
-					tg.setKeyName(key.getAttribute("name"));
-					Element keyPath = ConfigUtil.first(ConfigUtil.children(key, "Path"));
+					Element keyPath = ConfigUtil.first(ConfigUtil.children(keyNode, "Path"));
 					if (keyPath != null)
 					{
-						tg.setKeyLocation(new File(keyPath.getAttribute("value")));
+						groupKey = new FileKey(keyNode.getAttribute("name"), groupName,
+								new File(keyPath.getAttribute("value")));
+					}
+					else
+					{
+						groupKey = new PasswordKey(keyNode.getAttribute("name"), groupName);
 					}
 				}
 			}
 			
-			//add algorithm
-			Element algoNode = ConfigUtil.first(ConfigUtil.children(group, "Algorithm"));
-			if (algoNode == null)
-			{
-				Logger.log(LogLevel.k_error, "No algorithm node found for group: " + tg.getName());
-			}
-			else
-			{
-				tg.setAlgorithmName(algoNode.getAttribute("name"));
-			}
-			
 			//using database
-			tg.setUsingDatabase(Boolean.parseBoolean(group.getAttribute("usesDatabase")));
+			boolean usesDatabase = Boolean.parseBoolean(groupNode.getAttribute("usesDatabase"));
 			
-			//add paths
-			for (Element path:ConfigUtil.children(group, "Path"))
+			TrackingGroup group = new TrackingGroup(groupName, usesDatabase, groupAlgo, groupKey);
+			
+			//tracked paths
+			for (Element pathNode : ConfigUtil.children(
+										ConfigUtil.first(
+											ConfigUtil.children(
+													groupNode,
+													"Tracked")),
+										"Path"))
 			{
-				tg.addPath(path.getAttribute("value"));
+				group.addTrackedPath(pathNode.getAttribute("value"));
 			}
-			trackingGroups.add(tg);
+			
+			//untracked paths
+			for (Element pathNode : ConfigUtil.children(
+										ConfigUtil.first(
+											ConfigUtil.children(
+													groupNode,
+													"Untracked")),
+										"Path"))
+			{
+				group.addUntrackedPath(pathNode.getAttribute("value"));
+			}
+			
+			trackingGroups.add(group);
 		}
 	}
 	
@@ -181,19 +204,6 @@ public class Configuration {
 				
 		Logger.log(LogLevel.k_error, "Could not find tracking group: " + groupName);
 		return null;
-	}
-
-	public static String getGroupKeyName(String groupName) {
-		TrackingGroup tg = findTrackingGroup(groupName);
-		if (!tg.isSecure())
-		{
-			Logger.log(LogLevel.k_error, "Trying to get key of group which isn't secured: " + groupName);
-			return null;
-		}
-		else
-		{
-			return tg.getKeyName();
-		}
 	}
 
 	public static boolean groupUsingDatabase(String groupName) {

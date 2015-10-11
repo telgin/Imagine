@@ -72,7 +72,7 @@ public class IndexWorker implements Runnable{
 		System.out.println("Depth: " + depth);
 		if(folder.listFiles() != null && !shuttingDown){
 			for(File child:folder.listFiles()){
-				if(child.canRead() && FileSystemUtil.notExplicitlyTrackedByOther(child, trackingGroup.getName())){
+				if (child.canRead() && !FileSystemUtil.trackedBy(child, trackingGroup.getUntrackedFiles())){
 					if(child.isDirectory()){
 						crawl(child, depth+1);
 					}else{
@@ -83,7 +83,7 @@ public class IndexWorker implements Runnable{
 				
 			}
 		}else if(!folder.isDirectory() && folder.canRead() &&
-				FileSystemUtil.notExplicitlyTrackedByOther(folder, trackingGroup.getName())){
+				!FileSystemUtil.trackedBy(folder, trackingGroup.getUntrackedFiles())){
 			process(folder);
 		}
 	}

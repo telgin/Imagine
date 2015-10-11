@@ -15,6 +15,11 @@ public class Option {
 		this.value = value;
 	}
 	
+	public Option(Element optionNode)
+	{
+		this.value = optionNode.getAttribute("value");
+	}
+	
 	public Option(String startRange, String endRange) {
 		this.startRange = startRange;
 		this.endRange = endRange;

@@ -1,9 +1,10 @@
 package algorithms.fullpng;
 
 import algorithms.Algorithm;
-import algorithms.AlgorithmRegistry;
 import algorithms.Option;
 import algorithms.Parameter;
+import data.Key;
+import product.ProductFactoryCreation;
 
 public class Definition implements algorithms.Definition{
 	private static final String NAME = "FullPNG";
@@ -12,10 +13,12 @@ public class Definition implements algorithms.Definition{
 	
 	private Definition(){}
 	
-	public static void init()
+	public static Definition getInstance()
 	{
-		self = new Definition();
-		AlgorithmRegistry.registerDefinition(NAME, self);
+		if (self == null)
+			self = new Definition();
+		
+		return self;
 	}
 	
 	@Override
@@ -79,6 +82,16 @@ public class Definition implements algorithms.Definition{
 		}
 		
 		return algo;
+	}
+
+	@Override
+	public ProductFactoryCreation getProductFactoryCreation() {
+		return new ProductFactoryCreation() {
+		    @Override
+		    public FullPNGFactory create(Algorithm algo, Key key) {
+		        return new FullPNGFactory(algo, key);
+		    }
+		};
 	}
 
 }

@@ -20,8 +20,6 @@ public interface Product {
 	
 	
 	//secure methods
-	public void setKeyHash(byte[] bytes);
-	
 	public void secureStream();
 	
 	

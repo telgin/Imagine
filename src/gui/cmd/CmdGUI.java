@@ -189,14 +189,13 @@ public class CmdGUI extends GUI {
 	}
 
 	@Override
-	public File promptKeyFileLocation(TrackingGroup trackingGroup) {
-		System.out.println("Could not find key file for tracking group '" + trackingGroup.getName() + "'.");
-		return new File(getInput("Enter key file location for tracking group: "));
+	public File promptKeyFileLocation(String keyName, String groupName) {
+		return new File(getInput("Enter key (" + keyName + 
+				") file location for tracking group " + groupName + ": "));
 	}
 
 	@Override
-	public String promptKey(TrackingGroup trackingGroup) {
-		return getInput("Enter key (" + trackingGroup.getKeyName() + 
-				") for tracking group: " + trackingGroup.getName());
+	public String promptKey(String keyName, String groupName) {
+		return getInput("Enter key (" + keyName + ") for tracking group: " + groupName);
 	}
 }

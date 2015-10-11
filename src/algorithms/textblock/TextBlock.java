@@ -16,8 +16,6 @@ public class TextBlock implements Product{
 	private byte[] buffer;
 	private int index;
 	private int blockSize;
-	
-	private static ProductMode productMode = ProductMode.NORMAL;
 
 	public TextBlock(Algorithm algo) {
 		algorithm = algo;
@@ -53,12 +51,7 @@ public class TextBlock implements Product{
 
 	@Override
 	public ProductMode getProductMode() {
-		return productMode;
-	}
-
-	@Override
-	public void setKeyHash(byte[] bytes) {
-		//not used currently
+		return algorithm.getProductSecurityLevel();
 	}
 
 	@Override

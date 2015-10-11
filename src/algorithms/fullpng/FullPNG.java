@@ -15,6 +15,7 @@ import product.ProductMode;
 import util.ByteConversion;
 import util.Constants;
 import config.Configuration;
+import data.Key;
 import algorithms.Algorithm;
 import algorithms.Parameter;
 
@@ -25,22 +26,25 @@ public class FullPNG implements Product{
 	private UniqueRandomRange randOrder;
 	private int maxWriteSize;
 	private HashRandom random;
-	private byte[] keyHash;
+	private Key key;
 	private boolean skippedAll = false;
 	private byte[] uuid;
+	private int maxWidth;
+	private int maxHeight;
 	
-	public FullPNG(Algorithm algo, byte[] keyHash)
+	public FullPNG(Algorithm algo, Key key)
 	{
 		this.algorithm = algo;
-		this.keyHash = keyHash;
-		maxWriteSize = Configuration.getFullPNGMaxWidth() * Configuration.getFullPNGMaxHeight() * 3;
+		this.key = key;
+		maxWidth = Integer.parseInt(algo.getParameterValue("maxWidth"));
+		maxHeight = Integer.parseInt(algo.getParameterValue("maxHeight"));
+		maxWriteSize = maxWidth * maxHeight * 3;
 	}
 
 	@Override
 	public void newProduct() {
 		//should really use the rgb configuration parameter somehow
-		img = new BufferedImage(Configuration.getFullPNGMaxWidth(), 
-				Configuration.getFullPNGMaxHeight(), 
+		img = new BufferedImage(maxWidth, maxHeight, 
 				BufferedImage.TYPE_INT_RGB);
 		
 		reset();
@@ -84,11 +88,6 @@ public class FullPNG implements Product{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void setKeyHash(byte[] bytes) {
-		keyHash = bytes;
 	}
 	
 	private void setImageByte(int index, byte data)
@@ -175,7 +174,7 @@ public class FullPNG implements Product{
 		randOrder = new UniqueRandomRange(random, maxWriteSize);
 		byte[] uuid = new byte[Constants.PRODUCT_UUID_SIZE];
 		read(uuid);
-		randOrder.reseed(ByteConversion.concat(keyHash, uuid));
+		randOrder.reseed(ByteConversion.concat(key.getKeyHash(), uuid));
 		
 		int productSequenceNumber = ByteConversion.bytesToInt(uuid[8], uuid[9], uuid[10], uuid[11]);
 		
@@ -190,7 +189,7 @@ public class FullPNG implements Product{
 	@Override
 	public void secureStream() {
 		//since this is a secure product, the uuid was already set and written
-		randOrder.reseed(ByteConversion.concat(keyHash, uuid));
+		randOrder.reseed(ByteConversion.concat(key.getKeyHash(), uuid));
 	}
 
 	@Override

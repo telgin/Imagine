@@ -2,7 +2,6 @@ package gui;
 
 import java.io.File;
 
-import data.TrackingGroup;
 import runner.Runner;
 
 public abstract class GUI {
@@ -31,7 +30,7 @@ public abstract class GUI {
 
 	public abstract String promptTrackingGroup();
 
-	public abstract File promptKeyFileLocation(TrackingGroup trackingGroup);
+	public abstract File promptKeyFileLocation(String keyName, String groupName);
 
-	public abstract String promptKey(TrackingGroup trackingGroup);
+	public abstract String promptKey(String keyName, String groupName);
 }

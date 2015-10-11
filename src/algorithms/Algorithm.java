@@ -7,13 +7,20 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import data.Key;
 import logging.LogLevel;
 import logging.Logger;
+import product.Product;
+import product.ProductFactory;
+import product.ProductFactoryCreation;
+import product.ProductMode;
+import util.ConfigUtil;
 
 public class Algorithm {
 	private String name;
 	private int versionNum;
 	private HashMap<String, Parameter> parameters;
+	private ProductFactoryCreation productFactoryCreation;
 	
 	public Algorithm(String name, int versionNum)
 	{
@@ -21,10 +28,32 @@ public class Algorithm {
 		this.versionNum = versionNum;
 		parameters = new HashMap<String, Parameter>();
 	}
+	
+	public Algorithm(Element algoNode)
+	{
+		this.name = algoNode.getAttribute("name");
+		this.versionNum = Integer.parseInt(algoNode.getAttribute("version"));
+		
+		parameters = new HashMap<String, Parameter>();
+		for (Element paramNode : ConfigUtil.children(algoNode, "Parameter"))
+		{
+			addParameter(new Parameter(paramNode));
+		}
+	}
+	
+	public void setProductFactoryCreation(ProductFactoryCreation creation)
+	{
+		productFactoryCreation = creation;
+	}
 
 	public List<Parameter> getParameters()
 	{
 		return new ArrayList<Parameter>(parameters.values());
+	}
+	
+	public ProductMode getProductSecurityLevel()
+	{
+		return ProductMode.getMode(getParameterValue("ProductMode"));
 	}
 	
 	public void setParameter(String name, String value)
@@ -138,5 +167,9 @@ public class Algorithm {
 			}
 		}
 		
+	}
+
+	public ProductFactory<? extends Product> getProductFactory(Key key) {
+		return productFactoryCreation.create(this, key);
 	}
 }

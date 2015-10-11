@@ -12,7 +12,6 @@ import logging.LogLevel;
 import logging.Logger;
 import product.Product;
 import product.ProductFactory;
-import product.ProductFactoryRegistry;
 import data.IndexWorker;
 import data.ProductWorker;
 import data.TrackingGroup;
@@ -33,7 +32,7 @@ public class BackupJob implements Runnable{
 	public BackupJob(TrackingGroup group, int indexWorkerCount, int productWorkerCount)
 	{
 		this.group = group;
-		remainingFiles = new LinkedList<File>(group.getFileSet());
+		remainingFiles = new LinkedList<File>(group.getTrackedFiles());
 		this.indexWorkerCount = indexWorkerCount;
 		this.productWorkerCount = productWorkerCount;
 		
@@ -61,8 +60,7 @@ public class BackupJob implements Runnable{
 
 	private ProductWorker setupNewProductWorker() {
 		Logger.log(LogLevel.k_debug, "Adding new Product Worker");
-		ProductFactory<? extends Product> factory = 
-				ProductFactoryRegistry.getProductFactory(group);
+		ProductFactory<? extends Product> factory = group.getProductFactory();
 		
 		return new ProductWorker(queue, group.getName(), factory);
 	}

@@ -8,6 +8,7 @@ import java.io.IOException;
 import logging.LogLevel;
 import logging.Logger;
 import config.Configuration;
+import data.TrackingGroup;
 import database.DatabaseManager;
 import util.ByteConversion;
 import util.Constants;
@@ -107,9 +108,10 @@ public class ProductLoader
 		currentProduct.write(groupName.getBytes());		
 		
 		//write group key name / length
-		if (Configuration.findTrackingGroup(groupName).isSecure())
+		TrackingGroup group = Configuration.findTrackingGroup(groupName);
+		if (group.getKey().isSecure())
 		{
-			byte[] groupKeyName = Configuration.getGroupKeyName(groupName).getBytes();
+			byte[] groupKeyName = group.getKey().getName().getBytes();
 			currentProduct.write(ByteConversion.shortToBytes((short)groupKeyName.length));
 			currentProduct.write(groupKeyName);
 		}

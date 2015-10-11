@@ -7,17 +7,14 @@ import logging.LogLevel;
 import logging.Logger;
 import config.Configuration;
 import data.TrackingGroup;
-import gui.GUI;
 
 public class BackupRunner extends Runner {
-	private GUI gui;
 	private ControlPanelRunner controlPanelRunner;
 	private HashMap<TrackingGroup, BackupJob> backupJobs;
 	private List<Thread> jobThreads;
 	
-	public BackupRunner(GUI gui)
+	public BackupRunner()
 	{
-		this.gui = gui;
 	}
 
 	public void setControlPanelRunner(ControlPanelRunner controlPanel)
@@ -35,12 +32,6 @@ public class BackupRunner extends Runner {
 		List<TrackingGroup> groups = Configuration.getTrackingGroups();
 		
 		Logger.log(LogLevel.k_debug, "Found " + groups.size() + " groups.");
-		
-		
-		//prompt user for key information if not known
-		for (TrackingGroup group: groups)
-			if (!group.getName().equals("Untracked"))
-				updateKeyHash(group);
 		
 		//run the backups
 		for (TrackingGroup group: groups)
@@ -104,9 +95,9 @@ public class BackupRunner extends Runner {
 		Logger.shutdown();
 		
 		if (controlPanelRunner == null)
-			controlPanelRunner = new ControlPanelRunner(gui);
+			controlPanelRunner = new ControlPanelRunner();
 		
-		gui.setRunner(controlPanelRunner);
-		gui.showControlPanel();
+		getActiveGUI().setRunner(controlPanelRunner);
+		getActiveGUI().showControlPanel();
 	}
 }

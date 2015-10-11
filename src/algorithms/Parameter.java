@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 
 import logging.LogLevel;
 import logging.Logger;
+import util.ConfigUtil;
 
 public class Parameter {
 	private ArrayList<Option> options;
@@ -30,6 +31,25 @@ public class Parameter {
 	public Parameter(String name, String type, String value, boolean optional)
 	{
 		this(name, type, value, optional, !optional);
+	}
+	
+	public Parameter(Element paramElement)
+	{
+		options = new ArrayList<Option>();
+		
+		setName(paramElement.getAttribute("name"));
+		setType(paramElement.getAttribute("type"));
+		setValue(paramElement.getAttribute("value"));
+		setOptional(Boolean.parseBoolean(paramElement.getAttribute("optional")));
+		if (paramElement.hasAttribute("enabled"))
+		{
+			setEnabled(Boolean.parseBoolean(paramElement.getAttribute("enabled")));
+		}
+		
+		for (Element optionNode : ConfigUtil.children(paramElement, "Option"))
+		{
+			options.add(new Option(optionNode));
+		}
 	}
 	
 	public void addOption(Option opt)

@@ -30,12 +30,21 @@ public class BackupManager {
 		if (mode.equals("help"))
 			new HelpRunner();
 		else if (mode.equals("cmd"))
-			new ControlPanelRunner(new CmdGUI());
+		{
+			Runner.setActiveGUI(new CmdGUI());
+			new ControlPanelRunner().start();
+		}
 		else if (mode.equals("gui"))
-			new ControlPanelRunner(new ControlPanelGUI());
+		{
+			Runner.setActiveGUI(new ControlPanelGUI());
+			new ControlPanelRunner().start();
+		}
 		else if (mode.equals("silent_backup"))
-			new BackupRunner(new BackgroundGUI());
-			else
+		{
+			Runner.setActiveGUI(new BackgroundGUI());
+			new BackupRunner().runBackup();
+		}
+		else
 			usage("Unknown mode: " + mode);
 	}
 

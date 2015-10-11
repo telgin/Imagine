@@ -5,27 +5,27 @@ import java.io.IOException;
 import java.util.HashSet;
 
 import algorithms.Algorithm;
+import algorithms.AlgorithmRegistry;
+import product.Product;
+import product.ProductFactory;
 import product.ProductMode;
 
 public class TrackingGroup {
 	private String name;
-	private HashSet<File> fileSet;
-	private ProductMode productSecurityLevel;
-	private String keyName;
-	private File keyLocation;
-	private String algorithmName;
+	private HashSet<File> trackedFiles;
+	private HashSet<File> untrackedFiles;
 	private boolean usingDatabase;
-	private boolean secure;
-	private byte[] keyHash;
 	private Algorithm algorithm;
+	private Key key;
 	
-	public TrackingGroup(String name)
+	public TrackingGroup(String name, boolean usesDatabase, Algorithm algo, Key key)
 	{
-		this.setName(name);
-		fileSet = new HashSet<File>();
+		setName(name);
+		trackedFiles = new HashSet<File>();
+		untrackedFiles = new HashSet<File>();
 	}
 	
-	public void addPath(String path)
+	public void addTrackedPath(String path)
 	{
 		File file = new File(path);
 		if (!file.exists())
@@ -35,7 +35,21 @@ public class TrackingGroup {
 		}
 		else
 		{
-			fileSet.add(file);
+			trackedFiles.add(file);
+		}
+	}
+	
+	public void addUntrackedPath(String path)
+	{
+		File file = new File(path);
+		if (!file.exists())
+		{
+			System.err.println("Warning: The path in tracking group '" + name + "' does not exist:");
+			System.err.println(file.getPath());
+		}
+		else
+		{
+			untrackedFiles.add(file);
 		}
 	}
 
@@ -56,84 +70,52 @@ public class TrackingGroup {
 	/**
 	 * @return the fileSet
 	 */
-	public HashSet<File> getFileSet() {
-		return fileSet;
+	public HashSet<File> getTrackedFiles() {
+		return trackedFiles;
+	}
+	
+	/**
+	 * @return the fileSet
+	 */
+	public HashSet<File> getUntrackedFiles() {
+		return untrackedFiles;
 	}
 
-	/**
-	 * @param fileSet the fileSet to set
-	 */
-	public void setFileSet(HashSet<File> fileSet) {
-		this.fileSet = fileSet;
-	}
+
 
 	public String toString()
 	{
 		String text = "Tracking Group: " + name;
-		for(File f:fileSet)
+		
+		text += "Tracked Files: ";
+		for(File f:trackedFiles)
+		{
 			try {
 				text += "\n\t" + f.getCanonicalPath();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+		
+		text += "Untracked Files: ";
+		for(File f:untrackedFiles)
+		{
+			try {
+				text += "\n\t" + f.getCanonicalPath();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+			
 		
 		return text;
 	}
 
 	/**
-	 * @return the productSecurityLevel
-	 */
-	public ProductMode getProductSecurityLevel() {
-		return productSecurityLevel;
-	}
-
-	/**
-	 * @param productSecurityLevel the productSecurityLevel to set
-	 */
-	public void setProductSecurityLevel(ProductMode productSecurityLevel) {
-		this.productSecurityLevel = productSecurityLevel;
-	}
-
-	/**
-	 * @return the keyName
-	 */
-	public String getKeyName() {
-		return keyName;
-	}
-
-	/**
-	 * @param keyName the keyName to set
-	 */
-	public void setKeyName(String keyName) {
-		this.keyName = keyName;
-	}
-
-	/**
-	 * @return the keyLocation
-	 */
-	public File getKeyLocation() {
-		return keyLocation;
-	}
-
-	/**
-	 * @param keyLocation the keyLocation to set
-	 */
-	public void setKeyLocation(File keyLocation) {
-		this.keyLocation = keyLocation;
-	}
-
-	/**
 	 * @return the algorithmName
 	 */
-	public String getAlgorithmName() {
-		return algorithmName;
-	}
-
-	/**
-	 * @param algorithmName the algorithmName to set
-	 */
-	public void setAlgorithmName(String algorithmName) {
-		this.algorithmName = algorithmName;
+	public Key getKey() {
+		return key;
 	}
 
 	/**
@@ -150,39 +132,15 @@ public class TrackingGroup {
 		this.usingDatabase = usingDatabase;
 	}
 
-	/**
-	 * @return the secure
-	 */
-	public boolean isSecure() {
-		return secure;
-	}
-
-	/**
-	 * @param secure the secure to set
-	 */
-	public void setSecure(boolean secure) {
-		this.secure = secure;
-	}
-
-	/**
-	 * @return the keyHash
-	 */
-	public byte[] getKeyHash() {
-		return keyHash;
-	}
-
-	/**
-	 * @param keyHash the keyHash to set
-	 */
-	public void setKeyHash(byte[] keyHash) {
-		this.keyHash = keyHash;
-	}
-
 	public Algorithm getAlgorithm() {
 		return algorithm;
 	}
 
 	public void setAlgorithm(Algorithm algorithm) {
 		this.algorithm = algorithm;
+	}
+
+	public ProductFactory<? extends Product> getProductFactory() {
+		return AlgorithmRegistry.getProductFactory(algorithm, key);
 	}
 }

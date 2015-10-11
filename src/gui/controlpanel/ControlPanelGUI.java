@@ -38,13 +38,13 @@ public class ControlPanelGUI extends GUI {
 	}
 
 	@Override
-	public File promptKeyFileLocation(TrackingGroup trackingGroup) {
+	public File promptKeyFileLocation(String keyName, String groupName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String promptKey(TrackingGroup trackingGroup) {
+	public String promptKey(String keyName, String groupName) {
 		// TODO Auto-generated method stub
 		return null;
 	}

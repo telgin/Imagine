@@ -1,22 +1,22 @@
 package algorithms.fullpng;
 
 import algorithms.Algorithm;
+import data.Key;
 import product.ProductFactory;
-import product.ProductMode;
 
 public class FullPNGFactory implements ProductFactory<FullPNG> {
 	
-	private byte[] keyHash;
+	private Key key;
 	private Algorithm algo;
 	
-	public FullPNGFactory(Algorithm algo, byte[] keyHash)
+	public FullPNGFactory(Algorithm algo, Key key)
 	{
-		this.keyHash = keyHash;
+		this.key = key;
 		this.algo = algo;
 	}
 	
 	@Override
 	public FullPNG create(){
-		return new FullPNG(algo, keyHash);
+		return new FullPNG(algo, key);
 	}
 }

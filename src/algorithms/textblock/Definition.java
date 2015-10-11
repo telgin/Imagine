@@ -1,9 +1,10 @@
 package algorithms.textblock;
 
 import algorithms.Algorithm;
-import algorithms.AlgorithmRegistry;
 import algorithms.Option;
 import algorithms.Parameter;
+import data.Key;
+import product.ProductFactoryCreation;
 
 public class Definition implements algorithms.Definition{
 	private static final String NAME = "TextBlock";
@@ -12,16 +13,19 @@ public class Definition implements algorithms.Definition{
 	
 	private Definition(){}
 
-	public static void init()
+	public static Definition getInstance()
 	{
-		self = new Definition();
-		AlgorithmRegistry.registerDefinition(NAME, self);
+		if (self == null)
+			self = new Definition();
+		
+		return self;
 	}
 	
 	@Override
 	public String getName() {
 		return NAME;
 	}
+	
 	@Override
 	public Algorithm getDefaultAlgorithm() {
 		return construct(false);
@@ -57,6 +61,16 @@ public class Definition implements algorithms.Definition{
 		}
 		
 		return algo;
+	}
+
+	@Override
+	public ProductFactoryCreation getProductFactoryCreation() {
+		return new ProductFactoryCreation() {
+		    @Override
+		    public TextBlockFactory create(Algorithm algo, Key key) {
+		        return new TextBlockFactory(algo);
+		    }
+		};
 	}
 
 }
