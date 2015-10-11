@@ -11,7 +11,7 @@ import logging.LogLevel;
 import logging.Logger;
 
 import database.Database;
-
+import util.FileSystemUtil;
 import util.Hashing;
 
 public class IndexWorker implements Runnable{
@@ -69,7 +69,7 @@ public class IndexWorker implements Runnable{
 	 * @param depth
 	 */
 	private void crawl(File folder, int depth){
-		System.out.println("Depth: " + depth);
+		Logger.log(LogLevel.k_debug, "Depth: " + depth);
 		if(folder.listFiles() != null && !shuttingDown){
 			for(File child:folder.listFiles()){
 				if (child.canRead() && !FileSystemUtil.trackedBy(child, trackingGroup.getUntrackedFiles())){

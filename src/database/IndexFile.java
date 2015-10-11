@@ -64,7 +64,7 @@ public class IndexFile {
 		while (indexFolder == null)
 		{
 			//specify the folder we'd like
-			String path = curFolder.getAbsolutePath() + "\\" + INDEX_FOLDER_NAME;
+			String path = curFolder.getAbsolutePath() + "/" + INDEX_FOLDER_NAME;
 			indexFolder = new File(path);
 			
 			//try to create it
@@ -87,7 +87,7 @@ public class IndexFile {
 			}
 		}
 		
-		String path = indexFolder.getAbsolutePath() + "\\" +
+		String path = indexFolder.getAbsolutePath() + "/" +
 				ByteConversion.bytesToHexString(folder.getAbsolutePath().getBytes());
 		
 		//this file may or may not already exist

@@ -17,8 +17,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javax.imageio.ImageIO;
 
 import util.ByteConversion;
+import util.FileSystemUtil;
 import config.Configuration;
-import data.FileSystemUtil;
 import data.IndexWorker;
 import data.ProductWorker;
 import data.TrackingGroup;

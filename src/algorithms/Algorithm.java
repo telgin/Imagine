@@ -58,7 +58,7 @@ public class Algorithm {
 	
 	public void setParameter(String name, String value)
 	{
-		Parameter param = parameters.get(name);
+		Parameter param = parameters.get(name.toLowerCase());
 		if (param == null)
 			Logger.log(LogLevel.k_error, "No such parameter '" + name + "' in algorithm '" + this.name + "'");
 		else
@@ -67,7 +67,7 @@ public class Algorithm {
 	
 	public void setParameterEnabled(String name, boolean enabled)
 	{
-		Parameter param = parameters.get(name);
+		Parameter param = parameters.get(name.toLowerCase());
 		if (param == null)
 			Logger.log(LogLevel.k_error, "No such parameter '" + name + "' in algorithm '" + this.name + "'");
 		else
@@ -76,11 +76,11 @@ public class Algorithm {
 
 	public void addParameter(Parameter param)
 	{
-		parameters.put(param.getName(), param);
+		parameters.put(param.getName().toLowerCase(), param);
 	}
 
 	public Parameter getParameter(String name) {
-		return parameters.get(name);
+		return parameters.get(name.toLowerCase());
 	}
 
 	public String getName() {
@@ -92,8 +92,8 @@ public class Algorithm {
 		return versionNum;
 	}
 
-	public String getParameterValue(String string) {
-		Parameter param = parameters.get(name);
+	public String getParameterValue(String name) {
+		Parameter param = parameters.get(name.toLowerCase());
 		if (param == null)
 		{
 			Logger.log(LogLevel.k_error, "No such parameter '" + name + "' in algorithm '" + this.name + "'");

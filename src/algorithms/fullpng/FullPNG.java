@@ -12,6 +12,7 @@ import logging.LogLevel;
 import logging.Logger;
 import product.Product;
 import product.ProductMode;
+import stats.ProgressMonitor;
 import util.ByteConversion;
 import util.Constants;
 import config.Configuration;
@@ -29,22 +30,22 @@ public class FullPNG implements Product{
 	private Key key;
 	private boolean skippedAll = false;
 	private byte[] uuid;
-	private int maxWidth;
-	private int maxHeight;
+	private int width;
+	private int height;
 	
 	public FullPNG(Algorithm algo, Key key)
 	{
 		this.algorithm = algo;
 		this.key = key;
-		maxWidth = Integer.parseInt(algo.getParameterValue("maxWidth"));
-		maxHeight = Integer.parseInt(algo.getParameterValue("maxHeight"));
-		maxWriteSize = maxWidth * maxHeight * 3;
+		width = Integer.parseInt(algo.getParameterValue("width"));
+		height = Integer.parseInt(algo.getParameterValue("height"));
+		maxWriteSize = width * height * 3;
 	}
 
 	@Override
 	public void newProduct() {
 		//should really use the rgb configuration parameter somehow
-		img = new BufferedImage(maxWidth, maxHeight, 
+		img = new BufferedImage(width, height, 
 				BufferedImage.TYPE_INT_RGB);
 		
 		reset();
@@ -65,7 +66,7 @@ public class FullPNG implements Product{
 
 	@Override
 	public void write(byte[] bytes) {
-		System.out.println("Writing " + bytes.length + " bytes.");
+		//Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
 		for (int x=0; x<bytes.length; ++x)
 		{
 			write(bytes[x]);
@@ -80,11 +81,14 @@ public class FullPNG implements Product{
 	@Override
 	public void saveFile(String fileName) {
 		try {
-			File imgFile = new File(Configuration.getProductStagingFolder().getAbsolutePath() + "\\" + fileName + ".png");
+			File imgFile = new File(Configuration.getProductStagingFolder().getAbsolutePath() + "/" + fileName + ".png");
 			Logger.log(LogLevel.k_info, "Saving product file: " + imgFile.getAbsolutePath());
 			if (!imgFile.getParentFile().exists())
 				imgFile.getParentFile().mkdirs();
 			ImageIO.write(img, "PNG", imgFile);
+			
+			//update progress
+			ProgressMonitor.getStat("productsCreated").incrementNumericProgress(1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -138,7 +142,7 @@ public class FullPNG implements Product{
 
 	@Override
 	public void read(byte[] bytes) {
-		System.out.println("Reading " + bytes.length + " bytes.");
+		Logger.log(LogLevel.k_debug, "Reading " + bytes.length + " bytes.");
 		for (int x=0; x<bytes.length; ++x)
 		{
 			bytes[x] = read();
@@ -153,7 +157,7 @@ public class FullPNG implements Product{
 
 	@Override
 	public void skip(long bytes) {
-		System.out.println("Skipping " + bytes + " bytes. (" + getRemainingBytes() + " are remaining before this.)");
+		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes. (" + getRemainingBytes() + " are remaining before this.)");
 		
 		if (bytes == getRemainingBytes())
 			skippedAll = true;
@@ -178,7 +182,7 @@ public class FullPNG implements Product{
 		
 		int productSequenceNumber = ByteConversion.bytesToInt(uuid[8], uuid[9], uuid[10], uuid[11]);
 		
-		System.out.println("Product sequence number: " + productSequenceNumber);
+		Logger.log(LogLevel.k_debug, "Product sequence number: " + productSequenceNumber);
 		
 		return uuid;
 	}

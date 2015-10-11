@@ -1,5 +1,8 @@
 package product;
 
+import logging.LogLevel;
+import logging.Logger;
+
 public class Clock {
 
 	/**
@@ -10,7 +13,7 @@ public class Clock {
 	{
 		long time = System.currentTimeMillis();
 		
-		System.out.println("Unique Clock Time Given: " + time);
+		Logger.log(LogLevel.k_debug, "Unique Clock Time Given: " + time);
 		
 		//wait to make sure these are all unique
 		try {

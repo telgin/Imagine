@@ -52,7 +52,7 @@ public class Definition implements algorithms.Definition{
 		
 		{
 			//colors
-			Parameter param = new Parameter("colors", "string", "rgb", false);
+			Parameter param = new Parameter("Colors", "string", "rgb", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("rgb"));
@@ -63,7 +63,7 @@ public class Definition implements algorithms.Definition{
 
 		{
 			//width
-			Parameter param = new Parameter("width", "int", "1820", false);
+			Parameter param = new Parameter("Width", "int", "1820", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("0", "10000"));
@@ -73,7 +73,7 @@ public class Definition implements algorithms.Definition{
 
 		{
 			//height
-			Parameter param = new Parameter("height", "int", "980", false);
+			Parameter param = new Parameter("Height", "int", "980", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("0", "10000"));

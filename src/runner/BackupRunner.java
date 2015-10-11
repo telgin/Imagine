@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import logging.LogLevel;
 import logging.Logger;
+import stats.ProgressMonitor;
+import stats.StateStat;
 import config.Configuration;
 import data.TrackingGroup;
 
@@ -15,6 +17,11 @@ public class BackupRunner extends Runner {
 	
 	public BackupRunner()
 	{
+		backupJobs = new HashMap<TrackingGroup, BackupJob>();
+		jobThreads = new ArrayList<Thread>();
+		
+		ProgressMonitor.addStat(new StateStat("filesProcessed", 0.0));
+		ProgressMonitor.addStat(new StateStat("productsCreated", 0.0));
 	}
 
 	public void setControlPanelRunner(ControlPanelRunner controlPanel)
@@ -22,41 +29,30 @@ public class BackupRunner extends Runner {
 		controlPanelRunner = controlPanel;
 	}
 	
-	@Override
-	public void runBackup() {
+	public boolean isRunning()
+	{
+		for (Thread thread : jobThreads)
+		{
+			if (thread.isAlive())
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public void runAllBackups() {
 		Logger.log(LogLevel.k_debug, "Running Backup...?");
-		
-		backupJobs = new HashMap<TrackingGroup, BackupJob>();
-		jobThreads = new ArrayList<Thread>();
-		
+
 		List<TrackingGroup> groups = Configuration.getTrackingGroups();
 		
 		Logger.log(LogLevel.k_debug, "Found " + groups.size() + " groups.");
 		
 		//run the backups
 		for (TrackingGroup group: groups)
-			if (!group.getName().equals("Untracked"))
-				runBackup(group);
-		
-		//show progress of the backup jobs
-		//pass in 'ProgressMonitor' to things, or just static, add stat and such?
-			//thread safety
-		
-		//wait so something can happen in testing:
-		System.out.println("sleeping");
-		try {
-			Thread.sleep(15000);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-		
-		//for now, shutdown and block here
-		shutdown();
-		
-		Logger.log(LogLevel.k_debug, "Backup done.");
+			runBackup(group);
 	}
 	
-	private void runBackup(TrackingGroup group)
+	public void runBackup(TrackingGroup group)
 	{
 		Logger.log(LogLevel.k_general, "Running backup for group: " + group.getName());
 		if (backupJobs.containsKey(group))
@@ -90,9 +86,6 @@ public class BackupRunner extends Runner {
 				e.printStackTrace();
 			}
 		}
-		
-		//TODO remove this, put it where it should be
-		Logger.shutdown();
 		
 		if (controlPanelRunner == null)
 			controlPanelRunner = new ControlPanelRunner();

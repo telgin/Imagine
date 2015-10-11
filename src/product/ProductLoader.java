@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import logging.LogLevel;
 import logging.Logger;
+import stats.ProgressMonitor;
 import config.Configuration;
 import data.TrackingGroup;
 import database.DatabaseManager;
@@ -23,7 +24,7 @@ public class ProductLoader
 	
 	private byte[] streamUUID;
 	private int sequenceNumber;
-	private String groupName;
+	private TrackingGroup group;
 	
 	private Product currentProduct;
 	private byte[] currentUUID;
@@ -31,14 +32,14 @@ public class ProductLoader
 	private boolean fileWritten = false;
 	private boolean writingFile = false;
 	
-	public ProductLoader(ProductFactory<? extends Product> factory, String groupName)
+	public ProductLoader(ProductFactory<? extends Product> factory, TrackingGroup group)
 	{
 		//this.factory = factory;
 		
 		streamUUID = ByteConversion.longToBytes(Clock.getUniqueTime());
 		sequenceNumber = 0;
 		
-		this.groupName = groupName;
+		this.group = group;
 		
 		currentProduct = factory.create();
 		resetToNextProduct();
@@ -102,13 +103,13 @@ public class ProductLoader
 		currentProduct.write(currentUUID);
 		
 		//write group name len
+		String groupName = group.getName();
 		currentProduct.write(ByteConversion.shortToBytes((short)groupName.getBytes().length));
 		
 		//write group name
 		currentProduct.write(groupName.getBytes());		
 		
 		//write group key name / length
-		TrackingGroup group = Configuration.findTrackingGroup(groupName);
 		if (group.getKey().isSecure())
 		{
 			byte[] groupKeyName = group.getKey().getName().getBytes();
@@ -124,7 +125,7 @@ public class ProductLoader
 	private String getSaveName()
 	{
 		return 
-			new String(groupName) + 
+			new String(group.getName()) + 
 			"_" + 
 			Long.toString(ByteConversion.bytesToLong(streamUUID)) +
 			"_" +
@@ -150,7 +151,7 @@ public class ProductLoader
 		//save off the first product uuid where we're saving the file
 		//it might actually start in the next one if we're out of space in this one.
 		//easy enough to figure out later.
-		if (Configuration.groupUsingDatabase(groupName) && !fileMetadata.isMetadataUpdate())
+		if (group.isUsingDatabase() && !fileMetadata.isMetadataUpdate())
 		{
 			fileMetadata.setProductUUID(currentProduct.getUUID());
 			DatabaseManager.saveProductUUID(fileMetadata);
@@ -209,6 +210,8 @@ public class ProductLoader
 		writingFile = false;
 		fileWritten = true;
 		
+		//update progress
+		ProgressMonitor.getStat("filesProcessed").incrementNumericProgress(1);
 	}
 	
 	private void writeFileHeader(Metadata fileMetadata, long fragmentNumber, long fileLengthRemaining)

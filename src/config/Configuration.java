@@ -29,14 +29,36 @@ public class Configuration {
 	private static File extractionFolder;
 	private static File logFolder;
 	private static List<TrackingGroup> trackingGroups;
-	
-	
+
 	static
+	{
+		reloadConfig();
+	}
+	
+	public static void reloadConfig()
 	{
 		doc = ConfigUtil.loadConfig(Constants.configFile);
 		doc.getDocumentElement().normalize();
 		
 		root = doc.getDocumentElement();
+	}
+	
+	public static void loadConfig(Document document)
+	{
+		doc = document;
+		root = doc.getDocumentElement();
+	}
+	
+	public static void saveConfig()
+	{
+		ConfigUtil.saveConfig(doc, Constants.configFile);
+	}
+	
+	//TODO add setters
+	
+	public static void addTrackingGroup(TrackingGroup group)
+	{
+		//TODO trackingGroup -> Group Element
 	}
 	
 	public static File getDatabaseFile()
@@ -195,7 +217,7 @@ public class Configuration {
 			trackingGroups.add(group);
 		}
 	}
-	
+	/**
 	public static TrackingGroup findTrackingGroup(String groupName)
 	{
 		for (TrackingGroup tg:trackingGroups)
@@ -205,11 +227,7 @@ public class Configuration {
 		Logger.log(LogLevel.k_error, "Could not find tracking group: " + groupName);
 		return null;
 	}
-
-	public static boolean groupUsingDatabase(String groupName) {
-		return findTrackingGroup(groupName).isUsingDatabase();
-	}
-	
+	*/
 	private static Element getAlgorithm(String name)
 	{
 		Element supportedAlgosNode = ConfigUtil.first(ConfigUtil.children(root, "SupportedAlgorithms"));

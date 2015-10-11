@@ -60,9 +60,8 @@ public class BackupJob implements Runnable{
 
 	private ProductWorker setupNewProductWorker() {
 		Logger.log(LogLevel.k_debug, "Adding new Product Worker");
-		ProductFactory<? extends Product> factory = group.getProductFactory();
 		
-		return new ProductWorker(queue, group.getName(), factory);
+		return new ProductWorker(queue, group);
 	}
 
 	public void stopBackup()
@@ -124,7 +123,20 @@ public class BackupJob implements Runnable{
 					if (!indexWorkers[i].isActive())
 						indexWorkers[i] = setupNewIndexWorker();
 				}
+				
+				if (remainingFiles.size() == 0 && queue.size() == 0)
+				{
+					//TODO shutdown only if all index workers are inactive
+					shuttingDown = true;
+				}
+				
 				sleep(2000);
+			}
+			
+			if (remainingFiles.size() == 0 && queue.size() == 0)
+			{
+				//TODO shutdown only if all index workers are inactive
+				shuttingDown = true;
 			}
 			
 			sleep(1000);

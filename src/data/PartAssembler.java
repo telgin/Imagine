@@ -66,7 +66,7 @@ public class PartAssembler {
 				try
 				{
 					int partNumber = Integer.parseInt(partNumberString);
-					File nextFile = new File(partFile.getParentFile().getAbsolutePath() + "\\" +
+					File nextFile = new File(partFile.getParentFile().getAbsolutePath() + "/" +
 							filenameFirstHalf + ".part" + (partNumber + 1));
 					
 					if (nextFile.exists())

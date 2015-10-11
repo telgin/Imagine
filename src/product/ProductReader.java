@@ -530,7 +530,7 @@ public class ProductReader {
 
 	private File getPartFileName(byte[] fileHash, long fragmentNumber)
 	{
-		String path = Configuration.getExtractionFolder().getAbsolutePath() + "\\" +
+		String path = Configuration.getExtractionFolder().getAbsolutePath() + "/" +
 				ByteConversion.bytesToHexString(fileHash) +  "_" + fragmentNumber + ".part";
 		
 		return new File(path);

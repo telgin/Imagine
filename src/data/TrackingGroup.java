@@ -21,6 +21,9 @@ public class TrackingGroup {
 	public TrackingGroup(String name, boolean usesDatabase, Algorithm algo, Key key)
 	{
 		setName(name);
+		setUsingDatabase(usesDatabase);
+		this.algorithm = algo;
+		this.key = key;
 		trackedFiles = new HashSet<File>();
 		untrackedFiles = new HashSet<File>();
 	}

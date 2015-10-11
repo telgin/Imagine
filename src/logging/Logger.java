@@ -24,7 +24,7 @@ public class Logger {
 		exceptionLevel = defaultExceptionLevel;
 		lines = new ArrayList<String>();
 		
-		String path = Configuration.getLogFolder().getPath() + "\\" + 
+		String path = Configuration.getLogFolder().getPath() + "/" + 
 				System.currentTimeMillis() + ".log";
 		
 		logFile = new File(path);

@@ -63,4 +63,14 @@ public abstract class Stat {
 	public void updateProgress(String update) {
 		curString = update;
 	}
+	
+	public void incrementNumericProgress(double amount)
+	{
+		curDouble += amount;
+	}
+	
+	public void decrementNumericProgress(double amount)
+	{
+		curDouble -= amount;
+	}
 }

@@ -20,8 +20,6 @@ public abstract class Runner {
 	{
 		return currentGUI;
 	}
-	
-	public abstract void runBackup();
 
 	public abstract void shutdown();
 	

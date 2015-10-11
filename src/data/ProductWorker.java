@@ -7,8 +7,6 @@ import java.util.concurrent.BlockingQueue;
 
 import logging.LogLevel;
 import logging.Logger;
-import product.Product;
-import product.ProductFactory;
 import product.ProductLoader;
 
 /**
@@ -16,40 +14,39 @@ import product.ProductLoader;
  * Might not need this class
  */
 public class ProductWorker implements Runnable{
-
-	// would only need to store this if there's ever a reason to reset
-	//the product loader, which there might not be.
-	//private final ProductFactory<? extends Product> factory;
 	
 	private boolean stopping = false;
 	private BlockingQueue<Metadata> queue;
 	private ProductLoader loader;
 	
-	public ProductWorker(BlockingQueue<Metadata> queue, String groupName, ProductFactory<? extends Product> factory)
+	public ProductWorker(BlockingQueue<Metadata> queue, TrackingGroup group)
 	{
 		this.queue = queue;
-		loader = new ProductLoader(factory, groupName);
-		//this.factory = factory;
+		loader = new ProductLoader(group.getProductFactory(), group);
 	}
 	
 	@Override
 	public void run() {
+		int count = 0;
 		while (!stopping)
 		{
-			Logger.log(LogLevel.k_debug, "Product worker waiting for queued metadata...");
+			if (count % 4 == 0)
+				Logger.log(LogLevel.k_debug, "Product worker waiting for queued metadata...");
+			
 			while (!queue.isEmpty() && !stopping)
 			{
 				try {
 					loader.writeFile(queue.take());
 				} catch (IOException | InterruptedException e) {
 					Logger.log(LogLevel.k_error, "Product worker failed to load a file from the queue.");
-					e.printStackTrace();
+					Logger.log(LogLevel.k_error, e, false);
 				}
 			}
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 			}
+			count++;
 		}
 		
 		loader.shutdown();

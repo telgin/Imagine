@@ -18,11 +18,6 @@ public abstract class GUI {
 	{
 		runner.shutdown();
 	}
-	
-	public void runBackup()
-	{
-		runner.runBackup();
-	}
 
 	public abstract void showControlPanel();
 	

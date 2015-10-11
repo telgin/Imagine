@@ -12,8 +12,6 @@ import data.TrackingGroup;
 public class ControlPanelRunner extends Runner{
 	private BackupRunner backupRunner;
 	
-	private TrackingGroup curTrackingGroup;
-	
 	public ControlPanelRunner()
 	{
 	}
@@ -24,28 +22,15 @@ public class ControlPanelRunner extends Runner{
 	}
 
 	@Override
-	public void runBackup() {
-		if (backupRunner == null)
-		{
-			backupRunner = new BackupRunner();
-			backupRunner.setControlPanelRunner(this);
-		}
-		
-		getActiveGUI().setRunner(backupRunner);
-		getActiveGUI().showBackupPanel();
-		backupRunner.runBackup();
-	}
-
-	@Override
 	public void shutdown() {
-		System.out.println("Control Panel shutdown");
+		Logger.log(LogLevel.k_debug, "Control Panel shutdown");
 		// TODO Auto-generated method stub
 		
 	}
 	
-	public ProductContents extractAll(File productFile)
+	public ProductContents extractAll(File productFile, TrackingGroup group)
 	{
-		ProductReader reader = new ProductReader(getTrackingGroup().getProductFactory());
+		ProductReader reader = new ProductReader(group.getProductFactory());
 		
 		ProductContents productContents = reader.extractAll(productFile);
 		if (productContents == null)
@@ -54,12 +39,5 @@ public class ControlPanelRunner extends Runner{
 		}
 		
 		return productContents;		
-	}
-
-	private TrackingGroup getTrackingGroup() {
-		while(curTrackingGroup == null)
-			curTrackingGroup = Configuration.findTrackingGroup(getActiveGUI().promptTrackingGroup());
-		
-		return curTrackingGroup;
 	}
 }

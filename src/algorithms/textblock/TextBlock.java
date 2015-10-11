@@ -9,6 +9,7 @@ import logging.LogLevel;
 import logging.Logger;
 import product.Product;
 import product.ProductMode;
+import stats.ProgressMonitor;
 import config.Configuration;
 
 public class TextBlock implements Product{
@@ -73,10 +74,13 @@ public class TextBlock implements Product{
 	@Override
 	public void saveFile(String filename) {
 		try {
-			File toSave = new File(Configuration.getProductStagingFolder().getAbsolutePath() + "\\" +
+			File toSave = new File(Configuration.getProductStagingFolder().getAbsolutePath() + "/" +
 					filename + ".txt");
 			Logger.log(LogLevel.k_info, "Saving product file: " + toSave.getAbsolutePath());
 			Files.write(toSave.toPath(), buffer);
+			
+			//update progress
+			ProgressMonitor.getStat("productsCreated").incrementNumericProgress(1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
