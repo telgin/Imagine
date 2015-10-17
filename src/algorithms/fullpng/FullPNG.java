@@ -60,18 +60,21 @@ public class FullPNG implements Product{
 
 	@Override
 	public void write(byte b) {
+		//Logger.log(LogLevel.k_debug, "Writing " + 1 + " byte.");
 		int index = randOrder.next();
 		byte toSet = ByteConversion.intToByte(b ^ random.nextByte());
 		setImageByte(index, toSet);
+		System.out.print(ByteConversion.bytesToHex(new byte[]{toSet}));
 	}
 
 	@Override
 	public void write(byte[] bytes) {
-		//Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
+		Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
 		for (int x=0; x<bytes.length; ++x)
 		{
 			write(bytes[x]);
 		}
+		System.out.println();
 	}
 
 	@Override
@@ -120,7 +123,10 @@ public class FullPNG implements Product{
 
 	@Override
 	public byte read() {
-		return ByteConversion.intToByte(getImageByte(randOrder.next()) ^ random.nextByte());
+		//Logger.log(LogLevel.k_debug, "Reading " + 1 + " byte.");
+		byte secured = getImageByte(randOrder.next());
+		System.out.print(ByteConversion.bytesToHex(new byte[]{secured}));
+		return ByteConversion.intToByte(secured ^ random.nextByte());
 	}
 
 	private byte getImageByte(int index) {
@@ -150,6 +156,7 @@ public class FullPNG implements Product{
 		{
 			bytes[x] = read();
 		}
+		System.out.println();
 	}
 
 	@Override

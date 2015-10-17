@@ -10,8 +10,8 @@ public class Metadata {
 	private long dateModified;
 	private byte[] fileHash;
 	private File file;
-	private long fragment1StreamUUID;
-	private int fragment1ProductSequenceNumber;
+	private byte[] productUUID;
+	private byte[] previousProductUUID;
 	private boolean metadataUpdate;
 	private short permissions;
 	
@@ -90,16 +90,11 @@ public class Metadata {
 	}
 	
 	public void setProductUUID(byte[] uuid) {
-		//TODO splitting it like this is pointless unless it's used somewhere
-		fragment1StreamUUID = ByteConversion.bytesToLong(uuid, 0);
-		fragment1ProductSequenceNumber = ByteConversion.bytesToInt(uuid,
-				Constants.STREAM_UUID_SIZE-1);
+		this.productUUID = uuid;
 	}
 	
 	public byte[] getProductUUID(){
-		return ByteConversion.concat(
-				ByteConversion.longToBytes(fragment1StreamUUID),
-				ByteConversion.intToBytes(fragment1ProductSequenceNumber));
+		return productUUID;
 	}
 
 	public boolean isMetadataUpdate() {
@@ -131,10 +126,6 @@ public class Metadata {
 				!(file.getAbsolutePath().equals(other.getFile().getAbsolutePath()));
 	}
 
-	public void setPreviousProductUUID(byte[] productUUID) {
-		// TODO Auto-generated method stub
-	}
-
 	/**
 	 * @return the permissions
 	 */
@@ -147,6 +138,20 @@ public class Metadata {
 	 */
 	public void setPermissions(short permissions) {
 		this.permissions = permissions;
+	}
+
+	/**
+	 * @return the previousProductUUID
+	 */
+	public byte[] getPreviousProductUUID() {
+		return previousProductUUID;
+	}
+
+	/**
+	 * @param previousProductUUID the previousProductUUID to set
+	 */
+	public void setPreviousProductUUID(byte[] uuid) {
+		this.previousProductUUID = uuid;
 	}
 
 

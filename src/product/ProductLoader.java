@@ -6,6 +6,8 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Base64;
+
 import logging.LogLevel;
 import logging.Logger;
 import stats.ProgressMonitor;
@@ -160,10 +162,19 @@ public class ProductLoader
 		//save off the first product uuid where we're saving the file
 		//it might actually start in the next one if we're out of space in this one.
 		//easy enough to figure out later.
-		if (group.isUsingDatabase() && !fileMetadata.isMetadataUpdate())
+		if (group.isUsingDatabase())
 		{
-			fileMetadata.setProductUUID(currentUUID);
-			DatabaseManager.saveProductUUID(fileMetadata);
+			if (fileMetadata.isMetadataUpdate())
+			{
+				fileMetadata.setPreviousProductUUID(fileMetadata.getProductUUID());
+				fileMetadata.setProductUUID(currentUUID);
+			}
+			else
+			{
+				fileMetadata.setProductUUID(currentUUID);
+				DatabaseManager.saveProductUUID(fileMetadata);
+			}
+			
 		}
 		
 		//start a reader
@@ -239,7 +250,6 @@ public class ProductLoader
 		
 		//file hash
 		currentProduct.write(fileMetadata.getFileHash());
-		//System.out.println(Base64.encode(fileHash));
 		
 		//file name length
 		currentProduct.write(ByteConversion.shortToBytes((short)fileMetadata.getPath().length()));
@@ -253,8 +263,24 @@ public class ProductLoader
 		//date modified
 		currentProduct.write(ByteConversion.longToBytes(fileMetadata.getDateModified()));
 		
-		//length of data that still needs to be written
-		currentProduct.write(ByteConversion.longToBytes(fileLengthRemaining));
+		//permissions
+		currentProduct.write(ByteConversion.shortToBytes(fileMetadata.getPermissions()));
+		
+		//metadata update flag
+		currentProduct.write(ByteConversion.booleanToByte(fileMetadata.isMetadataUpdate()));
+		
+		if (fileMetadata.isMetadataUpdate())
+		{
+			//previous fragment1 product uuid
+			currentProduct.write(fileMetadata.getPreviousProductUUID());
+		}
+		else
+		{
+			//length of data that still needs to be written
+			currentProduct.write(ByteConversion.longToBytes(fileLengthRemaining));
+		}
+		
+		
 	}
 	
 	private long writeFileData(DataInputStream reader, long fileLengthRemaining) throws IOException

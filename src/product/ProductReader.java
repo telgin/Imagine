@@ -26,6 +26,7 @@ public class ProductReader {
 	private byte[] curFileHash;
 	private long curFragmentNumber;
 	private File extractionFolder;
+	private boolean endCodeReached = false;
 	
 	public ProductReader(ProductFactory<? extends Product> factory)
 	{
@@ -77,6 +78,7 @@ public class ProductReader {
 		}
 		catch(Exception e)
 		{
+			System.out.println("Here1");
 			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
 		}
 		
@@ -104,6 +106,9 @@ public class ProductReader {
 			{
 				
 				FileContents fileContents = readNextFileHeader(true);
+				if (endCodeReached)
+					break;
+				
 				if (fileContents != null)
 				{
 					File extracted = readNextFileData(true);
@@ -124,13 +129,13 @@ public class ProductReader {
 					Logger.log(LogLevel.k_error, "Failed to extract next file from product: " + productFile.getPath());
 					break; // the metadata of a file was corrupted, probably not going to get back on track
 				}
-				//@@@@@@@@@@@@@@remove!!!
-				productEmpty = true;
 			}
 				
 		}
 		catch(Exception e)
 		{
+			System.out.println("Here2");
+			Logger.log(LogLevel.k_debug, e, false); 
 			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
 		}
 		
@@ -195,6 +200,7 @@ public class ProductReader {
 		}
 		catch(Exception e)
 		{
+			System.out.println("Here3");
 			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
 		}
 		
@@ -212,8 +218,12 @@ public class ProductReader {
 			{
 				ProductContents contents = new ProductContents();
 
-				//if a product used the uuid when the loader first set it, it will have
-				//retrieved it upon reset
+				//stealth products need their uuid
+				if (product.getProductMode().equals(ProductMode.STEALTH))
+				{
+					product.setUUID(product.readUUID());
+					product.secureStream();
+				}
 				
 				//product version
 				contents.setProductVersionNumber(ByteConversion.byteToInt(product.read()));
@@ -231,17 +241,16 @@ public class ProductReader {
 				//algorithm version
 				contents.setAlgorithmVersionNumber(ByteConversion.byteToInt(product.read()));
 				
-				//@@@@@@@@@@@@@@2out of order with loader
 				//product uuid:
-				//stream uuid
-				buffer = new byte[Constants.STREAM_UUID_SIZE];
+				buffer = new byte[Constants.PRODUCT_UUID_SIZE];
 				product.read(buffer);
-				contents.setStreamUUID(ByteConversion.bytesToLong(buffer));
+				product.setUUID(buffer);
+				
+				//stream uuid
+				contents.setStreamUUID(ByteConversion.getStreamUUID(buffer));
 				
 				//product sequence number
-				buffer = new byte[Constants.PRODUCT_SEQUENCE_NUMBER_SIZE];
-				product.read(buffer);
-				contents.setProductSequenceNumber(ByteConversion.bytesToInt(buffer));
+				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(buffer));
 				
 				//group name length
 				buffer = new byte[Constants.GROUP_NAME_LENGTH_SIZE];
@@ -263,6 +272,12 @@ public class ProductReader {
 				buffer = new byte[groupKeyNameLength];
 				product.read(buffer);
 				contents.setGroupKeyName(new String(buffer));
+				
+				//secure products secure the stream now with the uuid they were given
+				if (product.getProductMode().equals(ProductMode.STEALTH))
+				{
+					product.secureStream();
+				}
 				
 				return contents;
 			}
@@ -324,6 +339,7 @@ public class ProductReader {
 		
 		byte[] buffer;
 		FileContents contents = null;
+		endCodeReached = false;
 		
 		if (parseData)
 		{
@@ -347,6 +363,7 @@ public class ProductReader {
 			if (curFragmentNumber == Constants.END_CODE)
 			{
 				Logger.log(LogLevel.k_debug, "The end code was reached.");
+				endCodeReached = true;
 				return null;
 			}
 			
@@ -356,6 +373,7 @@ public class ProductReader {
 				buffer = new byte[Constants.FILE_HASH_SIZE];
 				product.read(buffer);
 				curFileHash = buffer;
+				System.out.println(ByteConversion.bytesToHex((curFileHash)));
 				contents.getMetadata().setFileHash(curFileHash);
 			}
 			else
@@ -365,6 +383,7 @@ public class ProductReader {
 			
 			//file name length
 			buffer = new byte[Constants.FILE_NAME_LENGTH_SIZE];
+			product.read(buffer);
 			short fileNameLength = ByteConversion.bytesToShort(buffer);
 			
 			System.out.println("Read file name length of " + fileNameLength);

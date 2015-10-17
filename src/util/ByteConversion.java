@@ -122,4 +122,18 @@ public class ByteConversion {
 	public static byte[] hexToBytes(String string) {
 		return DatatypeConverter.parseHexBinary(string);
 	}
+
+	public static byte booleanToByte(boolean metadataUpdate) {
+		return metadataUpdate ? intToByte(1) : intToByte(0);
+	}
+	
+	public static long getStreamUUID(byte[] productUUID)
+	{
+		return ByteConversion.bytesToLong(productUUID, 0);
+	}
+	
+	public static int getProductSequenceNumber(byte[] productUUID)
+	{
+		return ByteConversion.bytesToInt(productUUID, Constants.STREAM_UUID_SIZE-1);
+	}
 }
