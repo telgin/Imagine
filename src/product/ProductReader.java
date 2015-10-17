@@ -394,11 +394,12 @@ public class ProductReader {
 				product.skip(Constants.DATE_MODIFIED_SIZE);
 			}
 			
-			//permissions byte
+			//permissions
 			if (parseData)
 			{
-				int permissions = ByteConversion.byteToInt(product.read());
-				contents.getMetadata().setPermissions(permissions);
+				buffer = new byte[Constants.PERMISSIONS_SIZE];
+				product.read(buffer);
+				contents.getMetadata().setPermissions(ByteConversion.bytesToShort(buffer));
 			}
 			else
 			{
@@ -531,7 +532,7 @@ public class ProductReader {
 	private File getPartFileName(byte[] fileHash, long fragmentNumber)
 	{
 		String path = Configuration.getExtractionFolder().getAbsolutePath() + "/" +
-				ByteConversion.bytesToHexString(fileHash) +  "_" + fragmentNumber + ".part";
+				ByteConversion.bytesToHex(fileHash) +  "_" + fragmentNumber + ".part";
 		
 		return new File(path);
 	}

@@ -13,11 +13,13 @@ public class Metadata {
 	private long fragment1StreamUUID;
 	private int fragment1ProductSequenceNumber;
 	private boolean metadataUpdate;
-	private int permissions;
+	private short permissions;
 	
 	public Metadata()
 	{
-		
+		dateCreated = -1;
+		dateModified = -1;
+		permissions = -1;
 	}
 	
 	public int getTotalLength()
@@ -130,14 +132,14 @@ public class Metadata {
 	/**
 	 * @return the permissions
 	 */
-	public int getPermissions() {
+	public short getPermissions() {
 		return permissions;
 	}
 
 	/**
 	 * @param permissions the permissions to set
 	 */
-	public void setPermissions(int permissions) {
+	public void setPermissions(short permissions) {
 		this.permissions = permissions;
 	}
 

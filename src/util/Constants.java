@@ -40,7 +40,7 @@ public abstract class Constants {
 	public static final int FILE_NAME_LENGTH_SIZE = 2;
 	public static final int DATE_CREATED_SIZE = 8;
 	public static final int DATE_MODIFIED_SIZE = 8;
-	public static final long PERMISSIONS_SIZE = 1;
+	public static final int PERMISSIONS_SIZE = 2;
 	public static final int FILE_PERMISSIONS_SIZE = 1;
 	public static final int METADATA_UPDATE_FLAG_SIZE = 1;
 	public static final int FILE_LENGTH_REMAINING_SIZE = 8;

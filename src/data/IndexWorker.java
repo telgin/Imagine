@@ -11,6 +11,7 @@ import logging.LogLevel;
 import logging.Logger;
 
 import database.Database;
+import util.ByteConversion;
 import util.FileSystemUtil;
 import util.Hashing;
 
@@ -51,83 +52,119 @@ public class IndexWorker implements Runnable{
 
 	@Override
 	public void run() {
-		active = true;
+		active = !initialFolders.isEmpty();
 		
-		Logger.log(LogLevel.k_debug, "Index worker running...");
-		
-		//index all top level folders
-		for(File top:initialFolders){
-			crawl(top, 0);
+		while (!shuttingDown)
+		{
+			Logger.log(LogLevel.k_debug, "Index worker running...");
+			
+			//index all top level folders
+			for(File top:initialFolders)
+			{
+				crawl(top, 0);
+			}
+			
+			active = false;
+			
+			//wait to check again for more files
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {}
 		}
-		
-		active = false;
 	}
 	
 	/**
 	 * depth first traversal
-	 * @param folder
+	 * @param f
 	 * @param depth
 	 */
-	private void crawl(File folder, int depth){
+	private void crawl(File f, int depth){
+		active = true;
 		Logger.log(LogLevel.k_debug, "Depth: " + depth);
-		if(folder.listFiles() != null && !shuttingDown){
-			for(File child:folder.listFiles()){
-				if (child.canRead() && !FileSystemUtil.trackedBy(child, trackingGroup.getUntrackedFiles())){
-					if(child.isDirectory()){
-						crawl(child, depth+1);
-					}else{
-						if (!shuttingDown)
+		if (!shuttingDown)
+		{
+			//if the file list is not null, go through all the files
+			//otherwise, f is either a file or not readable.
+			if(f.listFiles() != null)
+			{
+				for(File child:f.listFiles())
+				{
+					if (child.canRead() && !FileSystemUtil.trackedBy(child, trackingGroup.getUntrackedFiles()))
+					{
+						if(child.isDirectory())
+						{
+							crawl(child, depth+1);
+						}
+						else if (!shuttingDown)
+						{
 							process(child);
+						}
 					}
+					
 				}
-				
 			}
-		}else if(!folder.isDirectory() && folder.canRead() &&
-				!FileSystemUtil.trackedBy(folder, trackingGroup.getUntrackedFiles())){
-			process(folder);
+			else if(!f.isDirectory() && f.canRead() && //make sure f is a readable file
+					!FileSystemUtil.trackedBy(f, trackingGroup.getUntrackedFiles()))
+			{
+				//f was a file, process it
+				process(f);
+			}
 		}
 	}
 	
 	private void process(File file)
 	{
-		byte[] fileHash = Hashing.hash(file);
+		//byte[] fileHash = Hashing.hash(file);
 		
 		if (trackingGroup.isUsingDatabase())
 		{
-			if (Database.containsFileRecord(fileHash)) //for efficiency, might be better to take a null here
+			Metadata recordMetadata = Database.getFileMetadata(file, trackingGroup);
+			if (recordMetadata != null) //there is a previous metadata record of the file
 			{
-				Metadata databaseMetadata = Database.getNewestMetadata(fileHash);
-				Metadata fileMetadata = new Metadata();
-				fileMetadata.setFileHash(fileHash);
-				fileMetadata.setFile(file);
-				FileSystemUtil.loadMetadataFromFile(fileMetadata, file);
+				//to avoid hashing, compare the date modified of the file
+				//to what is in the recorded metadata
+				long currentDateModified = FileSystemUtil.getDateModified(file);
 				
 				//add the file only if it is newer than the database record
-				if (fileMetadata.isNewerThan(databaseMetadata))
+				if (currentDateModified > recordMetadata.getDateModified())
 				{
-					fileMetadata.setMetadataUpdate(true);
-					fileMetadata.setPreviousProductUUID(databaseMetadata.getProductUUID());
-					Database.updateMetadata(fileMetadata); //should probably be called only after written?
+					//create a new metadata, load from file system
+					Metadata fileMetadata = new Metadata();
+					fileMetadata.setDateModified(currentDateModified);
+					FileSystemUtil.loadMetadataFromFile(fileMetadata, file);
+					
+					//if the file hashes are the same, this is just a metadata update
+					if (ByteConversion.bytesEqual(recordMetadata.getFileHash(), fileMetadata.getFileHash()))
+					{
+						fileMetadata.setMetadataUpdate(true);
+					}
+					
+					fileMetadata.setPreviousProductUUID(recordMetadata.getProductUUID());
 					queue.add(fileMetadata);
 				}
 			}
 			else
 			{
-				Metadata metadata = new Metadata();
-				metadata.setFileHash(fileHash);
-				metadata.setFile(file);
-				FileSystemUtil.loadMetadataFromFile(metadata, file);
-				Database.saveMetadata(metadata); //should probably be called only after written?
+				//the metadata was not found within the file system database, so
+				//load it from the file system directly
+				Metadata metadata = FileSystemUtil.loadMetadataFromFile(file);
+				
+				//check the database to see if the hash already exists,
+				//if so, it's a metadata update (possibly due to copying or moving/renaming)
+				if (Database.containsFileHash(metadata.getFileHash(), trackingGroup))
+				{
+					metadata.setMetadataUpdate(true);
+				}
+				
 				queue.add(metadata);
 			}
 		}
 		else
 		{
-			Metadata metadata = new Metadata();
-			metadata.setFileHash(fileHash);
-			metadata.setFile(file);
-			FileSystemUtil.loadMetadataFromFile(metadata, file);
-			queue.add(metadata);
+			//The group is not using a database, so we always get current
+			//metadata from the file system and add the file.
+			//(It cannot be a metadata update)
+			queue.add(FileSystemUtil.loadMetadataFromFile(file));
 		}
 	}
 

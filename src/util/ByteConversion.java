@@ -115,7 +115,11 @@ public class ByteConversion {
 		return true;
 	}
 
-	public static String bytesToHexString(byte[] bytes) {
+	public static String bytesToHex(byte[] bytes) {
 		return DatatypeConverter.printHexBinary(bytes);
+	}
+
+	public static byte[] hexToBytes(String string) {
+		return DatatypeConverter.parseHexBinary(string);
 	}
 }

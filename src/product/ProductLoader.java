@@ -10,6 +10,7 @@ import logging.Logger;
 import stats.ProgressMonitor;
 import config.Configuration;
 import data.TrackingGroup;
+import database.Database;
 import database.DatabaseManager;
 import util.ByteConversion;
 import util.Constants;
@@ -207,6 +208,13 @@ public class ProductLoader
 		}
 		
 		reader.close();
+		
+		//update the database
+		if (group.isUsingDatabase())
+		{
+			Database.saveMetadata(fileMetadata, group);
+		}
+		
 		writingFile = false;
 		fileWritten = true;
 		

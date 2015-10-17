@@ -3,8 +3,11 @@ package database;
 import hibernate.Metadata;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
+import data.TrackingGroup;
 import util.ByteConversion;
 import util.Constants;
 import util.Hashing;
@@ -14,22 +17,94 @@ import logging.LogLevel;
 import logging.Logger;
 
 public class IndexFile {
-	private static final String INDEX_FOLDER_NAME = "." + Constants.APPLICATION_NAME_SHORT.toLowerCase();
-
-	private static final String INDEX_FILE_DELIMETER = "<~>";
+	private static final String INDEX_FOLDER_NAME = "." +
+			Constants.APPLICATION_NAME_SHORT.toLowerCase();
+	private static final String INDEX_FILE_VERSION = "0.0.0";
 	
 	private File path;
+	private HashMap<byte[], FileRecord> records;
 	
 	private IndexFile()
+	{
+		records = new HashMap<byte[], FileRecord>();
+	}
+	
+	private void addFileRecord(FileRecord fileRecord) {
+		records.put(fileRecord.getFilePathHash(), fileRecord);
+	}
+
+	public void saveMetadata(Metadata metadata) {
+		boolean found = true;
+		byte[] pathHash = Hashing.hash(metadata.getFile().getAbsolutePath().getBytes());
+		FileRecord record = records.get(pathHash);
+		if (record == null)
+		{
+			found = false;
+			record = new FileRecord();
+		}
+		
+		//update all fields
+		record.setFilePathHash(Hashing.hash(metadata.getPath().getBytes()));
+		record.setFileHash(metadata.getFileHash());
+		record.setDateCreated(metadata.getDateCreated());
+		record.setDateModified(metadata.getDateModified());
+		record.setPermissions(metadata.getPermissions());
+		record.setFragment1ProductUUID(metadata.getProductUUID());
+		
+		if (!found)
+		{
+			records.put(pathHash, record);
+		}
+	}
+
+	/**
+	 * @return the path
+	 */
+	public File getPath() {
+		return path;
+	}
+
+	/**
+	 * @param path the path to set
+	 */
+	public void setPath(File path) {
+		this.path = path;
+	}
+	
+	public void save()
 	{
 		
 	}
 	
-	public static IndexFile loadIndex(File curFolder)
-	{
-		assert(!curFolder.isDirectory());
+	public Metadata getFileMetadata(File f) {
+		FileRecord record = records.get(Hashing.hash(f.getAbsolutePath().getBytes()));
 		
-		File indexFileLocation = findIndexFile(curFolder);
+		if (record != null)
+		{
+			Metadata metadata = new Metadata();
+			metadata.setFile(f);
+			metadata.setDateCreated(record.getDateCreated());
+			metadata.setDateModified(record.getDateModified());
+			metadata.setFileHash(record.getFileHash());
+			metadata.setPermissions(record.getPermissions());
+			metadata.setPreviousProductUUID(record.getFragment1ProductUUID());
+			return metadata;
+		}
+		else
+		{
+			return null;
+		}
+		
+	}
+	
+	
+	
+	
+	//static loading functions:
+	
+	public static IndexFile loadIndex(File lookup, TrackingGroup group)
+	{		
+		File indexFileLocation = findIndexFile(lookup, group);
 
 		if (indexFileLocation == null)
 		{
@@ -46,19 +121,20 @@ public class IndexFile {
 		
 		List<String> recordLines = myUtilities.readListFromFile(indexFileLocation);
 		for (String line:recordLines)
-			indexFile.addFileRecord(new FileRecord(line.split(INDEX_FILE_DELIMETER)));
+			indexFile.addFileRecord(new FileRecord(line));
 		
 		return indexFile;
 	}
 
-	private void addFileRecord(FileRecord fileRecord) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private static File findIndexFile(File folder) {
+	public static File findIndexFile(File lookup, TrackingGroup group) {
 		File indexFolder = null;
-		File curFolder = new File(folder.getAbsolutePath());
+		
+		if (lookup.isDirectory())
+		{
+			Logger.log(LogLevel.k_error, "Trying to load index file for a directory: " + lookup.getPath());
+		}
+		
+		File curFolder = lookup.getAbsoluteFile().getParentFile();
 		
 		//use the pre-existing folder, or create a new one
 		while (indexFolder == null)
@@ -81,71 +157,17 @@ public class IndexFile {
 
 				if (curFolder == null)
 				{
-					Logger.log(LogLevel.k_error, "An index folder cannot be created for the folder: " + folder.getPath());
+					Logger.log(LogLevel.k_error, "An index folder cannot be created for the folder: " + lookup.getPath());
 					return null;
 				}
 			}
 		}
 		
-		String path = indexFolder.getAbsolutePath() + "/" +
-				ByteConversion.bytesToHexString(folder.getAbsolutePath().getBytes());
+		String path = indexFolder.getAbsolutePath() + "/" +  
+				ByteConversion.bytesToHex((group.getName() + indexFolder.getAbsolutePath()).getBytes());
 		
 		//this file may or may not already exist
 		//should be writable since parent folder is writable
 		return new File(path);
-	}
-	
-	public void save()
-	{
-		
-	}
-	
-	public static Metadata getFileMetadata(File f) {
-		Metadata temp = new Metadata();
-		temp.setPath(f.getAbsolutePath());
-		temp.setDateCreated(0);
-		temp.setDateModified(0);
-		
-		return temp;
-	}
-
-	public static byte[] getFileHash(File f) {
-		
-		// should be looking this up from the database, not hashing it here.
-		return Hashing.hash(f);
-	}
-
-	public static Metadata getNewestMetadata(byte[] fileHash) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static void updateMetadata(Metadata fileMetadata) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void saveMetadata(Metadata metadata) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static boolean containsFileRecord(byte[] fileHash) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/**
-	 * @return the path
-	 */
-	public File getPath() {
-		return path;
-	}
-
-	/**
-	 * @param path the path to set
-	 */
-	public void setPath(File path) {
-		this.path = path;
 	}
 }
