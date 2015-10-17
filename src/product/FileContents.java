@@ -10,6 +10,17 @@ public class FileContents {
 	private File extractedFile;
 	private Metadata metadata;
 
+	public String toString()
+	{
+		String text = "FileContents:";
+		text += "\nFragment? " + fragment;
+		text += "\nfragmentNumber " + fragmentNumber;
+		text += "\nremainingData " + remainingData;
+		text += "\nextractedFile " + extractedFile.getName();
+		text += "\n" + metadata.toString();
+		return text;
+	}
+	
 	/**
 	 * @return the fragment
 	 */

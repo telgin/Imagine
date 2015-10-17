@@ -1,4 +1,4 @@
-package test;
+package testing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,7 +30,7 @@ import algorithms.fullpng.FullPNGFactory;
 import algorithms.fullpng.HashRandom;
 import algorithms.fullpng.UniqueRandomRange;
 
-public class Test {
+public class Scratch {
 	public static void main(String args[]) throws IOException, InterruptedException{
 		
 		//test2();

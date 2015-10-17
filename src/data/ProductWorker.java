@@ -25,6 +25,11 @@ public class ProductWorker implements Runnable{
 		loader = new ProductLoader(group.getProductFactory(), group);
 	}
 	
+	public boolean isActive()
+	{
+		return !queue.isEmpty() && !stopping;
+	}
+	
 	@Override
 	public void run() {
 		int count = 0;
@@ -48,7 +53,6 @@ public class ProductWorker implements Runnable{
 			}
 			count++;
 		}
-		
 		loader.shutdown();
 	}
 	

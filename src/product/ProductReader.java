@@ -11,6 +11,8 @@ import logging.Logger;
 import util.ByteConversion;
 import util.Constants;
 import config.Configuration;
+import data.TrackingGroup;
+import hibernate.Metadata;
 
 public class ProductReader {
 
@@ -23,6 +25,7 @@ public class ProductReader {
 	private long curPartLengthRemaining;
 	private byte[] curFileHash;
 	private long curFragmentNumber;
+	private File extractionFolder;
 	
 	public ProductReader(ProductFactory<? extends Product> factory)
 	{
@@ -121,6 +124,8 @@ public class ProductReader {
 					Logger.log(LogLevel.k_error, "Failed to extract next file from product: " + productFile.getPath());
 					break; // the metadata of a file was corrupted, probably not going to get back on track
 				}
+				//@@@@@@@@@@@@@@remove!!!
+				productEmpty = true;
 			}
 				
 		}
@@ -226,6 +231,7 @@ public class ProductReader {
 				//algorithm version
 				contents.setAlgorithmVersionNumber(ByteConversion.byteToInt(product.read()));
 				
+				//@@@@@@@@@@@@@@2out of order with loader
 				//product uuid:
 				//stream uuid
 				buffer = new byte[Constants.STREAM_UUID_SIZE];
@@ -241,6 +247,7 @@ public class ProductReader {
 				buffer = new byte[Constants.GROUP_NAME_LENGTH_SIZE];
 				product.read(buffer);
 				short groupNameLength = ByteConversion.bytesToShort(buffer);
+				System.out.println("groupNameLength: " + groupNameLength);
 				
 				//group name
 				buffer = new byte[groupNameLength];
@@ -321,6 +328,7 @@ public class ProductReader {
 		if (parseData)
 		{
 			contents = new FileContents();
+			contents.setMetadata(new Metadata());
 		}
 		
 		try
@@ -334,6 +342,7 @@ public class ProductReader {
 				contents.setFragmentNumber(curFragmentNumber);
 			}
 			
+			System.out.println("End code? " + curFragmentNumber);
 			//if end code, no more files
 			if (curFragmentNumber == Constants.END_CODE)
 			{
@@ -357,6 +366,8 @@ public class ProductReader {
 			//file name length
 			buffer = new byte[Constants.FILE_NAME_LENGTH_SIZE];
 			short fileNameLength = ByteConversion.bytesToShort(buffer);
+			
+			System.out.println("Read file name length of " + fileNameLength);
 			
 			//file name
 			if (parseData)
@@ -474,6 +485,7 @@ public class ProductReader {
 					}
 				}
 				bos.close();
+				Logger.log(LogLevel.k_info, "Extracted part file: " + partFile.getAbsolutePath());
 				return partFile;
 			}
 			catch (Exception e)
@@ -531,9 +543,24 @@ public class ProductReader {
 
 	private File getPartFileName(byte[] fileHash, long fragmentNumber)
 	{
-		String path = Configuration.getExtractionFolder().getAbsolutePath() + "/" +
-				ByteConversion.bytesToHex(fileHash) +  "_" + fragmentNumber + ".part";
+		String path = extractionFolder.getAbsolutePath() + "/" +
+				Integer.toString(Math.abs(ByteConversion.bytesToInt(fileHash, 0))) +
+				"_" + fragmentNumber + ".part";
 		
 		return new File(path);
+	}
+
+	/**
+	 * @return the extractionFolder
+	 */
+	public File getExtractionFolder() {
+		return extractionFolder;
+	}
+
+	/**
+	 * @param extractionFolder the extractionFolder to set
+	 */
+	public void setExtractionFolder(File extractionFolder) {
+		this.extractionFolder = extractionFolder;
 	}
 }

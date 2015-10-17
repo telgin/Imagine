@@ -12,13 +12,14 @@ import logging.Logger;
 
 import database.Database;
 import util.ByteConversion;
+import util.Constants;
 import util.FileSystemUtil;
 import util.Hashing;
 
 public class IndexWorker implements Runnable{
 
 	private BlockingQueue<Metadata> queue;
-	private Collection<File> initialFolders;
+	private LinkedList<File> initialFolders;
 	private TrackingGroup trackingGroup;
 	private boolean shuttingDown;
 	private boolean active;
@@ -27,10 +28,10 @@ public class IndexWorker implements Runnable{
 			Collection<File> initialFolders, TrackingGroup trackingGroup)
 	{
 		this.queue = queue;
-		this.initialFolders = initialFolders;
+		this.initialFolders = new LinkedList<File>(initialFolders);
 		this.trackingGroup = trackingGroup;
 		shuttingDown = false;
-		active = false;
+		active = true;
 	}
 	
 	public IndexWorker(BlockingQueue<Metadata> queue, File file, TrackingGroup trackingGroup)
@@ -38,10 +39,13 @@ public class IndexWorker implements Runnable{
 		Logger.log(LogLevel.k_debug, "Creating index worker for " + file.getPath());
 		this.queue = queue;
 		this.trackingGroup = trackingGroup;
+		active = true;
 		
 		LinkedList<File> folders = new LinkedList<File>();
 		folders.add(file);
 		initialFolders = folders;
+		
+		System.out.println("Given " + initialFolders.size() + " folders");
 	}
 	
 	public void shutdown()
@@ -59,9 +63,9 @@ public class IndexWorker implements Runnable{
 			Logger.log(LogLevel.k_debug, "Index worker running...");
 			
 			//index all top level folders
-			for(File top:initialFolders)
+			while (initialFolders.size() > 0)
 			{
-				crawl(top, 0);
+				crawl(initialFolders.remove(), 0);
 			}
 			
 			active = false;
@@ -81,7 +85,7 @@ public class IndexWorker implements Runnable{
 	private void crawl(File f, int depth){
 		active = true;
 		Logger.log(LogLevel.k_debug, "Depth: " + depth);
-		if (!shuttingDown)
+		if (!shuttingDown && !f.getName().equals(Constants.INDEX_FOLDER_NAME))
 		{
 			//if the file list is not null, go through all the files
 			//otherwise, f is either a file or not readable.
@@ -114,7 +118,7 @@ public class IndexWorker implements Runnable{
 	
 	private void process(File file)
 	{
-		//byte[] fileHash = Hashing.hash(file);
+		System.out.println("Processing " + file.getAbsolutePath());
 		
 		if (trackingGroup.isUsingDatabase())
 		{
@@ -140,7 +144,13 @@ public class IndexWorker implements Runnable{
 					}
 					
 					fileMetadata.setPreviousProductUUID(recordMetadata.getProductUUID());
+					
+					System.out.println("Adding to queue");
 					queue.add(fileMetadata);
+				}
+				else
+				{
+					System.out.println("File is not newer: " + file.getAbsolutePath());
 				}
 			}
 			else

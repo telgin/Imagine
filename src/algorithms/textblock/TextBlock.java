@@ -10,6 +10,7 @@ import logging.Logger;
 import product.Product;
 import product.ProductMode;
 import stats.ProgressMonitor;
+import stats.Stat;
 import config.Configuration;
 
 public class TextBlock implements Product{
@@ -62,6 +63,7 @@ public class TextBlock implements Product{
 
 	@Override
 	public void write(byte b) {
+		System.out.println("Wrote: " + 1);
 		buffer[index++] = b;
 	}
 
@@ -69,18 +71,21 @@ public class TextBlock implements Product{
 	public void write(byte[] bytes) {
 		System.arraycopy(bytes, 0, buffer, index, bytes.length);
 		index += bytes.length;
+		System.out.println("Wrote: " + bytes.length);
 	}
 
 	@Override
-	public void saveFile(String filename) {
+	public void saveFile(File productStagingFolder, String filename) {
 		try {
-			File toSave = new File(Configuration.getProductStagingFolder().getAbsolutePath() + "/" +
+			File toSave = new File(productStagingFolder.getAbsolutePath() + "/" +
 					filename + ".txt");
 			Logger.log(LogLevel.k_info, "Saving product file: " + toSave.getAbsolutePath());
 			Files.write(toSave.toPath(), buffer);
 			
 			//update progress
-			ProgressMonitor.getStat("productsCreated").incrementNumericProgress(1);
+			Stat stat = ProgressMonitor.getStat("productsCreated");
+			if (stat != null)
+				stat.incrementNumericProgress(1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -88,6 +93,7 @@ public class TextBlock implements Product{
 
 	@Override
 	public byte read() {
+		System.out.println("Read: " + 1);
 		return buffer[index++];
 	}
 
@@ -95,6 +101,7 @@ public class TextBlock implements Product{
 	public void read(byte[] bytes) {
 		System.arraycopy(buffer, index, bytes, 0, bytes.length);
 		index += bytes.length;
+		System.out.println("Read: " + bytes.length);
 	}
 
 	@Override

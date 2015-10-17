@@ -20,6 +20,7 @@ public class BackupJob implements Runnable{
 	private TrackingGroup group;
 	private boolean shuttingDown = false;
 	private boolean active = true;
+	private boolean finished = false;
 	private int maxWaitingFiles;
 	private BlockingQueue<Metadata> queue;
 	private IndexWorker[] indexWorkers;
@@ -71,7 +72,7 @@ public class BackupJob implements Runnable{
 	
 	public boolean isFinished()
 	{
-		return true;
+		return finished;
 	}
 
 	public void start() {
@@ -124,19 +125,21 @@ public class BackupJob implements Runnable{
 						indexWorkers[i] = setupNewIndexWorker();
 				}
 				
-				if (remainingFiles.size() == 0 && queue.size() == 0)
+				if (indexWorkersInactive() && remainingFiles.size() == 0 && queue.size() == 0)
 				{
-					//TODO shutdown only if all index workers are inactive
-					shuttingDown = true;
+					active = false;
 				}
 				
 				sleep(2000);
 			}
 			
-			if (remainingFiles.size() == 0 && queue.size() == 0)
+			if (allWorkersInactive() && remainingFiles.size() == 0 && queue.size() == 0)
 			{
-				//TODO shutdown only if all index workers are inactive
 				shuttingDown = true;
+			}
+			else
+			{
+				active = remainingFiles.size() == 0;
 			}
 			
 			sleep(1000);
@@ -160,10 +163,31 @@ public class BackupJob implements Runnable{
 				e.printStackTrace();
 			}
 		}
-			
-
+		
+		finished = true;
 	}
 	
+	private boolean allWorkersInactive()
+	{
+		return indexWorkersInactive() && productWorkersInactive();
+	}
+	
+	private boolean productWorkersInactive() {
+		for (ProductWorker worker:productWorkers)
+			if (worker.isActive())
+				return false;
+		
+		return true;
+	}
+	
+	private boolean indexWorkersInactive() {
+		for (IndexWorker worker:indexWorkers)
+			if (worker.isActive())
+				return false;
+		
+		return true;
+	}
+
 	private IndexWorker setupNewIndexWorker() {
 		Logger.log(LogLevel.k_debug, "Adding new Index Worker.");
 		return new IndexWorker(queue, remainingFiles.remove(0), group);

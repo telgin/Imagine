@@ -22,6 +22,11 @@ public class Metadata {
 		permissions = -1;
 	}
 	
+	public String toString()
+	{
+		return file.getName();
+	}
+	
 	public int getTotalLength()
 	{
 		int totalLength = 0;
@@ -85,6 +90,7 @@ public class Metadata {
 	}
 	
 	public void setProductUUID(byte[] uuid) {
+		//TODO splitting it like this is pointless unless it's used somewhere
 		fragment1StreamUUID = ByteConversion.bytesToLong(uuid, 0);
 		fragment1ProductSequenceNumber = ByteConversion.bytesToInt(uuid,
 				Constants.STREAM_UUID_SIZE-1);

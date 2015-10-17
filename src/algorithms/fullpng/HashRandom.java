@@ -3,7 +3,7 @@ package algorithms.fullpng;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import test.CodeTimer;
+import testing.CodeTimer;
 import util.ByteConversion;
 
 /**

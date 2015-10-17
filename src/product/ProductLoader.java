@@ -3,11 +3,13 @@ package product;
 import hibernate.Metadata;
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import logging.LogLevel;
 import logging.Logger;
 import stats.ProgressMonitor;
+import stats.Stat;
 import config.Configuration;
 import data.TrackingGroup;
 import database.Database;
@@ -21,11 +23,12 @@ public class ProductLoader
 	//do we ever need another product?
 	//private final ProductFactory<? extends Product> factory;
 	
-	private final byte PRODUCT_VERSION_NUMBER = ByteConversion.intToByte(1);
+	private final byte PRODUCT_VERSION_NUMBER = ByteConversion.intToByte(0);
 	
 	private byte[] streamUUID;
 	private int sequenceNumber;
 	private TrackingGroup group;
+	private File productStagingFolder;
 	
 	private Product currentProduct;
 	private byte[] currentUUID;
@@ -41,6 +44,10 @@ public class ProductLoader
 		sequenceNumber = 0;
 		
 		this.group = group;
+		
+		productStagingFolder = group.getProductStagingFolder();
+		if (productStagingFolder == null)
+			productStagingFolder = Configuration.getProductStagingFolder();
 		
 		currentProduct = factory.create();
 		resetToNextProduct();
@@ -60,7 +67,8 @@ public class ProductLoader
 		{
 			if (currentProduct.getRemainingBytes() > Constants.END_CODE_SIZE)
 				currentProduct.write(ByteConversion.longToBytes(Constants.END_CODE));
-			currentProduct.saveFile(getSaveName());
+
+			currentProduct.saveFile(productStagingFolder, getSaveName());
 		}
 	}
 	
@@ -154,7 +162,7 @@ public class ProductLoader
 		//easy enough to figure out later.
 		if (group.isUsingDatabase() && !fileMetadata.isMetadataUpdate())
 		{
-			fileMetadata.setProductUUID(currentProduct.getUUID());
+			fileMetadata.setProductUUID(currentUUID);
 			DatabaseManager.saveProductUUID(fileMetadata);
 		}
 		
@@ -176,7 +184,7 @@ public class ProductLoader
 					currentProduct.write(ByteConversion.longToBytes(Constants.END_CODE));
 				}// end state is assumed if there's no space to write the end code
 				
-				currentProduct.saveFile(getSaveName());
+				currentProduct.saveFile(productStagingFolder, getSaveName());
 				resetToNextProduct();
 				
 				//the new product should now have enough space
@@ -219,7 +227,9 @@ public class ProductLoader
 		fileWritten = true;
 		
 		//update progress
-		ProgressMonitor.getStat("filesProcessed").incrementNumericProgress(1);
+		Stat stat = ProgressMonitor.getStat("filesProcessed");
+		if (stat != null)
+			stat.incrementNumericProgress(1);
 	}
 	
 	private void writeFileHeader(Metadata fileMetadata, long fragmentNumber, long fileLengthRemaining)

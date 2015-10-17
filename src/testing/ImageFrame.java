@@ -1,4 +1,4 @@
-package test;
+package testing;
 
 import java.awt.BorderLayout;
 import java.awt.event.WindowEvent;

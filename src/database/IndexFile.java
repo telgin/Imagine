@@ -3,6 +3,7 @@ package database;
 import hibernate.Metadata;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,20 +18,19 @@ import logging.LogLevel;
 import logging.Logger;
 
 public class IndexFile {
-	private static final String INDEX_FOLDER_NAME = "." +
-			Constants.APPLICATION_NAME_SHORT.toLowerCase();
 	private static final String INDEX_FILE_VERSION = "0.0.0";
 	
 	private File path;
-	private HashMap<byte[], FileRecord> records;
+	private HashMap<String, FileRecord> records;
 	
-	private IndexFile()
+	private IndexFile(File location)
 	{
-		records = new HashMap<byte[], FileRecord>();
+		path = location;
+		records = new HashMap<String, FileRecord>();
 	}
 	
 	private void addFileRecord(FileRecord fileRecord) {
-		records.put(fileRecord.getFilePathHash(), fileRecord);
+		records.put(ByteConversion.bytesToHex(fileRecord.getFilePathHash()), fileRecord);
 	}
 
 	public void saveMetadata(Metadata metadata) {
@@ -53,7 +53,7 @@ public class IndexFile {
 		
 		if (!found)
 		{
-			records.put(pathHash, record);
+			records.put(ByteConversion.bytesToHex(pathHash), record);
 		}
 	}
 
@@ -73,11 +73,23 @@ public class IndexFile {
 	
 	public void save()
 	{
+		ArrayList<String> lines = new ArrayList<String>();
+		lines.add(Constants.APPLICATION_NAME_SHORT + 
+				" file system tracker - version " + INDEX_FILE_VERSION);
 		
+		for (FileRecord record:records.values())
+			lines.add(record.toString());
+		
+		myUtilities.writeListToFile(path, lines);
+	}
+	
+	private String getFileKey(File f)
+	{
+		return ByteConversion.bytesToHex(Hashing.hash(f.getAbsolutePath().getBytes()));
 	}
 	
 	public Metadata getFileMetadata(File f) {
-		FileRecord record = records.get(Hashing.hash(f.getAbsolutePath().getBytes()));
+		FileRecord record = records.get(getFileKey(f));
 		
 		if (record != null)
 		{
@@ -96,32 +108,44 @@ public class IndexFile {
 		}
 		
 	}
-	
-	
+
 	
 	
 	//static loading functions:
 	
 	public static IndexFile loadIndex(File lookup, TrackingGroup group)
-	{		
+	{
+		Logger.log(LogLevel.k_debug, "Trying to load index file for " + lookup.getAbsolutePath());
+		
 		File indexFileLocation = findIndexFile(lookup, group);
 
 		if (indexFileLocation == null)
 		{
 			//the file does not exist, and a new one can't be created
+			Logger.log(LogLevel.k_debug, "Cannot load index file for " + lookup.getAbsolutePath());
 			return null;
 		}
 		
-		return parseIndexFile(indexFileLocation);
-			
+		Logger.log(LogLevel.k_debug, "Using index file: " + indexFileLocation.getAbsolutePath());
+		
+		if (!indexFileLocation.exists())
+		{
+			indexFileLocation.getParentFile().mkdirs();
+			return new IndexFile(indexFileLocation);
+		}
+		
+		return parseIndexFile(indexFileLocation);	
 	}
 	
 	private static IndexFile parseIndexFile(File indexFileLocation) {
-		IndexFile indexFile = new IndexFile();
+		IndexFile indexFile = new IndexFile(indexFileLocation);
 		
 		List<String> recordLines = myUtilities.readListFromFile(indexFileLocation);
-		for (String line:recordLines)
-			indexFile.addFileRecord(new FileRecord(line));
+		
+		//get all file records, skip version line for now
+		//TODO validate version
+		for (int i=1; i<recordLines.size(); ++i)
+			indexFile.addFileRecord(new FileRecord(recordLines.get(i)));
 		
 		return indexFile;
 	}
@@ -140,7 +164,7 @@ public class IndexFile {
 		while (indexFolder == null)
 		{
 			//specify the folder we'd like
-			String path = curFolder.getAbsolutePath() + "/" + INDEX_FOLDER_NAME;
+			String path = curFolder.getAbsolutePath() + "/" + Constants.INDEX_FOLDER_NAME;
 			indexFolder = new File(path);
 			
 			//try to create it
@@ -163,8 +187,10 @@ public class IndexFile {
 			}
 		}
 		
-		String path = indexFolder.getAbsolutePath() + "/" +  
-				ByteConversion.bytesToHex((group.getName() + indexFolder.getAbsolutePath()).getBytes());
+		byte[] nameHash = Hashing.hash((group.getName() + indexFolder.getAbsolutePath()).getBytes());
+		String filename = Integer.toString(Math.abs(ByteConversion.bytesToInt(nameHash, 0)));
+		
+		String path = indexFolder.getAbsolutePath() + "/" + filename;
 		
 		//this file may or may not already exist
 		//should be writable since parent folder is writable

@@ -13,6 +13,7 @@ import logging.Logger;
 import product.Product;
 import product.ProductMode;
 import stats.ProgressMonitor;
+import stats.Stat;
 import util.ByteConversion;
 import util.Constants;
 import config.Configuration;
@@ -79,16 +80,18 @@ public class FullPNG implements Product{
 	}
 
 	@Override
-	public void saveFile(String fileName) {
+	public void saveFile(File productStagingFolder, String fileName) {
 		try {
-			File imgFile = new File(Configuration.getProductStagingFolder().getAbsolutePath() + "/" + fileName + ".png");
+			File imgFile = new File(productStagingFolder.getAbsolutePath() + "/" + fileName + ".png");
 			Logger.log(LogLevel.k_info, "Saving product file: " + imgFile.getAbsolutePath());
 			if (!imgFile.getParentFile().exists())
 				imgFile.getParentFile().mkdirs();
 			ImageIO.write(img, "PNG", imgFile);
 			
 			//update progress
-			ProgressMonitor.getStat("productsCreated").incrementNumericProgress(1);
+			Stat stat = ProgressMonitor.getStat("productsCreated");
+			if (stat != null)
+				stat.incrementNumericProgress(1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

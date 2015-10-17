@@ -36,7 +36,7 @@ public class FileSystemUtil {
 			metadata.setPermissions(getNumericFilePermissions(file));
 	}
 	
-	private static short getNumericFilePermissions(File file) {
+	public static short getNumericFilePermissions(File file) {
 		try {
 			Set<PosixFilePermission> permissions = 
 					Files.getPosixFilePermissions(file.toPath());
@@ -137,7 +137,7 @@ public class FileSystemUtil {
 		  return result;
 	}
 
-	private static long getDateCreated(File file) {
+	public static long getDateCreated(File file) {
 		try {
 			BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
 			return attr.creationTime().toMillis();
@@ -201,5 +201,20 @@ public class FileSystemUtil {
 			
 			return false;
 		}
+	}
+	
+	/**
+	 * @credit Jeff Learman
+	 * @credit http://stackoverflow.com/questions/20281835/how-to-delete-a-folder-with-files-using-java
+	 * @param file
+	 */
+	public static void deleteDir(File file) {
+	    File[] contents = file.listFiles();
+	    if (contents != null) {
+	        for (File f : contents) {
+	            deleteDir(f);
+	        }
+	    }
+	    file.delete();
 	}
 }

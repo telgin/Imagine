@@ -1,6 +1,7 @@
 package product;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProductContents {
 
@@ -82,9 +83,14 @@ public class ProductContents {
 		text += "\nSequence Number: " + productSequenceNumber;
 		text += "\nGroup Name: " + groupName;
 		for (FileContents fc:files)
-			text += fc.toString();
+			text += "\n" + fc.toString();
 		
 		return text;
+	}
+	
+	public List<FileContents> getFileContents()
+	{
+		return files;
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package test;
+package testing;
 
 public class CodeTimer {
 	private long startMillis = 0;

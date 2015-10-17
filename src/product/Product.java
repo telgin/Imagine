@@ -28,7 +28,7 @@ public interface Product {
 
 	public void write(byte[] bytes);
 
-	public void saveFile(String fileName);
+	public void saveFile(File productStagingFolder, String fileName);
 
 	//should be able to take an input stream reader to make things more efficient. 
 	

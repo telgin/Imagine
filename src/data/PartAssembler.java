@@ -17,12 +17,12 @@ public class PartAssembler {
 	 * @param outputFile
 	 * @return True if it seems to be successful
 	 */
-	public boolean assemble(File partFolder, File outputFile){
+	public static boolean assemble(File partFolder, File outputFile){
 		try
 		{
 			for (File partFile:partFolder.listFiles())
 			{
-				if (partFile.getName().endsWith(".part0"))
+				if (partFile.getName().endsWith("_1.part"))
 				{	
 					FileOutputStream fos = new FileOutputStream(outputFile);
 					File curPart = partFile;
@@ -48,7 +48,7 @@ public class PartAssembler {
 		
 	}
 
-	private File getNextPartFile(File partFile) {
+	private static File getNextPartFile(File partFile) {
 		if (partFile.isDirectory())
 		{
 			Logger.log(LogLevel.k_debug, "The partfile supplied is a folder: " + partFile.getPath());
@@ -56,18 +56,19 @@ public class PartAssembler {
 		}
 		else
 		{
+			//format: fileID_partNum.part
 			String filename = partFile.getName();
-			int partIndex = filename.lastIndexOf(".part");
-			if (partIndex >= 0)
+			if (filename.contains(".part"))
 			{
-				String filenameFirstHalf = filename.substring(0, partIndex);
-				String partNumberString = filename.substring(partIndex+5, filename.length());
+				String[] nameParts = filename.split("_");
+				String filenameID = nameParts[0];
+				String partNumberString = nameParts[1].split("\\.")[0];
 				
 				try
 				{
 					int partNumber = Integer.parseInt(partNumberString);
 					File nextFile = new File(partFile.getParentFile().getAbsolutePath() + "/" +
-							filenameFirstHalf + ".part" + (partNumber + 1));
+							filenameID + "_" + (partNumber + 1) + ".part");
 					
 					if (nextFile.exists())
 						return nextFile;

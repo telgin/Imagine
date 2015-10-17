@@ -1,6 +1,8 @@
 package database;
 
 import hibernate.Metadata;
+import logging.LogLevel;
+import logging.Logger;
 
 import java.io.File;
 import java.util.HashMap;
@@ -39,6 +41,7 @@ public class Database {
 	}
 
 	public static void saveMetadata(Metadata metadata, TrackingGroup group) {
+		Logger.log(LogLevel.k_debug, "Saving metadata for " + metadata.getFile().getAbsolutePath());
 		IndexFile index = getIndexFile(metadata.getFile(), group);
 		index.saveMetadata(metadata);
 	}
@@ -61,8 +64,12 @@ public class Database {
 		if (loadedIndexFiles.size() >= MAX_LOADED_INDEX_FILES)
 		{
 			//make some room
-			IndexFile removed = loadedIndexFiles.remove();
-			removed.save();
+			try {
+				IndexFile removed = loadedIndexFiles.take();
+				removed.save();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		IndexFile index = IndexFile.loadIndex(lookup, group);
@@ -71,5 +78,15 @@ public class Database {
 			loadedIndexFiles.add(index);
 		}
 		return index;
+	}
+
+	public static void save() {
+		Logger.log(LogLevel.k_debug, "Saving Database (" + loadedIndexFiles.size() + " index files)");
+		while (loadedIndexFiles.size() > 0)
+			try {
+				loadedIndexFiles.take().save();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 	}
 }

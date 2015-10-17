@@ -6,6 +6,8 @@ import java.util.HashSet;
 
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
+import logging.LogLevel;
+import logging.Logger;
 import product.Product;
 import product.ProductFactory;
 import product.ProductMode;
@@ -17,6 +19,8 @@ public class TrackingGroup {
 	private boolean usingDatabase;
 	private Algorithm algorithm;
 	private Key key;
+	private File productStagingFolder;
+	private File extractionFolder;
 	
 	public TrackingGroup(String name, boolean usesDatabase, Algorithm algo, Key key)
 	{
@@ -31,10 +35,15 @@ public class TrackingGroup {
 	public void addTrackedPath(String path)
 	{
 		File file = new File(path);
+		addTrackedPath(file);
+	}
+	
+	public void addTrackedPath(File file)
+	{
 		if (!file.exists())
 		{
-			System.err.println("Warning: The path in tracking group '" + name + "' does not exist:");
-			System.err.println(file.getPath());
+			Logger.log(LogLevel.k_error, "Warning: The path in tracking group '" + name + "' does not exist:");
+			Logger.log(LogLevel.k_error, file.getPath());
 		}
 		else
 		{
@@ -45,10 +54,15 @@ public class TrackingGroup {
 	public void addUntrackedPath(String path)
 	{
 		File file = new File(path);
+		addUntrackedPath(file);
+	}
+	
+	public void addUntrackedPath(File file)
+	{
 		if (!file.exists())
 		{
-			System.err.println("Warning: The path in tracking group '" + name + "' does not exist:");
-			System.err.println(file.getPath());
+			Logger.log(LogLevel.k_error, "Warning: The path in tracking group '" + name + "' does not exist:");
+			Logger.log(LogLevel.k_error, file.getPath());
 		}
 		else
 		{
@@ -145,5 +159,33 @@ public class TrackingGroup {
 
 	public ProductFactory<? extends Product> getProductFactory() {
 		return AlgorithmRegistry.getProductFactory(algorithm, key);
+	}
+
+	/**
+	 * @return the extractionFolder
+	 */
+	public File getExtractionFolder() {
+		return extractionFolder;
+	}
+
+	/**
+	 * @param extractionFolder the extractionFolder to set
+	 */
+	public void setExtractionFolder(File extractionFolder) {
+		this.extractionFolder = extractionFolder;
+	}
+
+	/**
+	 * @return the productStagingFolder
+	 */
+	public File getProductStagingFolder() {
+		return productStagingFolder;
+	}
+
+	/**
+	 * @param productStagingFolder the productStagingFolder to set
+	 */
+	public void setProductStagingFolder(File productStagingFolder) {
+		this.productStagingFolder = productStagingFolder;
 	}
 }
