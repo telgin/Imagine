@@ -188,4 +188,12 @@ public class TrackingGroup {
 	public void setProductStagingFolder(File productStagingFolder) {
 		this.productStagingFolder = productStagingFolder;
 	}
+
+	public void clearTrackedPaths() {
+		trackedFiles = new HashSet<File>();
+	}
+	
+	public void clearUntrackedPaths() {
+		untrackedFiles = new HashSet<File>();
+	}
 }

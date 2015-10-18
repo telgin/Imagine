@@ -3,23 +3,25 @@ package database;
 import hibernate.Metadata;
 import logging.LogLevel;
 import logging.Logger;
+import runner.ActiveComponent;
+import runner.SystemManager;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import data.TrackingGroup;
-import util.FileSystemUtil;
-import util.Hashing;
 
-public class Database {
+public class Database implements ActiveComponent{
 	private static final int MAX_LOADED_INDEX_FILES = 5;
 	private static BlockingQueue<IndexFile> loadedIndexFiles = 
 			new LinkedBlockingQueue<IndexFile>();
+	private static boolean shutdown;
+	
+	static
+	{
+		SystemManager.registerActiveComponent(new Database());
+	}
 
 	public static Metadata getFileMetadata(File f, TrackingGroup group) {
 		Metadata indexMetadata = getIndexFile(f, group).getFileMetadata(f);
@@ -88,5 +90,16 @@ public class Database {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+	}
+
+	@Override
+	public void shutdown() {
+		save();
+		shutdown = true;
+	}
+
+	@Override
+	public boolean isShutdown() {
+		return shutdown;
 	}
 }

@@ -28,4 +28,14 @@ public class SystemManager {
 		//shutdown the log last
 		Logger.shutdown();
 	}
+	
+	public static boolean isShutdown()
+	{
+		for (ActiveComponent component:components)
+		{
+			if (!component.isShutdown())
+				return false;
+		}
+		return true;
+	}
 }

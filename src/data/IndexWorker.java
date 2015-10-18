@@ -60,7 +60,8 @@ public class IndexWorker implements Runnable{
 		
 		while (!shuttingDown)
 		{
-			Logger.log(LogLevel.k_debug, "Index worker running...");
+			Logger.log(LogLevel.k_debug, "Index worker running, " +
+					initialFolders.size() + " initialFolders left, active=" + active);
 			
 			//index all top level folders
 			while (initialFolders.size() > 0)
@@ -176,9 +177,13 @@ public class IndexWorker implements Runnable{
 			//(It cannot be a metadata update)
 			queue.add(FileSystemUtil.loadMetadataFromFile(file));
 		}
+		
+		System.err.println("Done processing: " + file.getName());
 	}
 
 	public boolean isActive() {
+		System.out.println("Returning active state: " + active + ", " +
+				initialFolders.size() + " initialFolders left");
 		return active;
 	}
 }

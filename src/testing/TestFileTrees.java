@@ -9,27 +9,33 @@ import com.google.common.io.Files;
 import util.FileSystemUtil;
 
 public class TestFileTrees {
-	private static HashMap<Integer, FileTree> trees;
+	private static HashMap<String, FileTree> trees;
 	private static File bank = new File("testing/bank/");
 	
 	static
 	{
 		//trees:
-		trees = new HashMap<Integer, FileTree>();
-		trees.put(1, getFileTree1());
+		trees = new HashMap<String, FileTree>();
+		trees.put("nofiles", getNoFilesTree());
+		trees.put("smallfile", getSmallFileTree());
+		trees.put("smallfiles", getSmallFilesTree());
+		trees.put("bigfile", getBigFileTree());
+		trees.put("dynamictree", getDynamicTree());
 	}
 	
-	public static void clear(File parent, int i)
+	public static void clear(File parent, String name)
 	{
-		clearFolder(trees.get(i).getRoot(parent));
+		clearFolder(trees.get(name.toLowerCase()).getRoot(parent));
 	}
 
-	private static FileTree getFileTree1() {
+
+
+	private static FileTree getNoFilesTree() {
 		FileTree tree = new FileTree(){
 
 			@Override
 			public File getRoot(File parent) {
-				return new File(parent.getPath() + "/testFiles1/");
+				return new File(parent.getPath() + "/noFiles/");
 			}
 
 			@Override
@@ -42,15 +48,87 @@ public class TestFileTrees {
 		return tree;
 	}
 
-	public static void reset(File parent, int i)
-	{
-		clear(parent, i);
-		create(parent, i);
+	private static FileTree getSmallFileTree() {
+		FileTree tree = new FileTree(){
+
+			@Override
+			public File getRoot(File parent) {
+				return new File(parent.getPath() + "/smallFile/");
+			}
+
+			@Override
+			public void create(File parent) {
+				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));				
+			}
+			
+		};
+		
+		return tree;
 	}
 	
-	public static void create(File parent, int i)
+	private static FileTree getSmallFilesTree() {
+		FileTree tree = new FileTree(){
+
+			@Override
+			public File getRoot(File parent) {
+				return new File(parent.getPath() + "/smallFiles/");
+			}
+
+			@Override
+			public void create(File parent) {
+				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));				
+			}
+			
+		};
+		
+		return tree;
+	}
+
+	private static FileTree getBigFileTree() {
+		FileTree tree = new FileTree(){
+
+			@Override
+			public File getRoot(File parent) {
+				return new File(parent.getPath() + "/bigFile/");
+			}
+
+			@Override
+			public void create(File parent) {
+				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));				
+			}
+			
+		};
+		
+		return tree;
+	}
+
+	private static FileTree getDynamicTree() {
+		FileTree tree = new FileTree(){
+
+			@Override
+			public File getRoot(File parent) {
+				return new File(parent.getPath() + "/dynamicTree/");
+			}
+
+			@Override
+			public void create(File parent) {
+				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));				
+			}
+			
+		};
+		
+		return tree;
+	}
+
+	public static void reset(File parent, String name)
 	{
-		trees.get(i).create(parent);
+		clear(parent, name.toLowerCase());
+		create(parent, name.toLowerCase());
+	}
+	
+	public static void create(File parent, String name)
+	{
+		trees.get(name.toLowerCase()).create(parent);
 	}
 	
 	private static void clearFolder(File folder)
@@ -60,8 +138,8 @@ public class TestFileTrees {
 		folder.mkdir();
 	}
 
-	public static File getRoot(File parent, int i) {
-		return trees.get(i).getRoot(parent);
+	public static File getRoot(File parent, String name) {
+		return trees.get(name.toLowerCase()).getRoot(parent);
 	}
 	
 	private static void addFile(File target, File newParent)

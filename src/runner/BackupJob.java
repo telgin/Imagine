@@ -47,6 +47,10 @@ public class BackupJob implements Runnable{
 		
 		addIndexWorkers();
 		addProductWorkers();
+		
+		System.err.println("RemainingFiles: ");
+		for (File f:remainingFiles)
+			System.err.println(f.getPath());
 	}
 	
 	private void addIndexWorkers() {
@@ -122,7 +126,11 @@ public class BackupJob implements Runnable{
 				for (int i=0; i<indexWorkers.length && remainingFiles.size() > 0; ++i)
 				{
 					if (!indexWorkers[i].isActive())
+					{
+						indexWorkers[i].shutdown();
 						indexWorkers[i] = setupNewIndexWorker();
+					}
+						
 				}
 				
 				if (indexWorkersInactive() && remainingFiles.size() == 0 && queue.size() == 0)
@@ -190,7 +198,10 @@ public class BackupJob implements Runnable{
 
 	private IndexWorker setupNewIndexWorker() {
 		Logger.log(LogLevel.k_debug, "Adding new Index Worker.");
-		return new IndexWorker(queue, remainingFiles.remove(0), group);
+		File next = remainingFiles.remove(0);
+		System.err.println("Adding index worker for " + next.getPath());
+		System.err.println("remainingFiles.size()=" + remainingFiles.size());
+		return new IndexWorker(queue, next, group);
 	}
 
 	private void sleep(long ms)
@@ -207,5 +218,16 @@ public class BackupJob implements Runnable{
 
 	public void setMaxWaitingFiles(int maxWaitingFiles) {
 		this.maxWaitingFiles = maxWaitingFiles;
+	}
+
+	public void printState() {
+		String text = "State:\n";
+		text += "shuttingdown=" + shuttingDown + "\n";
+		text += "active=" + active + "\n";
+		text += "finished=" + finished + "\n";
+		text += "queue.size()=" + queue.size() + "\n";
+		text += "indexWorkersActive()=" + !indexWorkersInactive() + "\n";
+		text += "productWorkersActive()=" + !productWorkersInactive();
+		System.out.println(text);
 	}
 }
