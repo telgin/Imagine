@@ -48,9 +48,9 @@ public class BackupJob implements Runnable{
 		addIndexWorkers();
 		addProductWorkers();
 		
-		System.err.println("RemainingFiles: ");
-		for (File f:remainingFiles)
-			System.err.println(f.getPath());
+		//System.err.println("RemainingFiles: ");
+		//for (File f:remainingFiles)
+		//	System.err.println(f.getPath());
 	}
 	
 	private void addIndexWorkers() {
@@ -199,8 +199,8 @@ public class BackupJob implements Runnable{
 	private IndexWorker setupNewIndexWorker() {
 		Logger.log(LogLevel.k_debug, "Adding new Index Worker.");
 		File next = remainingFiles.remove(0);
-		System.err.println("Adding index worker for " + next.getPath());
-		System.err.println("remainingFiles.size()=" + remainingFiles.size());
+		//System.err.println("Adding index worker for " + next.getPath());
+		//System.err.println("remainingFiles.size()=" + remainingFiles.size());
 		return new IndexWorker(queue, next, group);
 	}
 

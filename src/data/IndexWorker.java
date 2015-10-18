@@ -45,7 +45,7 @@ public class IndexWorker implements Runnable{
 		folders.add(file);
 		initialFolders = folders;
 		
-		System.out.println("Given " + initialFolders.size() + " folders");
+		//System.out.println("Given " + initialFolders.size() + " folders");
 	}
 	
 	public void shutdown()
@@ -146,7 +146,7 @@ public class IndexWorker implements Runnable{
 					
 					fileMetadata.setPreviousProductUUID(recordMetadata.getProductUUID());
 					
-					System.out.println("Adding to queue");
+					//System.out.println("Adding to queue");
 					queue.add(fileMetadata);
 				}
 				else
@@ -182,8 +182,8 @@ public class IndexWorker implements Runnable{
 	}
 
 	public boolean isActive() {
-		System.out.println("Returning active state: " + active + ", " +
-				initialFolders.size() + " initialFolders left");
+		//System.out.println("Returning active state: " + active + ", " +
+		//		initialFolders.size() + " initialFolders left");
 		return active;
 	}
 }

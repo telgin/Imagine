@@ -39,9 +39,7 @@ public class TestFileTrees {
 			}
 
 			@Override
-			public void create(File parent) {
-				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));				
-			}
+			public void create(File parent) {}
 			
 		};
 		
@@ -94,7 +92,7 @@ public class TestFileTrees {
 
 			@Override
 			public void create(File parent) {
-				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));				
+				addFile(new File(bank.getPath() + "/Computer Art.zip"), getRoot(parent));				
 			}
 			
 		};
@@ -112,7 +110,7 @@ public class TestFileTrees {
 
 			@Override
 			public void create(File parent) {
-				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));				
+				addFile(new File(bank.getPath() + "/eclipse-installer"), getRoot(parent));				
 			}
 			
 		};

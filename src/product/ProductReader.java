@@ -21,7 +21,6 @@ public class ProductReader {
 	//private final ProductFactory<? extends Product> factory;
 	
 	private Product product;
-	private boolean productEmpty;
 	private long curPartLengthRemaining;
 	private byte[] curFileHash;
 	private long curFragmentNumber;
@@ -32,7 +31,6 @@ public class ProductReader {
 	{
 		//this.factory = factory;
 		product = factory.create();
-		productEmpty = false;
 	}
 	
 	public ProductContents getProductHeader(File productFile)
@@ -57,7 +55,7 @@ public class ProductReader {
 		try
 		{
 			contents = readProductHeader(true);
-			while (!productEmpty)
+			while (product.getRemainingBytes() >= Constants.FRAGMENT_NUMBER_SIZE)
 			{
 				
 				FileContents fileContents = readNextFileHeader(true);
@@ -98,11 +96,7 @@ public class ProductReader {
 		{
 			contents = readProductHeader(true);
 			
-			//secure products will secure data beyond this point
-			if (product.getProductMode().equals(ProductMode.SECURE))
-				product.secureStream();
-			
-			while (!productEmpty)
+			while (product.getRemainingBytes() >= Constants.FRAGMENT_NUMBER_SIZE)
 			{
 				
 				FileContents fileContents = readNextFileHeader(true);
@@ -146,6 +140,7 @@ public class ProductReader {
 	{
 		try {
 			product.loadFile(productFile);
+			Logger.log(LogLevel.k_debug, "Loaded Product File for Reading: " + productFile.getName());
 		} catch (IOException e) {
 			Logger.log(LogLevel.k_error, "Failed to load product file " + productFile.getName());
 			Logger.log(LogLevel.k_error, e, false);
@@ -166,11 +161,7 @@ public class ProductReader {
 		{
 			readProductHeader(false);
 			
-			//secure products will secure data beyond this point
-			if (product.getProductMode().equals(ProductMode.SECURE))
-				product.secureStream();
-			
-			while (!productEmpty)
+			while (product.getRemainingBytes() >= Constants.FRAGMENT_NUMBER_SIZE)
 			{
 				FileContents fileContents = readNextFileHeader(true);
 				if (fileContents != null)
@@ -213,18 +204,18 @@ public class ProductReader {
 
 		try
 		{
+			//stealth products need their uuid
+			if (product.getProductMode().equals(ProductMode.STEALTH))
+			{
+				product.setUUID(product.readUUID());
+				product.secureStream();
+			}
+			
 			//in this case, the code for reading and skipping is substantially different
 			if (parseData)
 			{
 				ProductContents contents = new ProductContents();
 
-				//stealth products need their uuid
-				if (product.getProductMode().equals(ProductMode.STEALTH))
-				{
-					product.setUUID(product.readUUID());
-					product.secureStream();
-				}
-				
 				//product version
 				contents.setProductVersionNumber(ByteConversion.byteToInt(product.read()));
 				
@@ -274,7 +265,7 @@ public class ProductReader {
 				contents.setGroupKeyName(new String(buffer));
 				
 				//secure products secure the stream now with the uuid they were given
-				if (product.getProductMode().equals(ProductMode.STEALTH))
+				if (product.getProductMode().equals(ProductMode.SECURE))
 				{
 					product.secureStream();
 				}
@@ -322,6 +313,12 @@ public class ProductReader {
 				
 				//group key name
 				product.skip(groupKeyNameLength);
+				
+				//secure products secure the stream now with the uuid they were given
+				if (product.getProductMode().equals(ProductMode.SECURE))
+				{
+					product.secureStream();
+				}
 				
 				return null;
 			}
@@ -462,7 +459,7 @@ public class ProductReader {
 				//file length remaining
 				buffer = new byte[Constants.FILE_LENGTH_REMAINING_SIZE];
 				product.read(buffer);
-				curPartLengthRemaining = ByteConversion.bytesToLong(buffer);
+				curPartLengthRemaining = Math.min(ByteConversion.bytesToLong(buffer), product.getRemainingBytes());
 				
 				if (parseData)
 				{
@@ -484,16 +481,23 @@ public class ProductReader {
 	private File readNextFileData(boolean saveData)
 	{
 		if (saveData)
-		{		
-			byte[] buffer = new byte[(int) Math.min(Constants.MAX_READ_BUFFER_SIZE, curPartLengthRemaining)];
+		{	
+			int bufferSize = (int) (Math.min(Constants.MAX_READ_BUFFER_SIZE, Math.min(product.getRemainingBytes(), curPartLengthRemaining)));
+			byte[] buffer = new byte[bufferSize];
 			File partFile = getPartFileName(curFileHash, curFragmentNumber);
 			BufferedOutputStream bos = null;
+			System.out.println("Reading File data: " + buffer.length);
+			System.out.println("There are " + curPartLengthRemaining +
+					" bytes remaining in the product though.");
 			
 			try
 			{
 				bos = new BufferedOutputStream(new FileOutputStream(partFile));
 				while (curPartLengthRemaining > 0)
 				{
+					System.out.println("Reading File data: " + buffer.length);
+					System.out.println("There are " + product.getRemainingBytes() +
+							" bytes remaining in the product though.");
 					product.read(buffer);
 					bos.write(buffer);
 					curPartLengthRemaining -= buffer.length;

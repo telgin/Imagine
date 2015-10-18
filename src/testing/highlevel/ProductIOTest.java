@@ -52,48 +52,80 @@ public class ProductIOTest {
 		
 				static TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
 				
-				@Test(timeout = 10000)
-				public void testNoFiles_1_1(){ testNoFiles(group, 1, 1); }
+//				@Test(timeout = 10000)
+//				public void testNoFiles_1_1(){ testNoFiles(group, 1, 1); }
 				@Test(timeout = 10000)
 				public void testSmallFile_1_1(){ testSmallFile(group, 1, 1); }
-				@Test(timeout = 10000)
-				public void testSmallFiles_1_1(){ testSmallFiles(group, 1, 1); }
-				@Test(timeout = 10000)
+//				@Test(timeout = 10000)
+//				public void testSmallFiles_1_1(){ testSmallFiles(group, 1, 1); }
+				@Test(timeout = 20000)
 				public void testBigFile_1_1(){ testBigFile(group, 1, 1); }
-				@Test(timeout = 10000)
-				public void testDynamicTree_1_1(){ testDynamicTree(group, 1, 1); }
+//				@Test(timeout = 10000)
+//				public void testDynamicTree_1_1(){ testDynamicTree(group, 1, 1); }
 				
-				@Test(timeout = 10000)
-				public void testNoFiles_5_5(){ testNoFiles(group, 5, 5); }
+//				@Test(timeout = 10000)
+//				public void testNoFiles_5_5(){ testNoFiles(group, 5, 5); }
 				@Test(timeout = 10000)
 				public void testSmallFile_5_5(){ testSmallFile(group, 5, 5); }
-				@Test(timeout = 10000)
-				public void testSmallFiles_5_5(){ testSmallFiles(group, 5, 5); }
-				@Test(timeout = 10000)
+//				@Test(timeout = 10000)
+//				public void testSmallFiles_5_5(){ testSmallFiles(group, 5, 5); }
+				@Test(timeout = 20000)
 				public void testBigFile_5_5(){ testBigFile(group, 5, 5); }
-				@Test(timeout = 10000)
-				public void testDynamicTree_5_5(){ testDynamicTree(group, 5, 5); }
-				
-				@Test(timeout = 10000)
-				public void testDynamicTree_1_5(){ testDynamicTree(group, 1, 5); }
-				@Test(timeout = 10000)
-				public void testDynamicTree_5_1(){ testDynamicTree(group, 5, 1); }
+//				@Test(timeout = 10000)
+//				public void testDynamicTree_5_5(){ testDynamicTree(group, 5, 5); }
+//				
+//				@Test(timeout = 10000)
+//				public void testDynamicTree_1_5(){ testDynamicTree(group, 1, 5); }
+//				@Test(timeout = 10000)
+//				public void testDynamicTree_5_1(){ testDynamicTree(group, 5, 1); }
 			}
 	}
 	
-	public void testTextBlock() {
-		{
-			Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("TextBlock");
+	public static class TextBlockPNG
+	{
+			/**
+			 * Default parameters
+			 * File Key
+			 * Uses Database
+			 */
+			public static class TreeTests1
+			{
+				static Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("TextBlock");
 			
-			//tracking group setup
-			String keyName = "testKeyName";
-			String groupName = "testGroupName";
-			Key key = new FileKey(keyName, groupName, new File("testing/keys/key1.txt"));
-	
-			TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
-			
-			
-		}
+				//tracking group setup
+				static String keyName = "testKeyName";
+				static String groupName = "testGroupName";
+				static Key key = new FileKey(keyName, groupName, new File("testing/keys/key1.txt"));
+		
+				static TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
+				
+//				@Test(timeout = 10000)
+//				public void testNoFiles_1_1(){ testNoFiles(group, 1, 1); }
+				@Test(timeout = 10000)
+				public void testSmallFile_1_1(){ testSmallFile(group, 1, 1); }
+//				@Test(timeout = 10000)
+//				public void testSmallFiles_1_1(){ testSmallFiles(group, 1, 1); }
+				@Test(timeout = 20000)
+				public void testBigFile_1_1(){ testBigFile(group, 1, 1); }
+//				@Test(timeout = 10000)
+//				public void testDynamicTree_1_1(){ testDynamicTree(group, 1, 1); }
+				
+//				@Test(timeout = 10000)
+//				public void testNoFiles_5_5(){ testNoFiles(group, 5, 5); }
+				@Test(timeout = 10000)
+				public void testSmallFile_5_5(){ testSmallFile(group, 5, 5); }
+//				@Test(timeout = 10000)
+//				public void testSmallFiles_5_5(){ testSmallFiles(group, 5, 5); }
+				@Test(timeout = 20000)
+				public void testBigFile_5_5(){ testBigFile(group, 5, 5); }
+//				@Test(timeout = 10000)
+//				public void testDynamicTree_5_5(){ testDynamicTree(group, 5, 5); }
+//				
+//				@Test(timeout = 10000)
+//				public void testDynamicTree_1_5(){ testDynamicTree(group, 1, 5); }
+//				@Test(timeout = 10000)
+//				public void testDynamicTree_5_1(){ testDynamicTree(group, 5, 1); }
+			}
 	}
 	
 	private static void shutdown()
@@ -335,31 +367,36 @@ public class ProductIOTest {
 		
 		//see what we got:
 		//should be only one file
-		assertEquals(1, outputFolder.listFiles().length);
+		assertTrue(outputFolder.listFiles().length > 1);
 		
-		File productFile = outputFolder.listFiles()[0];
-		
-		//read the file, make sure the fields are all the same
+		//extract from all files in the output folder
 		ProductReader reader = new ProductReader(group.getProductFactory());
 		reader.setExtractionFolder(extractionFolder);
-		ProductContents productContents = reader.extractAll(productFile);
-		//System.out.println(productContents.toString());
-		assertEquals(productContents.getAlgorithmName(), group.getAlgorithm().getName());
-		assertEquals(productContents.getAlgorithmVersionNumber(), group.getAlgorithm().getVersion());
-		assertEquals(group.getKey().getName(), productContents.getGroupKeyName());
-		assertEquals(productContents.getGroupName(), group.getName());
-		assertEquals(productContents.getProductVersionNumber(), 0);
+		String extractedFilename = null;
+		for (File productFile : outputFolder.listFiles())
+		{
+			//read the file, make sure the fields are all the same
+			ProductContents productContents = reader.extractAll(productFile);
+			//System.out.println(productContents.toString());
+			assertEquals(productContents.getAlgorithmName(), group.getAlgorithm().getName());
+			assertEquals(productContents.getAlgorithmVersionNumber(), group.getAlgorithm().getVersion());
+			assertEquals(group.getKey().getName(), productContents.getGroupKeyName());
+			assertEquals(productContents.getGroupName(), group.getName());
+			assertEquals(productContents.getProductVersionNumber(), 0);
+			
+			List<FileContents> files = productContents.getFileContents();
+			assertEquals(1, files.size());
+			FileContents fileContents = files.get(0);
+	
+			Metadata extractedMetadata = fileContents.getMetadata();
+			compareMetadata(previousMetadata, extractedMetadata);
+			
+			if (extractedFilename == null)
+				extractedFilename = extractedMetadata.getFile().getName();
+		}
 		
-		
-		List<FileContents> files = productContents.getFileContents();
-		assertEquals(1, files.size());
-		FileContents fileContents = files.get(0);
-
-		Metadata extractedMetadata = fileContents.getMetadata();
-		compareMetadata(previousMetadata, extractedMetadata);
-		
-		File assembled = new File(assemblyFolder.getAbsolutePath() + "/" +
-				extractedMetadata.getFile().getName());
+		//assemble all part files into the specified extracted filename
+		File assembled = new File(assemblyFolder.getAbsolutePath() + "/" + extractedFilename);
 		PartAssembler.assemble(extractionFolder, assembled);
 		assertTrue(ByteConversion.bytesEqual(Hashing.hash(assembled), Hashing.hash(testFile)));
 		
@@ -488,11 +525,11 @@ public class ProductIOTest {
 		while (!job.isFinished())
 		{
 			try {
-				job.printState();
+				//job.printState();
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-				job.printState();
+				//job.printState();
 			}
 		}
 		

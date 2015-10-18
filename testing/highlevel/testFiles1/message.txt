@@ -1,3 +1,0 @@
-This file contains a message. The message is for testing.
-Additionally, this is another line.
-Yep.

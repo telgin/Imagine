@@ -63,7 +63,7 @@ public class TextBlock implements Product{
 
 	@Override
 	public void write(byte b) {
-		System.out.println("Wrote: " + 1);
+		//System.out.println("Wrote: " + 1);
 		buffer[index++] = b;
 	}
 
@@ -71,7 +71,7 @@ public class TextBlock implements Product{
 	public void write(byte[] bytes) {
 		System.arraycopy(bytes, 0, buffer, index, bytes.length);
 		index += bytes.length;
-		System.out.println("Wrote: " + bytes.length);
+		//System.out.println("Wrote: " + bytes.length);
 	}
 
 	@Override
@@ -93,7 +93,7 @@ public class TextBlock implements Product{
 
 	@Override
 	public byte read() {
-		System.out.println("Read: " + 1);
+		//System.out.println("Read: " + 1);
 		return buffer[index++];
 	}
 
@@ -101,7 +101,7 @@ public class TextBlock implements Product{
 	public void read(byte[] bytes) {
 		System.arraycopy(buffer, index, bytes, 0, bytes.length);
 		index += bytes.length;
-		System.out.println("Read: " + bytes.length);
+		//System.out.println("Read: " + bytes.length);
 	}
 
 	@Override
