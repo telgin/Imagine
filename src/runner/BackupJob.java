@@ -25,7 +25,7 @@ public class BackupJob implements Runnable{
 	private BlockingQueue<Metadata> queue;
 	private IndexWorker[] indexWorkers;
 	private List<ProductWorker> productWorkers;
-	private List<Thread> workerThreads;
+	private Thread[] workerThreads;
 	private int productWorkerCount;
 	private int indexWorkerCount;
 	private List<File> remainingFiles;
@@ -43,7 +43,7 @@ public class BackupJob implements Runnable{
 		queue = new LinkedBlockingQueue<Metadata>();
 		indexWorkers = new IndexWorker[Math.min(indexWorkerCount, remainingFiles.size())];
 		productWorkers = new LinkedList<ProductWorker>();
-		workerThreads = new LinkedList<Thread>();
+		workerThreads = new Thread[indexWorkers.length + productWorkerCount];
 		
 		addIndexWorkers();
 		addProductWorkers();
@@ -82,18 +82,18 @@ public class BackupJob implements Runnable{
 	public void start() {
 		Logger.log(LogLevel.k_debug, "Backup job starting...");
 		
-		for (ProductWorker pw: productWorkers)
+		for (int i=indexWorkers.length; i<workerThreads.length; ++i)
 		{
-			Thread thread = new Thread(pw);
-			workerThreads.add(thread);
+			Thread thread = new Thread(productWorkers.get(i-indexWorkers.length));
+			workerThreads[i] = thread;
 			thread.start();
 			sleep(100);
 		}
 		
-		for (IndexWorker iw: indexWorkers)
+		for (int i=0; i<indexWorkers.length; ++i)
 		{
-			Thread thread = new Thread(iw);
-			workerThreads.add(thread);
+			Thread thread = new Thread(indexWorkers[i]);
+			workerThreads[i] = thread;
 			thread.start();
 		}		
 	}
@@ -129,6 +129,9 @@ public class BackupJob implements Runnable{
 					{
 						indexWorkers[i].shutdown();
 						indexWorkers[i] = setupNewIndexWorker();
+						Thread iThread = new Thread(indexWorkers[i]);
+						workerThreads[i] = iThread;
+						iThread.start();
 					}
 						
 				}
@@ -199,8 +202,8 @@ public class BackupJob implements Runnable{
 	private IndexWorker setupNewIndexWorker() {
 		Logger.log(LogLevel.k_debug, "Adding new Index Worker.");
 		File next = remainingFiles.remove(0);
-		//System.err.println("Adding index worker for " + next.getPath());
-		//System.err.println("remainingFiles.size()=" + remainingFiles.size());
+		System.err.println("Adding index worker for " + next.getPath());
+		System.err.println("remainingFiles.size()=" + remainingFiles.size());
 		return new IndexWorker(queue, next, group);
 	}
 

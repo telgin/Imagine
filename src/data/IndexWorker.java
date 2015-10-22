@@ -86,6 +86,7 @@ public class IndexWorker implements Runnable{
 	private void crawl(File f, int depth){
 		active = true;
 		Logger.log(LogLevel.k_debug, "Depth: " + depth);
+		System.out.println("Crawling on " + f.getAbsolutePath());
 		if (!shuttingDown && !f.getName().equals(Constants.INDEX_FOLDER_NAME))
 		{
 			//if the file list is not null, go through all the files

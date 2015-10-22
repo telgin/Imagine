@@ -10,6 +10,7 @@ import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
 import util.Constants;
+import util.Hashing;
 import config.Configuration;
 import data.TrackingGroup;
 import hibernate.Metadata;
@@ -61,7 +62,7 @@ public class ProductReader {
 				FileContents fileContents = readNextFileHeader(true);
 				if (fileContents != null)
 				{
-					readNextFileData(false);
+					readNextFileData(false, fileContents.getMetadata().getFile());
 					
 					//at least get the metadata even if a failure occurred
 					contents.addFileContents(fileContents);
@@ -105,10 +106,10 @@ public class ProductReader {
 				
 				if (fileContents != null)
 				{
-					File extracted = readNextFileData(true);
+					File extracted = readNextFileData(true, fileContents.getMetadata().getFile());
 					if (extracted != null)
 					{
-						fileContents.setExtractedFile(extracted);
+						fileContents.setExtractedFile(extracted.getParentFile());
 					}
 					else
 					{
@@ -168,7 +169,7 @@ public class ProductReader {
 				{
 					if (ByteConversion.bytesEqual(fileContents.getMetadata().getFileHash(), hash))
 					{
-						File extracted = readNextFileData(true);
+						File extracted = readNextFileData(true, fileContents.getMetadata().getFile());
 						if (extracted != null)
 						{
 							fileContents.setExtractedFile(extracted);
@@ -478,13 +479,15 @@ public class ProductReader {
 		}
 	}
 	
-	private File readNextFileData(boolean saveData)
+	private File readNextFileData(boolean saveData, File origFile)
 	{
 		if (saveData)
 		{	
 			int bufferSize = (int) (Math.min(Constants.MAX_READ_BUFFER_SIZE, Math.min(product.getRemainingBytes(), curPartLengthRemaining)));
 			byte[] buffer = new byte[bufferSize];
-			File partFile = getPartFileName(curFileHash, curFragmentNumber);
+			File partFile = getPartFileName(origFile, curFragmentNumber);
+			if (!partFile.getParentFile().exists())
+				partFile.getParentFile().mkdir();
 			BufferedOutputStream bos = null;
 			System.out.println("Reading File data: " + buffer.length);
 			System.out.println("There are " + curPartLengthRemaining +
@@ -564,10 +567,11 @@ public class ProductReader {
 	}
 	
 
-	private File getPartFileName(byte[] fileHash, long fragmentNumber)
+	private File getPartFileName(File origFile, long fragmentNumber)
 	{
-		String path = extractionFolder.getAbsolutePath() + "/" +
-				Integer.toString(Math.abs(ByteConversion.bytesToInt(fileHash, 0))) +
+		byte[] pathHash = Hashing.hash(origFile.getAbsolutePath().getBytes());
+		String fileID = Integer.toString(Math.abs(ByteConversion.bytesToInt(pathHash, 0)));
+		String path = extractionFolder.getAbsolutePath() + "/" + fileID + "/" + fileID +
 				"_" + fragmentNumber + ".part";
 		
 		return new File(path);

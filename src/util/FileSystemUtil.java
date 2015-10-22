@@ -4,16 +4,27 @@ import hibernate.Metadata;
 import logging.LogLevel;
 import logging.Logger;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+
+import database.Database;
 
 public class FileSystemUtil {
 	
@@ -216,5 +227,100 @@ public class FileSystemUtil {
 	        }
 	    }
 	    file.delete();
+	}
+	
+	
+	/**
+	 * @credit http://www.mkyong.com/java/how-to-copy-directory-in-java/
+	 * @param src
+	 * @param dest
+	 * @throws IOException 
+	 */
+	public static void copyDir2(File src, File dest) throws IOException
+	{
+		if(src.isDirectory()){
+    		
+    		if(!dest.exists())
+    		   dest.mkdir();
+    		
+    		for (String file : src.list()) {
+    		   File srcFile = new File(src, file);
+    		   File destFile = new File(dest, file);
+
+    		   copyDir2(srcFile,destFile);
+    		}
+    	   
+    	}else{
+    		com.google.common.io.Files.copy(src,  dest);
+    	}
+	}
+	
+	/**
+	 * (Can't believe it's this complicated in Java)
+	 * @credit http://javatutorialhq.com/java/example-source-code/io/nio/folder-copy/
+	 * @param from
+	 * @param to
+	 * @throws IOException 
+	 */
+	public static void copyDir(File from, File to) throws IOException
+	{
+		Path source = from.toPath();
+		Path target = to.toPath();
+		
+		CopyOption[] copyOptions = new CopyOption[]
+		{
+			StandardCopyOption.COPY_ATTRIBUTES,
+			StandardCopyOption.REPLACE_EXISTING
+		};
+
+		if(Files.isDirectory(source))
+		{
+			Files.walkFileTree(source,
+					EnumSet.of(FileVisitOption.FOLLOW_LINKS),
+					Integer.MAX_VALUE,
+					new FileVisitor<Path>()
+				{
+					@Override
+					public FileVisitResult postVisitDirectory(Path dir,
+							IOException exc) throws IOException
+					{
+						return FileVisitResult.CONTINUE;
+					}
+	
+					@Override
+					public FileVisitResult preVisitDirectory(Path dir,
+							BasicFileAttributes attrs)
+					{
+						Path newDirectory = target.resolve(source.relativize(dir));
+						try
+						{
+							Files.copy(dir, newDirectory, copyOptions);
+						}
+						catch(FileAlreadyExistsException x){}
+						catch(IOException x)
+						{
+							return FileVisitResult.SKIP_SUBTREE;
+						}
+	
+						return FileVisitResult.CONTINUE;
+					}
+	
+					@Override
+					public FileVisitResult visitFile(Path file,
+							BasicFileAttributes attrs) throws IOException
+					{
+						Files.copy(source, target, copyOptions);
+						return FileVisitResult.CONTINUE;
+					}
+	
+					@Override
+					public FileVisitResult visitFileFailed(Path file,
+							IOException exc) throws IOException
+					{
+						return FileVisitResult.CONTINUE;
+					}
+				}
+			);
+		}
 	}
 }

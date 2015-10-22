@@ -18,9 +18,9 @@ public class TestFileTrees {
 		trees = new HashMap<String, FileTree>();
 		trees.put("nofiles", getNoFilesTree());
 		trees.put("smallfile", getSmallFileTree());
-		trees.put("smallfiles", getSmallFilesTree());
+		trees.put("smalltree", getSmallTree());
 		trees.put("bigfile", getBigFileTree());
-		trees.put("dynamictree", getDynamicTree());
+		trees.put("bigtree", getBigTree());
 	}
 	
 	public static void clear(File parent, String name)
@@ -64,17 +64,17 @@ public class TestFileTrees {
 		return tree;
 	}
 	
-	private static FileTree getSmallFilesTree() {
+	private static FileTree getSmallTree() {
 		FileTree tree = new FileTree(){
 
 			@Override
 			public File getRoot(File parent) {
-				return new File(parent.getPath() + "/smallFiles/");
+				return new File(parent.getPath() + "/smallTree/");
 			}
 
 			@Override
 			public void create(File parent) {
-				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));				
+				addFile(new File(bank.getPath(), "/tracked_topfolder_r/"), getRoot(parent));				
 			}
 			
 		};
@@ -100,17 +100,17 @@ public class TestFileTrees {
 		return tree;
 	}
 
-	private static FileTree getDynamicTree() {
+	private static FileTree getBigTree() {
 		FileTree tree = new FileTree(){
 
 			@Override
 			public File getRoot(File parent) {
-				return new File(parent.getPath() + "/dynamicTree/");
+				return new File(parent.getPath() + "/bigTree/");
 			}
 
 			@Override
 			public void create(File parent) {
-				addFile(new File(bank.getPath() + "/eclipse-installer"), getRoot(parent));				
+				addFile(new File(bank.getPath() + "/eclipse-installer/"), getRoot(parent));				
 			}
 			
 		};
@@ -131,7 +131,6 @@ public class TestFileTrees {
 	
 	private static void clearFolder(File folder)
 	{
-		//folder.delete();
 		FileSystemUtil.deleteDir(folder);
 		folder.mkdir();
 	}
@@ -144,7 +143,10 @@ public class TestFileTrees {
 	{
 		File copyTo = new File(newParent.getPath() + "/" + target.getName());
 		try {
-			Files.copy(target, copyTo);
+			if (target.isDirectory())
+				FileSystemUtil.copyDir2(target, copyTo);
+			else
+				Files.copy(target, copyTo);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
