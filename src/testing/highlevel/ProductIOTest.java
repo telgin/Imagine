@@ -35,7 +35,7 @@ import util.FileSystemUtil;
 import util.Hashing;
 
 public class ProductIOTest {
-	private static File homeFolder = new File("testing/highlevel/");
+	static File homeFolder = new File("testing/highlevel/");
 	private static File outputFolder = new File("testing/output/");
 	private static File extractionFolder = new File("testing/extraction/");
 	private static File assemblyFolder = new File("testing/assembly/");

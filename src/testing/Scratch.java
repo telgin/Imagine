@@ -18,6 +18,8 @@ import javax.imageio.ImageIO;
 
 import util.ByteConversion;
 import util.FileSystemUtil;
+import util.algorithms.HashRandom;
+import util.algorithms.UniqueRandomRange;
 import config.Configuration;
 import data.IndexWorker;
 import data.ProductWorker;
@@ -27,8 +29,6 @@ import product.ProductLoader;
 import product.ProductReader;
 import algorithms.fullpng.FullPNG;
 import algorithms.fullpng.FullPNGFactory;
-import algorithms.fullpng.HashRandom;
-import algorithms.fullpng.UniqueRandomRange;
 
 public class Scratch {
 	public static void main(String args[]) throws IOException, InterruptedException{

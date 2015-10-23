@@ -1,4 +1,4 @@
-package algorithms.fullpng;
+package util.algorithms;
 
 public class ImageUtil {
 	

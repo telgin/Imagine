@@ -23,6 +23,9 @@ public class AlgorithmRegistry {
 		
 		definitions.put(algorithms.fullpng.Definition.getInstance().getName(),
 				algorithms.fullpng.Definition.getInstance());
+		
+		definitions.put(algorithms.stealthpng.Definition.getInstance().getName(),
+				algorithms.stealthpng.Definition.getInstance());
 	}
 	
 	/**

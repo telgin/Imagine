@@ -1,4 +1,4 @@
-package algorithms.fullpng;
+package util.algorithms;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
