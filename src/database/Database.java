@@ -7,15 +7,18 @@ import runner.ActiveComponent;
 import runner.SystemManager;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import data.TrackingGroup;
 
 public class Database implements ActiveComponent{
-	private static final int MAX_LOADED_INDEX_FILES = 5;
+	private static final int MAX_LOADED_INDEX_FILES = 50;
 	private static BlockingQueue<IndexFile> loadedIndexFiles = 
 			new LinkedBlockingQueue<IndexFile>();
+	private static BlockingQueue<IndexFile> toSave = new LinkedBlockingQueue<IndexFile>();
 	private static boolean shutdown;
 	
 	static
@@ -28,6 +31,8 @@ public class Database implements ActiveComponent{
 		
 		//the index metadata might be null if the file is new
 		//and doesn't exist there yet
+		if (indexMetadata == null)
+			System.err.println("METADATA FOR " + f.getName() + " WAS NULL!!!");
 		
 		return indexMetadata;
 	}
@@ -48,10 +53,27 @@ public class Database implements ActiveComponent{
 		index.saveMetadata(metadata);
 	}
 
-	private static IndexFile getIndexFile(File lookup, TrackingGroup group) {
+	private static synchronized IndexFile getIndexFile(File lookup, TrackingGroup group) {
 		//search the preloaded index files first
 		
 		File indexFilePath = IndexFile.findIndexFile(lookup, group);
+		
+		//search within saving files first,
+		//block while it's in here
+//		boolean saving = true;
+//		while (saving)
+//		{
+//			for (IndexFile index:toSave)
+//			{
+//				if (index.getPath().equals(indexFilePath))
+//				{
+//					//index was preloaded, just return it
+//					return index;
+//				}
+//			}
+//		}
+		
+		//search within loaded files
 		for (IndexFile index:loadedIndexFiles)
 		{
 			if (index.getPath().equals(indexFilePath))
@@ -66,13 +88,26 @@ public class Database implements ActiveComponent{
 		if (loadedIndexFiles.size() >= MAX_LOADED_INDEX_FILES)
 		{
 			//make some room
-			try {
-				IndexFile removed = loadedIndexFiles.take();
-				removed.save();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			for (int i=0; i < 5 && !loadedIndexFiles.isEmpty(); ++i)
+			{
+				try {
+					loadedIndexFiles.peek().save();
+					loadedIndexFiles.take();
+					//IndexFile removed = loadedIndexFiles.take();
+					//removed.save();
+					//toSave.add(loadedIndexFiles.take());
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
+		
+//		while (!toSave.isEmpty())
+//			try {
+//				toSave.take().save();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		
 		IndexFile index = IndexFile.loadIndex(lookup, group);
 		if (index != null)

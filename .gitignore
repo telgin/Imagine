@@ -1,7 +1,11 @@
 /bin/
 /keys/
 /logs/
-/output/
+/output/*
+/testing/assembly/*
+/testing/extraction/*
+/testing/highlevel/*
+/testing/output/*
 /products/
 /specs/
 /testGroupInput/

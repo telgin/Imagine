@@ -181,7 +181,7 @@ public class ProductLoader
 		DataInputStream reader = new DataInputStream(new FileInputStream(fileMetadata.getFile()));
 		
 		//write the file to one or multiple products
-		while (fileLengthRemaining > 0)
+		do
 		{
 			//check that there is enough space left for the metadata and some data
 			if (fileHeaderSize + 1 > currentProduct.getRemainingBytes())
@@ -225,6 +225,7 @@ public class ProductLoader
 				fileLengthRemaining = writeFileData(reader, fileLengthRemaining);
 			}
 		}
+		while (fileLengthRemaining > 0);
 		
 		reader.close();
 		

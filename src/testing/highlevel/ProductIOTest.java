@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.junit.Test;
@@ -39,100 +42,6 @@ public class ProductIOTest {
 	private static boolean shutdownCalled = true;
 	private static ArrayList<BackupJob> jobs = new ArrayList<BackupJob>();
 
-	public static class TestFullPNG
-	{
-			/**
-			 * Default parameters
-			 * File Key
-			 * Uses Database
-			 */
-			public static class TreeTests1
-			{
-				static Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("FullPNG");
-			
-				//tracking group setup
-				static String keyName = "testKeyName";
-				static String groupName = "testGroupName";
-				static Key key = new FileKey(keyName, groupName, new File("testing/keys/key1.txt"));
-		
-				static TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
-				
-				@Test(timeout = 10000)
-				public void testNoFiles_1_1(){ testNoFiles(group, 1, 1); }
-				@Test(timeout = 10000)
-				public void testSmallFile_1_1(){ testSmallFile(group, 1, 1); }
-				@Test(timeout = 20000)
-				public void testSmallTree_1_1(){ testSmallTree(group, 1, 1); }
-				@Test(timeout = 20000)
-				public void testBigFile_1_1(){ testBigFile(group, 1, 1); }
-//				@Test(timeout = 10000)
-//				public void testBigTree_1_1(){ testBigTree(group, 1, 1); }
-				
-				@Test(timeout = 10000)
-				public void testNoFiles_5_5(){ testNoFiles(group, 5, 5); }
-				@Test(timeout = 10000)
-				public void testSmallFile_5_5(){ testSmallFile(group, 5, 5); }
-				@Test(timeout = 20000)
-				public void testSmallTree_5_5(){ testSmallTree(group, 5, 5); }
-				@Test(timeout = 20000)
-				public void testBigFile_5_5(){ testBigFile(group, 5, 5); }
-//				@Test(timeout = 10000)
-//				public void testBigTree_5_5(){ testBigTree(group, 5, 5); }
-//				
-//				@Test(timeout = 10000)
-//				public void testBigTree_1_5(){ testBigTree(group, 1, 5); }
-//				@Test(timeout = 10000)
-//				public void testBigTree_5_1(){ testBigTree(group, 5, 1); }
-			}
-	}
-	
-	public static class TestTextBlock
-	{
-			/**
-			 * Default parameters
-			 * File Key
-			 * Uses Database
-			 */
-			public static class TreeTests1
-			{
-				static Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("TextBlock");
-			
-				//tracking group setup
-				static String keyName = "testKeyName";
-				static String groupName = "testGroupName";
-				static Key key = new FileKey(keyName, groupName, new File("testing/keys/key1.txt"));
-		
-				static TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
-				
-				@Test(timeout = 10000)
-				public void testNoFiles_1_1(){ testNoFiles(group, 1, 1); }
-				@Test(timeout = 10000)
-				public void testSmallFile_1_1(){ testSmallFile(group, 1, 1); }
-				@Test(timeout = 18000)
-				public void testSmallTree_1_1(){ testSmallTree(group, 1, 1); }
-				@Test(timeout = 10000)
-				public void testBigFile_1_1(){ testBigFile(group, 1, 1); }
-//				@Test(timeout = 10000)
-//				public void testBigTree_1_1(){ testBigTree(group, 1, 1); }
-				
-				@Test(timeout = 10000)
-				public void testNoFiles_5_5(){ testNoFiles(group, 5, 5); }
-				@Test(timeout = 10000)
-				public void testSmallFile_5_5(){ testSmallFile(group, 5, 5); }
-				@Test(timeout = 10000)
-				public void testSmallTree_5_5(){ testSmallTree(group, 5, 5); }
-				@Test(timeout = 10000)
-				public void testBigFile_5_5(){ testBigFile(group, 5, 5); }
-//				@Test(timeout = 10000)
-//				public void testBigTree_5_5(){ testBigTree(group, 5, 5); }
-//				
-//				@Test(timeout = 10000)
-//				public void testBigTree_1_5(){ testBigTree(group, 1, 5); }
-//				@Test(timeout = 10000)
-//				public void testBigTree_5_1(){ testBigTree(group, 5, 1); }
-			}
-	}
-	
 	private static void shutdown()
 	{
 		SystemManager.shutdown();
@@ -142,7 +51,7 @@ public class ProductIOTest {
 		shutdownCalled = true;
 	}
 	
-	private static void testNoFiles(TrackingGroup group, int indexWorkers, int productWorkers)
+	public static void testNoFiles(TrackingGroup group, int indexWorkers, int productWorkers)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -176,7 +85,7 @@ public class ProductIOTest {
 		shutdown();
 	}
 	
-	private static void testSmallFile(TrackingGroup group, int indexWorkers, int productWorkers)
+	public static void testSmallFile(TrackingGroup group, int indexWorkers, int productWorkers)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -242,7 +151,7 @@ public class ProductIOTest {
 		shutdown();
 	}
 	
-	private static void testSmallTree(TrackingGroup group, int indexWorkers, int productWorkers)
+	public static void testSmallTree(TrackingGroup group, int indexWorkers, int productWorkers)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -378,7 +287,7 @@ public class ProductIOTest {
 		shutdown();
 	}
 	
-	private static void testBigFile(TrackingGroup group, int indexWorkers, int productWorkers)
+	public static void testBigFile(TrackingGroup group, int indexWorkers, int productWorkers)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -450,7 +359,14 @@ public class ProductIOTest {
 		shutdown();
 	}
 	
-	private static void testBigTree(TrackingGroup group, int indexWorkers, int productWorkers)
+	/**
+	 * Focuses on verifying that every file is correct and that
+	 * the files are assembled into folders which mirror the tree
+	 * @param group
+	 * @param indexWorkers
+	 * @param productWorkers
+	 */
+	public static void testBigTree(TrackingGroup group, int indexWorkers, int productWorkers)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -463,57 +379,147 @@ public class ProductIOTest {
 		System.out.println("Running test for tree: " + treeName +
 				"(" + indexWorkers + ", " + productWorkers + ")");
 		
-		//set tracked paths
+		//set tracked paths 
 		group.clearTrackedPaths();
 		group.clearUntrackedPaths();
-		group.addTrackedPath(inputFolder);
-		group.setProductStagingFolder(outputFolder);
 		
-		//specify the original single test file
-		File testFile = inputFolder.listFiles()[0];
+		//take in the whole folder
+		File eclipse_installer = new File(inputFolder, "eclipse-installer");
+		
+		//make sure these all exist first:
+		assertTrue(eclipse_installer.isDirectory());
+		
+		//add the rules
+		group.addTrackedPath(eclipse_installer);
+		
+		group.setProductStagingFolder(outputFolder);
+
+		
+		//collect paths and hashes for all content before io
+		int[] oldFileCount = new int[1];
+		HashMap<String, byte[]> hashes = new HashMap<String, byte[]>();
+		try {
+			Files.walk(eclipse_installer.toPath())
+			.filter(Files::isRegularFile)
+			.forEach((f) ->
+				{
+					File file = f.toFile();
+					
+					if (!file.getParentFile().getName().equals(Constants.INDEX_FOLDER_NAME))
+					{
+						String relativized = inputFolder.toURI().relativize(file.toURI()).getPath();
+						if (relativized.endsWith(".lock"))
+							System.err.println("Relativized: " + relativized);
+						hashes.put(relativized, Hashing.hash(file));
+						oldFileCount[0] += 1;
+					}
+				}
+			);
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail();
+		}
+		
 		
 		runJob(group, indexWorkers, productWorkers);
 		
-		//get the metadata of our single test file now
-		//that it should have been saved
-		Metadata previousMetadata = Database.getFileMetadata(testFile, group);
-		compareMetadataFile(testFile, previousMetadata);
-		assertFalse(previousMetadata.isMetadataUpdate());
-		
-		//see what we got:
-		//should be only one file
-		assertEquals(1, outputFolder.listFiles().length);
-		
-		File productFile = outputFolder.listFiles()[0];
-		
-		//read the file, make sure the fields are all the same
-		ProductReader reader = new ProductReader(group.getProductFactory());
-		reader.setExtractionFolder(extractionFolder);
-		ProductContents productContents = reader.extractAll(productFile);
-		//System.out.println(productContents.toString());
-		assertEquals(productContents.getAlgorithmName(), group.getAlgorithm().getName());
-		assertEquals(productContents.getAlgorithmVersionNumber(), group.getAlgorithm().getVersion());
-		assertEquals(group.getKey().getName(), productContents.getGroupKeyName());
-		assertEquals(productContents.getGroupName(), group.getName());
-		assertEquals(productContents.getProductVersionNumber(), 0);
-		
-		
-		List<FileContents> files = productContents.getFileContents();
-		assertEquals(1, files.size());
-		FileContents fileContents = files.get(0);
+		//verify all metadata is correct
+		try {
+			Files.walk(inputFolder.toPath())
+			.filter(Files::isRegularFile)
+			.forEach((f) ->
+				{
+					File file = f.toFile();
+					
+					if (!file.getParentFile().getName().equals(Constants.INDEX_FOLDER_NAME))
+					{
+						if (file.getAbsolutePath().endsWith(".lock"))
+							System.out.println("Walked: " + file.getAbsolutePath());
+						Metadata previousMetadata = Database.getFileMetadata(file, group);
+						compareMetadataFile(file, previousMetadata);
+						assertFalse(previousMetadata.isMetadataUpdate());
+					}
+				}
+			);
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail();
+		}
 
-		Metadata extractedMetadata = fileContents.getMetadata();
-		compareMetadata(previousMetadata, extractedMetadata);
+		HashMap<File, File> extractionFolders = new HashMap<File, File>();
+		
+		for (File productFile: outputFolder.listFiles())
+		{
+			//read the file, make sure the fields are all the same
+			ProductReader reader = new ProductReader(group.getProductFactory());
+			reader.setExtractionFolder(extractionFolder);
+			ProductContents productContents = reader.extractAll(productFile);
+			System.out.println(productFile.getPath());
+			System.out.println(productContents.toString());
+	
+			assertEquals(productContents.getAlgorithmName(), group.getAlgorithm().getName());
+			assertEquals(productContents.getAlgorithmVersionNumber(), group.getAlgorithm().getVersion());
+			assertEquals(group.getKey().getName(), productContents.getGroupKeyName());
+			assertEquals(productContents.getGroupName(), group.getName());
+			assertEquals(productContents.getProductVersionNumber(), 0);
+			
+			
+			List<FileContents> files = productContents.getFileContents();
+			for (FileContents fc:files)
+			{
+				Metadata extractedMetadata = fc.getMetadata();
+				
+				//verify all file contents are correct
+				compareMetadata(Database.getFileMetadata(extractedMetadata.getFile(), group), extractedMetadata);
+				
+				if (!extractionFolders.containsKey(fc.getExtractedFile()))
+				{
+					//specify assembled file name
+					String relativized = inputFolder.toURI().relativize(extractedMetadata.getFile().toURI()).getPath();
+					File assembledFile = new File(assemblyFolder.getAbsolutePath(), relativized);
+					
+					//associate the extraction folder with the assembled file path
+					extractionFolders.put(fc.getExtractedFile(), assembledFile);
+				}
+			}	
+		}
+		
+		//assemble all files
+		int newFileCount = 0;
+		Set<String> extractedFileSet = new HashSet<String>();
+		for (File partFolder:extractionFolders.keySet())
+		{
+			File assembleTo = extractionFolders.get(partFolder);
+			if (!assembleTo.getParentFile().exists())
+				assembleTo.getParentFile().mkdirs();
+			PartAssembler.assemble(partFolder, assembleTo);
+			
+			//make sure the files are the same
+			String relativized = assemblyFolder.toURI().relativize(assembleTo.toURI()).getPath();
+			extractedFileSet.add(relativized);
+			//TODO shouldn't be recording absolute paths when crawling,
+			//should be relativizing there based on root folder
+			if (relativized.endsWith(".lock"))
+				System.err.println("Relativized: " + relativized);
+			byte[] oldHash = hashes.get(relativized);
+			byte[] newHash = Hashing.hash(assembleTo);
+			assertArrayEquals(oldHash, newHash);
+			++newFileCount;
+		}
+		
+		Set<String> originalFileSet = new HashSet<String>(hashes.keySet());
+		Set<String> skippedFileSet = new HashSet<String>(originalFileSet);
+		skippedFileSet.removeAll(extractedFileSet);
 
-		assertFalse(extractedMetadata.isMetadataUpdate());
+		if (!skippedFileSet.isEmpty())
+		{
+			System.err.println("Some files were skipped: ");
+			for (String path:skippedFileSet)
+				System.err.println(path);
+			fail();
+		}
 		
-		File assembled = new File(assemblyFolder.getAbsolutePath() + "/" +
-				extractedMetadata.getFile().getName());
-		PartAssembler.assemble(extractionFolder, assembled);
-		assertTrue(ByteConversion.bytesEqual(Hashing.hash(assembled), Hashing.hash(testFile)));
-		
-		assertEquals(assembled.getParentFile().getAbsolutePath(), assemblyFolder.getAbsolutePath());
-		assertEquals(1, assemblyFolder.listFiles().length);
+		assertEquals(oldFileCount[0], newFileCount);
 		
 		shutdown();
 	}
