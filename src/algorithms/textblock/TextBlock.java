@@ -116,12 +116,6 @@ public class TextBlock implements Product{
 	}
 
 	@Override
-	public byte[] readUUID() {
-		//not currently used
-		return null;
-	}
-
-	@Override
 	public byte[] getUUID() {
 		//not currently used
 		return null;

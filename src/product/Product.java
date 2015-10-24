@@ -18,6 +18,8 @@ public interface Product {
 	
 	public void setUUID(byte[] uuid);
 	
+	public byte[] getUUID();
+	
 	public ProductMode getProductMode();
 	
 	
@@ -44,11 +46,5 @@ public interface Product {
 	public void loadFile(File f) throws IOException;
 
 	public void skip(long bytes) throws ProductIOException;
-
-	public byte[] readUUID() throws ProductIOException;
-
-	public byte[] getUUID();
-
-
 
 }

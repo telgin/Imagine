@@ -41,8 +41,8 @@ public class StealthPNGTest
 //		public void testNoFiles_1_1(){ ProductIOTest.testNoFiles(group, 1, 1); }
 		@Test
 		public void testSmallFile_1_1(){ ProductIOTest.testSmallFile(group, 1, 1); }
-		@Test
-		public void testSmallTree_1_1(){ ProductIOTest.testSmallTree(group, 1, 1); }
+//		@Test
+//		public void testSmallTree_1_1(){ ProductIOTest.testSmallTree(group, 1, 1); }
 //		@Test
 //		public void testBigFile_1_1(){ ProductIOTest.testBigFile(group, 1, 1); }
 //		@Test(timeout = 60000)

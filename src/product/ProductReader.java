@@ -205,10 +205,14 @@ public class ProductReader {
 		System.err.println("Reading file header");
 		try
 		{
-			//stealth products need their uuid
+			//product uuid:
+			buffer = new byte[Constants.PRODUCT_UUID_SIZE];
+			product.read(buffer);
+			product.setUUID(buffer);
+				
+			//stealth secure stream now
 			if (product.getProductMode().equals(ProductMode.STEALTH))
 			{
-				product.setUUID(product.readUUID());
 				product.secureStream();
 			}
 			
@@ -232,17 +236,12 @@ public class ProductReader {
 				
 				//algorithm version
 				contents.setAlgorithmVersionNumber(ByteConversion.byteToInt(product.read()));
-				
-				//product uuid:
-				buffer = new byte[Constants.PRODUCT_UUID_SIZE];
-				product.read(buffer);
-				product.setUUID(buffer);
-				
+
 				//stream uuid
-				contents.setStreamUUID(ByteConversion.getStreamUUID(buffer));
+				contents.setStreamUUID(ByteConversion.getStreamUUID(product.getUUID()));
 				
 				//product sequence number
-				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(buffer));
+				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(product.getUUID()));
 				
 				//group name length
 				buffer = new byte[Constants.GROUP_NAME_LENGTH_SIZE];
@@ -265,7 +264,7 @@ public class ProductReader {
 				product.read(buffer);
 				contents.setGroupKeyName(new String(buffer));
 				
-				//secure products secure the stream now with the uuid they were given
+				//secure products secure the stream now
 				if (product.getProductMode().equals(ProductMode.SECURE))
 				{
 					product.secureStream();
@@ -317,7 +316,7 @@ public class ProductReader {
 				//group key name
 				product.skip(groupKeyNameLength);
 				
-				//secure products secure the stream now with the uuid they were given
+				//secure products secure the stream now
 				if (product.getProductMode().equals(ProductMode.SECURE))
 				{
 					product.secureStream();

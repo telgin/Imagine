@@ -113,7 +113,7 @@ public class StealthPNG implements Product{
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				//e.printStackTrace();
 				break;
 			}
 		}
@@ -164,7 +164,7 @@ public class StealthPNG implements Product{
 		//	System.out.print("Byte Count: " + byteCount);
 		//	System.out.println(", Remaining Bytes: " + getRemainingBytes());
 		//}
-		try{
+
 		int[] pv = new int[3];
 		int vLeft = ByteConversion.byteToInt(
 				ByteConversion.intToByte(b ^ random.nextByte()));
@@ -193,11 +193,6 @@ public class StealthPNG implements Product{
 		}
 		
 		++byteCount;
-		} catch(ProductIOException e)
-		{
-			e.printStackTrace();
-			throw e;
-		}
 	}
 	
 	private void setColor(int index, byte data)
@@ -331,21 +326,6 @@ public class StealthPNG implements Product{
 		}
 		
 		byteCount += bytes;
-	}
-
-	@Override
-	public byte[] readUUID() throws ProductIOException {
-		random = new HashRandom(1337l);//any constant seed
-		randOrder = new UniqueRandomRange(random, maxWriteSize);
-		byte[] uuid = new byte[Constants.PRODUCT_UUID_SIZE];
-		read(uuid);
-		randOrder.reseed(ByteConversion.concat(key.getKeyHash(), uuid));
-		
-		int productSequenceNumber = ByteConversion.bytesToInt(uuid[8], uuid[9], uuid[10], uuid[11]);
-		
-		Logger.log(LogLevel.k_debug, "Product sequence number: " + productSequenceNumber);
-		
-		return uuid;
 	}
 
 	@Override

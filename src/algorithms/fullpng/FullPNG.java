@@ -186,21 +186,6 @@ public class FullPNG implements Product{
 		
 	}
 
-	@Override
-	public byte[] readUUID() throws ProductIOException {		
-		random = new HashRandom(1337l);//any constant seed
-		randOrder = new UniqueRandomRange(random, maxWriteSize);
-		byte[] uuid = new byte[Constants.PRODUCT_UUID_SIZE];
-		read(uuid);
-		randOrder.reseed(ByteConversion.concat(key.getKeyHash(), uuid));
-		
-		int productSequenceNumber = ByteConversion.bytesToInt(uuid[8], uuid[9], uuid[10], uuid[11]);
-		
-		Logger.log(LogLevel.k_debug, "Product sequence number: " + productSequenceNumber);
-		
-		return uuid;
-	}
-
 	/* (non-Javadoc)
 	 * @see algorithms.SecureProduct#secureStream()
 	 */

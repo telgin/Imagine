@@ -95,9 +95,12 @@ public class ProductLoader
 	private void resetToNextProduct() throws ProductIOException
 	{
 		currentProduct.newProduct();
+
+		//write product uuid
+		currentUUID = ByteConversion.concat(streamUUID, ByteConversion.intToBytes(sequenceNumber++));
+		currentProduct.write(currentUUID);
 		
 		//set the uuid in case it is used internally by the product
-		currentUUID = ByteConversion.concat(streamUUID, ByteConversion.intToBytes(sequenceNumber++));
 		currentProduct.setUUID(currentUUID);
 		
 		//stealth products will encrypt data beyond this point
@@ -127,9 +130,6 @@ public class ProductLoader
 		
 		//write algorithm version
 		currentProduct.write(ByteConversion.intToByte(currentProduct.getAlgorithmVersionNumber()));
-		
-		//write product uuid
-		currentProduct.write(currentUUID);
 		
 		//write group name len
 		String groupName = group.getName();
