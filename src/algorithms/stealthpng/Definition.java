@@ -42,7 +42,7 @@ public class Definition implements algorithms.Definition{
 		
 		{
 			//product mode
-			Parameter param = new Parameter("ProductMode", "string", "Secure", false);
+			Parameter param = new Parameter("ProductMode", "string", "Normal", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("Secure"));
@@ -56,6 +56,7 @@ public class Definition implements algorithms.Definition{
 			if (includeOptions)
 			{
 				param.addOption(new Option("1"));
+				param.addOption(new Option("2"));
 			}
 			algo.addParameter(param);
 		}

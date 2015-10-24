@@ -202,7 +202,7 @@ public class ProductReader {
 	private ProductContents readProductHeader(boolean parseData)
 	{
 		byte[] buffer;
-
+		System.err.println("Reading file header");
 		try
 		{
 			//stealth products need their uuid
@@ -271,6 +271,8 @@ public class ProductReader {
 					product.secureStream();
 				}
 				
+				System.out.println(contents);
+				
 				return contents;
 			}
 			else // don't parse, skip when possible
@@ -334,7 +336,7 @@ public class ProductReader {
 	
 	private FileContents readNextFileHeader(boolean parseData)
 	{
-		
+		System.err.println("Reading file header");
 		byte[] buffer;
 		FileContents contents = null;
 		endCodeReached = false;

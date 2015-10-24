@@ -265,6 +265,9 @@ public class ProductIOTest {
 			
 			
 			List<FileContents> files = productContents.getFileContents();
+
+			assertEquals(15, files.size());
+			
 			for (FileContents fc:files)
 			{
 				Metadata extractedMetadata = fc.getMetadata();

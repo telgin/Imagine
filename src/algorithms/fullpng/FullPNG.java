@@ -23,6 +23,7 @@ import config.Configuration;
 import data.Key;
 import algorithms.Algorithm;
 import algorithms.Parameter;
+import algorithms.ProductIOException;
 
 public class FullPNG implements Product{
 	
@@ -62,7 +63,7 @@ public class FullPNG implements Product{
 	}
 
 	@Override
-	public void write(byte b) {
+	public void write(byte b) throws ProductIOException {
 		//Logger.log(LogLevel.k_debug, "Writing " + 1 + " byte.");
 		int index = randOrder.next();
 		byte toSet = ByteConversion.intToByte(b ^ random.nextByte());
@@ -71,7 +72,7 @@ public class FullPNG implements Product{
 	}
 
 	@Override
-	public void write(byte[] bytes) {
+	public void write(byte[] bytes) throws ProductIOException {
 		//Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
 		for (int x=0; x<bytes.length; ++x)
 		{
@@ -125,7 +126,7 @@ public class FullPNG implements Product{
 	}
 
 	@Override
-	public byte read() {
+	public byte read() throws ProductIOException {
 		//Logger.log(LogLevel.k_debug, "Reading " + 1 + " byte.");
 		byte secured = getImageByte(randOrder.next());
 		//System.out.print(ByteConversion.bytesToHex(new byte[]{secured}));
@@ -153,7 +154,7 @@ public class FullPNG implements Product{
 	}
 
 	@Override
-	public void read(byte[] bytes) {
+	public void read(byte[] bytes) throws ProductIOException {
 		//Logger.log(LogLevel.k_debug, "Reading " + bytes.length + " bytes.");
 		for (int x=0; x<bytes.length; ++x)
 		{
@@ -169,7 +170,7 @@ public class FullPNG implements Product{
 	}
 
 	@Override
-	public void skip(long bytes) {
+	public void skip(long bytes) throws ProductIOException {
 		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes. (" + getRemainingBytes() + " are remaining before this.)");
 		
 		if (bytes == getRemainingBytes())
@@ -186,7 +187,7 @@ public class FullPNG implements Product{
 	}
 
 	@Override
-	public byte[] readUUID() {		
+	public byte[] readUUID() throws ProductIOException {		
 		random = new HashRandom(1337l);//any constant seed
 		randOrder = new UniqueRandomRange(random, maxWriteSize);
 		byte[] uuid = new byte[Constants.PRODUCT_UUID_SIZE];

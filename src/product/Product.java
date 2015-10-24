@@ -3,6 +3,8 @@ package product;
 import java.io.File;
 import java.io.IOException;
 
+import algorithms.ProductIOException;
+
 public interface Product {
 
 	//generic methods
@@ -24,9 +26,9 @@ public interface Product {
 	
 	
 	//write methods
-	public void write(byte b);
+	public void write(byte b) throws ProductIOException;
 
-	public void write(byte[] bytes);
+	public void write(byte[] bytes) throws ProductIOException;
 
 	public void saveFile(File productStagingFolder, String fileName);
 
@@ -35,15 +37,15 @@ public interface Product {
 	
 
 	//read methods
-	public byte read();
+	public byte read() throws ProductIOException;
 
-	public void read(byte[] bytes);
+	public void read(byte[] bytes) throws ProductIOException;
 
 	public void loadFile(File f) throws IOException;
 
-	public void skip(long bytes);
+	public void skip(long bytes) throws ProductIOException;
 
-	public byte[] readUUID();
+	public byte[] readUUID() throws ProductIOException;
 
 	public byte[] getUUID();
 

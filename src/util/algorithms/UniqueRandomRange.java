@@ -1,5 +1,6 @@
 package util.algorithms;
 
+import algorithms.ProductIOException;
 
 public class UniqueRandomRange
 {
@@ -33,16 +34,23 @@ public class UniqueRandomRange
 		return index > 0;
 	}
 	
-	public int next()
+	public int next() throws ProductIOException
 	{
-		int swapIndex = random.nextInt(index);
-		int temp = array[swapIndex];
-		array[swapIndex] = array[index - 1];
-		array[index - 1] = temp;
-		
-		--index;
-		
-		//System.out.println(temp);
-		return temp;
+		try
+		{
+			int swapIndex = random.nextInt(index);
+			int temp = array[swapIndex];
+			array[swapIndex] = array[index - 1];
+			array[index - 1] = temp;
+			
+			--index;
+			
+			//System.out.println(temp);
+			return temp;
+		}
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			throw new ProductIOException("URR ran out of numbers.");
+		}
 	}
 }

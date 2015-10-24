@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Base64;
 
+import algorithms.ProductIOException;
 import logging.LogLevel;
 import logging.Logger;
 import stats.ProgressMonitor;
@@ -37,6 +38,7 @@ public class ProductLoader
 	
 	private boolean fileWritten = false;
 	private boolean writingFile = false;
+	private boolean needsReset = true;
 	
 	public ProductLoader(ProductFactory<? extends Product> factory, TrackingGroup group)
 	{
@@ -52,7 +54,13 @@ public class ProductLoader
 			productStagingFolder = Configuration.getProductStagingFolder();
 		
 		currentProduct = factory.create();
-		resetToNextProduct();
+		
+		try {
+			resetToNextProduct();
+		} catch (ProductIOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void shutdown()
@@ -68,13 +76,23 @@ public class ProductLoader
 		if (fileWritten)
 		{
 			if (currentProduct.getRemainingBytes() > Constants.END_CODE_SIZE)
-				currentProduct.write(ByteConversion.longToBytes(Constants.END_CODE));
+			{
+				try
+				{
+					currentProduct.write(ByteConversion.longToBytes(Constants.END_CODE));
+				}
+				catch (ProductIOException e)
+				{
+					//the product may have been full already,
+					//nothing to do...
+				}
+			}
 
 			currentProduct.saveFile(productStagingFolder, getSaveName());
 		}
 	}
 	
-	private void resetToNextProduct()
+	private void resetToNextProduct() throws ProductIOException
 	{
 		currentProduct.newProduct();
 		
@@ -95,7 +113,7 @@ public class ProductLoader
 
 	}
 	
-	private void writeProductHeader()
+	private void writeProductHeader() throws ProductIOException
 	{
 		//write version number
 		currentProduct.write(PRODUCT_VERSION_NUMBER);
@@ -145,6 +163,12 @@ public class ProductLoader
 	
 	public void writeFile(Metadata fileMetadata) throws IOException
 	{
+//		if (needsReset)
+//		{
+//			resetToNextProduct();
+//			needsReset = false;
+//		}
+//		
 		Logger.log(LogLevel.k_info, "Loading file: " + fileMetadata.getFile().getPath() + " into product " + getSaveName());
 		writingFile = true;
 		
@@ -244,7 +268,7 @@ public class ProductLoader
 			stat.incrementNumericProgress(1);
 	}
 	
-	private void writeFileHeader(Metadata fileMetadata, long fragmentNumber, long fileLengthRemaining)
+	private void writeFileHeader(Metadata fileMetadata, long fragmentNumber, long fileLengthRemaining) throws ProductIOException
 	{
 		//fragment number
 		currentProduct.write(ByteConversion.longToBytes(fragmentNumber));

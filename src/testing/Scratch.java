@@ -159,7 +159,7 @@ public class Scratch {
 		
 		frame.setVisible(true);
 	}
-	*/
+	*//*
 	private static void test2()
 	{
 		CodeTimer ct = new CodeTimer();
@@ -184,7 +184,7 @@ public class Scratch {
 		}
 		
 		
-		/*
+		
 		byte red = intToByte(5);
 		byte green = intToByte(55);
 		byte blue = intToByte(66);
@@ -204,7 +204,7 @@ public class Scratch {
 		System.out.println("Green: " + getGreen(rgb));
 		System.out.println("Green: " + byteToInt(getGreen(rgb)));
 		
-		*/
+		
 		ct.end();
 		
 		System.out.println("Total time: " + ct.getElapsedTime());
@@ -213,7 +213,7 @@ public class Scratch {
 		
 		frame.setVisible(true);
 	}
-	
+	*/
 	public static int byteToInt(byte b)
 	{
 		return b & 0xff;
