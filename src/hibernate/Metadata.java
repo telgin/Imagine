@@ -29,20 +29,20 @@ public class Metadata {
 	
 	public int getTotalLength()
 	{
+		//TODO update this to be correct for a file header size
 		int totalLength = 0;
 		
 		totalLength += file.getAbsolutePath().getBytes().length;
 		totalLength += Constants.DATE_CREATED_SIZE;
 		totalLength += Constants.DATE_MODIFIED_SIZE;
-		//totalLength += fileHash.length;
+		totalLength += fileHash.length;
 		totalLength += Constants.METADATA_UPDATE_FLAG_SIZE;
-		/*
+		
 		if (metadataUpdate)
 		{
 			totalLength += Constants.STREAM_UUID_SIZE;
 			totalLength += Constants.PRODUCT_SEQUENCE_NUMBER_SIZE;
 		}
-		*/
 		
 		return totalLength;
 	}

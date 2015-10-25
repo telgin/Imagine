@@ -6,7 +6,7 @@ import config.Configuration;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductContents;
-import product.ProductReader;
+import product.ProductExtractor;
 import data.TrackingGroup;
 
 public class ControlPanelRunner extends Runner{
@@ -30,7 +30,7 @@ public class ControlPanelRunner extends Runner{
 	
 	public ProductContents extractAll(File productFile, TrackingGroup group)
 	{
-		ProductReader reader = new ProductReader(group.getProductFactory());
+		ProductExtractor reader = new ProductExtractor(group.getProductFactory());
 		
 		ProductContents productContents = reader.extractAll(productFile);
 		if (productContents == null)

@@ -31,6 +31,7 @@ public abstract class Constants {
 	public static final int PRODUCT_SEQUENCE_NUMBER_SIZE = 4;
 	public static final int PRODUCT_UUID_SIZE = STREAM_UUID_SIZE + PRODUCT_SEQUENCE_NUMBER_SIZE;
 	public static final int PRODUCT_VERSION_NUMBER_SIZE = 1;
+	public static final int FILE_HEADER_LENGTH_SIZE = 4;
 	public static final int ALGORITHM_NAME_LENGTH_SIZE = 2;
 	public static final int ALGORITHM_VERSION_NUMBER_SIZE = 1;
 	public static final int GROUP_NAME_LENGTH_SIZE = 2;
@@ -46,6 +47,7 @@ public abstract class Constants {
 	public static final int FILE_LENGTH_REMAINING_SIZE = 8;
 	public static final String INDEX_FOLDER_NAME = "." +
 			Constants.APPLICATION_NAME_SHORT.toLowerCase();
+	
 
 	
 	

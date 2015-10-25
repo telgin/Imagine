@@ -5,6 +5,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -13,6 +14,7 @@ import com.google.common.io.Files;
 import algorithms.Algorithm;
 import algorithms.ProductIOException;
 import algorithms.stealthpng.patterns.Pattern;
+import algorithms.stealthpng.patterns.Pattern2;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
@@ -30,7 +32,7 @@ public class StealthPNG implements Product{
 	private Algorithm algorithm;
 	private BufferedImage img;
 	private UniqueRandomRange randOrder;
-	private int maxWriteSize;
+	//private int maxWriteSize;
 	private HashRandom random;
 	private Key key;
 	private boolean skippedAll = false;
@@ -64,11 +66,11 @@ public class StealthPNG implements Product{
 	
 	@Override
 	public void newProduct() {
-		loadFile();
-		testSize();
+		loadCleanFile();
+		reset();
 	}
 	
-	private void loadFile()
+	private void loadCleanFile()
 	{
 		File imgFile = InputImageManager.nextImageFile();
 		try {
@@ -90,6 +92,7 @@ public class StealthPNG implements Product{
 		byteCount = 0;
 	}
 
+	/*
 	private int testSize() {
 		
 		//TODO ~75% speedup if you figure out the math for chi squared
@@ -101,12 +104,54 @@ public class StealthPNG implements Product{
 		reset();
 		
 		maxWriteSize = 0;
+		System.out.println("Testing image to get max write size: ");
+		randOrder.reseed(ByteConversion.intToBytes(new Random().nextInt(255)));
+		
+		int minY = 100;
+		int minX = 100;
+		int maxY = 0;
+		int maxX = 0;
+		
+		randOrder = new UniqueRandomRange(random, 100);
+		
+		for (int i=0; i<100; ++i)
+		{
+			int i2 = -55555;
+			try {
+				i2 = randOrder.next();
+			} catch (ProductIOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			int rgb = i2 % 3;
+			int pixel = i2 / 3;
+			int y = pixel / img.getWidth();
+			int x = pixel % img.getWidth();
+			
+			if (y < minY)
+				minY = y;
+			
+			if (x < minX)
+				minX = x;
+			
+			if (y > maxY)
+				maxY = y;
+			
+			if (x > maxX)
+				maxX = x;
+		}
+		
+		System.out.println(minX + ", " + minY + ", " + maxX + ", " + maxY + ", " + img.getWidth() + ", " + img.getHeight());
+		
+		reset();
+		randOrder.reseed(ByteConversion.intToBytes(2));
 		
 		while (true)
 		{
 			try
 			{
-				write(ByteConversion.intToByte(100));
+				write(ByteConversion.intToByte(144));
 				++maxWriteSize;
 				if (maxWriteSize % 10000 == 0)
 					System.out.println(maxWriteSize);
@@ -125,11 +170,7 @@ public class StealthPNG implements Product{
 		
 		return maxWriteSize;
 	}
-
-	@Override
-	public long getRemainingBytes() {
-		return maxWriteSize - byteCount;
-	}
+	*/
 
 	@Override
 	public String getAlgorithmName() {
@@ -158,41 +199,52 @@ public class StealthPNG implements Product{
 	}
 
 	@Override
-	public void write(byte b) throws ProductIOException {
+	public boolean write(byte b) {
 		//if (byteCount > 534000)
 		//{
 		//	System.out.print("Byte Count: " + byteCount);
 		//	System.out.println(", Remaining Bytes: " + getRemainingBytes());
 		//}
-
-		int[] pv = new int[3];
-		int vLeft = ByteConversion.byteToInt(
-				ByteConversion.intToByte(b ^ random.nextByte()));
-		int tLeft = 255;
-		
-		while (tLeft > 0)
+		try
 		{
-			pv[0] = randOrder.next();
-			//if (byteCount < 50)
-			//{
-			//	System.out.print("Byte Count: " + byteCount);
-			//	System.out.println(", Random Index: " + pv[0]);
-			//}
-			while (!Pattern.validIndex(pattern, pv[0], img.getWidth(), img.getHeight()))
-				pv[0] = randOrder.next();
+			int[] pv = new int[3];
+			int vLeft = ByteConversion.byteToInt(
+					ByteConversion.intToByte(b ^ random.nextByte()));
+			int tLeft = 255;
 			
-			Pattern.eval(pattern, pv, img.getWidth(), img.getHeight());
-			int c1 = getColor(pv[1]);
-			int c2 = getColor(pv[2]);
-			int tsub = Math.abs(c1 - c2);
-			int vsub = Math.min(vLeft, tsub);
-			int val = Math.min(c1, c2) + vsub;
-			setColor(pv[0], ByteConversion.intToByte(val));
-			vLeft = Math.max(0, vLeft-vsub);
-			tLeft -= tsub;
+			int rotations = 0;
+			
+			while (tLeft > 0)
+			{
+				pv[0] = randOrder.next();
+				//if (byteCount < 50)
+				//{
+				//	System.out.print("Byte Count: " + byteCount);
+				//	System.out.println(", Random Index: " + pv[0]);
+				//}
+				while (!Pattern.validIndex(pattern, pv[0], img.getWidth(), img.getHeight()))
+					pv[0] = randOrder.next();
+				
+				Pattern.eval(pattern, pv, img.getWidth(), img.getHeight());
+				int c1 = getColor(pv[1]);
+				int c2 = getColor(pv[2]);
+				int tsub = Math.abs(c1 - c2);
+				int vsub = Math.min(vLeft, tsub);
+				int val = Math.min(c1, c2) + vsub;
+				setColor(pv[0], ByteConversion.intToByte(val));
+				vLeft = Math.max(0, vLeft-vsub);
+				tLeft -= tsub;
+				++rotations;
+			}
 		}
+		catch (ProductIOException e)
+		{
+			return false;
+		}
+		//System.out.print(rotations + " ");
 		
 		++byteCount;
+		return true;
 	}
 	
 	private void setColor(int index, byte data)
@@ -239,9 +291,17 @@ public class StealthPNG implements Product{
 	}
 
 	@Override
-	public void write(byte[] bytes) throws ProductIOException {
-		for (int i=0; i<bytes.length; ++i)
-			write(bytes[i]);
+	public int write(byte[] bytes, int offset, int length)
+	{
+		//Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
+		for (int x = offset; x < offset + length; ++x)
+		{
+			if (!write(bytes[x]))
+				return x - offset;
+		}
+		////System.out.println();
+		
+		return length;
 	}
 
 	@Override
@@ -262,8 +322,7 @@ public class StealthPNG implements Product{
 		}
 	}
 
-	@Override
-	public byte read() throws ProductIOException {
+	private byte read() throws ProductIOException {
 		//Logger.log(LogLevel.k_debug, "Reading " + 1 + " byte.");
 		byte xor = random.nextByte();
 		int[] pv = new int[3];
@@ -292,28 +351,38 @@ public class StealthPNG implements Product{
 	}
 
 	@Override
-	public void read(byte[] bytes) throws ProductIOException {
+	public int read(byte[] bytes, int offset, int length)
+	{
 		//Logger.log(LogLevel.k_debug, "Reading " + bytes.length + " bytes.");
-		for (int x=0; x<bytes.length; ++x)
+		for (int x = offset; x < offset + length; ++x)
 		{
-			bytes[x] = read();
+			try
+			{
+				bytes[x] = read();
+			}
+			catch (ProductIOException e)
+			{
+				return x;
+			}
 		}
 		////System.out.println();
+		
+		return offset + length;
 	}
 
 	@Override
 	public void loadFile(File f) throws IOException {
 		img = ImageIO.read(f);
-		testSize();
+		reset();
 	}
 
 	@Override
-	public void skip(long bytes) throws ProductIOException {
-		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes. (" + getRemainingBytes() + " are remaining before this.)");
+	public long skip(long bytes)
+	{
+		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes.");
 		
-		if (bytes == getRemainingBytes())
-			skippedAll = true;
-		else
+		long skipped = 0;
+		try
 		{
 			for (long l=0; l<bytes; ++l)
 			{
@@ -322,15 +391,25 @@ public class StealthPNG implements Product{
 				tempPv[0] = randOrder.next();
 				while (!Pattern.validIndex(pattern, tempPv[0], img.getWidth(), img.getHeight()))
 					tempPv[0] = randOrder.next();
+				
+				++skipped;
 			}
 		}
+		catch (ProductIOException e)
+		{
+			//couldn't skip as many as requested,
+			//nothing to do
+		}
 		
+		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes was requested and " + skipped + " were skipped.");
 		byteCount += bytes;
+		
+		return skipped;
+		
 	}
 
 	@Override
 	public byte[] getUUID() {
 		return uuid;
 	}
-
 }

@@ -25,7 +25,7 @@ public abstract class Pattern {
 	public abstract boolean isOpen(int i, int w, int h);
 	
 	protected static int[] toColor(int index, int w)
-	{
+	{	
 		int rgb = index % 3;
 		int pixel = index / 3;
 		int y = pixel / w;
@@ -38,7 +38,11 @@ public abstract class Pattern {
 	{
 		return (((coords[1] * w) + coords[0]) * 3) + coords[2];
 	}
-
+	
+	protected final boolean inBounds(int x, int y, int w, int h)
+	{
+		return x >= 0 && x < w && y >= 0 && y < h;
+	}
 
 
 	

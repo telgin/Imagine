@@ -16,7 +16,10 @@ public class FileContents {
 		text += "\nFragment? " + fragment;
 		text += "\nfragmentNumber " + fragmentNumber;
 		text += "\nremainingData " + remainingData;
-		text += "\nextractedFile " + extractedFile.getName();
+		if (extractedFile == null)
+			text += "\nextractedFile null";
+		else
+			text += "\nextractedFile " + extractedFile.getName();
 		text += "\n" + metadata.toString();
 		return text;
 	}

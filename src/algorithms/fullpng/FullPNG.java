@@ -63,27 +63,34 @@ public class FullPNG implements Product{
 	}
 
 	@Override
-	public void write(byte b) throws ProductIOException {
-		//Logger.log(LogLevel.k_debug, "Writing " + 1 + " byte.");
-		int index = randOrder.next();
-		byte toSet = ByteConversion.intToByte(b ^ random.nextByte());
-		setImageByte(index, toSet);
-		//System.out.print(ByteConversion.bytesToHex(new byte[]{toSet}));
+	public boolean write(byte b){
+		try
+		{
+			//Logger.log(LogLevel.k_debug, "Writing " + 1 + " byte.");
+			int index = randOrder.next();
+			byte toSet = ByteConversion.intToByte(b ^ random.nextByte());
+			setImageByte(index, toSet);
+			//System.out.print(ByteConversion.bytesToHex(new byte[]{toSet}));
+			return true;
+		}
+		catch (ProductIOException e)
+		{
+			return false;
+		}
 	}
 
 	@Override
-	public void write(byte[] bytes) throws ProductIOException {
+	public int write(byte[] bytes, int offset, int length)
+	{
 		//Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
-		for (int x=0; x<bytes.length; ++x)
+		for (int x = offset; x < offset + length; ++x)
 		{
-			write(bytes[x]);
+			if (!write(bytes[x]))
+				return x - offset;
 		}
 		////System.out.println();
-	}
-
-	@Override
-	public long getRemainingBytes() {
-		return skippedAll ? 0 : randOrder.remainingNumbers();
+		
+		return length;
 	}
 
 	@Override
@@ -125,15 +132,37 @@ public class FullPNG implements Product{
 		}
 	}
 
-	@Override
-	public byte read() throws ProductIOException {
+	private byte read() throws ProductIOException {
 		//Logger.log(LogLevel.k_debug, "Reading " + 1 + " byte.");
 		byte secured = getImageByte(randOrder.next());
 		//System.out.print(ByteConversion.bytesToHex(new byte[]{secured}));
 		return ByteConversion.intToByte(secured ^ random.nextByte());
 	}
 
-	private byte getImageByte(int index) {
+
+
+	@Override
+	public int read(byte[] bytes, int offset, int length)
+	{
+		//Logger.log(LogLevel.k_debug, "Reading " + bytes.length + " bytes.");
+		for (int x = offset; x < offset + length; ++x)
+		{
+			try
+			{
+				bytes[x] = read();
+			}
+			catch (ProductIOException e)
+			{
+				return x;
+			}
+		}
+		////System.out.println();
+		
+		return offset + length;
+	}
+	
+	private byte getImageByte(int index)
+	{
 		int color = index % 3;
 		int pixel = index / 3;
 		int y = pixel / img.getWidth();
@@ -154,36 +183,33 @@ public class FullPNG implements Product{
 	}
 
 	@Override
-	public void read(byte[] bytes) throws ProductIOException {
-		//Logger.log(LogLevel.k_debug, "Reading " + bytes.length + " bytes.");
-		for (int x=0; x<bytes.length; ++x)
-		{
-			bytes[x] = read();
-		}
-		////System.out.println();
-	}
-
-	@Override
 	public void loadFile(File f) throws IOException {
 		img = ImageIO.read(f);
 		reset();
 	}
 
 	@Override
-	public void skip(long bytes) throws ProductIOException {
-		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes. (" + getRemainingBytes() + " are remaining before this.)");
-		
-		if (bytes == getRemainingBytes())
-			skippedAll = true;
-		else
+	public long skip(long bytes)
+	{	
+		long skipped = 0;
+		try
 		{
 			for (long l=0; l<bytes; ++l)
 			{
 				randOrder.next();
 				random.nextByte();
+				++skipped;
 			}
 		}
+		catch (ProductIOException e)
+		{
+			//couldn't skip as many as requested,
+			//nothing to do
+		}
 		
+		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes was requested and " + skipped + " were skipped.");
+		
+		return skipped;
 	}
 
 	/* (non-Javadoc)

@@ -81,7 +81,10 @@ public class ProductContents {
 		text += "\nProduct Version: " + productVersionNumber;
 		text += "\nStreamUUID: " + streamUUID;
 		text += "\nSequence Number: " + productSequenceNumber;
+		text += "\nAlgorithm Version: " + algorithmVersionNumber;
+		text += "\nAlgorithm Name: " + algorithmName;
 		text += "\nGroup Name: " + groupName;
+		text += "\nGroup Key Name: " + groupKeyName;
 		for (FileContents fc:files)
 			text += "\n" + fc.toString();
 		

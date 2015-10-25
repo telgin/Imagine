@@ -35,6 +35,9 @@ public class ProductLoader
 	
 	private Product currentProduct;
 	private byte[] currentUUID;
+	private byte[] buffer;
+	private int dataOffset;
+	private int dataLength;
 	
 	private boolean fileWritten = false;
 	private boolean writingFile = false;
@@ -55,6 +58,8 @@ public class ProductLoader
 		
 		currentProduct = factory.create();
 		
+		buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
+		
 		try {
 			resetToNextProduct();
 		} catch (ProductIOException e) {
@@ -65,6 +70,7 @@ public class ProductLoader
 	
 	public void shutdown()
 	{
+		System.out.println("Product loader shutting down.");
 		while (writingFile)
 		{
 			try {
@@ -73,32 +79,50 @@ public class ProductLoader
 			}
 		}
 		
+		//fileWritten indicates a file is written, but there is as least some space left
+		//if there is more space than the size of the end code, the end code is 
+		//written to indicate no more reading should be done (there is no next file)
 		if (fileWritten)
 		{
-			if (currentProduct.getRemainingBytes() > Constants.END_CODE_SIZE)
-			{
-				try
-				{
-					currentProduct.write(ByteConversion.longToBytes(Constants.END_CODE));
-				}
-				catch (ProductIOException e)
-				{
-					//the product may have been full already,
-					//nothing to do...
-				}
-			}
+			//if there's not enough space for the end code, the reader logic
+			//handles it the same as if it were written
+			System.out.print("Writing end code...");
+			if (writeFull(ByteConversion.longToBytes(Constants.END_CODE)))
+				System.out.println("success.");
+			else
+				System.out.println("failure.");
 
 			currentProduct.saveFile(productStagingFolder, getSaveName());
 		}
 	}
 	
+	private boolean writeFull(byte[] bytes)
+	{
+		return currentProduct.write(bytes, 0, bytes.length) == bytes.length;
+	}
+	
+	private boolean writeFull(byte b)
+	{
+		return currentProduct.write(b);
+	}
+	
 	private void resetToNextProduct() throws ProductIOException
 	{
 		currentProduct.newProduct();
+		
+		//no file was written in this product yet
+		fileWritten = false;
 
 		//write product uuid
 		currentUUID = ByteConversion.concat(streamUUID, ByteConversion.intToBytes(sequenceNumber++));
-		currentProduct.write(currentUUID);
+		
+		if (!writeFull(currentUUID))
+			throw new ProductIOException("Cannot write product uuid.");
+		
+		System.out.println("Was " + ByteConversion.bytesToLong(streamUUID));
+		System.out.println("Was " + (sequenceNumber-1));
+		System.out.println("Wrote " + ByteConversion.getStreamUUID(currentUUID));
+		System.out.println("Wrote " + ByteConversion.getProductSequenceNumber(currentUUID));
 		
 		//set the uuid in case it is used internally by the product
 		currentProduct.setUUID(currentUUID);
@@ -108,47 +132,61 @@ public class ProductLoader
 			currentProduct.secureStream();
 		
 		//write the product header
-		writeProductHeader();
+		if (!writeProductHeader())
+			throw new ProductIOException("Cannot write product header.");
 		
 		//secure products will secure data beyond this point
 		if (currentProduct.getProductMode().equals(ProductMode.SECURE))
 			currentProduct.secureStream();
-
 	}
 	
-	private void writeProductHeader() throws ProductIOException
+	private boolean writeProductHeader() throws ProductIOException
 	{
 		//write version number
-		currentProduct.write(PRODUCT_VERSION_NUMBER);
+		if (!writeFull(PRODUCT_VERSION_NUMBER))
+			return false;
 		
 		//write algorithm name length
 		byte[] algorithmName = currentProduct.getAlgorithmName().getBytes();
-		currentProduct.write(ByteConversion.shortToBytes((short)algorithmName.length));
+		if (!writeFull(ByteConversion.shortToBytes((short)algorithmName.length)))
+			return false;
 		
 		//write algorithm name
-		currentProduct.write(algorithmName);
+		if (!writeFull(algorithmName))
+			return false;
 		
 		//write algorithm version
-		currentProduct.write(ByteConversion.intToByte(currentProduct.getAlgorithmVersionNumber()));
+		if (!writeFull(ByteConversion.intToByte(currentProduct.getAlgorithmVersionNumber())))
+			return false;
 		
 		//write group name len
 		String groupName = group.getName();
-		currentProduct.write(ByteConversion.shortToBytes((short)groupName.getBytes().length));
+		if (!writeFull(ByteConversion.shortToBytes((short)groupName.getBytes().length)))
+			return false;
 		
 		//write group name
-		currentProduct.write(groupName.getBytes());		
+		if (!writeFull(groupName.getBytes()))
+			return false;		
 		
 		//write group key name / length
 		if (group.getKey().isSecure())
 		{
+			System.out.println("Writing key name: " + group.getKey().getName() + " of length: " +
+					group.getKey().getName().getBytes().length);
 			byte[] groupKeyName = group.getKey().getName().getBytes();
-			currentProduct.write(ByteConversion.shortToBytes((short)groupKeyName.length));
-			currentProduct.write(groupKeyName);
+			if (!writeFull(ByteConversion.shortToBytes((short)groupKeyName.length)))
+				return false;
+			if (!writeFull(groupKeyName))
+				return false;
 		}
 		else
 		{
-			currentProduct.write(ByteConversion.shortToBytes((short)0));
+			System.out.println("Not writing key name because the product is not secure.");
+			if (!writeFull(ByteConversion.shortToBytes((short)0)))
+				return false;
 		}
+		
+		return true;
 	}
 	
 	private String getSaveName()
@@ -169,19 +207,17 @@ public class ProductLoader
 //			needsReset = false;
 //		}
 //		
+		dataLength = 0;
+		dataOffset = buffer.length;
+		
 		Logger.log(LogLevel.k_info, "Loading file: " + fileMetadata.getFile().getPath() + " into product " + getSaveName());
 		writingFile = true;
 		
 		
-		long fileLengthRemaining = fileMetadata.isMetadataUpdate() ?
-										Constants.PRODUCT_UUID_SIZE :
-										fileMetadata.getFile().length();
+		long fileLengthRemaining = fileMetadata.isMetadataUpdate() ? 0 :
+			fileMetadata.getFile().length();
 		long fragmentNumber = 1;
-		int fileHeaderSize = fileMetadata.getTotalLength() + 
-				Constants.FILE_NAME_LENGTH_SIZE +
-				Constants.DATE_CREATED_SIZE +
-				Constants.DATE_MODIFIED_SIZE + 
-				Constants.FILE_LENGTH_REMAINING_SIZE;
+		//int fileHeaderSize = fileMetadata.getTotalLength();
 		
 		//save off the first product uuid where we're saving the file
 		//it might actually start in the next one if we're out of space in this one.
@@ -207,47 +243,37 @@ public class ProductLoader
 		//write the file to one or multiple products
 		do
 		{
-			//check that there is enough space left for the metadata and some data
-			if (fileHeaderSize + 1 > currentProduct.getRemainingBytes())
+			//write file header size
+			//writeFileHeaderSize(fileHeaderSize);
+			
+			//write file header
+			if (!writeFileHeader(fileMetadata, fragmentNumber, fileLengthRemaining))
 			{
-				//there wasn't enough space to add more bytes of the file, so
-				//write the end code instead of the next fragment number, and reset
-				
-				//check to see if there is enough space for the end code
-				if (Constants.END_CODE_SIZE <= currentProduct.getRemainingBytes())
-				{
-					currentProduct.write(ByteConversion.longToBytes(Constants.END_CODE));
-				}// end state is assumed if there's no space to write the end code
-				
+				//there wasn't enough space, reset
 				currentProduct.saveFile(productStagingFolder, getSaveName());
 				resetToNextProduct();
 				
-				//the new product should now have enough space
-				assert(currentProduct.getRemainingBytes() >= fileHeaderSize + 1);
+				//writeFileHeaderSize(fileHeaderSize);
+				
+				//try again
+				if (!writeFileHeader(fileMetadata, fragmentNumber, fileLengthRemaining))
+				{
+					//second failure indicates product is too small
+					throw new ProductIOException("Cannot write file header, product is too small");
+				}
 			}
 			
-			//(write file header for each fragment)
-			writeFileHeader(fileMetadata, fragmentNumber++, fileLengthRemaining);
-			
-			//Does the metadata specify a new file or a metadata update for
-			//an existing file? This should never be true if the group does
-			//not use a database.
-			if (fileMetadata.isMetadataUpdate())
+			//write data if there is any
+			if (!fileMetadata.isMetadataUpdate())
 			{
-				//Since the new metadata was written in the file header,
-				//just write the previous first product uuid as the file data.
-				//This will act as a sort of pointer to the location of the
-				//actual file data.
-				currentProduct.write(fileMetadata.getProductUUID());
-				fileLengthRemaining -= Constants.PRODUCT_UUID_SIZE;
-				assert (fileLengthRemaining == 0);
-			}
-			else
-			{
-				//write as much as you can, if the product fills up, we get
+				//write as much as possible, if the product fills up, we get
 				//back to here and start again where we left off
 				fileLengthRemaining = writeFileData(reader, fileLengthRemaining);
 			}
+			
+			//update fragment number
+			++fragmentNumber;
+
 		}
 		while (fileLengthRemaining > 0);
 		
@@ -268,65 +294,113 @@ public class ProductLoader
 			stat.incrementNumericProgress(1);
 	}
 	
-	private void writeFileHeader(Metadata fileMetadata, long fragmentNumber, long fileLengthRemaining) throws ProductIOException
+	private void writeFileHeaderSize(int fileHeaderSize) throws ProductIOException
+	{
+		if (!writeFull(ByteConversion.intToBytes(fileHeaderSize)))
+		{
+			//there wasn't enough space, reset
+			currentProduct.saveFile(productStagingFolder, getSaveName());
+			resetToNextProduct();
+			
+			//try again
+			if (!writeFull(ByteConversion.intToBytes(fileHeaderSize)))
+			{
+				//a second failure after reset means that the product size is
+				//too small
+				throw new ProductIOException("Cannot write file header, product size is too small.");
+			}
+		}
+	}
+	
+	private boolean writeFileHeader(Metadata fileMetadata,
+			long fragmentNumber, long fileLengthRemaining)
 	{
 		//fragment number
-		currentProduct.write(ByteConversion.longToBytes(fragmentNumber));
+		if (!writeFull(ByteConversion.longToBytes(fragmentNumber)))
+			return false;
 		
 		//file hash
-		currentProduct.write(fileMetadata.getFileHash());
+		if (!writeFull(fileMetadata.getFileHash()))
+			return false;
 		
 		//file name length
-		currentProduct.write(ByteConversion.shortToBytes((short)fileMetadata.getPath().length()));
+		if (!writeFull(ByteConversion.shortToBytes((short)fileMetadata.getPath().length())))
+			return false;
 		
 		//file name
-		currentProduct.write(fileMetadata.getPath().getBytes());
+		if (!writeFull(fileMetadata.getPath().getBytes()))
+			return false;
 		
 		//date created
-		currentProduct.write(ByteConversion.longToBytes(fileMetadata.getDateCreated()));
+		if (!writeFull(ByteConversion.longToBytes(fileMetadata.getDateCreated())))
+			return false;
 		
 		//date modified
-		currentProduct.write(ByteConversion.longToBytes(fileMetadata.getDateModified()));
+		if (!writeFull(ByteConversion.longToBytes(fileMetadata.getDateModified())))
+			return false;
 		
 		//permissions
-		currentProduct.write(ByteConversion.shortToBytes(fileMetadata.getPermissions()));
+		if (!writeFull(ByteConversion.shortToBytes(fileMetadata.getPermissions())))
+			return false;
 		
 		//metadata update flag
-		currentProduct.write(ByteConversion.booleanToByte(fileMetadata.isMetadataUpdate()));
+		if (!writeFull(ByteConversion.booleanToByte(fileMetadata.isMetadataUpdate())))
+			return false;
 		
+		
+		//Does the metadata specify a new file or a metadata update for
+		//an existing file? This should never be true if the group does
+		//not use a database.
 		if (fileMetadata.isMetadataUpdate())
 		{
-			//previous fragment1 product uuid
-			currentProduct.write(fileMetadata.getPreviousProductUUID());
+			//Since the new metadata was written in the file header,
+			//just write the previous first product uuid as the file data.
+			//This will act as a sort of pointer to the location of the
+			//actual file data.
+			if (!writeFull(fileMetadata.getPreviousProductUUID()))
+				return false;
 		}
 		else
 		{
 			//length of data that still needs to be written
-			currentProduct.write(ByteConversion.longToBytes(fileLengthRemaining));
+			if (!writeFull(ByteConversion.longToBytes(fileLengthRemaining)))
+				return false;
 		}
 		
-		
+		return true;
 	}
 	
 	private long writeFileData(DataInputStream reader, long fileLengthRemaining) throws IOException
-	{			
-		int bufferSize = (int) (Math.min(Constants.MAX_READ_BUFFER_SIZE, Math.min(currentProduct.getRemainingBytes(), fileLengthRemaining)));
-		byte[] buffer = new byte[bufferSize];
-		while (fileLengthRemaining > 0 && currentProduct.getRemainingBytes() > 0)
+	{
+		do
 		{
-			reader.read(buffer);
-			currentProduct.write(buffer);
-			fileLengthRemaining -= bufferSize;
-			//later probably should add an indexing mechanism so you don't have to create a new array
+			System.out.println("Bytes requested to be written: " + (dataLength));
+			int bytesWritten = currentProduct.write(buffer, dataOffset, dataLength);
+			System.out.println("bytes written: " + bytesWritten);
+			dataOffset += bytesWritten;
+			dataLength -= bytesWritten;
+			fileLengthRemaining -= bytesWritten;
 			
-			//create a new buffer only if the new size is different
-			int newSize = (int) (Math.min(Constants.MAX_READ_BUFFER_SIZE, Math.min(currentProduct.getRemainingBytes(), fileLengthRemaining)));
-			if (newSize != bufferSize)
+			System.out.println("File length remaining: " + fileLengthRemaining);
+			
+			if (dataOffset == buffer.length)
 			{
-				bufferSize = newSize;
-				buffer = new byte[bufferSize];
+				//the full thing was written, get more
+				dataOffset = 0;
+				dataLength = reader.read(buffer, dataOffset, buffer.length);
 			}
+			else
+			{
+				//the product is full, some portion of the data was not written
+				return fileLengthRemaining;
+			}
+			
+			
 		}
+		while (dataLength > 0);
+
+		assert(fileLengthRemaining == 0);
+		
 		return fileLengthRemaining;
 	}
 }

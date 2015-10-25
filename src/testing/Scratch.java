@@ -26,7 +26,7 @@ import data.ProductWorker;
 import data.TrackingGroup;
 import product.ProductContents;
 import product.ProductLoader;
-import product.ProductReader;
+import product.ProductExtractor;
 import algorithms.fullpng.FullPNG;
 import algorithms.fullpng.FullPNGFactory;
 

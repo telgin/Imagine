@@ -18,6 +18,7 @@ public class TextBlock implements Product{
 	private byte[] buffer;
 	private int index;
 	private int blockSize;
+	private byte[] uuid;
 
 	public TextBlock(Algorithm algo) {
 		algorithm = algo;
@@ -29,11 +30,6 @@ public class TextBlock implements Product{
 	public void newProduct() {
 		buffer = new byte[blockSize];
 		index = 0;
-	}
-
-	@Override
-	public long getRemainingBytes() {
-		return buffer.length - index;
 	}
 
 	@Override
@@ -49,6 +45,7 @@ public class TextBlock implements Product{
 	@Override
 	public void setUUID(byte[] uuid) {
 		//not used currently
+		this.uuid = uuid;
 	}
 
 	@Override
@@ -60,17 +57,28 @@ public class TextBlock implements Product{
 	public void secureStream() {
 		//only normal mode supported
 	}
-
+	
 	@Override
-	public void write(byte b) {
-		//System.out.println("Wrote: " + 1);
-		buffer[index++] = b;
+	public boolean write(byte b) {
+		///System.out.println("Wrote: " + 1);
+		try
+		{
+			buffer[index++] = b;
+			return true;
+		}
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			return false;
+		}
 	}
 
 	@Override
-	public void write(byte[] bytes) {
-		System.arraycopy(bytes, 0, buffer, index, bytes.length);
-		index += bytes.length;
+	public int write(byte[] bytes, int offset, int length)
+	{
+		int toWrite = Math.min((buffer.length - 1) - index, length);
+		System.arraycopy(bytes, offset, buffer, index, toWrite);
+		index += toWrite;
+		return toWrite;
 		//System.out.println("Wrote: " + bytes.length);
 	}
 
@@ -92,33 +100,33 @@ public class TextBlock implements Product{
 	}
 
 	@Override
-	public byte read() {
-		//System.out.println("Read: " + 1);
-		return buffer[index++];
-	}
-
-	@Override
-	public void read(byte[] bytes) {
-		System.arraycopy(buffer, index, bytes, 0, bytes.length);
-		index += bytes.length;
+	public int read(byte[] bytes, int offset, int length)
+	{
+		int toRead = Math.min((buffer.length - 1) - index, length);
+		System.arraycopy(buffer, index, bytes, offset, toRead);
+		index += toRead;
+		return toRead;
 		//System.out.println("Read: " + bytes.length);
 	}
 
 	@Override
-	public void loadFile(File f) throws IOException {
+	public void loadFile(File f) throws IOException
+	{
 		index = 0;
 		buffer = Files.readAllBytes(f.toPath());
 	}
 
 	@Override
-	public void skip(long bytes) {
-		index += bytes;
+	public long skip(long bytes)
+	{
+		long toSkip = Math.min((buffer.length - 1) - index, bytes);
+		index += toSkip;
+		return toSkip;
 	}
 
 	@Override
 	public byte[] getUUID() {
 		//not currently used
-		return null;
+		return uuid;
 	}
-
 }

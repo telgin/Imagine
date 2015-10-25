@@ -10,7 +10,7 @@ public interface Product {
 	//generic methods
 	public void newProduct();
 	
-	public long getRemainingBytes();
+	//public long getRemainingBytes();
 	
 	public String getAlgorithmName();
 
@@ -28,9 +28,19 @@ public interface Product {
 	
 	
 	//write methods
-	public void write(byte b) throws ProductIOException;
+	/**
+	 * @param b
+	 * @return True if written
+	 */
+	public boolean write(byte b);
 
-	public void write(byte[] bytes) throws ProductIOException;
+	/**
+	 * @param bytes
+	 * @param offset
+	 * @param length
+	 * @return The length of bytes written
+	 */
+	public int write(byte[] bytes, int offset, int length);
 
 	public void saveFile(File productStagingFolder, String fileName);
 
@@ -39,12 +49,10 @@ public interface Product {
 	
 
 	//read methods
-	public byte read() throws ProductIOException;
-
-	public void read(byte[] bytes) throws ProductIOException;
+	public int read(byte[] bytes, int offset, int length);
 
 	public void loadFile(File f) throws IOException;
 
-	public void skip(long bytes) throws ProductIOException;
+	public long skip(long bytes);
 
 }

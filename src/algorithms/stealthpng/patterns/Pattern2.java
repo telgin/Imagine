@@ -34,6 +34,9 @@ public class Pattern2 extends Pattern{
 		
 		pv[1] = toIndex(a1, w);
 		pv[2] = toIndex(a2, w);
+		
+		//assert(!isOpen(pv[1], w, h));
+		//assert(!isOpen(pv[2], w, h));
 	}
 	
 
@@ -43,11 +46,6 @@ public class Pattern2 extends Pattern{
 		int[] p = toColor(i, w);
 		
 		return columnOpen(p[0], w) ? true : rowOpen(p[1], h);
-	}
-	
-	private final boolean inBounds(int x, int y, int w, int h)
-	{
-		return x >= 0 && x < w && y >= 0 && y < h;
 	}
 	
 	private final boolean columnOpen(int x, int w)

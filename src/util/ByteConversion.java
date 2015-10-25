@@ -87,6 +87,14 @@ public class ByteConversion {
         return shortBuffer.getShort();
     }
     
+    public static short bytesToShort(byte[] bytes, int offset) {
+    	ByteBuffer shortBuffer = ByteBuffer.allocate(Short.BYTES);
+    	shortBuffer.clear(); //clears probably aren't necessary anymore
+    	shortBuffer.put(bytes, offset, Short.BYTES);
+    	shortBuffer.flip();
+        return shortBuffer.getShort();
+    }
+    
     public static byte[] concat(byte[] a, byte[] b) {
     	   int len1 = a.length;
     	   int len2 = b.length;
@@ -134,6 +142,13 @@ public class ByteConversion {
 	
 	public static int getProductSequenceNumber(byte[] productUUID)
 	{
-		return ByteConversion.bytesToInt(productUUID, Constants.STREAM_UUID_SIZE-1);
+		return ByteConversion.bytesToInt(productUUID, Constants.STREAM_UUID_SIZE);
+	}
+	
+	public static byte[] subArray(byte[] data, int offset, int length)
+	{
+		byte[] sub = new byte[length];
+		System.arraycopy(data, offset, sub, 0, length);
+		return sub;
 	}
 }
