@@ -1,11 +1,15 @@
 package algorithms.stealthpng;
 
 import algorithms.Algorithm;
+import algorithms.stealthpng.StealthPNGReader;
+import algorithms.stealthpng.StealthPNGWriter;
 import data.Key;
-import product.ProductFactory;
+import product.ProductReaderFactory;
+import product.ProductWriterFactory;
 
-public class StealthPNGFactory implements ProductFactory<StealthPNG> {
-	
+public class StealthPNGFactory  implements 
+	ProductReaderFactory<StealthPNGReader>, ProductWriterFactory<StealthPNGWriter>
+{
 	private Key key;
 	private Algorithm algo;
 	
@@ -14,9 +18,14 @@ public class StealthPNGFactory implements ProductFactory<StealthPNG> {
 		this.key = key;
 		this.algo = algo;
 	}
-	
+
 	@Override
-	public StealthPNG create(){
-		return new StealthPNG(algo, key);
+	public StealthPNGWriter createWriter() {
+		return new StealthPNGWriter(algo, key);
+	}
+
+	@Override
+	public StealthPNGReader createReader() {
+		return new StealthPNGReader(algo, key);
 	}
 }

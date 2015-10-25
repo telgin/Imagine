@@ -13,23 +13,17 @@ import stats.ProgressMonitor;
 import stats.Stat;
 import config.Configuration;
 
-public class TextBlock implements Product{
-	private Algorithm algorithm;
-	private byte[] buffer;
-	private int index;
-	private int blockSize;
-	private byte[] uuid;
+public abstract class TextBlock implements Product{
+	protected Algorithm algorithm;
+	protected byte[] buffer;
+	protected int index;
+	protected int blockSize;
+	protected byte[] uuid;
 
 	public TextBlock(Algorithm algo) {
 		algorithm = algo;
 		blockSize = Integer.parseInt(algorithm.getParameterValue("blockSize"));
 		Logger.log(LogLevel.k_debug, "TextBlock Created");
-	}
-
-	@Override
-	public void newProduct() {
-		buffer = new byte[blockSize];
-		index = 0;
 	}
 
 	@Override
@@ -57,72 +51,72 @@ public class TextBlock implements Product{
 	public void secureStream() {
 		//only normal mode supported
 	}
-	
-	@Override
-	public boolean write(byte b) {
-		///System.out.println("Wrote: " + 1);
-		try
-		{
-			buffer[index++] = b;
-			return true;
-		}
-		catch (ArrayIndexOutOfBoundsException e)
-		{
-			return false;
-		}
-	}
-
-	@Override
-	public int write(byte[] bytes, int offset, int length)
-	{
-		int toWrite = Math.min((buffer.length - 1) - index, length);
-		System.arraycopy(bytes, offset, buffer, index, toWrite);
-		index += toWrite;
-		return toWrite;
-		//System.out.println("Wrote: " + bytes.length);
-	}
-
-	@Override
-	public void saveFile(File productStagingFolder, String filename) {
-		try {
-			File toSave = new File(productStagingFolder.getAbsolutePath() + "/" +
-					filename + ".txt");
-			Logger.log(LogLevel.k_info, "Saving product file: " + toSave.getAbsolutePath());
-			Files.write(toSave.toPath(), buffer);
-			
-			//update progress
-			Stat stat = ProgressMonitor.getStat("productsCreated");
-			if (stat != null)
-				stat.incrementNumericProgress(1);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public int read(byte[] bytes, int offset, int length)
-	{
-		int toRead = Math.min((buffer.length - 1) - index, length);
-		System.arraycopy(buffer, index, bytes, offset, toRead);
-		index += toRead;
-		return toRead;
-		//System.out.println("Read: " + bytes.length);
-	}
-
-	@Override
-	public void loadFile(File f) throws IOException
-	{
-		index = 0;
-		buffer = Files.readAllBytes(f.toPath());
-	}
-
-	@Override
-	public long skip(long bytes)
-	{
-		long toSkip = Math.min((buffer.length - 1) - index, bytes);
-		index += toSkip;
-		return toSkip;
-	}
+//	
+//	@Override
+//	public boolean write(byte b) {
+//		///System.out.println("Wrote: " + 1);
+//		try
+//		{
+//			buffer[index++] = b;
+//			return true;
+//		}
+//		catch (ArrayIndexOutOfBoundsException e)
+//		{
+//			return false;
+//		}
+//	}
+//
+//	@Override
+//	public int write(byte[] bytes, int offset, int length)
+//	{
+//		int toWrite = Math.min((buffer.length - 1) - index, length);
+//		System.arraycopy(bytes, offset, buffer, index, toWrite);
+//		index += toWrite;
+//		return toWrite;
+//		//System.out.println("Wrote: " + bytes.length);
+//	}
+//
+//	@Override
+//	public void saveFile(File productStagingFolder, String filename) {
+//		try {
+//			File toSave = new File(productStagingFolder.getAbsolutePath() + "/" +
+//					filename + ".txt");
+//			Logger.log(LogLevel.k_info, "Saving product file: " + toSave.getAbsolutePath());
+//			Files.write(toSave.toPath(), buffer);
+//			
+//			//update progress
+//			Stat stat = ProgressMonitor.getStat("productsCreated");
+//			if (stat != null)
+//				stat.incrementNumericProgress(1);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
+//
+//	@Override
+//	public int read(byte[] bytes, int offset, int length)
+//	{
+//		int toRead = Math.min((buffer.length - 1) - index, length);
+//		System.arraycopy(buffer, index, bytes, offset, toRead);
+//		index += toRead;
+//		return toRead;
+//		//System.out.println("Read: " + bytes.length);
+//	}
+//
+//	@Override
+//	public void loadFile(File f) throws IOException
+//	{
+//		index = 0;
+//		buffer = Files.readAllBytes(f.toPath());
+//	}
+//
+//	@Override
+//	public long skip(long bytes)
+//	{
+//		long toSkip = Math.min((buffer.length - 1) - index, bytes);
+//		index += toSkip;
+//		return toSkip;
+//	}
 
 	@Override
 	public byte[] getUUID() {

@@ -9,8 +9,11 @@ import algorithms.AlgorithmRegistry;
 import logging.LogLevel;
 import logging.Logger;
 import product.Product;
-import product.ProductFactory;
 import product.ProductMode;
+import product.ProductReader;
+import product.ProductReaderFactory;
+import product.ProductWriter;
+import product.ProductWriterFactory;
 
 public class TrackingGroup {
 	private String name;
@@ -157,8 +160,12 @@ public class TrackingGroup {
 		this.algorithm = algorithm;
 	}
 
-	public ProductFactory<? extends Product> getProductFactory() {
-		return AlgorithmRegistry.getProductFactory(algorithm, key);
+	public ProductReaderFactory<? extends ProductReader> getProductReaderFactory() {
+		return AlgorithmRegistry.getProductReaderFactory(algorithm, key);
+	}
+	
+	public ProductWriterFactory<? extends ProductWriter> getProductWriterFactory() {
+		return AlgorithmRegistry.getProductWriterFactory(algorithm, key);
 	}
 
 	/**

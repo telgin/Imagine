@@ -30,7 +30,7 @@ public class ControlPanelRunner extends Runner{
 	
 	public ProductContents extractAll(File productFile, TrackingGroup group)
 	{
-		ProductExtractor reader = new ProductExtractor(group.getProductFactory());
+		ProductExtractor reader = new ProductExtractor(group.getProductReaderFactory());
 		
 		ProductContents productContents = reader.extractAll(productFile);
 		if (productContents == null)

@@ -21,17 +21,16 @@ public class ProductExtractor {
 	//do we ever need another product?
 	//private final ProductFactory<? extends Product> factory;
 	
-	private Product product;
+	private ProductReader product;
 	private byte[] curFileHash;
 	private long curFragmentNumber;
 	private File extractionFolder;
-	private boolean endCodeReached = false;
 	private byte[] buffer;
 	
-	public ProductExtractor(ProductFactory<? extends Product> factory)
+	public ProductExtractor(ProductReaderFactory<? extends ProductReader> factory)
 	{
 		//this.factory = factory;
-		product = factory.create();
+		product = factory.createReader();
 		
 		buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
 	}
@@ -377,7 +376,6 @@ public class ProductExtractor {
 		System.err.println("Reading file header");
 
 		FileContents contents = null;
-		endCodeReached = false;
 		
 		if (parseData)
 		{
@@ -401,7 +399,6 @@ public class ProductExtractor {
 			if (curFragmentNumber == Constants.END_CODE)
 			{
 				Logger.log(LogLevel.k_debug, "The end code was reached.");
-				endCodeReached = true;
 				return null;
 			}
 			

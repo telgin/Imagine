@@ -9,7 +9,10 @@ import data.TrackingGroup;
 import logging.LogLevel;
 import logging.Logger;
 import product.Product;
-import product.ProductFactory;
+import product.ProductReader;
+import product.ProductReaderFactory;
+import product.ProductWriter;
+import product.ProductWriterFactory;
 
 public class AlgorithmRegistry {
 	private static HashMap<String, Definition> definitions;	
@@ -48,12 +51,21 @@ public class AlgorithmRegistry {
 		return definitions.get(name).getAlgorithmSpec();
 	}
 	
-	public static ProductFactory<? extends Product> getProductFactory(Algorithm algo, Key key) //make this a part of the algorithm class?
+	public static ProductReaderFactory<? extends ProductReader> getProductReaderFactory(Algorithm algo, Key key) //make this a part of the algorithm class?
 	{
 		if (!definitions.containsKey(algo.getName()))
 			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + algo.getName());
 		
 		return definitions.get(algo.getName()).getProductFactoryCreation()
-				.create(algo, key);
+				.createReader(algo, key);
+	}
+	
+	public static ProductWriterFactory<? extends ProductWriter> getProductWriterFactory(Algorithm algo, Key key)
+	{
+		if (!definitions.containsKey(algo.getName()))
+			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + algo.getName());
+		
+		return definitions.get(algo.getName()).getProductFactoryCreation()
+				.createWriter(algo, key);
 	}
 }

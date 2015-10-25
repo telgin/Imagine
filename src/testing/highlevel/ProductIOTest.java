@@ -122,7 +122,7 @@ public class ProductIOTest {
 		File productFile = outputFolder.listFiles()[0];
 		
 		//read the file, make sure the fields are all the same
-		ProductExtractor reader = new ProductExtractor(group.getProductFactory());
+		ProductExtractor reader = new ProductExtractor(group.getProductReaderFactory());
 		reader.setExtractionFolder(extractionFolder);
 		ProductContents productContents = reader.extractAll(productFile);
 		//System.out.println(productContents.toString());
@@ -253,7 +253,7 @@ public class ProductIOTest {
 		for (File productFile: outputFolder.listFiles())
 		{
 			//read the file, make sure the fields are all the same
-			ProductExtractor reader = new ProductExtractor(group.getProductFactory());
+			ProductExtractor reader = new ProductExtractor(group.getProductReaderFactory());
 			reader.setExtractionFolder(extractionFolder);
 			ProductContents productContents = reader.extractAll(productFile);
 	
@@ -323,7 +323,7 @@ public class ProductIOTest {
 		assertTrue(outputFolder.listFiles().length > 1);
 		
 		//extract from all files in the output folder
-		ProductExtractor reader = new ProductExtractor(group.getProductFactory());
+		ProductExtractor reader = new ProductExtractor(group.getProductReaderFactory());
 		reader.setExtractionFolder(extractionFolder);
 		File extractedFolder = null;
 		for (File productFile : outputFolder.listFiles())
@@ -452,7 +452,7 @@ public class ProductIOTest {
 		for (File productFile: outputFolder.listFiles())
 		{
 			//read the file, make sure the fields are all the same
-			ProductExtractor reader = new ProductExtractor(group.getProductFactory());
+			ProductExtractor reader = new ProductExtractor(group.getProductReaderFactory());
 			reader.setExtractionFolder(extractionFolder);
 			ProductContents productContents = reader.extractAll(productFile);
 			System.out.println(productFile.getPath());

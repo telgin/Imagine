@@ -10,8 +10,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import logging.LogLevel;
 import logging.Logger;
-import product.Product;
-import product.ProductFactory;
 import data.IndexWorker;
 import data.ProductWorker;
 import data.TrackingGroup;

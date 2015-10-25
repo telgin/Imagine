@@ -33,7 +33,7 @@ public class ProductLoader
 	private TrackingGroup group;
 	private File productStagingFolder;
 	
-	private Product currentProduct;
+	private ProductWriter currentProduct;
 	private byte[] currentUUID;
 	private byte[] buffer;
 	private int dataOffset;
@@ -43,7 +43,7 @@ public class ProductLoader
 	private boolean writingFile = false;
 	private boolean needsReset = true;
 	
-	public ProductLoader(ProductFactory<? extends Product> factory, TrackingGroup group)
+	public ProductLoader(ProductWriterFactory<? extends ProductWriter> factory, TrackingGroup group)
 	{
 		//this.factory = factory;
 		
@@ -56,7 +56,7 @@ public class ProductLoader
 		if (productStagingFolder == null)
 			productStagingFolder = Configuration.getProductStagingFolder();
 		
-		currentProduct = factory.create();
+		currentProduct = factory.createWriter();
 		
 		buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
 		

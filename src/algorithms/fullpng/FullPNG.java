@@ -27,16 +27,16 @@ import algorithms.ProductIOException;
 
 public class FullPNG implements Product{
 	
-	private Algorithm algorithm;
-	private BufferedImage img;
-	private UniqueRandomRange randOrder;
-	private int maxWriteSize;
-	private HashRandom random;
-	private Key key;
-	private boolean skippedAll = false;
-	private byte[] uuid;
-	private int width;
-	private int height;
+	protected Algorithm algorithm;
+	protected BufferedImage img;
+	protected UniqueRandomRange randOrder;
+	protected int maxWriteSize;
+	protected HashRandom random;
+	protected Key key;
+	protected boolean skippedAll = false;
+	protected byte[] uuid;
+	protected int width;
+	protected int height;
 	
 	public FullPNG(Algorithm algo, Key key)
 	{
@@ -47,170 +47,170 @@ public class FullPNG implements Product{
 		maxWriteSize = width * height * 3;
 	}
 
-	@Override
-	public void newProduct() {
-		//should really use the rgb configuration parameter somehow
-		img = new BufferedImage(width, height, 
-				BufferedImage.TYPE_INT_RGB);
-		
-		reset();
-	}
+//	@Override
+//	public void newProduct() {
+//		//should really use the rgb configuration parameter somehow
+//		img = new BufferedImage(width, height, 
+//				BufferedImage.TYPE_INT_RGB);
+//		
+//		reset();
+//	}
 	
-	private void reset()
+	protected void reset()
 	{
 		random = new HashRandom(1337l);//any constant seed
 		randOrder = new UniqueRandomRange(random, maxWriteSize);
 	}
 
-	@Override
-	public boolean write(byte b){
-		try
-		{
-			//Logger.log(LogLevel.k_debug, "Writing " + 1 + " byte.");
-			int index = randOrder.next();
-			byte toSet = ByteConversion.intToByte(b ^ random.nextByte());
-			setImageByte(index, toSet);
-			//System.out.print(ByteConversion.bytesToHex(new byte[]{toSet}));
-			return true;
-		}
-		catch (ProductIOException e)
-		{
-			return false;
-		}
-	}
-
-	@Override
-	public int write(byte[] bytes, int offset, int length)
-	{
-		//Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
-		for (int x = offset; x < offset + length; ++x)
-		{
-			if (!write(bytes[x]))
-				return x - offset;
-		}
-		////System.out.println();
-		
-		return length;
-	}
-
-	@Override
-	public void saveFile(File productStagingFolder, String fileName) {
-		try {
-			File imgFile = new File(productStagingFolder.getAbsolutePath() + "/" + fileName + ".png");
-			Logger.log(LogLevel.k_info, "Saving product file: " + imgFile.getAbsolutePath());
-			if (!imgFile.getParentFile().exists())
-				imgFile.getParentFile().mkdirs();
-			ImageIO.write(img, "PNG", imgFile);
-			
-			//update progress
-			Stat stat = ProgressMonitor.getStat("productsCreated");
-			if (stat != null)
-				stat.incrementNumericProgress(1);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void setImageByte(int index, byte data)
-	{
-		int color = index % 3;
-		int pixel = index / 3;
-		int y = pixel / img.getWidth();
-		int x = pixel % img.getWidth();
-
-		if (color == 0)
-		{
-			img.setRGB(x, y, ImageUtil.setRed(img.getRGB(x, y), data));
-		}
-		else if (color == 1)
-		{
-			img.setRGB(x, y, ImageUtil.setGreen(img.getRGB(x, y), data));
-		}
-		else
-		{
-			img.setRGB(x, y, ImageUtil.setBlue(img.getRGB(x, y), data));
-		}
-	}
-
-	private byte read() throws ProductIOException {
-		//Logger.log(LogLevel.k_debug, "Reading " + 1 + " byte.");
-		byte secured = getImageByte(randOrder.next());
-		//System.out.print(ByteConversion.bytesToHex(new byte[]{secured}));
-		return ByteConversion.intToByte(secured ^ random.nextByte());
-	}
-
-
-
-	@Override
-	public int read(byte[] bytes, int offset, int length)
-	{
-		//Logger.log(LogLevel.k_debug, "Reading " + bytes.length + " bytes.");
-		for (int x = offset; x < offset + length; ++x)
-		{
-			try
-			{
-				bytes[x] = read();
-			}
-			catch (ProductIOException e)
-			{
-				return x;
-			}
-		}
-		////System.out.println();
-		
-		return offset + length;
-	}
-	
-	private byte getImageByte(int index)
-	{
-		int color = index % 3;
-		int pixel = index / 3;
-		int y = pixel / img.getWidth();
-		int x = pixel % img.getWidth();
-		
-		if (color == 0)
-		{
-			return ImageUtil.getRed(img.getRGB(x, y));
-		}
-		else if (color == 1)
-		{
-			return ImageUtil.getGreen(img.getRGB(x, y));
-		}
-		else
-		{
-			return ImageUtil.getBlue(img.getRGB(x, y));
-		}
-	}
-
-	@Override
-	public void loadFile(File f) throws IOException {
-		img = ImageIO.read(f);
-		reset();
-	}
-
-	@Override
-	public long skip(long bytes)
-	{	
-		long skipped = 0;
-		try
-		{
-			for (long l=0; l<bytes; ++l)
-			{
-				randOrder.next();
-				random.nextByte();
-				++skipped;
-			}
-		}
-		catch (ProductIOException e)
-		{
-			//couldn't skip as many as requested,
-			//nothing to do
-		}
-		
-		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes was requested and " + skipped + " were skipped.");
-		
-		return skipped;
-	}
+//	@Override
+//	public boolean write(byte b){
+//		try
+//		{
+//			//Logger.log(LogLevel.k_debug, "Writing " + 1 + " byte.");
+//			int index = randOrder.next();
+//			byte toSet = ByteConversion.intToByte(b ^ random.nextByte());
+//			setImageByte(index, toSet);
+//			//System.out.print(ByteConversion.bytesToHex(new byte[]{toSet}));
+//			return true;
+//		}
+//		catch (ProductIOException e)
+//		{
+//			return false;
+//		}
+//	}
+//
+//	@Override
+//	public int write(byte[] bytes, int offset, int length)
+//	{
+//		//Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
+//		for (int x = offset; x < offset + length; ++x)
+//		{
+//			if (!write(bytes[x]))
+//				return x - offset;
+//		}
+//		////System.out.println();
+//		
+//		return length;
+//	}
+//
+//	@Override
+//	public void saveFile(File productStagingFolder, String fileName) {
+//		try {
+//			File imgFile = new File(productStagingFolder.getAbsolutePath() + "/" + fileName + ".png");
+//			Logger.log(LogLevel.k_info, "Saving product file: " + imgFile.getAbsolutePath());
+//			if (!imgFile.getParentFile().exists())
+//				imgFile.getParentFile().mkdirs();
+//			ImageIO.write(img, "PNG", imgFile);
+//			
+//			//update progress
+//			Stat stat = ProgressMonitor.getStat("productsCreated");
+//			if (stat != null)
+//				stat.incrementNumericProgress(1);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
+//	
+//	private void setImageByte(int index, byte data)
+//	{
+//		int color = index % 3;
+//		int pixel = index / 3;
+//		int y = pixel / img.getWidth();
+//		int x = pixel % img.getWidth();
+//
+//		if (color == 0)
+//		{
+//			img.setRGB(x, y, ImageUtil.setRed(img.getRGB(x, y), data));
+//		}
+//		else if (color == 1)
+//		{
+//			img.setRGB(x, y, ImageUtil.setGreen(img.getRGB(x, y), data));
+//		}
+//		else
+//		{
+//			img.setRGB(x, y, ImageUtil.setBlue(img.getRGB(x, y), data));
+//		}
+//	}
+//
+//	private byte read() throws ProductIOException {
+//		//Logger.log(LogLevel.k_debug, "Reading " + 1 + " byte.");
+//		byte secured = getImageByte(randOrder.next());
+//		//System.out.print(ByteConversion.bytesToHex(new byte[]{secured}));
+//		return ByteConversion.intToByte(secured ^ random.nextByte());
+//	}
+//
+//
+//
+//	@Override
+//	public int read(byte[] bytes, int offset, int length)
+//	{
+//		//Logger.log(LogLevel.k_debug, "Reading " + bytes.length + " bytes.");
+//		for (int x = offset; x < offset + length; ++x)
+//		{
+//			try
+//			{
+//				bytes[x] = read();
+//			}
+//			catch (ProductIOException e)
+//			{
+//				return x;
+//			}
+//		}
+//		////System.out.println();
+//		
+//		return offset + length;
+//	}
+//	
+//	private byte getImageByte(int index)
+//	{
+//		int color = index % 3;
+//		int pixel = index / 3;
+//		int y = pixel / img.getWidth();
+//		int x = pixel % img.getWidth();
+//		
+//		if (color == 0)
+//		{
+//			return ImageUtil.getRed(img.getRGB(x, y));
+//		}
+//		else if (color == 1)
+//		{
+//			return ImageUtil.getGreen(img.getRGB(x, y));
+//		}
+//		else
+//		{
+//			return ImageUtil.getBlue(img.getRGB(x, y));
+//		}
+//	}
+//
+//	@Override
+//	public void loadFile(File f) throws IOException {
+//		img = ImageIO.read(f);
+//		reset();
+//	}
+//
+//	@Override
+//	public long skip(long bytes)
+//	{	
+//		long skipped = 0;
+//		try
+//		{
+//			for (long l=0; l<bytes; ++l)
+//			{
+//				randOrder.next();
+//				random.nextByte();
+//				++skipped;
+//			}
+//		}
+//		catch (ProductIOException e)
+//		{
+//			//couldn't skip as many as requested,
+//			//nothing to do
+//		}
+//		
+//		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes was requested and " + skipped + " were skipped.");
+//		
+//		return skipped;
+//	}
 
 	/* (non-Javadoc)
 	 * @see algorithms.SecureProduct#secureStream()

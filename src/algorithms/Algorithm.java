@@ -10,10 +10,12 @@ import org.w3c.dom.Element;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.Product;
-import product.ProductFactory;
 import product.ProductFactoryCreation;
 import product.ProductMode;
+import product.ProductReader;
+import product.ProductReaderFactory;
+import product.ProductWriter;
+import product.ProductWriterFactory;
 import util.ConfigUtil;
 
 public class Algorithm {
@@ -169,7 +171,11 @@ public class Algorithm {
 		
 	}
 
-	public ProductFactory<? extends Product> getProductFactory(Key key) {
-		return productFactoryCreation.create(this, key);
+	public ProductReaderFactory<? extends ProductReader> getProductReaderFactory(Key key) {
+		return productFactoryCreation.createReader(this, key);
+	}
+	
+	public ProductWriterFactory<? extends ProductWriter> getProductWriterFactory(Key key) {
+		return productFactoryCreation.createWriter(this, key);
 	}
 }

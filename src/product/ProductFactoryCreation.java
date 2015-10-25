@@ -4,5 +4,6 @@ import algorithms.Algorithm;
 import data.Key;
 
 public interface ProductFactoryCreation {
-	public ProductFactory<? extends Product> create(Algorithm algo, Key key);
+	public ProductReaderFactory<? extends ProductReader> createReader(Algorithm algo, Key key);
+	public ProductWriterFactory<? extends ProductWriter> createWriter(Algorithm algo, Key key);
 }

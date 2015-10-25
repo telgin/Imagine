@@ -22,7 +22,7 @@ public class ProductWorker implements Runnable{
 	public ProductWorker(BlockingQueue<Metadata> queue, TrackingGroup group)
 	{
 		this.queue = queue;
-		loader = new ProductLoader(group.getProductFactory(), group);
+		loader = new ProductLoader(group.getProductWriterFactory(), group);
 	}
 	
 	public boolean isActive()

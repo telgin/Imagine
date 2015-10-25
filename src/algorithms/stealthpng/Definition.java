@@ -5,6 +5,10 @@ import algorithms.Option;
 import algorithms.Parameter;
 import data.Key;
 import product.ProductFactoryCreation;
+import product.ProductReader;
+import product.ProductReaderFactory;
+import product.ProductWriter;
+import product.ProductWriterFactory;
 
 public class Definition implements algorithms.Definition{
 	private static final String NAME = "StealthPNG";
@@ -87,10 +91,15 @@ public class Definition implements algorithms.Definition{
 	@Override
 	public ProductFactoryCreation getProductFactoryCreation() {
 		return new ProductFactoryCreation() {
-		    @Override
-		    public StealthPNGFactory create(Algorithm algo, Key key) {
-		        return new StealthPNGFactory(algo, key);
-		    }
+			@Override
+			public ProductReaderFactory<? extends ProductReader> createReader(Algorithm algo, Key key) {
+				return new StealthPNGFactory(algo, key);
+			}
+
+			@Override
+			public ProductWriterFactory<? extends ProductWriter> createWriter(Algorithm algo, Key key) {
+				return new StealthPNGFactory(algo, key);
+			}
 		};
 	}
 

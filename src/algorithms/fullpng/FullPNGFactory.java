@@ -1,10 +1,15 @@
 package algorithms.fullpng;
 
 import algorithms.Algorithm;
+import algorithms.textblock.TextBlockReader;
+import algorithms.textblock.TextBlockWriter;
 import data.Key;
-import product.ProductFactory;
+import product.ProductReaderFactory;
+import product.ProductWriterFactory;
 
-public class FullPNGFactory implements ProductFactory<FullPNG> {
+public class FullPNGFactory implements 
+	ProductReaderFactory<FullPNGReader>, ProductWriterFactory<FullPNGWriter>
+{
 	
 	private Key key;
 	private Algorithm algo;
@@ -14,9 +19,14 @@ public class FullPNGFactory implements ProductFactory<FullPNG> {
 		this.key = key;
 		this.algo = algo;
 	}
-	
+
 	@Override
-	public FullPNG create(){
-		return new FullPNG(algo, key);
+	public FullPNGWriter createWriter() {
+		return new FullPNGWriter(algo, key);
+	}
+
+	@Override
+	public FullPNGReader createReader() {
+		return new FullPNGReader(algo, key);
 	}
 }
