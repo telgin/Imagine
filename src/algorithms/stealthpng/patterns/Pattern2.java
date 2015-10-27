@@ -3,37 +3,31 @@ package algorithms.stealthpng.patterns;
 public class Pattern2 extends Pattern{
 
 	@Override
-	public void getNeighbors(int[] pv, int w, int h) {
-		int[] t = toColor(pv[0], w);
-		int[] a1 = new int[]{-1, -1, t[2]};
-		int[] a2 = new int[]{-1, -1, t[2]};
-		
+	public void getNeighbors(int[] pv, int w, int h)
+	{		
 		boolean found1 = false;
-		int[] xdir = new int[]{1,1,1,0,-1,-1,-1,0};
+		int[] xdir = new int[]{1,1,1,0,-1,-1,-1,0}; //TODO optimize based on x % 3
 		int[] ydir = new int[]{-1,0,1,1,1,0,-1,-1};
 		for (int i=0; i<8; ++i)
 		{
-			int x = t[0] + xdir[i];
-			int y = t[1] + ydir[i];
+			int x = pv[0] + xdir[i];
+			int y = pv[1] + ydir[i];
 			if (inBounds(x, y, w, h) && !columnOpen(x, w) && !rowOpen(y, h))
 			{
 				if (!found1)
 				{
-					a1[0] = x;
-					a1[1] = y;
+					pv[2] = x;
+					pv[3] = y;
 					found1 = true;
 				}
 				else
 				{
-					a2[0] = x;
-					a2[1] = y;
+					pv[4] = x;
+					pv[5] = y;
 					break;
 				}
 			}
 		}
-		
-		pv[1] = toIndex(a1, w);
-		pv[2] = toIndex(a2, w);
 		
 		//assert(!isOpen(pv[1], w, h));
 		//assert(!isOpen(pv[2], w, h));
@@ -42,10 +36,8 @@ public class Pattern2 extends Pattern{
 
 
 	@Override
-	public boolean isOpen(int i, int w, int h) {
-		int[] p = toColor(i, w);
-		
-		return columnOpen(p[0], w) ? true : rowOpen(p[1], h);
+	public boolean isOpen(int x, int y, int w, int h) {
+		return columnOpen(x, w) ? true : rowOpen(y, h);
 	}
 	
 	private final boolean columnOpen(int x, int w)
@@ -70,8 +62,7 @@ public class Pattern2 extends Pattern{
 		{
 			for (int x=0; x<w; ++x)
 			{
-				int i = toIndex(new int[]{x, y, 1}, w);
-				if (p2.isOpen(i, w, h))
+				if (p2.isOpen(x, y, w, h))
 				{
 					System.out.print(" . ");
 				}

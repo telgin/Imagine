@@ -5,47 +5,45 @@ public class Pattern1 extends Pattern{
 	@Override
 	public void getNeighbors(int[] pv, int w, int h)
 	{
-		int[] t = toColor(pv[0], w);
-		int[] a1;
-		int[] a2;
-		
-		if (t[0] == w-1)
+		if (pv[0] == w-1)
 		{
-			if (t[1] == h-1)
+			if (pv[1] == h-1)
 			{
-				a1 = new int[]{t[0]-1,t[1],t[2]};
-				a2 = new int[]{t[0],t[1]-1,t[2]};
+				pv[2] = pv[0]-1;
+				pv[3] = pv[1];
+				pv[4] = pv[0];
+				pv[5] = pv[1]-1;
 			}
 			else
 			{
-				a1 = new int[]{t[0]-1,t[1],t[2]};
-				a2 = new int[]{t[0],t[1]+1,t[2]};
+				pv[2] = pv[0]-1;
+				pv[3] = pv[1];
+				pv[4] = pv[0];
+				pv[5] = pv[1]+1;
 			}
 		}
 		else
 		{
-			if (t[1] == h-1)
+			if (pv[1] == h-1)
 			{
-				a1 = new int[]{t[0],t[1]-1,t[2]};
-				a2 = new int[]{t[0]+1,t[1],t[2]};
+				pv[2] = pv[0];
+				pv[3] = pv[1]-1;
+				pv[4] = pv[0]+1;
+				pv[5] = pv[1];
 			}
 			else
 			{
-				a1 = new int[]{t[0],t[1]+1,t[2]};
-				a2 = new int[]{t[0]+1,t[1],t[2]};
+				pv[2] = pv[0];
+				pv[3] = pv[1]+1;
+				pv[4] = pv[0]+1;
+				pv[5] = pv[1];
 			}
 		}
-		
-		pv[1] = toIndex(a1, w);
-		pv[2] = toIndex(a2, w);
 	}
 
 	@Override
-	public boolean isOpen(int i, int w, int h) {
-		int[] point = toColor(i, w);
-		boolean cond1 = point[0] % 2 == 1;
-		boolean cond2 = point[1] % 2 == 1;
-		return cond1 ^ cond2;
+	public boolean isOpen(int x, int y, int w, int h) {
+		return (x % 2 == 1) ^ (y % 2 == 1);
 	}
 	
 	public static void main(String[] args)
@@ -57,8 +55,7 @@ public class Pattern1 extends Pattern{
 		{
 			for (int x=0; x<w; ++x)
 			{
-				int i = toIndex(new int[]{x, y, 1}, w);
-				if (p1.isOpen(i, w, h))
+				if (p1.isOpen(x, y, w, h))
 				{
 					System.out.print(" . ");
 				}

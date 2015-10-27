@@ -1,34 +1,18 @@
 package algorithms.stealthpng;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
-
 import javax.imageio.ImageIO;
-
-import com.google.common.io.Files;
 
 import algorithms.Algorithm;
 import algorithms.ProductIOException;
-import algorithms.fullpng.FullPNG;
 import algorithms.stealthpng.patterns.Pattern;
-import algorithms.stealthpng.patterns.Pattern2;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.Product;
 import product.ProductMode;
 import product.ProductReader;
-import stats.ProgressMonitor;
-import stats.Stat;
 import util.ByteConversion;
-import util.Constants;
-import util.algorithms.HashRandom;
-import util.algorithms.ImageUtil;
-import util.algorithms.UniqueRandomRange;
 
 public class StealthPNGReader extends StealthPNG implements ProductReader{
 	
@@ -66,23 +50,22 @@ public class StealthPNGReader extends StealthPNG implements ProductReader{
 	private byte read() throws ProductIOException {
 		//Logger.log(LogLevel.k_debug, "Reading " + 1 + " byte.");
 		byte xor = random.nextByte();
-		int[] pv = new int[3];
 		int val = 0;
-		int tLeft = 255;
 		
-		while (tLeft > 0)
+		while (true)
 		{
-			pv[0] = randOrder.next();
-			while (!Pattern.validIndex(pattern, pv[0], img.getWidth(), img.getHeight()))
-				pv[0] = randOrder.next();
+			nextPair();
 			
-			Pattern.eval(pattern, pv, img.getWidth(), img.getHeight());
-			int c0 = getColor(pv[0]);
-			int c1 = getColor(pv[1]);
-			int c2 = getColor(pv[2]);
-			int tsub = Math.abs(c1 - c2);
-			val += c0 - Math.min(c1, c2);
-			tLeft -= tsub;
+			int c0 = ByteConversion.byteToInt(getColor(pv[0], pv[1]));
+			int c1 = ByteConversion.byteToInt(getColor(pv[2], pv[3]));
+			int c2 = ByteConversion.byteToInt(getColor(pv[4], pv[5]));
+			
+			int diff = Math.abs(c1 - c2);
+			int vadd = c0 - Math.min(c1, c2);
+			val += vadd;
+			
+			if (vadd < diff)
+				break;
 		}
 		
 		++byteCount;
@@ -128,10 +111,7 @@ public class StealthPNGReader extends StealthPNG implements ProductReader{
 			for (long l=0; l<bytes; ++l)
 			{
 				random.nextByte();
-				int[] tempPv = new int[3];
-				tempPv[0] = randOrder.next();
-				while (!Pattern.validIndex(pattern, tempPv[0], img.getWidth(), img.getHeight()))
-					tempPv[0] = randOrder.next();
+				nextPair();
 				
 				++skipped;
 			}

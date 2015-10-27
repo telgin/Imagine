@@ -31,6 +31,9 @@ import algorithms.fullpng.FullPNG;
 import algorithms.fullpng.FullPNGFactory;
 
 public class Scratch {
+	public static int x = 0;
+	public static double y = 0;
+	public static HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
 	public static void main(String args[]) throws IOException, InterruptedException{
 		
 		//test2();
@@ -42,8 +45,57 @@ public class Scratch {
 		
 		//loadBallanceTest();
 
+		for (int i = 1; i <= 256; ++i)
+		{
+			int pow = (int) Math.floor(Math.log10(i) / Math.log10(2));
+			int base = (int) Math.pow(2, pow);
+			int add = i - base;
+			System.out.println(i + " --> " + pow + " (" + base + ") + " + add + " = " + (base+add)
+					+ " *" + (((float)(pow+add))/i) + "*");
+		}
 		
 		
+		for (int mult = 1; mult < 256; ++mult)
+		{
+			float average = 0;
+			for (int i = 1; i <= 256; ++i)
+			{
+				int base = i / mult;
+				int add = i % mult;
+				float percent = (((float)(base+add))/i);
+				//System.out.println(i + " --> " + base + "*16 + " + add + " = " + ((base*16)+add)
+				//		+ " *" + percent + "*");
+				
+				average += percent;
+				assert ((base*mult)+add == i);
+			}
+			average = average / 256;
+			
+			
+			System.out.println(mult + " --> " + average);
+		}
+		
+		for (int mult = 1; mult < 16; ++mult)
+		{
+			float average = 0;
+			for (int i = 1; i <= 16; ++i)
+			{
+				int base = i / mult;
+				int add = i % mult;
+				float percent = (((float)(base+add))/i);
+				//System.out.println(i + " --> " + base + "*16 + " + add + " = " + ((base*16)+add)
+				//		+ " *" + percent + "*");
+				
+				average += percent;
+				assert ((base*mult)+add == i);
+			}
+			average = average / 26;
+			
+			
+			System.out.println(mult + " --> " + average);
+		}
+		
+		//11 mult is minimum average percent ?!?!?!?!?
 	}
 	
 	/**
