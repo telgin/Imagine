@@ -315,6 +315,7 @@ public class ProductLoader
 	private boolean writeFileHeader(Metadata fileMetadata,
 			long fragmentNumber, long fileLengthRemaining)
 	{
+		System.out.println("Fragment number: " + fragmentNumber);
 		//fragment number
 		if (!writeFull(ByteConversion.longToBytes(fragmentNumber)))
 			return false;
@@ -372,10 +373,13 @@ public class ProductLoader
 	
 	private long writeFileData(DataInputStream reader, long fileLengthRemaining) throws IOException
 	{
+		
+		
 		do
 		{
 			System.out.println("Bytes requested to be written: " + (dataLength));
 			int bytesWritten = currentProduct.write(buffer, dataOffset, dataLength);
+			System.out.println("Buffer length: " + buffer.length);
 			System.out.println("bytes written: " + bytesWritten);
 			dataOffset += bytesWritten;
 			dataLength -= bytesWritten;

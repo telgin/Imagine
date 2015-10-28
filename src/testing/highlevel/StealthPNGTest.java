@@ -41,10 +41,10 @@ public class StealthPNGTest
 //		public void testNoFiles_1_1(){ ProductIOTest.testNoFiles(group, 1, 1); }
 //		@Test
 //		public void testSmallFile_1_1(){ ProductIOTest.testSmallFile(group, 1, 1); }
-		@Test
-		public void testSmallTree_1_1(){ ProductIOTest.testSmallTree(group, 1, 1); }
 //		@Test
-//		public void testBigFile_1_1(){ ProductIOTest.testBigFile(group, 1, 1); }
+//		public void testSmallTree_1_1(){ ProductIOTest.testSmallTree(group, 1, 1); }
+		@Test
+		public void testBigFile_1_1(){ ProductIOTest.testBigFile(group, 1, 1); }
 //		@Test(timeout = 60000)
 //		public void testBigTree_1_1(){ ProductIOTest.testBigTree(group, 1, 1); }
 //		
@@ -56,7 +56,7 @@ public class StealthPNGTest
 //		public void testSmallTree_5_5(){ ProductIOTest.testSmallTree(group, 5, 5); }
 //		@Test
 //		public void testBigFile_5_5(){ ProductIOTest.testBigFile(group, 5, 5); }
-//		@Test(timeout = 60000)
+//		@Test//(timeout = 60000)
 //		public void testBigTree_5_5(){ ProductIOTest.testBigTree(group, 5, 5); }
 //		
 //		@Test(timeout = 60000)

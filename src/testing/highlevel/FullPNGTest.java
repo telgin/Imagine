@@ -23,6 +23,12 @@ public class FullPNGTest
 	public static class TreeTest
 	{
 		static Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("FullPNG");
+		static
+		{
+			algorithm.setParameter("width", "485");
+			algorithm.setParameter("height", "485");
+			algorithm.setParameter("ProductMode", "Stealth");
+		}
 	
 		//tracking group setup
 		static String keyName = "testKeyName";
@@ -31,31 +37,31 @@ public class FullPNGTest
 
 		static TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
 		
-		@Test(timeout = 10000)
-		public void testNoFiles_1_1(){ ProductIOTest.testNoFiles(group, 1, 1); }
-		@Test(timeout = 10000)
-		public void testSmallFile_1_1(){ ProductIOTest.testSmallFile(group, 1, 1); }
-		@Test(timeout = 20000)
-		public void testSmallTree_1_1(){ ProductIOTest.testSmallTree(group, 1, 1); }
+//		@Test(timeout = 10000)
+//		public void testNoFiles_1_1(){ ProductIOTest.testNoFiles(group, 1, 1); }
+//		@Test(timeout = 10000)
+//		public void testSmallFile_1_1(){ ProductIOTest.testSmallFile(group, 1, 1); }
+//		@Test(timeout = 20000)
+//		public void testSmallTree_1_1(){ ProductIOTest.testSmallTree(group, 1, 1); }
 		@Test(timeout = 20000)
 		public void testBigFile_1_1(){ ProductIOTest.testBigFile(group, 1, 1); }
-		@Test(timeout = 60000)
-		public void testBigTree_1_1(){ ProductIOTest.testBigTree(group, 1, 1); }
-		
-		@Test(timeout = 10000)
-		public void testNoFiles_5_5(){ ProductIOTest.testNoFiles(group, 5, 5); }
-		@Test(timeout = 10000)
-		public void testSmallFile_5_5(){ ProductIOTest.testSmallFile(group, 5, 5); }
-		@Test(timeout = 20000)
-		public void testSmallTree_5_5(){ ProductIOTest.testSmallTree(group, 5, 5); }
-		@Test(timeout = 60000)
-		public void testBigFile_5_5(){ ProductIOTest.testBigFile(group, 5, 5); }
-		@Test(timeout = 60000)
-		public void testBigTree_5_5(){ ProductIOTest.testBigTree(group, 5, 5); }
-		
-		@Test(timeout = 60000)
-		public void testBigTree_1_5(){ ProductIOTest.testBigTree(group, 1, 5); }
-		@Test(timeout = 60000)
-		public void testBigTree_5_1(){ ProductIOTest.testBigTree(group, 5, 1); }
+//		@Test(timeout = 60000)
+//		public void testBigTree_1_1(){ ProductIOTest.testBigTree(group, 1, 1); }
+//		
+//		@Test(timeout = 10000)
+//		public void testNoFiles_5_5(){ ProductIOTest.testNoFiles(group, 5, 5); }
+//		@Test(timeout = 10000)
+//		public void testSmallFile_5_5(){ ProductIOTest.testSmallFile(group, 5, 5); }
+//		@Test(timeout = 20000)
+//		public void testSmallTree_5_5(){ ProductIOTest.testSmallTree(group, 5, 5); }
+//		@Test(timeout = 60000)
+//		public void testBigFile_5_5(){ ProductIOTest.testBigFile(group, 5, 5); }
+//		@Test(timeout = 60000)
+//		public void testBigTree_5_5(){ ProductIOTest.testBigTree(group, 5, 5); }
+//		
+//		@Test(timeout = 60000)
+//		public void testBigTree_1_5(){ ProductIOTest.testBigTree(group, 1, 5); }
+//		@Test(timeout = 60000)
+//		public void testBigTree_5_1(){ ProductIOTest.testBigTree(group, 5, 1); }
 	}
 }

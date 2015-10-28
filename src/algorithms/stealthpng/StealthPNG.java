@@ -22,6 +22,7 @@ import product.Product;
 import product.ProductMode;
 import stats.ProgressMonitor;
 import stats.Stat;
+import testing.Scratch;
 import util.ByteConversion;
 import util.Constants;
 import util.algorithms.HashRandom;
@@ -41,6 +42,7 @@ public class StealthPNG implements Product{
 	protected int colorIndex = 0;
 	private int colorMod = 0;
 	protected int[] pv;
+	private boolean incrementFailed = false;
 	
 	public StealthPNG(Algorithm algo, Key key)
 	{
@@ -76,13 +78,34 @@ public class StealthPNG implements Product{
 		
 		colorIndex = 0;
 		colorMod = 0;
+		
+		System.out.println("Scratch.x: " + Scratch.x);
+		
+		Scratch.x = 0;
+		
+		incrementFailed = false;
 	}
 	
 	protected final void nextPair() throws ProductIOException
 	{
+		if (incrementFailed)
+			throw new ProductIOException("previous increment failed");
+		
+		if (pv[0] == 3044 && pv[1] == 1690)
+			System.out.println("Happened by increment color1");
+		++Scratch.x;
+		
+		if (pv[0] == 3044 && pv[1] == 1690)
+			System.out.println("Happened by increment color2");
 		incrementColor();
+		
+		if (pv[0] == 3044 && pv[1] == 1690)
+			System.out.println("Happened by increment color3");
 		if (colorIndex == 0)
 			incrementVector();
+		
+		if (pv[0] == 3044 && pv[1] == 1690)
+			System.out.println("Happened by increment color4");
 	}
 	
 	private final void incrementColor()
@@ -92,6 +115,10 @@ public class StealthPNG implements Product{
 	
 	private final void incrementVector() throws ProductIOException
 	{
+		incrementFailed = true;
+		if (pv[0] == 3044 && pv[1] == 1690)
+			System.out.println("Happened by increment vector1");
+		
 		int pixel = randOrder.next();
 		pv[1] = pixel / img.getWidth();
 		pv[0] = pixel % img.getWidth();
@@ -103,7 +130,15 @@ public class StealthPNG implements Product{
 			pv[0] = pixel % img.getWidth();
 		}
 		
+		if (pv[0] == 3044 && pv[1] == 1690)
+			System.out.println("Happening in increment");
+		
 		Pattern.eval(pattern, pv, img.getWidth(), img.getHeight());
+		
+		if (pv[0] == 3044 && pv[1] == 1690)
+			System.out.println("Happening after eval");
+		
+		incrementFailed = false;
 	}
 
 	@Override
@@ -118,7 +153,8 @@ public class StealthPNG implements Product{
 
 	@Override
 	public void setUUID(byte[] uuid) {
-		this.uuid = uuid;
+		this.uuid = uuid;//TODO remove this
+		//this.uuid = new byte []{0,0,0,0,0,0,0,0,0,0,0,0};
 	}
 
 	@Override

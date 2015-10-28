@@ -1,6 +1,7 @@
 package util.algorithms;
 
 import algorithms.ProductIOException;
+import util.ByteConversion;
 
 public class UniqueRandomRange
 {
@@ -21,6 +22,7 @@ public class UniqueRandomRange
 	
 	public void reseed(byte[] seed)
 	{
+		System.out.println("Reseed: " + ByteConversion.bytesToHex(seed));
 		random = new HashRandom(seed);
 	}
 	
@@ -36,6 +38,9 @@ public class UniqueRandomRange
 	
 	public int next() throws ProductIOException
 	{
+		if (!hasRemainingNumbers())
+			throw new ProductIOException("URR ran out of numbers.");
+		
 		try
 		{
 			int swapIndex = random.nextInt(index);

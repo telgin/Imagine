@@ -46,7 +46,7 @@ public class Definition implements algorithms.Definition{
 		
 		{
 			//product mode
-			Parameter param = new Parameter("ProductMode", "string", "Stealth", false);
+			Parameter param = new Parameter("ProductMode", "string", "Normal", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("Secure"));
@@ -56,7 +56,7 @@ public class Definition implements algorithms.Definition{
 		
 		{
 			//pattern
-			Parameter param = new Parameter("Pattern", "string", "2", false);
+			Parameter param = new Parameter("Pattern", "string", "1", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("1"));

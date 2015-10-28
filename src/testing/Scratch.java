@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.imageio.ImageIO;
@@ -45,58 +46,283 @@ public class Scratch {
 		
 		//loadBallanceTest();
 
-		for (int i = 1; i <= 256; ++i)
-		{
-			int pow = (int) Math.floor(Math.log10(i) / Math.log10(2));
-			int base = (int) Math.pow(2, pow);
-			int add = i - base;
-			System.out.println(i + " --> " + pow + " (" + base + ") + " + add + " = " + (base+add)
-					+ " *" + (((float)(pow+add))/i) + "*");
-		}
 		
-		
-		for (int mult = 1; mult < 256; ++mult)
-		{
-			float average = 0;
-			for (int i = 1; i <= 256; ++i)
-			{
-				int base = i / mult;
-				int add = i % mult;
-				float percent = (((float)(base+add))/i);
-				//System.out.println(i + " --> " + base + "*16 + " + add + " = " + ((base*16)+add)
-				//		+ " *" + percent + "*");
-				
-				average += percent;
-				assert ((base*mult)+add == i);
-			}
-			average = average / 256;
-			
-			
-			System.out.println(mult + " --> " + average);
-		}
-		
-		for (int mult = 1; mult < 16; ++mult)
-		{
-			float average = 0;
-			for (int i = 1; i <= 16; ++i)
-			{
-				int base = i / mult;
-				int add = i % mult;
-				float percent = (((float)(base+add))/i);
-				//System.out.println(i + " --> " + base + "*16 + " + add + " = " + ((base*16)+add)
-				//		+ " *" + percent + "*");
-				
-				average += percent;
-				assert ((base*mult)+add == i);
-			}
-			average = average / 26;
-			
-			
-			System.out.println(mult + " --> " + average);
-		}
 		
 		//11 mult is minimum average percent ?!?!?!?!?
-	}
+		
+		
+		
+		
+		
+//		int i = 125;
+//		System.out.println(i);
+//		
+//		int t = i / 16;
+//		int u = i % 16;
+//		System.out.println(t + ", " + u);
+//		
+//		int a = t / 4;
+//		int b = t % 4;
+//		int c = u / 4;
+//		int d = u % 4;
+//		System.out.println(a + ", " + b + ", " + c + ", " + d);
+//		
+//		int z = (((a * 4) + b) * 16) + ((c * 4) + d);
+//		System.out.println(z);
+//		BufferedImage img = new BufferedImage(512,512,BufferedImage.TYPE_INT_RGB);
+//		boolean yes = true;
+//		for (int yy = 0; yy<512; ++yy)
+//		{
+//			for (int zz = 0; zz<512; ++zz)
+//			{
+//				if (yes)
+//					img.setRGB(zz, yy, Color.BLACK.getRGB());
+//				else
+//					img.setRGB(zz, yy, Color.WHITE.getRGB());
+//				yes = !yes;
+//			}
+//			yes = !yes;
+//		}
+//		
+//		ImageIO.write(img, "png", new File("/home/tom/testimg.png"));
+//		
+//		for (int yy = 0; yy<256; ++yy)
+//		{
+//			for (int zz = 0; zz<256; ++zz)
+//			{
+//				int[] colors = new int[]{yy, 255-zz, yy, zz, 255-yy, zz, 255-yy, 255-zz};
+//
+//
+//				for (int x=0; x<256; ++x)
+//				{
+//					
+//					
+//					int in = x;
+//					int[] written = new int[]{-1,-1,-1,-1};
+//					int read = -1;
+//					
+//					{
+//						int val = in;
+//						int div16 = val / 16;
+//						int mod16 = val % 16;
+//			
+//						int[] fourVals = new int[]{div16 / 4, div16 % 4, mod16 / 4, mod16 % 4};
+//						//System.out.println(fourVals[0] + ", " + fourVals[1] + ", " + fourVals[2] + ", " + fourVals[3]);
+//						
+//						for (int i=0; i<4; ++i)
+//						{
+//							int c1 = colors[i];
+//							int c2 = colors[i+1];
+//			
+//							int min = Math.min(c1, c2);
+//							if (min > 2)
+//							{
+//								written[i] = (min - 3) + fourVals[i];
+//							}
+//							else
+//							{
+//								written[i] = (min + 3) - fourVals[i];
+//							}
+//						}
+//					
+//					}
+//					
+//					{
+//						int[] fourVals = new int[]{0,0,0,0};
+//			
+//						for (int i=0; i<4; ++i)
+//						{
+//							int c0 = written[i];
+//							int c1 = colors[i];
+//							int c2 = colors[i+1];
+//							
+//							int min = Math.min(c1, c2);
+//							if (min > 2)
+//							{
+//								fourVals[i] = c0 - (min - 3);
+//							}
+//							else
+//							{
+//								fourVals[i] = (min + 3) - c0;
+//							}
+//						}
+//						//System.out.println(fourVals[0] + ", " + fourVals[1] + ", " + fourVals[2] + ", " + fourVals[3]);
+//						int val = (((fourVals[0] * 4) + fourVals[1]) * 16) + ((fourVals[2] * 4) + fourVals[3]);
+//						read = val;
+//					}
+//					
+//					if (in != read)
+//						System.out.println(x + ", " + in + ", " + read);
+//					
+//					
+//				}
+//			}
+//			
+//		}
+//		
+//		
+//		System.out.println("Done");
+//		
+		
+		
+		
+		
+		 Set<String> set = new HashSet<String>();
+		 
+		  
+		 
+		         // Get list of all informal format names understood by the current set of registered readers
+		 
+		         String[] formatNames = ImageIO.getReaderFormatNames();
+		 
+		  
+		 
+		         for (int i = 0; i < formatNames.length; i++) {
+		 
+		             set.add(formatNames[i].toLowerCase());
+		 
+		         }
+		 
+		         System.out.println("Supported read formats: " + set);
+		
+		  
+		 
+		         set.clear();
+		 
+		  
+		
+		         // Get list of all informal format names understood by the current set of registered writers
+		
+		         formatNames = ImageIO.getWriterFormatNames();
+		 
+		  
+		
+		         for (int i = 0; i < formatNames.length; i++) {
+		 
+		             set.add(formatNames[i].toLowerCase());
+		
+		         }
+		 
+		         System.out.println("Supported write formats: " + set);
+		
+		  
+		
+		         set.clear();
+		
+		  
+
+		         // Get list of all MIME types understood by the current set of registered readers
+		 
+		         formatNames = ImageIO.getReaderMIMETypes();
+		 
+		  
+		 
+		         for (int i = 0; i < formatNames.length; i++) {
+		
+		             set.add(formatNames[i].toLowerCase());
+		 
+		         }
+		 
+		         System.out.println("Supported read MIME types: " + set);
+		
+		  
+		
+		         set.clear();
+		 
+		  
+		 
+		         // Get list of all MIME types understood by the current set of registered writers
+		
+		         formatNames = ImageIO.getWriterMIMETypes();
+		
+		  
+		 
+		         for (int i = 0; i < formatNames.length; i++) {
+		
+		             set.add(formatNames[i].toLowerCase());
+		 
+		         }
+		 
+		         System.out.println("Supported write MIME types: " + set);
+		 
+		  
+		 
+		     }
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	
+	
+//	{
+//		
+//		for (int i = 1; i <= 256; ++i)
+//		{
+//			int pow = (int) Math.floor(Math.log10(i) / Math.log10(2));
+//			int base = (int) Math.pow(2, pow);
+//			int add = i - base;
+//			System.out.println(i + " --> " + pow + " (" + base + ") + " + add + " = " + (base+add)
+//					+ " *" + (((float)(pow+add))/i) + "*");
+//		}
+//		
+//		
+//		for (int mult = 1; mult < 256; ++mult)
+//		{
+//			float average = 0;
+//			for (int i = 1; i <= 256; ++i)
+//			{
+//				int base = i / mult;
+//				int add = i % mult;
+//				float percent = (((float)(base+add))/i);
+//				//System.out.println(i + " --> " + base + "*16 + " + add + " = " + ((base*16)+add)
+//				//		+ " *" + percent + "*");
+//				
+//				average += percent;
+//				assert ((base*mult)+add == i);
+//			}
+//			average = average / 256;
+//			
+//			
+//			System.out.println(mult + " --> " + average);
+//		}
+//		
+//		for (int mult = 1; mult < 16; ++mult)
+//		{
+//			float average = 0;
+//			for (int i = 1; i <= 16; ++i)
+//			{
+//				int base = i / mult;
+//				int add = i % mult;
+//				float percent = (((float)(base+add))/i);
+//				//System.out.println(i + " --> " + base + "*16 + " + add + " = " + ((base*16)+add)
+//				//		+ " *" + percent + "*");
+//				
+//				average += percent;
+//				assert ((base*mult)+add == i);
+//			}
+//			average = average / 26;
+//			
+//			
+//			System.out.println(mult + " --> " + average);
+//	}
 	
 	/**
 	private static void loadBallanceTest() throws InterruptedException
