@@ -1,6 +1,5 @@
 package util;
 
-import hibernate.Metadata;
 import logging.LogLevel;
 import logging.Logger;
 
@@ -24,6 +23,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
+import data.Metadata;
 import database.Database;
 
 public class FileSystemUtil

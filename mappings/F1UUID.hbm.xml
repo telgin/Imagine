@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd"> 
+
+<hibernate-mapping>
+	<class name="F1UUID" table="F1UUID">
+		<meta attribute="class-description">
+			This is the "fragment 1" product uuid associated with one or more files or metadata updates.
+		</meta>
+		<id name="id" type="int" column="id">
+			<generator class="native"/>
+		</id>
+		<property name="uuid" column="uuid" type="byte[]"/>
+	</class>
+</hibernate-mapping>

@@ -1,4 +1,4 @@
-package hibernate;
+package data;
 
 import java.io.File;
 import util.ByteConversion;

@@ -1,6 +1,5 @@
 package database;
 
-import hibernate.Metadata;
 import logging.LogLevel;
 import logging.Logger;
 import runner.ActiveComponent;
@@ -12,6 +11,7 @@ import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import data.Metadata;
 import data.TrackingGroup;
 
 public class Database implements ActiveComponent
@@ -39,17 +39,6 @@ public class Database implements ActiveComponent
 		return indexMetadata;
 	}
 
-	public static boolean containsFileHash(byte[] hash, TrackingGroup group)
-	{
-		// TODO implement database of trackingGroup/fileHash/fragment1UUID
-		// why uuids? because in the case of a metadata update, you might not
-		// know
-		// what the previous fragment1UUID was if it was a metadata update due
-		// to a path change. All you'd know is you've seen this hash before,
-		// not where it was saved last.
-		return false;
-	}
-
 	public static void saveMetadata(Metadata metadata, TrackingGroup group)
 	{
 		Logger.log(LogLevel.k_debug,
@@ -63,21 +52,6 @@ public class Database implements ActiveComponent
 		// search the preloaded index files first
 
 		File indexFilePath = IndexFile.findIndexFile(lookup, group);
-
-		// search within saving files first,
-		// block while it's in here
-		// boolean saving = true;
-		// while (saving)
-		// {
-		// for (IndexFile index:toSave)
-		// {
-		// if (index.getPath().equals(indexFilePath))
-		// {
-		// //index was preloaded, just return it
-		// return index;
-		// }
-		// }
-		// }
 
 		// search within loaded files
 		for (IndexFile index : loadedIndexFiles)
@@ -100,9 +74,6 @@ public class Database implements ActiveComponent
 				{
 					loadedIndexFiles.peek().save();
 					loadedIndexFiles.take();
-					// IndexFile removed = loadedIndexFiles.take();
-					// removed.save();
-					// toSave.add(loadedIndexFiles.take());
 				}
 				catch (InterruptedException e)
 				{
@@ -110,13 +81,6 @@ public class Database implements ActiveComponent
 				}
 			}
 		}
-
-		// while (!toSave.isEmpty())
-		// try {
-		// toSave.take().save();
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
 
 		IndexFile index = IndexFile.loadIndex(lookup, group);
 		if (index != null)

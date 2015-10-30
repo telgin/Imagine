@@ -1,7 +1,5 @@
 package data;
 
-import hibernate.Metadata;
-
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 

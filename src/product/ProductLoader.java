@@ -1,7 +1,5 @@
 package product;
 
-import hibernate.Metadata;
-
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +12,7 @@ import logging.Logger;
 import stats.ProgressMonitor;
 import stats.Stat;
 import config.Configuration;
+import data.Metadata;
 import data.TrackingGroup;
 import database.Database;
 import database.DatabaseManager;

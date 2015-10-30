@@ -1,7 +1,5 @@
 package runner;
 
-import hibernate.Metadata;
-
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +9,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import logging.LogLevel;
 import logging.Logger;
 import data.IndexWorker;
+import data.Metadata;
 import data.ProductWorker;
 import data.TrackingGroup;
 

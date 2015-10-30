@@ -12,8 +12,8 @@ import util.ByteConversion;
 import util.Constants;
 import util.Hashing;
 import config.Configuration;
+import data.Metadata;
 import data.TrackingGroup;
-import hibernate.Metadata;
 
 public class ProductExtractor {
 

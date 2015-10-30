@@ -1,7 +1,5 @@
 package data;
 
-import hibernate.Metadata;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -11,6 +9,7 @@ import logging.LogLevel;
 import logging.Logger;
 
 import database.Database;
+import database.DatabaseManager;
 import util.ByteConversion;
 import util.Constants;
 import util.FileSystemUtil;
@@ -179,7 +178,7 @@ public class IndexWorker implements Runnable
 				// check the database to see if the hash already exists,
 				// if so, it's a metadata update (possibly due to copying or
 				// moving/renaming)
-				if (Database.containsFileHash(metadata.getFileHash(), trackingGroup))
+				if (DatabaseManager.containsFileHash(metadata.getFileHash(), trackingGroup))
 				{
 					metadata.setMetadataUpdate(true);
 				}

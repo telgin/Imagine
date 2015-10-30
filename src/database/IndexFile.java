@@ -1,13 +1,12 @@
 package database;
 
-import hibernate.Metadata;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import data.Metadata;
 import data.TrackingGroup;
 import util.ByteConversion;
 import util.Constants;

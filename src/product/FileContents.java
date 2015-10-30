@@ -1,7 +1,8 @@
 package product;
 
 import java.io.File;
-import hibernate.Metadata;
+
+import data.Metadata;
 
 public class FileContents
 {
