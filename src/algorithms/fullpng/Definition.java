@@ -10,42 +10,48 @@ import product.ProductReaderFactory;
 import product.ProductWriter;
 import product.ProductWriterFactory;
 
-public class Definition implements algorithms.Definition{
+public class Definition implements algorithms.Definition
+{
 	private static final String NAME = "FullPNG";
 	private static final int VERSION_NUMBER = 1;
 	private static Definition self;
-	
-	private Definition(){}
-	
+
+	private Definition()
+	{
+	}
+
 	public static Definition getInstance()
 	{
 		if (self == null)
 			self = new Definition();
-		
+
 		return self;
 	}
-	
+
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return NAME;
 	}
 
 	@Override
-	public Algorithm getDefaultAlgorithm() {
+	public Algorithm getDefaultAlgorithm()
+	{
 		return construct(false);
 	}
 
 	@Override
-	public Algorithm getAlgorithmSpec() {
+	public Algorithm getAlgorithmSpec()
+	{
 		return construct(true);
 	}
-	
+
 	private Algorithm construct(boolean includeOptions)
 	{
 		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER);
-		
+
 		{
-			//product mode
+			// product mode
 			Parameter param = new Parameter("ProductMode", "string", "Secure", false);
 			if (includeOptions)
 			{
@@ -53,9 +59,9 @@ public class Definition implements algorithms.Definition{
 			}
 			algo.addParameter(param);
 		}
-		
+
 		{
-			//colors
+			// colors
 			Parameter param = new Parameter("Colors", "string", "rgb", false);
 			if (includeOptions)
 			{
@@ -66,7 +72,7 @@ public class Definition implements algorithms.Definition{
 		}
 
 		{
-			//width
+			// width
 			Parameter param = new Parameter("Width", "int", "1820", false);
 			if (includeOptions)
 			{
@@ -76,7 +82,7 @@ public class Definition implements algorithms.Definition{
 		}
 
 		{
-			//height
+			// height
 			Parameter param = new Parameter("Height", "int", "980", false);
 			if (includeOptions)
 			{
@@ -84,7 +90,7 @@ public class Definition implements algorithms.Definition{
 			}
 			algo.addParameter(param);
 		}
-		
+
 		return algo;
 	}
 
@@ -94,12 +100,16 @@ public class Definition implements algorithms.Definition{
 		return new ProductFactoryCreation()
 		{
 			@Override
-			public ProductReaderFactory<? extends ProductReader> createReader(Algorithm algo, Key key) {
+			public ProductReaderFactory<? extends ProductReader> createReader(
+							Algorithm algo, Key key)
+			{
 				return new FullPNGFactory(algo, key);
 			}
 
 			@Override
-			public ProductWriterFactory<? extends ProductWriter> createWriter(Algorithm algo, Key key) {
+			public ProductWriterFactory<? extends ProductWriter> createWriter(
+							Algorithm algo, Key key)
+			{
 				return new FullPNGFactory(algo, key);
 			}
 		};

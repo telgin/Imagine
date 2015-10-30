@@ -35,7 +35,9 @@ public class Definition implements algorithms.Definition
 		return self;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see algorithms.Definition#getName()
 	 */
 	@Override
@@ -44,7 +46,9 @@ public class Definition implements algorithms.Definition
 		return NAME;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see algorithms.Definition#getDefaultAlgorithm()
 	 */
 	@Override
@@ -53,7 +57,9 @@ public class Definition implements algorithms.Definition
 		return construct(false);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see algorithms.Definition#getAlgorithmSpec()
 	 */
 	@Override
@@ -94,7 +100,9 @@ public class Definition implements algorithms.Definition
 		return algo;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see algorithms.Definition#getProductFactoryCreation()
 	 */
 	@Override
@@ -103,13 +111,15 @@ public class Definition implements algorithms.Definition
 		return new ProductFactoryCreation()
 		{
 			@Override
-			public ProductReaderFactory<? extends ProductReader> createReader(Algorithm algo, Key key)
+			public ProductReaderFactory<? extends ProductReader> createReader(
+							Algorithm algo, Key key)
 			{
 				return new TextBlockFactory(algo, key);
 			}
 
 			@Override
-			public ProductWriterFactory<? extends ProductWriter> createWriter(Algorithm algo, Key key)
+			public ProductWriterFactory<? extends ProductWriter> createWriter(
+							Algorithm algo, Key key)
 			{
 				return new TextBlockFactory(algo, key);
 			}

@@ -7,12 +7,12 @@ import data.Key;
 import product.ProductReaderFactory;
 import product.ProductWriterFactory;
 
-public class StealthPNGFactory  implements 
-	ProductReaderFactory<StealthPNGReader>, ProductWriterFactory<StealthPNGWriter>
+public class StealthPNGFactory implements ProductReaderFactory<StealthPNGReader>,
+				ProductWriterFactory<StealthPNGWriter>
 {
 	private Key key;
 	private Algorithm algo;
-	
+
 	public StealthPNGFactory(Algorithm algo, Key key)
 	{
 		this.key = key;
@@ -20,12 +20,14 @@ public class StealthPNGFactory  implements
 	}
 
 	@Override
-	public StealthPNGWriter createWriter() {
+	public StealthPNGWriter createWriter()
+	{
 		return new StealthPNGWriter(algo, key);
 	}
 
 	@Override
-	public StealthPNGReader createReader() {
+	public StealthPNGReader createReader()
+	{
 		return new StealthPNGReader(algo, key);
 	}
 }

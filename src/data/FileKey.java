@@ -7,7 +7,8 @@ import logging.Logger;
 import runner.Runner;
 import util.Hashing;
 
-public class FileKey implements Key{
+public class FileKey implements Key
+{
 	private boolean secure;
 	private File keyLocation;
 	private String name;
@@ -23,36 +24,41 @@ public class FileKey implements Key{
 	}
 
 	@Override
-	public boolean isSecure() {
+	public boolean isSecure()
+	{
 		return secure;
 	}
 
 	@Override
-	public byte[] getKeyHash() {
+	public byte[] getKeyHash()
+	{
 		if (keyHash == null)
 		{
 			fetchKey();
 		}
-		
+
 		return keyHash;
 	}
 
-	private void fetchKey() {
+	private void fetchKey()
+	{
 		if (keyLocation == null)
 		{
 			keyLocation = Runner.getActiveGUI().promptKeyFileLocation(name, groupName);
 		}
-		
+
 		if (keyLocation == null)
 		{
-			Logger.log(LogLevel.k_fatal, "Could not retrieve key file for tracking group " + groupName);
+			Logger.log(LogLevel.k_fatal, "Could not retrieve key file for tracking group "
+							+ groupName);
 		}
-		
+
 		keyHash = Hashing.hash(keyLocation);
 	}
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 }

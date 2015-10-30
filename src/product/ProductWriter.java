@@ -2,9 +2,10 @@ package product;
 
 import java.io.File;
 
-public interface ProductWriter extends Product{
+public interface ProductWriter extends Product
+{
 	public void newProduct();
-	
+
 	/**
 	 * @param b
 	 * @return True if written
@@ -21,5 +22,6 @@ public interface ProductWriter extends Product{
 
 	public void saveFile(File productStagingFolder, String fileName);
 
-	//should be able to take an input stream reader to make things more efficient. 
+	// should be able to take an input stream reader to make things more
+	// efficient.
 }

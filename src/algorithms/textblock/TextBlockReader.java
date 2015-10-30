@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import algorithms.Algorithm;
 import algorithms.ProductIOException;
 import data.Key;
+import logging.LogLevel;
+import logging.Logger;
 import product.ProductMode;
 import product.ProductReader;
 import util.ByteConversion;
@@ -15,11 +17,6 @@ public class TextBlockReader extends TextBlock implements ProductReader{
 
 	public TextBlockReader(Algorithm algo, Key key) {
 		super(algo, key);
-	}
-
-	@Override
-	public ProductMode getProductMode() {
-		return algorithm.getProductSecurityLevel();
 	}
 	
 	private final byte read() throws ProductIOException
@@ -61,8 +58,25 @@ public class TextBlockReader extends TextBlock implements ProductReader{
 	@Override
 	public long skip(long bytes)
 	{
-		long toSkip = Math.min((buffer.length - 1) - index, bytes);
-		index += toSkip;
-		return toSkip;
+		long skipped = 0;
+		try
+		{
+			for (long l = 0; l < bytes; ++l)
+			{
+				order.next();
+				random.nextByte();
+				++skipped;
+			}
+		}
+		catch (ProductIOException e)
+		{
+			// couldn't skip as many as requested,
+			// nothing to do
+		}
+
+		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes was requested and "
+						+ skipped + " were skipped.");
+
+		return skipped;
 	}
 }

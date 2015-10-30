@@ -3,7 +3,8 @@ package data;
 import runner.Runner;
 import util.Hashing;
 
-public class PasswordKey implements Key{
+public class PasswordKey implements Key
+{
 	private boolean secure;
 	private String name;
 	private String groupName;
@@ -17,29 +18,34 @@ public class PasswordKey implements Key{
 	}
 
 	@Override
-	public boolean isSecure() {
+	public boolean isSecure()
+	{
 		return secure;
 	}
 
 	@Override
-	public byte[] getKeyHash() {
+	public byte[] getKeyHash()
+	{
 		if (keyHash == null)
 		{
 			fetchKey();
 		}
-		
+
 		return keyHash;
 	}
-	
-	private void fetchKey() {
+
+	private void fetchKey()
+	{
 		if (keyHash == null)
 		{
-			keyHash = Hashing.hash(Runner.getActiveGUI().promptKey(name, groupName).getBytes());
+			keyHash = Hashing.hash(
+							Runner.getActiveGUI().promptKey(name, groupName).getBytes());
 		}
 	}
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 

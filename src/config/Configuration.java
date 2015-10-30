@@ -133,7 +133,8 @@ public class Configuration {
 		return logFolder;
 	}
 
-	public static List<TrackingGroup> getTrackingGroups() {
+	public static List<TrackingGroup> getTrackingGroups()
+	{
 		if (trackingGroups == null)
 			parseTrackingGroups();
 			
@@ -230,7 +231,8 @@ public class Configuration {
 	*/
 	private static Element getAlgorithm(String name)
 	{
-		Element supportedAlgosNode = ConfigUtil.first(ConfigUtil.children(root, "SupportedAlgorithms"));
+		Element supportedAlgosNode = ConfigUtil.first(
+						ConfigUtil.children(root, "SupportedAlgorithms"));
 		Element algoNode = ConfigUtil.first(
 				ConfigUtil.filterByAttribute(
 						ConfigUtil.children(supportedAlgosNode, "Algorithm"), "name", name));
@@ -247,7 +249,8 @@ public class Configuration {
 	private static String getParameter(Element config, String name)
 	{
 		Element paramNode = ConfigUtil.first(
-				ConfigUtil.filterByAttribute(ConfigUtil.children(config, "Parameter"), "name", name));
+				ConfigUtil.filterByAttribute(
+						ConfigUtil.children(config, "Parameter"), "name", name));
 		
 		if (paramNode == null)
 		{
@@ -258,7 +261,8 @@ public class Configuration {
 		return paramNode.getAttribute("value");
 	}
 
-	public static Integer getTextBlockBlockSize() {
+	public static Integer getTextBlockBlockSize()
+	{
 		String value = getParameter(getAlgorithm("TextBlock"), "blockSize");
 		return Integer.parseInt(value);
 	}

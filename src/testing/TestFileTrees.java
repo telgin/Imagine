@@ -8,13 +8,18 @@ import com.google.common.io.Files;
 
 import util.FileSystemUtil;
 
-public class TestFileTrees {
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
+public class TestFileTrees
+{
 	private static HashMap<String, FileTree> trees;
 	private static File bank = new File("testing/bank/");
-	
+
 	static
 	{
-		//trees:
+		// trees:
 		trees = new HashMap<String, FileTree>();
 		trees.put("nofiles", getNoFilesTree());
 		trees.put("smallfile", getSmallFileTree());
@@ -22,132 +27,207 @@ public class TestFileTrees {
 		trees.put("bigfile", getBigFileTree());
 		trees.put("bigtree", getBigTree());
 	}
-	
+
+	/**
+	 * @update_comment
+	 * @param parent
+	 * @param name
+	 */
 	public static void clear(File parent, String name)
 	{
 		clearFolder(trees.get(name.toLowerCase()).getRoot(parent));
 	}
 
-
-
-	private static FileTree getNoFilesTree() {
-		FileTree tree = new FileTree(){
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	private static FileTree getNoFilesTree()
+	{
+		FileTree tree = new FileTree()
+		{
 
 			@Override
-			public File getRoot(File parent) {
+			public File getRoot(File parent)
+			{
 				return new File(parent.getPath() + "/noFiles/");
 			}
 
 			@Override
-			public void create(File parent) {}
-			
+			public void create(File parent)
+			{
+			}
+
 		};
-		
+
 		return tree;
 	}
 
-	private static FileTree getSmallFileTree() {
-		FileTree tree = new FileTree(){
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	private static FileTree getSmallFileTree()
+	{
+		FileTree tree = new FileTree()
+		{
 
 			@Override
-			public File getRoot(File parent) {
+			public File getRoot(File parent)
+			{
 				return new File(parent.getPath() + "/smallFile/");
 			}
 
 			@Override
-			public void create(File parent) {
-				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));				
+			public void create(File parent)
+			{
+				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));
 			}
-			
+
 		};
-		
+
 		return tree;
 	}
-	
-	private static FileTree getSmallTree() {
-		FileTree tree = new FileTree(){
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	private static FileTree getSmallTree()
+	{
+		FileTree tree = new FileTree()
+		{
 
 			@Override
-			public File getRoot(File parent) {
+			public File getRoot(File parent)
+			{
 				return new File(parent.getPath() + "/smallTree/");
 			}
 
 			@Override
-			public void create(File parent) {
-				addFile(new File(bank.getPath(), "/tracked_topfolder_r/"), getRoot(parent));				
+			public void create(File parent)
+			{
+				addFile(new File(bank.getPath(), "/tracked_topfolder_r/"),
+								getRoot(parent));
 			}
-			
+
 		};
-		
+
 		return tree;
 	}
 
-	private static FileTree getBigFileTree() {
-		FileTree tree = new FileTree(){
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	private static FileTree getBigFileTree()
+	{
+		FileTree tree = new FileTree()
+		{
 
 			@Override
-			public File getRoot(File parent) {
+			public File getRoot(File parent)
+			{
 				return new File(parent.getPath() + "/bigFile/");
 			}
 
 			@Override
-			public void create(File parent) {
-				addFile(new File(bank.getPath() + "/Computer Art.zip"), getRoot(parent));				
+			public void create(File parent)
+			{
+				addFile(new File(bank.getPath() + "/Computer Art.zip"), getRoot(parent));
 			}
-			
+
 		};
-		
+
 		return tree;
 	}
 
-	private static FileTree getBigTree() {
-		FileTree tree = new FileTree(){
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	private static FileTree getBigTree()
+	{
+		FileTree tree = new FileTree()
+		{
 
 			@Override
-			public File getRoot(File parent) {
+			public File getRoot(File parent)
+			{
 				return new File(parent.getPath() + "/bigTree/");
 			}
 
 			@Override
-			public void create(File parent) {
-				addFile(new File(bank.getPath() + "/eclipse-installer/"), getRoot(parent));				
+			public void create(File parent)
+			{
+				addFile(new File(bank.getPath() + "/eclipse-installer/"),
+								getRoot(parent));
 			}
-			
+
 		};
-		
+
 		return tree;
 	}
 
+	/**
+	 * @update_comment
+	 * @param parent
+	 * @param name
+	 */
 	public static void reset(File parent, String name)
 	{
 		clear(parent, name.toLowerCase());
 		create(parent, name.toLowerCase());
 	}
-	
+
+	/**
+	 * @update_comment
+	 * @param parent
+	 * @param name
+	 */
 	public static void create(File parent, String name)
 	{
 		trees.get(name.toLowerCase()).create(parent);
 	}
-	
+
+	/**
+	 * @update_comment
+	 * @param folder
+	 */
 	private static void clearFolder(File folder)
 	{
 		FileSystemUtil.deleteDir(folder);
 		folder.mkdir();
 	}
 
-	public static File getRoot(File parent, String name) {
+	/**
+	 * @update_comment
+	 * @param parent
+	 * @param name
+	 * @return
+	 */
+	public static File getRoot(File parent, String name)
+	{
 		return trees.get(name.toLowerCase()).getRoot(parent);
 	}
-	
+
+	/**
+	 * @update_comment
+	 * @param target
+	 * @param newParent
+	 */
 	private static void addFile(File target, File newParent)
 	{
 		File copyTo = new File(newParent.getPath() + "/" + target.getName());
-		try {
+		try
+		{
 			if (target.isDirectory())
 				FileSystemUtil.copyDir2(target, copyTo);
 			else
 				Files.copy(target, copyTo);
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 	}

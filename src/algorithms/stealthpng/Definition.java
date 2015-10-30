@@ -10,42 +10,48 @@ import product.ProductReaderFactory;
 import product.ProductWriter;
 import product.ProductWriterFactory;
 
-public class Definition implements algorithms.Definition{
+public class Definition implements algorithms.Definition
+{
 	private static final String NAME = "StealthPNG";
 	private static final int VERSION_NUMBER = 1;
 	private static Definition self;
-	
-	private Definition(){}
-	
+
+	private Definition()
+	{
+	}
+
 	public static Definition getInstance()
 	{
 		if (self == null)
 			self = new Definition();
-		
+
 		return self;
 	}
-	
+
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return NAME;
 	}
 
 	@Override
-	public Algorithm getDefaultAlgorithm() {
+	public Algorithm getDefaultAlgorithm()
+	{
 		return construct(false);
 	}
 
 	@Override
-	public Algorithm getAlgorithmSpec() {
+	public Algorithm getAlgorithmSpec()
+	{
 		return construct(true);
 	}
-	
+
 	private Algorithm construct(boolean includeOptions)
 	{
 		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER);
-		
+
 		{
-			//product mode
+			// product mode
 			Parameter param = new Parameter("ProductMode", "string", "Normal", false);
 			if (includeOptions)
 			{
@@ -53,9 +59,9 @@ public class Definition implements algorithms.Definition{
 			}
 			algo.addParameter(param);
 		}
-		
+
 		{
-			//pattern
+			// pattern
 			Parameter param = new Parameter("Pattern", "string", "1", false);
 			if (includeOptions)
 			{
@@ -64,40 +70,48 @@ public class Definition implements algorithms.Definition{
 			}
 			algo.addParameter(param);
 		}
-		
+
 		{
-			//input image folder
-			Parameter param = new Parameter("ImageFolder", "string", "./inputImages/", false);
+			// input image folder
+			Parameter param = new Parameter("ImageFolder", "string", "./inputImages/",
+							false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("*"));
 			}
 			algo.addParameter(param);
 		}
-		
+
 		{
-			//working folder
-			Parameter param = new Parameter("ImageFolder", "string", "./.StealthPNG_working/", false);
+			// working folder
+			Parameter param = new Parameter("ImageFolder", "string",
+							"./.StealthPNG_working/", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("*"));
 			}
 			algo.addParameter(param);
 		}
-		
+
 		return algo;
 	}
 
 	@Override
-	public ProductFactoryCreation getProductFactoryCreation() {
-		return new ProductFactoryCreation() {
+	public ProductFactoryCreation getProductFactoryCreation()
+	{
+		return new ProductFactoryCreation()
+		{
 			@Override
-			public ProductReaderFactory<? extends ProductReader> createReader(Algorithm algo, Key key) {
+			public ProductReaderFactory<? extends ProductReader> createReader(
+							Algorithm algo, Key key)
+			{
 				return new StealthPNGFactory(algo, key);
 			}
 
 			@Override
-			public ProductWriterFactory<? extends ProductWriter> createWriter(Algorithm algo, Key key) {
+			public ProductWriterFactory<? extends ProductWriter> createWriter(
+							Algorithm algo, Key key)
+			{
 				return new StealthPNGFactory(algo, key);
 			}
 		};

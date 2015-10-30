@@ -11,59 +11,74 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 @SuppressWarnings("serial")
-public class ImageFrame extends JFrame implements WindowListener{
-	
-	public ImageFrame(BufferedImage img){
+public class ImageFrame extends JFrame implements WindowListener
+{
+
+	public ImageFrame(BufferedImage img)
+	{
 		JLabel label = new JLabel(new ImageIcon(img));
 		getContentPane().add(label, BorderLayout.CENTER);
 		pack();
 		setLocationRelativeTo(null);
 	}
-	
-	public void display(){
+
+	public void display()
+	{
 		setVisible(true);
 	}
-	
-	public void destroy(){
+
+	public void destroy()
+	{
 		setVisible(false);
 		dispose();
 	}
 
 	@Override
-	public void windowActivated(WindowEvent arg0) {}
+	public void windowActivated(WindowEvent arg0)
+	{
+	}
 
 	@Override
-	public void windowClosed(WindowEvent arg0) {
+	public void windowClosed(WindowEvent arg0)
+	{
 		destroy();
 	}
 
 	@Override
-	public void windowClosing(WindowEvent arg0) {
+	public void windowClosing(WindowEvent arg0)
+	{
 		destroy();
 	}
 
 	@Override
-	public void windowDeactivated(WindowEvent arg0) {
+	public void windowDeactivated(WindowEvent arg0)
+	{
 		destroy();
-		
+
 	}
 
 	@Override
-	public void windowDeiconified(WindowEvent arg0) {
+	public void windowDeiconified(WindowEvent arg0)
+	{
 		destroy();
-		
+
 	}
 
 	@Override
-	public void windowIconified(WindowEvent arg0) {}
+	public void windowIconified(WindowEvent arg0)
+	{
+	}
 
 	@Override
-	public void windowOpened(WindowEvent arg0) {}
+	public void windowOpened(WindowEvent arg0)
+	{
+	}
 
-	public void setRandomLocation() {
+	public void setRandomLocation()
+	{
 		int xMax = 1920 - (getWidth() + 50);
 		int yMax = 1080 - (getHeight() + 50);
 		Random random = new Random(System.currentTimeMillis());
-		setLocation(random.nextInt(xMax),random.nextInt(yMax));
+		setLocation(random.nextInt(xMax), random.nextInt(yMax));
 	}
 }

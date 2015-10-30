@@ -5,13 +5,13 @@ import data.Key;
 import product.ProductReaderFactory;
 import product.ProductWriterFactory;
 
-public class TextBlockFactory implements 
-	ProductReaderFactory<TextBlockReader>, ProductWriterFactory<TextBlockWriter>
+public class TextBlockFactory implements ProductReaderFactory<TextBlockReader>,
+				ProductWriterFactory<TextBlockWriter>
 {
 
 	private Algorithm algo;
 	private Key key;
-	
+
 	public TextBlockFactory(Algorithm algo, Key key)
 	{
 		this.algo = algo;
@@ -19,12 +19,14 @@ public class TextBlockFactory implements
 	}
 
 	@Override
-	public TextBlockWriter createWriter() {
+	public TextBlockWriter createWriter()
+	{
 		return new TextBlockWriter(algo, key);
 	}
 
 	@Override
-	public TextBlockReader createReader() {
+	public TextBlockReader createReader()
+	{
 		return new TextBlockReader(algo, key);
 	}
 

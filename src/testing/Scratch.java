@@ -28,6 +28,7 @@ import data.TrackingGroup;
 import product.ProductContents;
 import product.ProductLoader;
 import product.ProductExtractor;
+import algorithms.ProductIOException;
 import algorithms.fullpng.FullPNG;
 import algorithms.fullpng.FullPNGFactory;
 
@@ -166,105 +167,134 @@ public class Scratch {
 		
 		
 		
-		
-		 Set<String> set = new HashSet<String>();
-		 
-		  
-		 
-		         // Get list of all informal format names understood by the current set of registered readers
-		 
-		         String[] formatNames = ImageIO.getReaderFormatNames();
-		 
-		  
-		 
-		         for (int i = 0; i < formatNames.length; i++) {
-		 
-		             set.add(formatNames[i].toLowerCase());
-		 
-		         }
-		 
-		         System.out.println("Supported read formats: " + set);
-		
-		  
-		 
-		         set.clear();
-		 
-		  
-		
-		         // Get list of all informal format names understood by the current set of registered writers
-		
-		         formatNames = ImageIO.getWriterFormatNames();
-		 
-		  
-		
-		         for (int i = 0; i < formatNames.length; i++) {
-		 
-		             set.add(formatNames[i].toLowerCase());
-		
-		         }
-		 
-		         System.out.println("Supported write formats: " + set);
-		
-		  
-		
-		         set.clear();
-		
-		  
-
-		         // Get list of all MIME types understood by the current set of registered readers
-		 
-		         formatNames = ImageIO.getReaderMIMETypes();
-		 
-		  
-		 
-		         for (int i = 0; i < formatNames.length; i++) {
-		
-		             set.add(formatNames[i].toLowerCase());
-		 
-		         }
-		 
-		         System.out.println("Supported read MIME types: " + set);
-		
-		  
-		
-		         set.clear();
-		 
-		  
-		 
-		         // Get list of all MIME types understood by the current set of registered writers
-		
-		         formatNames = ImageIO.getWriterMIMETypes();
-		
-		  
-		 
-		         for (int i = 0; i < formatNames.length; i++) {
-		
-		             set.add(formatNames[i].toLowerCase());
-		 
-		         }
-		 
-		         System.out.println("Supported write MIME types: " + set);
-		 
-		  
-		 
-		     }
-		
-		
+//		
+//		 Set<String> set = new HashSet<String>();
+//		 
+//		  
+//		 
+//		         // Get list of all informal format names understood by the current set of registered readers
+//		 
+//		         String[] formatNames = ImageIO.getReaderFormatNames();
+//		 
+//		  
+//		 
+//		         for (int i = 0; i < formatNames.length; i++) {
+//		 
+//		             set.add(formatNames[i].toLowerCase());
+//		 
+//		         }
+//		 
+//		         System.out.println("Supported read formats: " + set);
+//		
+//		  
+//		 
+//		         set.clear();
+//		 
+//		  
+//		
+//		         // Get list of all informal format names understood by the current set of registered writers
+//		
+//		         formatNames = ImageIO.getWriterFormatNames();
+//		 
+//		  
+//		
+//		         for (int i = 0; i < formatNames.length; i++) {
+//		 
+//		             set.add(formatNames[i].toLowerCase());
+//		
+//		         }
+//		 
+//		         System.out.println("Supported write formats: " + set);
+//		
+//		  
+//		
+//		         set.clear();
+//		
+//		  
+//
+//		         // Get list of all MIME types understood by the current set of registered readers
+//		 
+//		         formatNames = ImageIO.getReaderMIMETypes();
+//		 
+//		  
+//		 
+//		         for (int i = 0; i < formatNames.length; i++) {
+//		
+//		             set.add(formatNames[i].toLowerCase());
+//		 
+//		         }
+//		 
+//		         System.out.println("Supported read MIME types: " + set);
+//		
+//		  
+//		
+//		         set.clear();
+//		 
+//		  
+//		 
+//		         // Get list of all MIME types understood by the current set of registered writers
+//		
+//		         formatNames = ImageIO.getWriterMIMETypes();
+//		
+//		  
+//		 
+//		         for (int i = 0; i < formatNames.length; i++) {
+//		
+//		             set.add(formatNames[i].toLowerCase());
+//		 
+//		         }
+//		 
+//		         System.out.println("Supported write MIME types: " + set);
+//		 
+//		  
+//		 
+//		     }
 		
 		
 		
 		
 		
 		
+		HashRandom random = new HashRandom(1234l);
+		UniqueRandomRange urr = new UniqueRandomRange(random, 10);
+		int[] array = new int[]{1,2,3,4,5,6,7,8,9,10,11};
+		int[] array2 = new int[]{1,2,3,4,5,6,7,8,9,10,11};
+		int index = 10;
+		int temp = -1;
+		int[] store = new int[1];
 		
+		for (int i = 0; i < 13; ++i)
+		{
+			
+			try
+			{
+			store[0] = urr.next();
+			System.out.println(store[0]);
+//				int swapIndex = random.nextInt(index);
+//				temp = array[swapIndex];
+//				array[swapIndex] = array[index - 1];
+//				array[index - 1] = temp;
+//				
+//				--index;
+//				
+//				store[0] = temp;
+//				System.out.println(temp);
+//				
+			}
+			catch (ProductIOException | ArrayIndexOutOfBoundsException e)
+			{
+				e.printStackTrace();
+			}
 		
+		}
+		System.out.println("store: " + store[0]);
+		System.out.println("array: ");
+		for (int a = 0; a<array.length; ++a)
+		{
+			System.out.println(array[a]);
+		}
 		
-		
-		
-		
-		
-		
-		
+	}
 		
 		
 		

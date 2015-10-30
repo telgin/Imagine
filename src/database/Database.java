@@ -14,101 +14,110 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import data.TrackingGroup;
 
-public class Database implements ActiveComponent{
+public class Database implements ActiveComponent
+{
 	private static final int MAX_LOADED_INDEX_FILES = 50;
-	private static BlockingQueue<IndexFile> loadedIndexFiles = 
-			new LinkedBlockingQueue<IndexFile>();
+	private static BlockingQueue<IndexFile> loadedIndexFiles =
+					new LinkedBlockingQueue<IndexFile>();
 	private static BlockingQueue<IndexFile> toSave = new LinkedBlockingQueue<IndexFile>();
 	private static boolean shutdown;
-	
+
 	static
 	{
 		SystemManager.registerActiveComponent(new Database());
 	}
 
-	public static Metadata getFileMetadata(File f, TrackingGroup group) {
+	public static Metadata getFileMetadata(File f, TrackingGroup group)
+	{
 		Metadata indexMetadata = getIndexFile(f, group).getFileMetadata(f);
-		
-		//the index metadata might be null if the file is new
-		//and doesn't exist there yet
+
+		// the index metadata might be null if the file is new
+		// and doesn't exist there yet
 		if (indexMetadata == null)
 			System.err.println("METADATA FOR " + f.getName() + " WAS NULL!!!");
-		
+
 		return indexMetadata;
 	}
-	
+
 	public static boolean containsFileHash(byte[] hash, TrackingGroup group)
 	{
-		//TODO implement database of trackingGroup/fileHash/fragment1UUID
-		//why uuids? because in the case of a metadata update, you might not know
-		//what the previous fragment1UUID was if it was a metadata update due
-		//to a path change. All you'd know is you've seen this hash before,
-		//not where it was saved last.
+		// TODO implement database of trackingGroup/fileHash/fragment1UUID
+		// why uuids? because in the case of a metadata update, you might not
+		// know
+		// what the previous fragment1UUID was if it was a metadata update due
+		// to a path change. All you'd know is you've seen this hash before,
+		// not where it was saved last.
 		return false;
 	}
 
-	public static void saveMetadata(Metadata metadata, TrackingGroup group) {
-		Logger.log(LogLevel.k_debug, "Saving metadata for " + metadata.getFile().getAbsolutePath());
+	public static void saveMetadata(Metadata metadata, TrackingGroup group)
+	{
+		Logger.log(LogLevel.k_debug,
+						"Saving metadata for " + metadata.getFile().getAbsolutePath());
 		IndexFile index = getIndexFile(metadata.getFile(), group);
 		index.saveMetadata(metadata);
 	}
 
-	private static synchronized IndexFile getIndexFile(File lookup, TrackingGroup group) {
-		//search the preloaded index files first
-		
+	private static synchronized IndexFile getIndexFile(File lookup, TrackingGroup group)
+	{
+		// search the preloaded index files first
+
 		File indexFilePath = IndexFile.findIndexFile(lookup, group);
-		
-		//search within saving files first,
-		//block while it's in here
-//		boolean saving = true;
-//		while (saving)
-//		{
-//			for (IndexFile index:toSave)
-//			{
-//				if (index.getPath().equals(indexFilePath))
-//				{
-//					//index was preloaded, just return it
-//					return index;
-//				}
-//			}
-//		}
-		
-		//search within loaded files
-		for (IndexFile index:loadedIndexFiles)
+
+		// search within saving files first,
+		// block while it's in here
+		// boolean saving = true;
+		// while (saving)
+		// {
+		// for (IndexFile index:toSave)
+		// {
+		// if (index.getPath().equals(indexFilePath))
+		// {
+		// //index was preloaded, just return it
+		// return index;
+		// }
+		// }
+		// }
+
+		// search within loaded files
+		for (IndexFile index : loadedIndexFiles)
 		{
 			if (index.getPath().equals(indexFilePath))
 			{
-				//index was preloaded, just return it
+				// index was preloaded, just return it
 				return index;
 			}
 		}
-		
-		//index was not preloaded
-		
+
+		// index was not preloaded
+
 		if (loadedIndexFiles.size() >= MAX_LOADED_INDEX_FILES)
 		{
-			//make some room
-			for (int i=0; i < 5 && !loadedIndexFiles.isEmpty(); ++i)
+			// make some room
+			for (int i = 0; i < 5 && !loadedIndexFiles.isEmpty(); ++i)
 			{
-				try {
+				try
+				{
 					loadedIndexFiles.peek().save();
 					loadedIndexFiles.take();
-					//IndexFile removed = loadedIndexFiles.take();
-					//removed.save();
-					//toSave.add(loadedIndexFiles.take());
-				} catch (InterruptedException e) {
+					// IndexFile removed = loadedIndexFiles.take();
+					// removed.save();
+					// toSave.add(loadedIndexFiles.take());
+				}
+				catch (InterruptedException e)
+				{
 					e.printStackTrace();
 				}
 			}
 		}
-		
-//		while (!toSave.isEmpty())
-//			try {
-//				toSave.take().save();
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-		
+
+		// while (!toSave.isEmpty())
+		// try {
+		// toSave.take().save();
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+
 		IndexFile index = IndexFile.loadIndex(lookup, group);
 		if (index != null)
 		{
@@ -117,24 +126,31 @@ public class Database implements ActiveComponent{
 		return index;
 	}
 
-	public static void save() {
-		Logger.log(LogLevel.k_debug, "Saving Database (" + loadedIndexFiles.size() + " index files)");
+	public static void save()
+	{
+		Logger.log(LogLevel.k_debug,
+						"Saving Database (" + loadedIndexFiles.size() + " index files)");
 		while (loadedIndexFiles.size() > 0)
-			try {
+			try
+			{
 				loadedIndexFiles.take().save();
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e)
+			{
 				e.printStackTrace();
 			}
 	}
 
 	@Override
-	public void shutdown() {
+	public void shutdown()
+	{
 		save();
 		shutdown = true;
 	}
 
 	@Override
-	public boolean isShutdown() {
+	public boolean isShutdown()
+	{
 		return shutdown;
 	}
 }

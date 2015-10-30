@@ -1,4 +1,5 @@
 package util;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,38 +20,53 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public abstract class ConfigUtil {
-	
-	public static Document loadConfig(File inFile){
-		try {
+public abstract class ConfigUtil
+{
+
+	public static Document loadConfig(File inFile)
+	{
+		try
+		{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			return factory.newDocumentBuilder().parse(inFile);
-		} catch (IOException | SAXException | ParserConfigurationException e) {
+		}
+		catch (IOException | SAXException | ParserConfigurationException e)
+		{
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
-	public static Document getNewDocument(){
-		try {
+
+	public static Document getNewDocument()
+	{
+		try
+		{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			return factory.newDocumentBuilder().newDocument();
-		} catch (ParserConfigurationException e) {
+		}
+		catch (ParserConfigurationException e)
+		{
 			return null;
 		}
 	}
-	
-	public static boolean saveConfig(Document config, File outFile){
-		try {
+
+	public static boolean saveConfig(Document config, File outFile)
+	{
+		try
+		{
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
+							"4");
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-			
-			transformer.transform(new DOMSource(config), new StreamResult(new FileOutputStream(outFile)));
+
+			transformer.transform(new DOMSource(config),
+							new StreamResult(new FileOutputStream(outFile)));
 			return true;
-		} catch (IOException | TransformerException e) {
+		}
+		catch (IOException | TransformerException e)
+		{
 			e.printStackTrace();
 			return false;
 		}
@@ -62,27 +78,28 @@ public abstract class ConfigUtil {
 			return null;
 		return elements.get(0);
 	}
-	
-	public static ArrayList<Element> filterByAttribute(ArrayList<Element> elements, String name, String value)
+
+	public static ArrayList<Element> filterByAttribute(ArrayList<Element> elements,
+					String name, String value)
 	{
 		ArrayList<Element> filtered = new ArrayList<Element>();
-		for (Element e:elements)
+		for (Element e : elements)
 			if (e.hasAttribute(name) && e.getAttribute(name).equals(value))
 				filtered.add(e);
-				
+
 		return filtered;
-				
+
 	}
-	
+
 	public static ArrayList<Element> children(Element parent, String tag)
 	{
 		ArrayList<Element> elements = new ArrayList<Element>();
 		NodeList nodes = parent.getElementsByTagName(tag);
-		
-		for (int i=0; i<nodes.getLength(); ++i)
+
+		for (int i = 0; i < nodes.getLength(); ++i)
 			if (nodes.item(i).getNodeType() == Node.ELEMENT_NODE)
 				elements.add((Element) nodes.item(i));
-		
+
 		return elements;
 	}
 }

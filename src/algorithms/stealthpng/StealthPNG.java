@@ -29,7 +29,8 @@ import util.algorithms.HashRandom;
 import util.algorithms.ImageUtil;
 import util.algorithms.UniqueRandomRange;
 
-public class StealthPNG implements Product{
+public class StealthPNG implements Product
+{
 	protected Algorithm algorithm;
 	protected BufferedImage img;
 	protected UniqueRandomRange randOrder;
@@ -43,7 +44,7 @@ public class StealthPNG implements Product{
 	private int colorMod = 0;
 	protected int[] pv;
 	private boolean incrementFailed = false;
-	
+
 	public StealthPNG(Algorithm algo, Key key)
 	{
 		this.algorithm = algo;
@@ -51,10 +52,10 @@ public class StealthPNG implements Product{
 		pattern = Integer.parseInt(algo.getParameterValue("pattern"));
 		pv = new int[6];
 	}
-	
+
 	/**
-	 * @credit http://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
-	 * user 'Klark'
+	 * @credit http://stackoverflow.com/questions/3514158/how-do-you-clone-a-
+	 *         bufferedimage user 'Klark'
 	 * @param toCopy
 	 * @return
 	 */
@@ -65,113 +66,121 @@ public class StealthPNG implements Product{
 		WritableRaster raster = toCopy.copyData(null);
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
-	
+
 	public void reset()
 	{
-		//any constant seed
+		// any constant seed
 		random = new HashRandom(1337l);
-		
-		//obtain a random order
-		randOrder = new UniqueRandomRange(random, img.getWidth()*img.getHeight());
-		
+
+		// obtain a random order
+		randOrder = new UniqueRandomRange(random, img.getWidth() * img.getHeight());
+
 		byteCount = 0;
-		
+
 		colorIndex = 0;
 		colorMod = 0;
-		
+
 		System.out.println("Scratch.x: " + Scratch.x);
-		
+
 		Scratch.x = 0;
-		
+
 		incrementFailed = false;
 	}
-	
+
 	protected final void nextPair() throws ProductIOException
 	{
 		if (incrementFailed)
 			throw new ProductIOException("previous increment failed");
-		
+
 		if (pv[0] == 3044 && pv[1] == 1690)
 			System.out.println("Happened by increment color1");
 		++Scratch.x;
-		
+
 		if (pv[0] == 3044 && pv[1] == 1690)
 			System.out.println("Happened by increment color2");
 		incrementColor();
-		
+
 		if (pv[0] == 3044 && pv[1] == 1690)
 			System.out.println("Happened by increment color3");
 		if (colorIndex == 0)
 			incrementVector();
-		
+
 		if (pv[0] == 3044 && pv[1] == 1690)
 			System.out.println("Happened by increment color4");
 	}
-	
+
 	private final void incrementColor()
 	{
 		colorIndex = colorMod++ % 3;
 	}
-	
+
 	private final void incrementVector() throws ProductIOException
 	{
 		incrementFailed = true;
 		if (pv[0] == 3044 && pv[1] == 1690)
 			System.out.println("Happened by increment vector1");
-		
+
 		int pixel = randOrder.next();
 		pv[1] = pixel / img.getWidth();
 		pv[0] = pixel % img.getWidth();
 
-		while (!Pattern.validIndex(pattern, pv[0], pv[1], img.getWidth(), img.getHeight()))
+		while (!Pattern.validIndex(pattern, pv[0], pv[1], img.getWidth(),
+						img.getHeight()))
 		{
 			pixel = randOrder.next();
 			pv[1] = pixel / img.getWidth();
 			pv[0] = pixel % img.getWidth();
 		}
-		
+
 		if (pv[0] == 3044 && pv[1] == 1690)
 			System.out.println("Happening in increment");
-		
+
 		Pattern.eval(pattern, pv, img.getWidth(), img.getHeight());
-		
+
 		if (pv[0] == 3044 && pv[1] == 1690)
 			System.out.println("Happening after eval");
-		
+
 		incrementFailed = false;
 	}
 
 	@Override
-	public String getAlgorithmName() {
+	public String getAlgorithmName()
+	{
 		return algorithm.getName();
 	}
 
 	@Override
-	public int getAlgorithmVersionNumber() {
+	public int getAlgorithmVersionNumber()
+	{
 		return algorithm.getVersion();
 	}
 
 	@Override
-	public void setUUID(byte[] uuid) {
-		this.uuid = uuid;//TODO remove this
-		//this.uuid = new byte []{0,0,0,0,0,0,0,0,0,0,0,0};
+	public void setUUID(byte[] uuid)
+	{
+		this.uuid = uuid;// TODO remove this
+		// this.uuid = new byte []{0,0,0,0,0,0,0,0,0,0,0,0};
 	}
 
 	@Override
-	public ProductMode getProductMode() {
+	public ProductMode getProductMode()
+	{
 		return algorithm.getProductSecurityLevel();
 	}
 
 	@Override
-	public void secureStream() {
-		//uuid should be set prior to this
+	public void secureStream()
+	{
+		// uuid should be set prior to this
 		randOrder.reseed(ByteConversion.concat(key.getKeyHash(), uuid));
 	}
-	
-	protected byte getColor(int x, int y) {
+
+	protected byte getColor(int x, int y)
+	{
 		if (x < 0 || y < 0 || x >= img.getWidth() || y >= img.getHeight())
-				System.out.println(x + ", " + y + ", " + img.getWidth() + ", " + img.getHeight());
-		
+			System.out.println(x + ", " + y + ", " + img.getWidth() + ", "
+							+ img.getHeight());
+
 		if (colorIndex == 0)
 		{
 			return ImageUtil.getRed(img.getRGB(x, y));
@@ -187,7 +196,8 @@ public class StealthPNG implements Product{
 	}
 
 	@Override
-	public byte[] getUUID() {
+	public byte[] getUUID()
+	{
 		return uuid;
 	}
 }

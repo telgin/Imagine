@@ -15,20 +15,23 @@ import stats.ProgressMonitor;
 import stats.Stat;
 import util.ByteConversion;
 
-public class TextBlockWriter extends TextBlock implements ProductWriter{
-
-	public TextBlockWriter(Algorithm algo, Key key) {
+public class TextBlockWriter extends TextBlock implements ProductWriter
+{
+	public TextBlockWriter(Algorithm algo, Key key)
+	{
 		super(algo, key);
 	}
-	
+
 	@Override
-	public void newProduct() {
+	public void newProduct()
+	{
 		buffer = new byte[blockSize];
 		reset();
 	}
-	
+
 	@Override
-	public boolean write(byte b) {
+	public boolean write(byte b)
+	{
 		try
 		{
 			byte val = ByteConversion.intToByte(b ^ random.nextByte());
@@ -45,36 +48,41 @@ public class TextBlockWriter extends TextBlock implements ProductWriter{
 	public int write(byte[] bytes, int offset, int length)
 	{
 		Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
-		
+
 		for (int x = offset; x < offset + length; ++x)
 		{
 			if (!write(bytes[x]))
 				return x - offset;
 		}
-		
+
 		return length;
 	}
 
 	@Override
-	public void saveFile(File productStagingFolder, String filename) {
-		
-		//write random bytes to fill up the buffer
+	public void saveFile(File productStagingFolder, String filename)
+	{
+
+		// write random bytes to fill up the buffer
 		fillToEnd();
-		
-		try {
-			File toSave = new File(productStagingFolder.getAbsolutePath() + "/" +
-					filename + ".txt");
-			Logger.log(LogLevel.k_info, "Saving product file: " + toSave.getAbsolutePath());
-			
+
+		try
+		{
+			File toSave = new File(productStagingFolder.getAbsolutePath() + "/" + filename
+							+ ".txt");
+			Logger.log(LogLevel.k_info,
+							"Saving product file: " + toSave.getAbsolutePath());
+
 			PrintWriter writer = new PrintWriter(toSave);
 			writer.print(ByteConversion.bytesToBase64(buffer));
 			writer.close();
-			
-			//update progress
+
+			// update progress
 			Stat stat = ProgressMonitor.getStat("productsCreated");
 			if (stat != null)
 				stat.incrementNumericProgress(1);
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 	}

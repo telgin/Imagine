@@ -26,7 +26,8 @@ import algorithms.Algorithm;
 import algorithms.Parameter;
 import algorithms.ProductIOException;
 
-public class FullPNGWriter extends FullPNG implements ProductWriter{
+public class FullPNGWriter extends FullPNG implements ProductWriter
+{
 
 	public FullPNGWriter(Algorithm algo, Key key)
 	{
@@ -34,23 +35,24 @@ public class FullPNGWriter extends FullPNG implements ProductWriter{
 	}
 
 	@Override
-	public void newProduct() {
-		//should really use the rgb configuration parameter somehow
-		img = new BufferedImage(width, height, 
-				BufferedImage.TYPE_INT_RGB);
-		
+	public void newProduct()
+	{
+		// should really use the rgb configuration parameter somehow
+		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
 		reset();
 	}
 
 	@Override
-	public boolean write(byte b){
+	public boolean write(byte b)
+	{
 		try
 		{
-			//Logger.log(LogLevel.k_debug, "Writing " + 1 + " byte.");
+			// Logger.log(LogLevel.k_debug, "Writing " + 1 + " byte.");
 			int index = randOrder.next();
 			byte toSet = ByteConversion.intToByte(b ^ random.nextByte());
 			setImageByte(index, toSet);
-			//System.out.print(ByteConversion.bytesToHex(new byte[]{toSet}));
+			// System.out.print(ByteConversion.bytesToHex(new byte[]{toSet}));
 			return true;
 		}
 		catch (ProductIOException e)
@@ -62,35 +64,41 @@ public class FullPNGWriter extends FullPNG implements ProductWriter{
 	@Override
 	public int write(byte[] bytes, int offset, int length)
 	{
-		//Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
+		// Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
 		for (int x = offset; x < offset + length; ++x)
 		{
 			if (!write(bytes[x]))
 				return x - offset;
 		}
-		////System.out.println();
-		
+		//// System.out.println();
+
 		return length;
 	}
 
 	@Override
-	public void saveFile(File productStagingFolder, String fileName) {
-		try {
-			File imgFile = new File(productStagingFolder.getAbsolutePath() + "/" + fileName + ".png");
-			Logger.log(LogLevel.k_info, "Saving product file: " + imgFile.getAbsolutePath());
+	public void saveFile(File productStagingFolder, String fileName)
+	{
+		try
+		{
+			File imgFile = new File(productStagingFolder.getAbsolutePath() + "/"
+							+ fileName + ".png");
+			Logger.log(LogLevel.k_info,
+							"Saving product file: " + imgFile.getAbsolutePath());
 			if (!imgFile.getParentFile().exists())
 				imgFile.getParentFile().mkdirs();
 			ImageIO.write(img, "PNG", imgFile);
-			
-			//update progress
+
+			// update progress
 			Stat stat = ProgressMonitor.getStat("productsCreated");
 			if (stat != null)
 				stat.incrementNumericProgress(1);
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void setImageByte(int index, byte data)
 	{
 		int color = index % 3;

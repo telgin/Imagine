@@ -1,5 +1,6 @@
 package stats;
 
-public enum StatType {
+public enum StatType
+{
 
 }

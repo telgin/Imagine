@@ -14,7 +14,8 @@ import product.ProductReaderFactory;
 import product.ProductWriter;
 import product.ProductWriterFactory;
 
-public class AlgorithmRegistry {
+public class AlgorithmRegistry
+{
 	private static HashMap<String, Definition> definitions;	
 	
 	static

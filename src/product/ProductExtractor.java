@@ -625,14 +625,16 @@ public class ProductExtractor {
 	/**
 	 * @return the extractionFolder
 	 */
-	public File getExtractionFolder() {
+	public File getExtractionFolder()
+	{
 		return extractionFolder;
 	}
 
 	/**
 	 * @param extractionFolder the extractionFolder to set
 	 */
-	public void setExtractionFolder(File extractionFolder) {
+	public void setExtractionFolder(File extractionFolder)
+	{
 		this.extractionFolder = extractionFolder;
 	}
 }

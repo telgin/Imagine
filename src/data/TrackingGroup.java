@@ -15,7 +15,8 @@ import product.ProductReaderFactory;
 import product.ProductWriter;
 import product.ProductWriterFactory;
 
-public class TrackingGroup {
+public class TrackingGroup
+{
 	private String name;
 	private HashSet<File> trackedFiles;
 	private HashSet<File> untrackedFiles;
@@ -24,7 +25,7 @@ public class TrackingGroup {
 	private Key key;
 	private File productStagingFolder;
 	private File extractionFolder;
-	
+
 	public TrackingGroup(String name, boolean usesDatabase, Algorithm algo, Key key)
 	{
 		setName(name);
@@ -34,18 +35,19 @@ public class TrackingGroup {
 		trackedFiles = new HashSet<File>();
 		untrackedFiles = new HashSet<File>();
 	}
-	
+
 	public void addTrackedPath(String path)
 	{
 		File file = new File(path);
 		addTrackedPath(file);
 	}
-	
+
 	public void addTrackedPath(File file)
 	{
 		if (!file.exists())
 		{
-			Logger.log(LogLevel.k_error, "Warning: The path in tracking group '" + name + "' does not exist:");
+			Logger.log(LogLevel.k_error, "Warning: The path in tracking group '" + name
+							+ "' does not exist:");
 			Logger.log(LogLevel.k_error, file.getPath());
 		}
 		else
@@ -53,18 +55,19 @@ public class TrackingGroup {
 			trackedFiles.add(file);
 		}
 	}
-	
+
 	public void addUntrackedPath(String path)
 	{
 		File file = new File(path);
 		addUntrackedPath(file);
 	}
-	
+
 	public void addUntrackedPath(File file)
 	{
 		if (!file.exists())
 		{
-			Logger.log(LogLevel.k_error, "Warning: The path in tracking group '" + name + "' does not exist:");
+			Logger.log(LogLevel.k_error, "Warning: The path in tracking group '" + name
+							+ "' does not exist:");
 			Logger.log(LogLevel.k_error, file.getPath());
 		}
 		else
@@ -76,131 +79,155 @@ public class TrackingGroup {
 	/**
 	 * @return the name
 	 */
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
-	public void setName(String name) {
+	public void setName(String name)
+	{
 		this.name = name;
 	}
 
 	/**
 	 * @return the fileSet
 	 */
-	public HashSet<File> getTrackedFiles() {
+	public HashSet<File> getTrackedFiles()
+	{
 		return trackedFiles;
 	}
-	
+
 	/**
 	 * @return the fileSet
 	 */
-	public HashSet<File> getUntrackedFiles() {
+	public HashSet<File> getUntrackedFiles()
+	{
 		return untrackedFiles;
 	}
-
-
 
 	public String toString()
 	{
 		String text = "Tracking Group: " + name;
-		
+
 		text += "Tracked Files: ";
-		for(File f:trackedFiles)
+		for (File f : trackedFiles)
 		{
-			try {
+			try
+			{
 				text += "\n\t" + f.getCanonicalPath();
-			} catch (IOException e) {
+			}
+			catch (IOException e)
+			{
 				e.printStackTrace();
 			}
 		}
-		
+
 		text += "Untracked Files: ";
-		for(File f:untrackedFiles)
+		for (File f : untrackedFiles)
 		{
-			try {
+			try
+			{
 				text += "\n\t" + f.getCanonicalPath();
-			} catch (IOException e) {
+			}
+			catch (IOException e)
+			{
 				e.printStackTrace();
 			}
 		}
-			
-		
+
 		return text;
 	}
 
 	/**
 	 * @return the algorithmName
 	 */
-	public Key getKey() {
+	public Key getKey()
+	{
 		return key;
 	}
 
 	/**
 	 * @return the usingDatabase
 	 */
-	public boolean isUsingDatabase() {
+	public boolean isUsingDatabase()
+	{
 		return usingDatabase;
 	}
 
 	/**
-	 * @param usingDatabase if the group uses a database
+	 * @param usingDatabase
+	 *            if the group uses a database
 	 */
-	public void setUsingDatabase(boolean usingDatabase) {
+	public void setUsingDatabase(boolean usingDatabase)
+	{
 		this.usingDatabase = usingDatabase;
 	}
 
-	public Algorithm getAlgorithm() {
+	public Algorithm getAlgorithm()
+	{
 		return algorithm;
 	}
 
-	public void setAlgorithm(Algorithm algorithm) {
+	public void setAlgorithm(Algorithm algorithm)
+	{
 		this.algorithm = algorithm;
 	}
 
-	public ProductReaderFactory<? extends ProductReader> getProductReaderFactory() {
+	public ProductReaderFactory<? extends ProductReader> getProductReaderFactory()
+	{
 		return AlgorithmRegistry.getProductReaderFactory(algorithm, key);
 	}
-	
-	public ProductWriterFactory<? extends ProductWriter> getProductWriterFactory() {
+
+	public ProductWriterFactory<? extends ProductWriter> getProductWriterFactory()
+	{
 		return AlgorithmRegistry.getProductWriterFactory(algorithm, key);
 	}
 
 	/**
 	 * @return the extractionFolder
 	 */
-	public File getExtractionFolder() {
+	public File getExtractionFolder()
+	{
 		return extractionFolder;
 	}
 
 	/**
-	 * @param extractionFolder the extractionFolder to set
+	 * @param extractionFolder
+	 *            the extractionFolder to set
 	 */
-	public void setExtractionFolder(File extractionFolder) {
+	public void setExtractionFolder(File extractionFolder)
+	{
 		this.extractionFolder = extractionFolder;
 	}
 
 	/**
 	 * @return the productStagingFolder
 	 */
-	public File getProductStagingFolder() {
+	public File getProductStagingFolder()
+	{
 		return productStagingFolder;
 	}
 
 	/**
-	 * @param productStagingFolder the productStagingFolder to set
+	 * @param productStagingFolder
+	 *            the productStagingFolder to set
 	 */
-	public void setProductStagingFolder(File productStagingFolder) {
+	public void setProductStagingFolder(File productStagingFolder)
+	{
 		this.productStagingFolder = productStagingFolder;
 	}
 
-	public void clearTrackedPaths() {
+	public void clearTrackedPaths()
+	{
 		trackedFiles = new HashSet<File>();
 	}
-	
-	public void clearUntrackedPaths() {
+
+	public void clearUntrackedPaths()
+	{
 		untrackedFiles = new HashSet<File>();
 	}
 }

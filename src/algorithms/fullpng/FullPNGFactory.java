@@ -7,13 +7,13 @@ import data.Key;
 import product.ProductReaderFactory;
 import product.ProductWriterFactory;
 
-public class FullPNGFactory implements 
-	ProductReaderFactory<FullPNGReader>, ProductWriterFactory<FullPNGWriter>
+public class FullPNGFactory implements ProductReaderFactory<FullPNGReader>,
+				ProductWriterFactory<FullPNGWriter>
 {
-	
+
 	private Key key;
 	private Algorithm algo;
-	
+
 	public FullPNGFactory(Algorithm algo, Key key)
 	{
 		this.key = key;
@@ -21,12 +21,14 @@ public class FullPNGFactory implements
 	}
 
 	@Override
-	public FullPNGWriter createWriter() {
+	public FullPNGWriter createWriter()
+	{
 		return new FullPNGWriter(algo, key);
 	}
 
 	@Override
-	public FullPNGReader createReader() {
+	public FullPNGReader createReader()
+	{
 		return new FullPNGReader(algo, key);
 	}
 }

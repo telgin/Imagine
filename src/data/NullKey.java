@@ -1,21 +1,27 @@
 package data;
 
-public class NullKey implements Key{
+public class NullKey implements Key
+{
 
-	public NullKey(){}
-	
+	public NullKey()
+	{
+	}
+
 	@Override
-	public boolean isSecure() {
+	public boolean isSecure()
+	{
 		return false;
 	}
 
 	@Override
-	public byte[] getKeyHash() {
+	public byte[] getKeyHash()
+	{
 		return null;
 	}
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return null;
 	}
 

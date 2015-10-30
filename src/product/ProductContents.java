@@ -3,7 +3,8 @@ package product;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductContents {
+public class ProductContents
+{
 
 	private int productVersionNumber;
 	private long streamUUID;
@@ -12,72 +13,91 @@ public class ProductContents {
 	private int algorithmVersionNumber;
 	private String groupName;
 	private String groupKeyName;
-	
+
 	private ArrayList<FileContents> files;
-	
+
 	public ProductContents()
 	{
 		files = new ArrayList<FileContents>();
 	}
-	
+
 	public void addFileContents(FileContents contents)
 	{
 		files.add(contents);
 	}
-	
+
 	/**
 	 * @return the productVersionNumber
 	 */
-	public int getProductVersionNumber() {
+	public int getProductVersionNumber()
+	{
 		return productVersionNumber;
 	}
+
 	/**
-	 * @param productVersionNumber the productVersionNumber to set
+	 * @param productVersionNumber
+	 *            the productVersionNumber to set
 	 */
-	public void setProductVersionNumber(int productVersionNumber) {
+	public void setProductVersionNumber(int productVersionNumber)
+	{
 		this.productVersionNumber = productVersionNumber;
 	}
+
 	/**
 	 * @return the productSequenceNumber
 	 */
-	public int getProductSequenceNumber() {
+	public int getProductSequenceNumber()
+	{
 		return productSequenceNumber;
 	}
+
 	/**
-	 * @param productSequenceNumber the productSequenceNumber to set
+	 * @param productSequenceNumber
+	 *            the productSequenceNumber to set
 	 */
-	public void setProductSequenceNumber(int productSequenceNumber) {
+	public void setProductSequenceNumber(int productSequenceNumber)
+	{
 		this.productSequenceNumber = productSequenceNumber;
 	}
+
 	/**
 	 * @return the groupName
 	 */
-	public String getGroupName() {
+	public String getGroupName()
+	{
 		return groupName;
 	}
+
 	/**
-	 * @param groupName the groupName to set
+	 * @param groupName
+	 *            the groupName to set
 	 */
-	public void setGroupName(String groupName) {
+	public void setGroupName(String groupName)
+	{
 		this.groupName = groupName;
 	}
+
 	/**
 	 * @return the streamUUID
 	 */
-	public long getStreamUUID() {
+	public long getStreamUUID()
+	{
 		return streamUUID;
 	}
+
 	/**
-	 * @param uuid the streamUUID to set
+	 * @param uuid
+	 *            the streamUUID to set
 	 */
-	public void setStreamUUID(long uuid) {
+	public void setStreamUUID(long uuid)
+	{
 		this.streamUUID = uuid;
 	}
-	
+
 	public String toString()
 	{
 		String text = "Product Contents:";
-		
+
 		text += "\nProduct Version: " + productVersionNumber;
 		text += "\nStreamUUID: " + streamUUID;
 		text += "\nSequence Number: " + productSequenceNumber;
@@ -85,12 +105,12 @@ public class ProductContents {
 		text += "\nAlgorithm Name: " + algorithmName;
 		text += "\nGroup Name: " + groupName;
 		text += "\nGroup Key Name: " + groupKeyName;
-		for (FileContents fc:files)
+		for (FileContents fc : files)
 			text += "\n" + fc.toString();
-		
+
 		return text;
 	}
-	
+
 	public List<FileContents> getFileContents()
 	{
 		return files;
@@ -99,42 +119,51 @@ public class ProductContents {
 	/**
 	 * @return the algorithmName
 	 */
-	public String getAlgorithmName() {
+	public String getAlgorithmName()
+	{
 		return algorithmName;
 	}
 
 	/**
-	 * @param algorithmName the algorithmName to set
+	 * @param algorithmName
+	 *            the algorithmName to set
 	 */
-	public void setAlgorithmName(String algorithmName) {
+	public void setAlgorithmName(String algorithmName)
+	{
 		this.algorithmName = algorithmName;
 	}
 
 	/**
 	 * @return the algorithmVersionNumber
 	 */
-	public int getAlgorithmVersionNumber() {
+	public int getAlgorithmVersionNumber()
+	{
 		return algorithmVersionNumber;
 	}
 
 	/**
-	 * @param algorithmVersionNumber the algorithmVersionNumber to set
+	 * @param algorithmVersionNumber
+	 *            the algorithmVersionNumber to set
 	 */
-	public void setAlgorithmVersionNumber(int algorithmVersionNumber) {
+	public void setAlgorithmVersionNumber(int algorithmVersionNumber)
+	{
 		this.algorithmVersionNumber = algorithmVersionNumber;
 	}
 
 	/**
 	 * @return the groupKeyName
 	 */
-	public String getGroupKeyName() {
+	public String getGroupKeyName()
+	{
 		return groupKeyName;
 	}
 
 	/**
-	 * @param groupKeyName the groupKeyName to set
+	 * @param groupKeyName
+	 *            the groupKeyName to set
 	 */
-	public void setGroupKeyName(String groupKeyName) {
+	public void setGroupKeyName(String groupKeyName)
+	{
 		this.groupKeyName = groupKeyName;
 	}
 }
