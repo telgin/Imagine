@@ -11,19 +11,34 @@ import product.Product;
 import product.ProductMode;
 import stats.ProgressMonitor;
 import stats.Stat;
+import util.ByteConversion;
+import util.algorithms.HashRandom;
+import util.algorithms.UniqueRandomRange;
 import config.Configuration;
+import data.Key;
 
 public abstract class TextBlock implements Product{
 	protected Algorithm algorithm;
+	private Key key;
 	protected byte[] buffer;
 	protected int index;
 	protected int blockSize;
 	protected byte[] uuid;
+	protected HashRandom random;
+	protected UniqueRandomRange order;
 
-	public TextBlock(Algorithm algo) {
+	public TextBlock(Algorithm algo, Key key) {
 		algorithm = algo;
+		this.key = key;
 		blockSize = Integer.parseInt(algorithm.getParameterValue("blockSize"));
 		Logger.log(LogLevel.k_debug, "TextBlock Created");
+	}
+	
+	protected void reset()
+	{
+		random = new HashRandom(1337l);
+		order = new UniqueRandomRange(random, blockSize);
+		index = 0;
 	}
 
 	@Override
@@ -38,7 +53,6 @@ public abstract class TextBlock implements Product{
 
 	@Override
 	public void setUUID(byte[] uuid) {
-		//not used currently
 		this.uuid = uuid;
 	}
 
@@ -49,7 +63,7 @@ public abstract class TextBlock implements Product{
 
 	@Override
 	public void secureStream() {
-		//only normal mode supported
+		order.reseed(ByteConversion.concat(key.getKeyHash(), uuid));
 	}
 //	
 //	@Override

@@ -10,42 +10,69 @@ import product.ProductReaderFactory;
 import product.ProductWriter;
 import product.ProductWriterFactory;
 
-public class Definition implements algorithms.Definition{
+public class Definition implements algorithms.Definition
+{
 	private static final String NAME = "TextBlock";
 	private static final int VERSION_NUMBER = 1;
 	private static Definition self;
-	
-	private Definition(){}
 
+	/**
+	 * @update_comment
+	 */
+	private Definition()
+	{
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public static Definition getInstance()
 	{
 		if (self == null)
 			self = new Definition();
-		
+
 		return self;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getName()
+	 */
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return NAME;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getDefaultAlgorithm()
+	 */
 	@Override
-	public Algorithm getDefaultAlgorithm() {
+	public Algorithm getDefaultAlgorithm()
+	{
 		return construct(false);
 	}
 
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getAlgorithmSpec()
+	 */
 	@Override
-	public Algorithm getAlgorithmSpec() {
+	public Algorithm getAlgorithmSpec()
+	{
 		return construct(true);
 	}
-	
+
+	/**
+	 * @update_comment
+	 * @param includeOptions
+	 * @return
+	 */
 	private Algorithm construct(boolean includeOptions)
 	{
 		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER);
-		
+
 		{
-			//product mode
+			// product mode
 			Parameter param = new Parameter("ProductMode", "string", "Normal", false);
 			if (includeOptions)
 			{
@@ -55,7 +82,7 @@ public class Definition implements algorithms.Definition{
 		}
 
 		{
-			//blockSize
+			// blockSize
 			Parameter param = new Parameter("blockSize", "int", "102400", false);
 			if (includeOptions)
 			{
@@ -63,27 +90,28 @@ public class Definition implements algorithms.Definition{
 			}
 			algo.addParameter(param);
 		}
-		
+
 		return algo;
 	}
 
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getProductFactoryCreation()
+	 */
 	@Override
 	public ProductFactoryCreation getProductFactoryCreation()
 	{
 		return new ProductFactoryCreation()
 		{
 			@Override
-			public ProductReaderFactory<? extends ProductReader>
-				createReader(Algorithm algo, Key key)
+			public ProductReaderFactory<? extends ProductReader> createReader(Algorithm algo, Key key)
 			{
-				return new TextBlockFactory(algo);
+				return new TextBlockFactory(algo, key);
 			}
 
 			@Override
-			public ProductWriterFactory<? extends ProductWriter>
-				createWriter(Algorithm algo, Key key)
+			public ProductWriterFactory<? extends ProductWriter> createWriter(Algorithm algo, Key key)
 			{
-				return new TextBlockFactory(algo);
+				return new TextBlockFactory(algo, key);
 			}
 		};
 	}
