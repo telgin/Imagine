@@ -55,7 +55,7 @@ public class TextBlockTest
 //			
 //			@Test(timeout = 120000)
 //			public void testBigTree_1_5(){ ProductIOTest.testBigTree(group, 1, 5); }
-//			@Test(timeout = 120000)
-//			public void testBigTree_5_1(){ ProductIOTest.testBigTree(group, 5, 1); }
+			@Test(timeout = 120000)
+			public void testBigTree_5_1(){ ProductIOTest.testBigTree(group, 5, 1); }
 		}
 }

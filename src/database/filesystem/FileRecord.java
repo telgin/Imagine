@@ -1,4 +1,4 @@
-package database;
+package database.filesystem;
 
 import logging.LogLevel;
 import logging.Logger;

@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,17 +18,25 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.imageio.ImageIO;
 
+import org.apache.derby.tools.ij;
+
 import util.ByteConversion;
 import util.FileSystemUtil;
 import util.algorithms.HashRandom;
 import util.algorithms.UniqueRandomRange;
 import config.Configuration;
+import data.FileKey;
 import data.IndexWorker;
+import data.Key;
+import data.Metadata;
 import data.ProductWorker;
 import data.TrackingGroup;
+import database.derby.EmbeddedDB;
 import product.ProductContents;
 import product.ProductLoader;
 import product.ProductExtractor;
+import algorithms.Algorithm;
+import algorithms.AlgorithmRegistry;
 import algorithms.ProductIOException;
 import algorithms.fullpng.FullPNG;
 import algorithms.fullpng.FullPNGFactory;
@@ -36,7 +45,58 @@ public class Scratch {
 	public static int x = 0;
 	public static double y = 0;
 	public static HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
-	public static void main(String args[]) throws IOException, InterruptedException{
+	
+	public static void main(String args[]) throws IOException, InterruptedException, SQLException
+	{
+		
+		
+		
+		
+		
+		EmbeddedDB db = new EmbeddedDB();
+		
+		
+		Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("TextBlock");
+		
+		//tracking group setup
+		String keyName = "testKeyName";
+		String groupName = "Cheese and other Cheese";
+		Key key = new FileKey(keyName, groupName, new File("testing/keys/key1.txt"));
+
+		TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
+		
+		Metadata fileMetadata = FileSystemUtil.loadMetadataFromFile(new File("testing/keys/key1.txt"));
+		db.saveFileHash(fileMetadata, group);
+		
+		fileMetadata.setProductUUID(new byte[64]);
+		db.saveProductUUID(fileMetadata, group);
+		
+		//System.out.println();
+		
+		
+		db.display();
+		
+		
+		db.shutdown();
+		
+		
+		
+		
+	}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		//test2();
 		//test3();
@@ -252,49 +312,49 @@ public class Scratch {
 		
 		
 		
-		
-		
-		
-		HashRandom random = new HashRandom(1234l);
-		UniqueRandomRange urr = new UniqueRandomRange(random, 10);
-		int[] array = new int[]{1,2,3,4,5,6,7,8,9,10,11};
-		int[] array2 = new int[]{1,2,3,4,5,6,7,8,9,10,11};
-		int index = 10;
-		int temp = -1;
-		int[] store = new int[1];
-		
-		for (int i = 0; i < 13; ++i)
-		{
-			
-			try
-			{
-			store[0] = urr.next();
-			System.out.println(store[0]);
-//				int swapIndex = random.nextInt(index);
-//				temp = array[swapIndex];
-//				array[swapIndex] = array[index - 1];
-//				array[index - 1] = temp;
-//				
-//				--index;
-//				
-//				store[0] = temp;
-//				System.out.println(temp);
-//				
-			}
-			catch (ProductIOException | ArrayIndexOutOfBoundsException e)
-			{
-				e.printStackTrace();
-			}
-		
-		}
-		System.out.println("store: " + store[0]);
-		System.out.println("array: ");
-		for (int a = 0; a<array.length; ++a)
-		{
-			System.out.println(array[a]);
-		}
-		
-	}
+//		
+//		
+//		
+//		HashRandom random = new HashRandom(1234l);
+//		UniqueRandomRange urr = new UniqueRandomRange(random, 10);
+//		int[] array = new int[]{1,2,3,4,5,6,7,8,9,10,11};
+//		int[] array2 = new int[]{1,2,3,4,5,6,7,8,9,10,11};
+//		int index = 10;
+//		int temp = -1;
+//		int[] store = new int[1];
+//		
+//		for (int i = 0; i < 13; ++i)
+//		{
+//			
+//			try
+//			{
+//			store[0] = urr.next();
+//			System.out.println(store[0]);
+////				int swapIndex = random.nextInt(index);
+////				temp = array[swapIndex];
+////				array[swapIndex] = array[index - 1];
+////				array[index - 1] = temp;
+////				
+////				--index;
+////				
+////				store[0] = temp;
+////				System.out.println(temp);
+////				
+//			}
+//			catch (ProductIOException | ArrayIndexOutOfBoundsException e)
+//			{
+//				e.printStackTrace();
+//			}
+//		
+//		}
+//		System.out.println("store: " + store[0]);
+//		System.out.println("array: ");
+//		for (int a = 0; a<array.length; ++a)
+//		{
+//			System.out.println(array[a]);
+//		}
+//		
+//	}
 		
 		
 		

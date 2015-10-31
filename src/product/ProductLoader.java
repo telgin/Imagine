@@ -15,7 +15,8 @@ import config.Configuration;
 import data.Metadata;
 import data.TrackingGroup;
 import database.Database;
-import database.DatabaseManager;
+import database.derby.EmbeddedDB;
+import database.filesystem.FileSystemDB;
 import util.ByteConversion;
 import util.Constants;
 
@@ -236,13 +237,14 @@ public class ProductLoader
 		{
 			if (fileMetadata.isMetadataUpdate())
 			{
-				fileMetadata.setPreviousProductUUID(fileMetadata.getProductUUID());
+				//TODO decide if this makes sense or not... it doesn't work currently
+				//fileMetadata.setPreviousProductUUID(fileMetadata.getProductUUID());
 				fileMetadata.setProductUUID(currentUUID);
 			}
 			else
 			{
 				fileMetadata.setProductUUID(currentUUID);
-				DatabaseManager.saveProductUUID(fileMetadata);
+				Database.saveProductUUID(fileMetadata, group);
 			}
 
 		}

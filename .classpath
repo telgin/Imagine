@@ -15,5 +15,7 @@
 	<classpathentry kind="lib" path="/home/tom/data/hibernate-release-5.0.2.Final/lib/required/jandex-1.2.2.Final.jar"/>
 	<classpathentry kind="lib" path="/home/tom/data/hibernate-release-5.0.2.Final/lib/required/javassist-3.18.1-GA.jar"/>
 	<classpathentry kind="lib" path="/home/tom/data/hibernate-release-5.0.2.Final/lib/required/jboss-logging-3.3.0.Final.jar"/>
+	<classpathentry kind="lib" path="/home/tom/tools/jdk1.8.0_60/db/lib/derby.jar"/>
+	<classpathentry kind="lib" path="/home/tom/tools/jdk1.8.0_60/db/lib/derbytools.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

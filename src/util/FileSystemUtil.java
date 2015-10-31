@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import data.Metadata;
-import database.Database;
+import database.filesystem.FileSystemDB;
 
 public class FileSystemUtil
 {

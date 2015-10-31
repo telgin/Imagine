@@ -1,120 +1,72 @@
 package database;
 
-import logging.LogLevel;
-import logging.Logger;
-import runner.ActiveComponent;
+
 import runner.SystemManager;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import data.Metadata;
 import data.TrackingGroup;
+import database.derby.EmbeddedDB;
+import database.filesystem.FileSystemDB;
 
-public class Database implements ActiveComponent
+public class Database
 {
-	private static final int MAX_LOADED_INDEX_FILES = 50;
-	private static BlockingQueue<IndexFile> loadedIndexFiles =
-					new LinkedBlockingQueue<IndexFile>();
-	private static BlockingQueue<IndexFile> toSave = new LinkedBlockingQueue<IndexFile>();
-	private static boolean shutdown;
+	private static FileSystemDB fsdb;
+	private static EmbeddedDB embdb;
 
 	static
 	{
-		SystemManager.registerActiveComponent(new Database());
+		fsdb = new FileSystemDB();
+		SystemManager.registerActiveComponent(fsdb);
+		
+		embdb = new EmbeddedDB();
+		SystemManager.registerActiveComponent(embdb);
 	}
 
 	public static Metadata getFileMetadata(File f, TrackingGroup group)
 	{
-		Metadata indexMetadata = getIndexFile(f, group).getFileMetadata(f);
-
-		// the index metadata might be null if the file is new
-		// and doesn't exist there yet
-		if (indexMetadata == null)
-			System.err.println("METADATA FOR " + f.getName() + " WAS NULL!!!");
-
-		return indexMetadata;
+		return fsdb.getFileMetadata(f, group);
 	}
 
 	public static void saveMetadata(Metadata metadata, TrackingGroup group)
 	{
-		Logger.log(LogLevel.k_debug,
-						"Saving metadata for " + metadata.getFile().getAbsolutePath());
-		IndexFile index = getIndexFile(metadata.getFile(), group);
-		index.saveMetadata(metadata);
+		fsdb.saveMetadata(metadata, group);
+	}
+	
+	public static void saveProductUUID(Metadata fileMetadata, TrackingGroup group)
+	{
+		embdb.saveProductUUID(fileMetadata, group);
 	}
 
-	private static synchronized IndexFile getIndexFile(File lookup, TrackingGroup group)
+	public static void saveFileHash(Metadata fileMetadata, TrackingGroup group)
 	{
-		// search the preloaded index files first
+		embdb.saveFileHash(fileMetadata, group);
+	}
 
-		File indexFilePath = IndexFile.findIndexFile(lookup, group);
+	public static Integer addTrackingGroup(TrackingGroup group)
+	{
+		return embdb.addTrackingGroup(group);
+	}
 
-		// search within loaded files
-		for (IndexFile index : loadedIndexFiles)
-		{
-			if (index.getPath().equals(indexFilePath))
-			{
-				// index was preloaded, just return it
-				return index;
-			}
-		}
-
-		// index was not preloaded
-
-		if (loadedIndexFiles.size() >= MAX_LOADED_INDEX_FILES)
-		{
-			// make some room
-			for (int i = 0; i < 5 && !loadedIndexFiles.isEmpty(); ++i)
-			{
-				try
-				{
-					loadedIndexFiles.peek().save();
-					loadedIndexFiles.take();
-				}
-				catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-
-		IndexFile index = IndexFile.loadIndex(lookup, group);
-		if (index != null)
-		{
-			loadedIndexFiles.add(index);
-		}
-		return index;
+	public static boolean containsFileHash(byte[] hash, TrackingGroup group)
+	{
+		return embdb.containsFileHash(hash, group);
 	}
 
 	public static void save()
 	{
-		Logger.log(LogLevel.k_debug,
-						"Saving Database (" + loadedIndexFiles.size() + " index files)");
-		while (loadedIndexFiles.size() > 0)
-			try
-			{
-				loadedIndexFiles.take().save();
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
+		fsdb.save();
+		embdb.save();
 	}
 
-	@Override
-	public void shutdown()
+	/**
+	 * @update_comment
+	 * @param fileHash
+	 * @param trackingGroup
+	 * @return
+	 */
+	public static byte[] getFragment1ProductUUID(byte[] fileHash, TrackingGroup group)
 	{
-		save();
-		shutdown = true;
-	}
-
-	@Override
-	public boolean isShutdown()
-	{
-		return shutdown;
+		return EmbeddedDB.getFragment1ProductUUID(fileHash, group);
 	}
 }

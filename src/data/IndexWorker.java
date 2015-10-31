@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 
+import database.Database;
+import database.derby.EmbeddedDB;
+import database.filesystem.FileSystemDB;
 import logging.LogLevel;
 import logging.Logger;
-
-import database.Database;
-import database.DatabaseManager;
 import util.ByteConversion;
 import util.Constants;
 import util.FileSystemUtil;
@@ -178,9 +178,12 @@ public class IndexWorker implements Runnable
 				// check the database to see if the hash already exists,
 				// if so, it's a metadata update (possibly due to copying or
 				// moving/renaming)
-				if (DatabaseManager.containsFileHash(metadata.getFileHash(), trackingGroup))
+				if (Database.containsFileHash(metadata.getFileHash(), trackingGroup))
 				{
 					metadata.setMetadataUpdate(true);
+					metadata.setPreviousProductUUID(Database.getFragment1ProductUUID(
+									metadata.getFileHash(), trackingGroup));
+					System.out.println("@@@@@@@set previous product uuid " + metadata.getPreviousProductUUID());
 				}
 
 				queue.add(metadata);

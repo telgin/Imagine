@@ -5,20 +5,11 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
-
-import org.junit.Test;
-
-import algorithms.Algorithm;
-import algorithms.AlgorithmRegistry;
-import data.FileKey;
-import data.Key;
 import data.Metadata;
 import data.PartAssembler;
 import data.TrackingGroup;
@@ -496,7 +487,8 @@ public class ProductIOTest
 				compareMetadata(Database.getFileMetadata(extractedMetadata.getFile(),
 								group), extractedMetadata);
 
-				if (!extractionFolders.containsKey(fc.getExtractedFile()))
+				if (!extractedMetadata.isMetadataUpdate() && 
+						!extractionFolders.containsKey(fc.getExtractedFile()))
 				{
 					// specify assembled file name
 					String relativized =
@@ -581,7 +573,6 @@ public class ProductIOTest
 		assertEquals(m1.getDateCreated(), m2.getDateCreated());
 		assertEquals(m1.getDateModified(), m2.getDateModified());
 		assertEquals(m1.getProductUUID(), m2.getProductUUID());
-		assertEquals(m1.isMetadataUpdate(), m2.isMetadataUpdate());
 	}
 
 	private static void compareMetadataFile(File f, Metadata m)

@@ -1,4 +1,4 @@
-package hibernate;
+package database.derby;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
