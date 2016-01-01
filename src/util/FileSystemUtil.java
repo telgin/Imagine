@@ -2,12 +2,15 @@ package util;
 
 import logging.LogLevel;
 import logging.Logger;
+import product.Clock;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.CopyOption;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitOption;
@@ -346,6 +349,52 @@ public class FileSystemUtil
 						return FileVisitResult.CONTINUE;
 					}
 				});
+		}
+	}
+	
+	/**
+	 * @credit http://stackoverflow.com/questions/7883542/getting-the-computer-name-in-java
+	 * @update_comment
+	 * @return
+	 */
+	public static String getHostName()
+	{
+		try
+		{
+		    return InetAddress.getLocalHost().getHostName();
+		}
+		catch (UnknownHostException ex)
+		{
+		    return null;
+		}
+	}
+
+	/**
+	 * @update_comment
+	 * @param included
+	 * @return
+	 */
+	public static String getDriveUUID(File included)
+	{
+		//get the drive file
+		File parent = included.getParentFile();
+		while (parent.getParentFile() != null)
+			parent = parent.getParentFile();
+		
+		//look for the pre-existing drive uuid file
+		File uuidFile = new File(parent, ".imagine_drive_uuid");
+		if (uuidFile.exists())
+		{
+			String uuid = myUtilities.readStringFromFile(included).trim();
+			return uuid;
+		}
+		else
+		{
+			//create a new drive uuid if one wasn't found
+			byte[] newUUID = Hashing.hash(ByteConversion.longToBytes(Clock.getUniqueTime()));
+			String truncated = ByteConversion.bytesToHex(newUUID).substring(16);
+			myUtilities.writeStringToFile(uuidFile, truncated);
+			return truncated;
 		}
 	}
 }

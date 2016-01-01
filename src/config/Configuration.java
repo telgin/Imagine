@@ -266,4 +266,14 @@ public class Configuration {
 		String value = getParameter(getAlgorithm("TextBlock"), "blockSize");
 		return Integer.parseInt(value);
 	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	public static String getInstallationUUID()
+	{
+		// TODO Set this at installation
+		return "default";
+	}
 }

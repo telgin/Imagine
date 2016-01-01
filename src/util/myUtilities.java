@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,32 @@ public abstract class myUtilities
 		}
 		return true;
 	}
+	
+	/**
+	 * @update_comment
+	 * @param out
+	 * @param str
+	 * @return
+	 */
+	public static boolean writeStringToFile(File out, String str)
+	{
+		try
+		{
+			OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(out));
+			osw.write(str + System.lineSeparator());
+			osw.flush();
+			osw.close();
+		}
+		catch (FileNotFoundException e)
+		{
+			return false;
+		}
+		catch (IOException e)
+		{
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * @update_comment
@@ -58,7 +85,6 @@ public abstract class myUtilities
 	 */
 	public static ArrayList<String> readListFromFile(File in)
 	{
-
 		ArrayList<String> text = new ArrayList<String>();
 		try
 		{
@@ -79,7 +105,19 @@ public abstract class myUtilities
 			return null;
 		}
 		return text;
-
+	}
+	
+	public static String readStringFromFile(File in)
+	{
+		try
+		{
+			byte[] bytes = Files.readAllBytes(in.toPath());
+			return new String(bytes);
+		}
+		catch (IOException e)
+		{
+			return null;
+		}
 	}
 
 	/**
