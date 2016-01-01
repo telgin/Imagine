@@ -12,7 +12,7 @@ import logging.LogLevel;
 import logging.Logger;
 import product.ProductMode;
 import product.ProductReader;
-import testing.Scratch;
+import scratch.Scratch;
 import util.ByteConversion;
 
 public class StealthPNGReader extends StealthPNG implements ProductReader
