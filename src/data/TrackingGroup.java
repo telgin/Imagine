@@ -25,6 +25,7 @@ public class TrackingGroup
 	private Key key;
 	private File productStagingFolder;
 	private File extractionFolder;
+	private File hashDBFile;
 
 	public TrackingGroup(String name, boolean usesDatabase, Algorithm algo, Key key)
 	{
@@ -229,5 +230,22 @@ public class TrackingGroup
 	public void clearUntrackedPaths()
 	{
 		untrackedFiles = new HashSet<File>();
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	public File getHashDBFile()
+	{
+		return hashDBFile;
+	}
+
+	/**
+	 * @param hashDBFile the hashDBFile to set
+	 */
+	public void setHashDBFile(File hashDBFile)
+	{
+		this.hashDBFile = hashDBFile;
 	}
 }

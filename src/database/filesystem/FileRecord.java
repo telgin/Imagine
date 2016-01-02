@@ -20,7 +20,6 @@ public class FileRecord
 	private long dateCreated;
 	private long dateModified;
 	private short permissions;
-	private byte[] fragment1ProductUUID;
 
 	public FileRecord()
 	{
@@ -29,7 +28,7 @@ public class FileRecord
 	public FileRecord(String line)
 	{
 		String[] parts = line.split(FILE_RECORD_DELIMETER);
-		if (parts.length != 6)
+		if (parts.length != 5)
 		{
 			Logger.log(LogLevel.k_error, "Cannot parse file record: " + line);
 		}
@@ -40,20 +39,18 @@ public class FileRecord
 			setDateCreated(Long.parseLong(parts[2]));
 			setDateModified(Long.parseLong(parts[3]));
 			setPermissions(Short.parseShort(parts[4]));
-			setFragment1ProductUUID(ByteConversion.hexToBytes(parts[5]));
 		}
 	}
 
 	public String toString()
 	{
-		String parts[] = new String[6];
+		String parts[] = new String[5];
 
 		parts[0] = ByteConversion.bytesToHex(getFilePathHash());
 		parts[1] = ByteConversion.bytesToHex(getFileHash());
 		parts[2] = Long.toString(getDateCreated());
 		parts[3] = Long.toString(getDateModified());
 		parts[4] = Short.toString(getPermissions());
-		parts[5] = ByteConversion.bytesToHex(getFragment1ProductUUID());
 
 		return String.join(FILE_RECORD_DELIMETER, parts);
 	}
@@ -141,23 +138,6 @@ public class FileRecord
 	public void setPermissions(short permissions)
 	{
 		this.permissions = permissions;
-	}
-
-	/**
-	 * @return the fragment1ProductUUID
-	 */
-	public byte[] getFragment1ProductUUID()
-	{
-		return fragment1ProductUUID;
-	}
-
-	/**
-	 * @param fragment1ProductUUID
-	 *            the fragment1ProductUUID to set
-	 */
-	public void setFragment1ProductUUID(byte[] fragment1ProductUUID)
-	{
-		this.fragment1ProductUUID = fragment1ProductUUID;
 	}
 
 	/**

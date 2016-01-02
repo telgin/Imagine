@@ -11,9 +11,7 @@ import logging.Logger;
 import util.ByteConversion;
 import util.Constants;
 import util.Hashing;
-import config.Configuration;
 import data.Metadata;
-import data.TrackingGroup;
 
 public class ProductExtractor {
 
@@ -110,26 +108,18 @@ public class ProductExtractor {
 		FileContents fileContents = readNextFileHeader(true);
 		while (fileContents != null)
 		{
-			if (!fileContents.getMetadata().isMetadataUpdate())
+			File extracted = readNextFileData(true, fileContents);
+			if (extracted != null)
 			{
-				File extracted = readNextFileData(true, fileContents);
-				if (extracted != null)
-				{
-					fileContents.setExtractedFile(extracted.getParentFile());
-					contents.addFileContents(fileContents);
-				}
-				else
-				{
-					Logger.log(LogLevel.k_error, "Failed to extract file: " + fileContents.getMetadata().getPath());
-					//don't break, the file header was good so the next file might be ok?
-					//questionably the metadata without the attached file could be added here,
-					//but it's probably corrupted.
-				}
+				fileContents.setExtractedFile(extracted.getParentFile());
+				contents.addFileContents(fileContents);
 			}
 			else
 			{
-				//file is a metadata update, just add it
-				contents.addFileContents(fileContents);
+				Logger.log(LogLevel.k_error, "Failed to extract file: " + fileContents.getMetadata().getPath());
+				//don't break, the file header was good so the next file might be ok?
+				//questionably the metadata without the attached file could be added here,
+				//but it's probably corrupted.
 			}
 			
 			//try to get the next one
@@ -476,38 +466,10 @@ public class ProductExtractor {
 					return null;
 			}
 			
-			//metadata update flag
-			if (!readFull(Constants.METADATA_UPDATE_FLAG_SIZE))
+			//file length remaining
+			if (!readFull(Constants.FILE_LENGTH_REMAINING_SIZE))
 				return null;
-			boolean metadataUpdate = ByteConversion.byteToInt(buffer[0]) != 0;
-			if (parseData)
-			{
-				contents.getMetadata().setMetadataUpdate(metadataUpdate);
-			}
-			
-			if (metadataUpdate)
-			{
-				//previous first product uuid
-				if (parseData)
-				{
-					if (!readFull(Constants.PRODUCT_UUID_SIZE))
-						return null;
-					contents.getMetadata().setPreviousProductUUID(
-							ByteConversion.subArray(buffer, 0, Constants.PRODUCT_UUID_SIZE));
-				}
-				else
-				{
-					if (!skipFull(Constants.PRODUCT_UUID_SIZE))
-						return null;
-				}
-			}
-			else
-			{
-				//file length remaining
-				if (!readFull(Constants.FILE_LENGTH_REMAINING_SIZE))
-					return null;
-				contents.setRemainingData(ByteConversion.bytesToLong(buffer, 0));
-			}
+			contents.setRemainingData(ByteConversion.bytesToLong(buffer, 0));
 			
 			System.out.println("parse data? " + parseData);
 			if (contents != null)

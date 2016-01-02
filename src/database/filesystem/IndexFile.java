@@ -3,7 +3,6 @@ package database.filesystem;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import data.Metadata;
@@ -51,7 +50,6 @@ public class IndexFile
 		record.setDateCreated(metadata.getDateCreated());
 		record.setDateModified(metadata.getDateModified());
 		record.setPermissions(metadata.getPermissions());
-		record.setFragment1ProductUUID(metadata.getProductUUID());
 
 		if (!found)
 		{
@@ -105,7 +103,7 @@ public class IndexFile
 			metadata.setDateModified(record.getDateModified());
 			metadata.setFileHash(record.getFileHash());
 			metadata.setPermissions(record.getPermissions());
-			metadata.setPreviousProductUUID(record.getFragment1ProductUUID());
+
 			return metadata;
 		}
 		else

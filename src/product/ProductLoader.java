@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Base64;
 
 import algorithms.ProductIOException;
 import logging.LogLevel;
@@ -15,8 +14,6 @@ import config.Configuration;
 import data.Metadata;
 import data.TrackingGroup;
 import database.Database;
-import database.derby.EmbeddedDB;
-import database.filesystem.FileSystemDB;
 import util.ByteConversion;
 import util.Constants;
 
@@ -46,8 +43,6 @@ public class ProductLoader
 	public ProductLoader(ProductWriterFactory<? extends ProductWriter> factory,
 					TrackingGroup group)
 	{
-		// this.factory = factory;
-
 		streamUUID = ByteConversion.longToBytes(Clock.getUniqueTime());
 		sequenceNumber = 0;
 
@@ -211,12 +206,6 @@ public class ProductLoader
 
 	public void writeFile(Metadata fileMetadata) throws IOException
 	{
-		// if (needsReset)
-		// {
-		// resetToNextProduct();
-		// needsReset = false;
-		// }
-		//
 		dataLength = 0;
 		dataOffset = buffer.length;
 
@@ -224,7 +213,7 @@ public class ProductLoader
 						+ " into product " + getSaveName());
 		writingFile = true;
 
-		long fileLengthRemaining = fileMetadata.isMetadataUpdate() ? 0
+		long fileLengthRemaining = fileMetadata.isEmptyFolder() ? Constants.EMPTY_FOLDER_CODE
 						: fileMetadata.getFile().length();
 		long fragmentNumber = 1;
 		// int fileHeaderSize = fileMetadata.getTotalLength();
@@ -233,21 +222,7 @@ public class ProductLoader
 		// it might actually start in the next one if we're out of space in this
 		// one.
 		// easy enough to figure out later.
-		if (group.isUsingDatabase())
-		{
-			if (fileMetadata.isMetadataUpdate())
-			{
-				//TODO decide if this makes sense or not... it doesn't work currently
-				//fileMetadata.setPreviousProductUUID(fileMetadata.getProductUUID());
-				fileMetadata.setProductUUID(currentUUID);
-			}
-			else
-			{
-				fileMetadata.setProductUUID(currentUUID);
-				Database.saveProductUUID(fileMetadata, group);
-			}
-
-		}
+		fileMetadata.setProductUUID(currentUUID);
 
 		// start a reader
 		DataInputStream reader =
@@ -278,7 +253,7 @@ public class ProductLoader
 			}
 
 			// write data if there is any
-			if (!fileMetadata.isMetadataUpdate())
+			if (fileLengthRemaining > 0)
 			{
 				// write as much as possible, if the product fills up, we get
 				// back to here and start again where we left off
@@ -296,7 +271,8 @@ public class ProductLoader
 		// update the database
 		if (group.isUsingDatabase())
 		{
-			Database.saveMetadata(fileMetadata, group);
+			fileMetadata.setFragmentCount(fragmentNumber-1);
+			Database.saveConversionRecord(fileMetadata, group);
 		}
 
 		writingFile = false;
@@ -360,28 +336,10 @@ public class ProductLoader
 		if (!writeFull(ByteConversion.shortToBytes(fileMetadata.getPermissions())))
 			return false;
 
-		// metadata update flag
-		if (!writeFull(ByteConversion.booleanToByte(fileMetadata.isMetadataUpdate())))
+		// length of data that still needs to be written
+		// this may be FOLDER_CODE if the file is an empty folder
+		if (!writeFull(ByteConversion.longToBytes(fileLengthRemaining)))
 			return false;
-
-		// Does the metadata specify a new file or a metadata update for
-		// an existing file? This should never be true if the group does
-		// not use a database.
-		if (fileMetadata.isMetadataUpdate())
-		{
-			// Since the new metadata was written in the file header,
-			// just write the previous first product uuid as the file data.
-			// This will act as a sort of pointer to the location of the
-			// actual file data.
-			if (!writeFull(fileMetadata.getPreviousProductUUID()))
-				return false;
-		}
-		else
-		{
-			// length of data that still needs to be written
-			if (!writeFull(ByteConversion.longToBytes(fileLengthRemaining)))
-				return false;
-		}
 
 		return true;
 	}

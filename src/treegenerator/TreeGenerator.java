@@ -52,8 +52,9 @@ public class TreeGenerator
 			else
 			{
 				//add information about the parent or drive uuid
-				topLevelTracked.setAttribute("parent", included.getParentFile().getAbsolutePath());
-				topLevelTracked.setAttribute("driveuuid", FileSystemUtil.getDriveUUID(included));
+				File parent = included.getParentFile();
+				topLevelTracked.setAttribute("parent", parent != null ? parent.getAbsolutePath() : "");
+				//topLevelTracked.setAttribute("driveuuid", FileSystemUtil.getDriveUUID(included));
 				pc.appendChild(topLevelTracked);
 			}	
 		}
@@ -149,7 +150,11 @@ public class TreeGenerator
 		
 		Element folder = mkElement("folder");
 		folder.setAttribute("name", included.getName());
-		folder.setAttribute("empty", included.listFiles().length == 0 ? "1" : "0");
+		
+		//add an empty node if the folder is empty
+		//this makes things easier for parsing
+		if (included.listFiles().length == 0)
+			folder.appendChild(mkElement("empty"));
 		
 		return folder;
 	}
@@ -196,10 +201,10 @@ public class TreeGenerator
 			//when the conversion runs, this data will be read and used to create
 			//metadata objects for saving back to the file system db
 			file.setAttribute("name", included.getName());
-			file.setAttribute("dateCreated", Long.toString(curMetadata.getDateCreated()));
-			file.setAttribute("dateModified", Long.toString(curMetadata.getDateModified()));
+			file.setAttribute("created", Long.toString(curMetadata.getDateCreated()));
+			file.setAttribute("modified", Long.toString(curMetadata.getDateModified()));
 			file.setAttribute("perms", Short.toString(curMetadata.getPermissions()));
-			file.setAttribute("fileHash", ByteConversion.bytesToHex(curMetadata.getFileHash()));
+			file.setAttribute("hash", ByteConversion.bytesToHex(curMetadata.getFileHash()));
 			
 			return file;
 		}

@@ -47,7 +47,7 @@ public class Hashing
 		MessageDigest md = null;
 		try
 		{
-			md = MessageDigest.getInstance("SHA-512");
+			md = MessageDigest.getInstance("SHA-256");
 		}
 		catch (NoSuchAlgorithmException e)
 		{

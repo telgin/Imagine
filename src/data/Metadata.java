@@ -1,26 +1,26 @@
 package data;
 
 import java.io.File;
-import util.ByteConversion;
 import util.Constants;
 
 public class Metadata
 {
-
 	private long dateCreated;
 	private long dateModified;
 	private byte[] fileHash;
 	private File file;
 	private byte[] productUUID;
-	private byte[] previousProductUUID;
-	private boolean metadataUpdate;
+	private long fragmentCount;
 	private short permissions;
+	private boolean emptyFolder;
 
 	public Metadata()
 	{
 		dateCreated = -1;
 		dateModified = -1;
 		permissions = -1;
+		fragmentCount = -1;
+		emptyFolder = false;
 	}
 
 	public String toString()
@@ -37,13 +37,7 @@ public class Metadata
 		totalLength += Constants.DATE_CREATED_SIZE;
 		totalLength += Constants.DATE_MODIFIED_SIZE;
 		totalLength += fileHash.length;
-		totalLength += Constants.METADATA_UPDATE_FLAG_SIZE;
-
-		if (metadataUpdate)
-		{
-			totalLength += Constants.STREAM_UUID_SIZE;
-			totalLength += Constants.PRODUCT_SEQUENCE_NUMBER_SIZE;
-		}
+		totalLength += Constants.PERMISSIONS_SIZE;
 
 		return totalLength;
 	}
@@ -109,16 +103,6 @@ public class Metadata
 		return productUUID;
 	}
 
-	public boolean isMetadataUpdate()
-	{
-		return metadataUpdate;
-	}
-
-	public void setMetadataUpdate(boolean metadataUpdate)
-	{
-		this.metadataUpdate = metadataUpdate;
-	}
-
 	public File getFile()
 	{
 		return file;
@@ -163,20 +147,35 @@ public class Metadata
 	}
 
 	/**
-	 * @return the previousProductUUID
+	 * @return the fragmentCount
 	 */
-	public byte[] getPreviousProductUUID()
+	public long getFragmentCount()
 	{
-		return previousProductUUID;
+		return fragmentCount;
 	}
 
 	/**
-	 * @param previousProductUUID
-	 *            the previousProductUUID to set
+	 * @param fragmentCount the fragmentCount to set
 	 */
-	public void setPreviousProductUUID(byte[] uuid)
+	public void setFragmentCount(long fragmentCount)
 	{
-		this.previousProductUUID = uuid;
+		this.fragmentCount = fragmentCount;
+	}
+
+	/**
+	 * @return the emptyFolder
+	 */
+	public boolean isEmptyFolder()
+	{
+		return emptyFolder;
+	}
+
+	/**
+	 * @param emptyFolder the emptyFolder to set
+	 */
+	public void setEmptyFolder(boolean emptyFolder)
+	{
+		this.emptyFolder = emptyFolder;
 	}
 
 }

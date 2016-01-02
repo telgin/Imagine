@@ -5,6 +5,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import database.Database;
 import database.derby.EmbeddedDB;
 import database.filesystem.FileSystemDB;
@@ -19,35 +23,21 @@ public class IndexWorker implements Runnable
 {
 
 	private BlockingQueue<Metadata> queue;
-	private LinkedList<File> initialFolders;
 	private TrackingGroup trackingGroup;
 	private boolean shuttingDown;
 	private boolean active;
+	private Element root;
 
-	public IndexWorker(BlockingQueue<Metadata> queue, Collection<File> initialFolders,
+	public IndexWorker(BlockingQueue<Metadata> queue, Element tree,
 					TrackingGroup trackingGroup)
 	{
 		this.queue = queue;
-		this.initialFolders = new LinkedList<File>(initialFolders);
 		this.trackingGroup = trackingGroup;
 		shuttingDown = false;
 		active = true;
+		root = tree;
 	}
 
-	public IndexWorker(BlockingQueue<Metadata> queue, File file,
-					TrackingGroup trackingGroup)
-	{
-		Logger.log(LogLevel.k_debug, "Creating index worker for " + file.getPath());
-		this.queue = queue;
-		this.trackingGroup = trackingGroup;
-		active = true;
-
-		LinkedList<File> folders = new LinkedList<File>();
-		folders.add(file);
-		initialFolders = folders;
-
-		// System.out.println("Given " + initialFolders.size() + " folders");
-	}
 
 	public void shutdown()
 	{
@@ -57,17 +47,20 @@ public class IndexWorker implements Runnable
 	@Override
 	public void run()
 	{
-		active = !initialFolders.isEmpty();
+		active = true;
 
 		while (!shuttingDown)
 		{
-			Logger.log(LogLevel.k_debug, "Index worker running, " + initialFolders.size()
-							+ " initialFolders left, active=" + active);
+			Logger.log(LogLevel.k_debug, "Index worker running, " + 
+							root.getElementsByTagName("file").getLength() +
+							" initialFolders left, active=" + active);
 
 			// index all top level folders
-			while (initialFolders.size() > 0)
+			Node topLevel = root.getFirstChild();
+			while (topLevel != null)
 			{
-				crawl(initialFolders.remove(), 0);
+				crawl((Element) topLevel, new File(((Element)topLevel).getAttribute("parent")));
+				topLevel = topLevel.getNextSibling();
 			}
 
 			active = false;
@@ -84,120 +77,67 @@ public class IndexWorker implements Runnable
 	}
 
 	/**
-	 * depth first traversal
-	 * 
-	 * @param f
-	 * @param depth
+	 * @update_comment
+	 * @param topLevel
+	 * @param attribute
 	 */
-	private void crawl(File f, int depth)
+	private void crawl(Element ele, File parentFile)
 	{
-		active = true;
-		Logger.log(LogLevel.k_debug, "Depth: " + depth);
-		System.out.println("Crawling on " + f.getAbsolutePath());
-		if (!shuttingDown && !f.getName().equals(Constants.INDEX_FOLDER_NAME))
+		if (ele.getTagName().equals("folder"))
 		{
-			// if the file list is not null, go through all the files
-			// otherwise, f is either a file or not readable.
-			if (f.listFiles() != null)
+			//recurse through the folders
+			Node child = ele.getFirstChild();
+			while (child != null)
 			{
-				for (File child : f.listFiles())
-				{
-					if (child.canRead() && !FileSystemUtil.trackedBy(child,
-									trackingGroup.getUntrackedFiles()))
-					{
-						if (child.isDirectory())
-						{
-							crawl(child, depth + 1);
-						}
-						else if (!shuttingDown)
-						{
-							process(child);
-						}
-					}
-
-				}
-			}
-			else if (!f.isDirectory() && f.canRead() && // make sure f is a
-														// readable file
-							!FileSystemUtil.trackedBy(f,
-											trackingGroup.getUntrackedFiles()))
-			{
-				// f was a file, process it
-				process(f);
+				crawl((Element) child, new File(parentFile, ele.getAttribute("name")));
+				child = child.getNextSibling();
 			}
 		}
-	}
-
-	private void process(File file)
-	{
-		System.out.println("Processing " + file.getAbsolutePath());
-
-		if (trackingGroup.isUsingDatabase())
+		else if (ele.getTagName().equals("file"))
 		{
-			Metadata recordMetadata = Database.getFileMetadata(file, trackingGroup);
-			if (recordMetadata != null) // there is a previous metadata record
-										// of the file
+			//create metadata from the file element
+			Metadata fileMetadata = new Metadata();
+			fileMetadata.setFile(new File(parentFile, ele.getAttribute("name")));
+			fileMetadata.setDateCreated(Long.parseLong(ele.getAttribute("created")));
+			fileMetadata.setDateModified(Long.parseLong(ele.getAttribute("modified")));
+			fileMetadata.setFileHash(ByteConversion.hexToBytes(ele.getAttribute("hash")));
+			fileMetadata.setPermissions(Short.parseShort(ele.getAttribute("perms")));
+			
+			if (trackingGroup.isUsingDatabase())
 			{
-				// to avoid hashing, compare the date modified of the file
-				// to what is in the recorded metadata
-				long currentDateModified = FileSystemUtil.getDateModified(file);
-
-				// add the file only if it is newer than the database record
-				if (currentDateModified > recordMetadata.getDateModified())
+				//check to see if the file hash was already added earlier
+				if (!Database.containsFileHash(fileMetadata.getFileHash(), trackingGroup))
 				{
-					// create a new metadata, load from file system
-					Metadata fileMetadata = new Metadata();
-					fileMetadata.setDateModified(currentDateModified);
-					FileSystemUtil.loadMetadataFromFile(fileMetadata, file);
-
-					// if the file hashes are the same, this is just a metadata
-					// update
-					if (ByteConversion.bytesEqual(recordMetadata.getFileHash(),
-									fileMetadata.getFileHash()))
-					{
-						fileMetadata.setMetadataUpdate(true);
-					}
-
-					fileMetadata.setPreviousProductUUID(recordMetadata.getProductUUID());
-
-					// System.out.println("Adding to queue");
+					//new file, so add to queue
 					queue.add(fileMetadata);
+					
+					//show on the element that the file will be converted
+					ele.setAttribute("queued", "1");
 				}
 				else
 				{
-					System.out.println("File is not newer: " + file.getAbsolutePath());
+					//show on the element that the file will not be converted
+					ele.setAttribute("queued", "0");
 				}
 			}
 			else
 			{
-				// the metadata was not found within the file system database,
-				// so
-				// load it from the file system directly
-				Metadata metadata = FileSystemUtil.loadMetadataFromFile(file);
-
-				// check the database to see if the hash already exists,
-				// if so, it's a metadata update (possibly due to copying or
-				// moving/renaming)
-				if (Database.containsFileHash(metadata.getFileHash(), trackingGroup))
-				{
-					metadata.setMetadataUpdate(true);
-					metadata.setPreviousProductUUID(Database.getFragment1ProductUUID(
-									metadata.getFileHash(), trackingGroup));
-					System.out.println("@@@@@@@set previous product uuid " + metadata.getPreviousProductUUID());
-				}
-
-				queue.add(metadata);
+				//no tracking, so we'll always add the file
+				queue.add(fileMetadata);
+				
+				//show on the element that the file will be converted
+				ele.setAttribute("queued", "1");
 			}
 		}
 		else
 		{
-			// The group is not using a database, so we always get current
-			// metadata from the file system and add the file.
-			// (It cannot be a metadata update)
-			queue.add(FileSystemUtil.loadMetadataFromFile(file));
+			//empty node, add metadata just for the parent folder
+			Metadata folderMetadata = new Metadata();
+			folderMetadata.setEmptyFolder(true);
+			folderMetadata.setPermissions(FileSystemUtil.getNumericFilePermissions(parentFile));
+			folderMetadata.setFile(parentFile);
+			queue.add(folderMetadata);
 		}
-
-		System.err.println("Done processing: " + file.getName());
 	}
 
 	public boolean isActive()
