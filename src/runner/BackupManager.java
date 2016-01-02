@@ -93,7 +93,7 @@ public class BackupManager
 		else if (mode.equals("silent_backup"))
 		{
 			Runner.setActiveGUI(new BackgroundGUI());
-			new BackupRunner().runAllBackups();
+			new ConversionRunner().runAllBackups();
 		}
 		else
 			usage("Unknown mode: " + mode);

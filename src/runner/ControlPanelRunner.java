@@ -11,7 +11,7 @@ import data.TrackingGroup;
 
 public class ControlPanelRunner extends Runner
 {
-	private BackupRunner backupRunner;
+	private ConversionRunner backupRunner;
 
 	public ControlPanelRunner()
 	{

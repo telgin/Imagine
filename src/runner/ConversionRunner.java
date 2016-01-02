@@ -10,15 +10,15 @@ import stats.StateStat;
 import config.Configuration;
 import data.TrackingGroup;
 
-public class BackupRunner extends Runner
+public class ConversionRunner extends Runner
 {
 	private ControlPanelRunner controlPanelRunner;
-	private HashMap<TrackingGroup, BackupJob> backupJobs;
+	private HashMap<TrackingGroup, ConversionJob> backupJobs;
 	private List<Thread> jobThreads;
 
-	public BackupRunner()
+	public ConversionRunner()
 	{
-		backupJobs = new HashMap<TrackingGroup, BackupJob>();
+		backupJobs = new HashMap<TrackingGroup, ConversionJob>();
 		jobThreads = new ArrayList<Thread>();
 
 		ProgressMonitor.addStat(new StateStat("filesProcessed", 0.0));
@@ -62,7 +62,7 @@ public class BackupRunner extends Runner
 			assert(backupJobs.get(group) == null || backupJobs.get(group).isFinished());
 		}
 
-		BackupJob job = new BackupJob(group, 5, 5);
+		ConversionJob job = new ConversionJob(group, 5);
 		Thread jobThread = new Thread(job);
 		backupJobs.put(group, job);
 		jobThreads.add(jobThread);

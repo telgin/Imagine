@@ -23,19 +23,16 @@ import util.FileSystemUtil;
 public class TreeGenerator
 {
 	private Document doc;
-	private boolean useTrackingFiles;
+	private TrackingGroup group;
 	
-	public TreeGenerator(boolean generateTrackingFiles)
+	
+	public TreeGenerator(TrackingGroup group)
 	{
-		useTrackingFiles = false;
+		this.group = group;
 	}
 	
-	public void generateTree(TrackingGroup group, File outFile) throws IOException
+	public void generateTree()
 	{
-		//make the output file
-		if (!outFile.getParentFile().exists())
-			outFile.getParentFile().mkdirs();
-		
 		//create the xml
 		doc = ConfigUtil.getNewDocument();
 		Element root = mkElement("filetree");
@@ -43,7 +40,7 @@ public class TreeGenerator
 		root.appendChild(pc);
 		for (File included : group.getTrackedFiles())
 		{
-			Element topLevelTracked = mkBranch(included, group);
+			Element topLevelTracked = mkBranch(included);
 			if (topLevelTracked == null)
 			{
 				//warn user that a tracked region couldn't be found
@@ -59,9 +56,21 @@ public class TreeGenerator
 			}	
 		}
 		doc.appendChild(root);
-		
+	}
+	
+	public void save(File outFile)
+	{
+		//make the output file
+		if (!outFile.getParentFile().exists())
+			outFile.getParentFile().mkdirs();
+				
 		//save the file
 		ConfigUtil.saveConfig(doc, outFile);
+	}
+	
+	public Element getRoot()
+	{
+		return (Element) doc.getElementsByTagName("filetree").item(0);
 	}
 	
 	/**
@@ -85,7 +94,7 @@ public class TreeGenerator
 	 * @param group
 	 * @return
 	 */
-	private Element mkBranch(File included, TrackingGroup group)
+	private Element mkBranch(File included)
 	{
 		if (!included.exists())
 			return null;
@@ -94,12 +103,12 @@ public class TreeGenerator
 		
 		if (!included.isDirectory())
 		{
-			branchRoot = mkFile(included, group);
+			branchRoot = mkFile(included);
 		}
 		else
 		{
-			branchRoot = mkFolder(included, group);
-			processChildren(branchRoot, included.listFiles(), group);
+			branchRoot = mkFolder(included);
+			processChildren(branchRoot, included.listFiles());
 		}
 		
 		return branchRoot;
@@ -111,23 +120,22 @@ public class TreeGenerator
 	 * @param listFiles
 	 * @param group
 	 */
-	private void processChildren(Element parent, File[] children,
-					TrackingGroup group)
+	private void processChildren(Element parent, File[] children)
 	{
 		for (File child : children)
 		{
 			if (!child.isDirectory())
 			{
-				Element fileNode = mkFile(child, group);
+				Element fileNode = mkFile(child);
 				if (fileNode != null)
 					parent.appendChild(fileNode);
 			}
 			else
 			{
-				Element folderNode = mkFolder(child, group);
+				Element folderNode = mkFolder(child);
 				if (folderNode != null)
 				{
-					processChildren(folderNode, child.listFiles(), group);
+					processChildren(folderNode, child.listFiles());
 					parent.appendChild(folderNode);
 				}
 			}
@@ -140,7 +148,7 @@ public class TreeGenerator
 	 * @param included
 	 * @return
 	 */
-	private Element mkFolder(File included, TrackingGroup group)
+	private Element mkFolder(File included)
 	{
 		if (!included.exists())
 			return null;
@@ -164,7 +172,7 @@ public class TreeGenerator
 	 * @param included
 	 * @return
 	 */
-	private Element mkFile(File included, TrackingGroup group)
+	private Element mkFile(File included)
 	{
 		if (!included.exists())
 			return null;
@@ -173,7 +181,7 @@ public class TreeGenerator
 			return null;
 		
 		boolean update = false;
-		if (useTrackingFiles)
+		if (group.isUsingDatabase())
 		{
 			long lastModified = FileSystemUtil.getDateModified(included);
 			Metadata cachedMetadata = Database.getFileMetadata(included, group);

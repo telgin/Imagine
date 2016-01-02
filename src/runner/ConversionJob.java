@@ -6,14 +6,17 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.w3c.dom.Element;
+
 import logging.LogLevel;
 import logging.Logger;
+import treegenerator.TreeGenerator;
 import data.IndexWorker;
 import data.Metadata;
 import data.ProductWorker;
 import data.TrackingGroup;
 
-public class BackupJob implements Runnable
+public class ConversionJob implements Runnable
 {
 	private TrackingGroup group;
 	private boolean shuttingDown = false;
@@ -21,40 +24,32 @@ public class BackupJob implements Runnable
 	private boolean finished = false;
 	private int maxWaitingFiles;
 	private BlockingQueue<Metadata> queue;
-	private IndexWorker[] indexWorkers;
+	private IndexWorker indexWorker;
 	private List<ProductWorker> productWorkers;
 	private Thread[] workerThreads;
 	private int productWorkerCount;
-	private int indexWorkerCount;
-	private List<File> remainingFiles;
+	private TreeGenerator generator;
+	private static final int DEFAULT_PRODUCT_WORKER_COUNT = 3;
 
-	public BackupJob(TrackingGroup group, int indexWorkerCount, int productWorkerCount)
+	public ConversionJob(TrackingGroup group, int productWorkerCount)
 	{
 		this.group = group;
-		remainingFiles = new LinkedList<File>(group.getTrackedFiles());
-		this.indexWorkerCount = indexWorkerCount;
 		this.productWorkerCount = productWorkerCount;
 
 		// default for now
 		maxWaitingFiles = 500;
 
 		queue = new LinkedBlockingQueue<Metadata>();
-		indexWorkers = new IndexWorker[Math.min(indexWorkerCount, remainingFiles.size())];
 		productWorkers = new LinkedList<ProductWorker>();
-		workerThreads = new Thread[indexWorkers.length + productWorkerCount];
+		workerThreads = new Thread[1 + productWorkerCount]; //+1 for index worker
+		generator = new TreeGenerator(group);
 
-		addIndexWorkers();
 		addProductWorkers();
-
-		// System.err.println("RemainingFiles: ");
-		// for (File f:remainingFiles)
-		// System.err.println(f.getPath());
 	}
-
-	private void addIndexWorkers()
+	
+	public ConversionJob(TrackingGroup group)
 	{
-		for (int i = 0; i < indexWorkers.length; ++i)
-			indexWorkers[i] = setupNewIndexWorker();
+		this(group, DEFAULT_PRODUCT_WORKER_COUNT);
 	}
 
 	private void addProductWorkers()
@@ -83,21 +78,28 @@ public class BackupJob implements Runnable
 	public void start()
 	{
 		Logger.log(LogLevel.k_debug, "Backup job starting...");
+		
+		//create the tree
+		generator.generateTree();
+		Element root = generator.getRoot();
+		Element pcElement = (Element) root.getFirstChild();
+		
+		//setup index worker
+		indexWorker = new IndexWorker(queue, pcElement, group);
 
-		for (int i = indexWorkers.length; i < workerThreads.length; ++i)
+		//start product workers first
+		for (int i = 0; i < productWorkers.size(); ++i)
 		{
-			Thread thread = new Thread(productWorkers.get(i - indexWorkers.length));
+			Thread thread = new Thread(productWorkers.get(i));
 			workerThreads[i] = thread;
 			thread.start();
 			sleep(100);
 		}
 
-		for (int i = 0; i < indexWorkers.length; ++i)
-		{
-			Thread thread = new Thread(indexWorkers[i]);
-			workerThreads[i] = thread;
-			thread.start();
-		}
+		//start index worker
+		Thread thread = new Thread(indexWorker);
+		workerThreads[productWorkers.size()] = thread;
+		thread.start();
 	}
 
 	public void pauseLoading()
@@ -122,47 +124,15 @@ public class BackupJob implements Runnable
 
 		while (!shuttingDown)
 		{
-			while (active && !shuttingDown)
-			{
-				// search for a index worker that needs a new folder
-				for (int i = 0; i < indexWorkers.length && remainingFiles.size() > 0; ++i)
-				{
-					if (!indexWorkers[i].isActive())
-					{
-						indexWorkers[i].shutdown();
-						indexWorkers[i] = setupNewIndexWorker();
-						Thread iThread = new Thread(indexWorkers[i]);
-						workerThreads[i] = iThread;
-						iThread.start();
-					}
 
-				}
-
-				if (indexWorkersInactive() && remainingFiles.size() == 0
-								&& queue.size() == 0)
-				{
-					active = false;
-				}
-
-				sleep(2000);
-			}
-
-			if (allWorkersInactive() && remainingFiles.size() == 0 && queue.size() == 0)
-			{
-				shuttingDown = true;
-			}
-			else
-			{
-				active = remainingFiles.size() == 0;
-			}
+			shuttingDown = allWorkersInactive() && queue.size() == 0;
 
 			sleep(1000);
 		}
 
-		for (IndexWorker iw : indexWorkers)
-		{
-			iw.shutdown();
-		}
+		//shutting down...
+		
+		indexWorker.shutdown();
 
 		for (ProductWorker pw : productWorkers)
 		{
@@ -181,12 +151,16 @@ public class BackupJob implements Runnable
 			}
 		}
 
+		
+		//save tree
+		generator.save(new File("trees/" + group.getName() + "_" + System.currentTimeMillis() + ".tree"));
+		
 		finished = true;
 	}
 
 	private boolean allWorkersInactive()
 	{
-		return indexWorkersInactive() && productWorkersInactive();
+		return !indexWorker.isActive() && productWorkersInactive();
 	}
 
 	private boolean productWorkersInactive()
@@ -196,24 +170,6 @@ public class BackupJob implements Runnable
 				return false;
 
 		return true;
-	}
-
-	private boolean indexWorkersInactive()
-	{
-		for (IndexWorker worker : indexWorkers)
-			if (worker.isActive())
-				return false;
-
-		return true;
-	}
-
-	private IndexWorker setupNewIndexWorker()
-	{
-		Logger.log(LogLevel.k_debug, "Adding new Index Worker.");
-		File next = remainingFiles.remove(0);
-		System.err.println("Adding index worker for " + next.getPath());
-		System.err.println("remainingFiles.size()=" + remainingFiles.size());
-		return new IndexWorker(queue, next, group);
 	}
 
 	private void sleep(long ms)
@@ -244,7 +200,7 @@ public class BackupJob implements Runnable
 		text += "active=" + active + "\n";
 		text += "finished=" + finished + "\n";
 		text += "queue.size()=" + queue.size() + "\n";
-		text += "indexWorkersActive()=" + !indexWorkersInactive() + "\n";
+		text += "indexWorker.isActive()=" + indexWorker.isActive() + "\n";
 		text += "productWorkersActive()=" + !productWorkersInactive();
 		System.out.println(text);
 	}

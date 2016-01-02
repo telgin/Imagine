@@ -17,13 +17,13 @@ import gui.GUI;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductMode;
-import runner.BackupRunner;
+import runner.ConversionRunner;
 import stats.ProgressMonitor;
 
 public class CmdGUI extends GUI
 {
 	private BufferedReader cin;
-	private BackupRunner backupRunner;
+	private ConversionRunner backupRunner;
 
 	public CmdGUI()
 	{
@@ -152,7 +152,7 @@ public class CmdGUI extends GUI
 		try
 		{
 			if (backupRunner == null)
-				backupRunner = new BackupRunner();
+				backupRunner = new ConversionRunner();
 
 			setRunner(backupRunner);
 			backupRunner.runBackup(group);
@@ -169,7 +169,7 @@ public class CmdGUI extends GUI
 		try
 		{
 			if (backupRunner == null)
-				backupRunner = new BackupRunner();
+				backupRunner = new ConversionRunner();
 
 			setRunner(backupRunner);
 			backupRunner.runAllBackups();
