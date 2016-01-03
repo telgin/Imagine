@@ -247,5 +247,13 @@ public class TrackingGroup
 	public void setHashDBFile(File hashDBFile)
 	{
 		this.hashDBFile = hashDBFile;
+		if (!hashDBFile.exists())
+		{
+			try
+			{
+				hashDBFile.createNewFile();
+			}
+			catch (IOException e){}
+		}
 	}
 }

@@ -14,6 +14,7 @@ public class FileKey implements Key
 	private String name;
 	private String groupName;
 	private byte[] keyHash;
+	private final String TYPE = "FileKey";
 
 	public FileKey(String keyName, String groupName, File keyLocation)
 	{
@@ -39,6 +40,11 @@ public class FileKey implements Key
 
 		return keyHash;
 	}
+	
+	public File getKeyFile()
+	{
+		return keyLocation;
+	}
 
 	private void fetchKey()
 	{
@@ -60,5 +66,14 @@ public class FileKey implements Key
 	public String getName()
 	{
 		return name;
+	}
+
+	/* (non-Javadoc)
+	 * @see data.Key#getType()
+	 */
+	@Override
+	public String getType()
+	{
+		return TYPE;
 	}
 }

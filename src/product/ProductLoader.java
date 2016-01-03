@@ -1,5 +1,6 @@
 package product;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +12,7 @@ import logging.Logger;
 import stats.ProgressMonitor;
 import stats.Stat;
 import config.Configuration;
+import data.FileType;
 import data.Metadata;
 import data.TrackingGroup;
 import database.Database;
@@ -213,10 +215,32 @@ public class ProductLoader
 						+ " into product " + getSaveName());
 		writingFile = true;
 
-		long fileLengthRemaining = fileMetadata.isEmptyFolder() ? Constants.EMPTY_FOLDER_CODE
-						: fileMetadata.getFile().length();
+		//configure based on file type
+		long fileLengthRemaining;
+		DataInputStream reader;
+		if (fileMetadata.getType().equals(FileType.k_file))//k_file
+		{
+			fileLengthRemaining = fileMetadata.getFile().length();
+			reader = new DataInputStream(new FileInputStream(fileMetadata.getFile()));
+		}
+		else if (fileMetadata.getType().equals(FileType.k_folder))//k_folder
+		{
+			fileLengthRemaining = 0;
+			reader = null;
+		}
+		else //k_reference
+		{
+			//file data for a reference is the previous f1uuid plus the number of fragments
+			fileLengthRemaining = Constants.PRODUCT_UUID_SIZE + Constants.FRAGMENT_NUMBER_SIZE;
+			byte[] data = ByteConversion.concat(
+							Database.getCachedF1UUID(fileMetadata.getFileHash(), group),
+							ByteConversion.longToBytes(
+								Database.getCachedFragmentCount(fileMetadata.getFileHash(), group)));
+			reader = new DataInputStream(new ByteArrayInputStream(data));
+		}
+		
+		//fragment number starts at 1
 		long fragmentNumber = 1;
-		// int fileHeaderSize = fileMetadata.getTotalLength();
 
 		// save off the first product uuid where we're saving the file
 		// it might actually start in the next one if we're out of space in this
@@ -224,16 +248,10 @@ public class ProductLoader
 		// easy enough to figure out later.
 		fileMetadata.setProductUUID(currentUUID);
 
-		// start a reader
-		DataInputStream reader =
-						new DataInputStream(new FileInputStream(fileMetadata.getFile()));
 
 		// write the file to one or multiple products
 		do
 		{
-			// write file header size
-			// writeFileHeaderSize(fileHeaderSize);
-
 			// write file header
 			if (!writeFileHeader(fileMetadata, fragmentNumber, fileLengthRemaining))
 			{
@@ -266,14 +284,12 @@ public class ProductLoader
 		}
 		while (fileLengthRemaining > 0);
 
-		reader.close();
+		if (reader != null)
+			reader.close();
 
 		// update the database
-		if (group.isUsingDatabase())
-		{
-			fileMetadata.setFragmentCount(fragmentNumber-1);
-			Database.saveConversionRecord(fileMetadata, group);
-		}
+		fileMetadata.setFragmentCount(fragmentNumber-1);
+		Database.saveConversionRecord(fileMetadata, group);
 
 		writingFile = false;
 		fileWritten = true;
@@ -306,40 +322,62 @@ public class ProductLoader
 	private boolean writeFileHeader(Metadata fileMetadata, long fragmentNumber,
 					long fileLengthRemaining)
 	{
-		System.out.println("Fragment number: " + fragmentNumber);
-		// fragment number
-		if (!writeFull(ByteConversion.longToBytes(fragmentNumber)))
+		
+		//file type
+		if (!writeFull(ByteConversion.intToByte(fileMetadata.getType().toInt())))
 			return false;
-
-		// file hash
-		if (!writeFull(fileMetadata.getFileHash()))
-			return false;
-
-		// file name length
-		if (!writeFull(ByteConversion
-						.shortToBytes((short) fileMetadata.getPath().length())))
-			return false;
-
-		// file name
-		if (!writeFull(fileMetadata.getPath().getBytes()))
-			return false;
-
-		// date created
-		if (!writeFull(ByteConversion.longToBytes(fileMetadata.getDateCreated())))
-			return false;
-
-		// date modified
-		if (!writeFull(ByteConversion.longToBytes(fileMetadata.getDateModified())))
-			return false;
-
-		// permissions
-		if (!writeFull(ByteConversion.shortToBytes(fileMetadata.getPermissions())))
-			return false;
-
-		// length of data that still needs to be written
-		// this may be FOLDER_CODE if the file is an empty folder
-		if (!writeFull(ByteConversion.longToBytes(fileLengthRemaining)))
-			return false;
+		
+		if (fileMetadata.getType().equals(FileType.k_file) ||
+						fileMetadata.getType().equals(FileType.k_reference))
+		{
+		
+			System.out.println("Fragment number: " + fragmentNumber);
+			// fragment number
+			if (!writeFull(ByteConversion.longToBytes(fragmentNumber)))
+				return false;
+	
+			// file hash
+			if (!writeFull(fileMetadata.getFileHash()))
+				return false;
+	
+			// file name length
+			if (!writeFull(ByteConversion
+							.shortToBytes((short) fileMetadata.getPath().length())))
+				return false;
+	
+			// file name
+			if (!writeFull(fileMetadata.getPath().getBytes()))
+				return false;
+	
+			// date created
+			if (!writeFull(ByteConversion.longToBytes(fileMetadata.getDateCreated())))
+				return false;
+	
+			// date modified
+			if (!writeFull(ByteConversion.longToBytes(fileMetadata.getDateModified())))
+				return false;
+	
+			// permissions
+			if (!writeFull(ByteConversion.shortToBytes(fileMetadata.getPermissions())))
+				return false;
+	
+			// length of data that still needs to be written
+			if (!writeFull(ByteConversion.longToBytes(fileLengthRemaining)))
+				return false;
+		}
+		else
+		{
+			//folder type:
+			
+			// file name length
+			if (!writeFull(ByteConversion
+							.shortToBytes((short) fileMetadata.getPath().length())))
+				return false;
+	
+			// file name
+			if (!writeFull(fileMetadata.getPath().getBytes()))
+				return false;
+		}
 
 		return true;
 	}

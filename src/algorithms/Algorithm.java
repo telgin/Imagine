@@ -28,6 +28,7 @@ public class Algorithm
 	private int versionNum;
 	private HashMap<String, Parameter> parameters;
 	private ProductFactoryCreation productFactoryCreation;
+	private String presetName;
 
 	/**
 	 * @update_comment
@@ -49,6 +50,7 @@ public class Algorithm
 	{
 		this.name = algoNode.getAttribute("name");
 		this.versionNum = Integer.parseInt(algoNode.getAttribute("version"));
+		this.presetName = algoNode.getAttribute("presetName");
 
 		parameters = new HashMap<String, Parameter>();
 		for (Element paramNode : ConfigUtil.children(algoNode, "Parameter"))
@@ -179,6 +181,7 @@ public class Algorithm
 		Element element = doc.createElement("Algorithm");
 		element.setAttribute("name", name);
 		element.setAttribute("version", Integer.toString(versionNum));
+		element.setAttribute("presetName", presetName);
 
 		for (Parameter param : getParameters())
 		{
@@ -261,5 +264,21 @@ public class Algorithm
 	public ProductWriterFactory<? extends ProductWriter> getProductWriterFactory(Key key)
 	{
 		return productFactoryCreation.createWriter(this, key);
+	}
+
+	/**
+	 * @return the presetName
+	 */
+	public String getPresetName()
+	{
+		return presetName;
+	}
+
+	/**
+	 * @param presetName the presetName to set
+	 */
+	public void setPresetName(String presetName)
+	{
+		this.presetName = presetName;
 	}
 }

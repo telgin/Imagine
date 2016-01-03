@@ -2,6 +2,7 @@ package data;
 
 public class NullKey implements Key
 {
+	private final String TYPE = "NullKey";
 
 	public NullKey()
 	{
@@ -23,6 +24,15 @@ public class NullKey implements Key
 	public String getName()
 	{
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see data.Key#getType()
+	 */
+	@Override
+	public String getType()
+	{
+		return TYPE;
 	}
 
 }

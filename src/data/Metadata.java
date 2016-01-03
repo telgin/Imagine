@@ -13,6 +13,7 @@ public class Metadata
 	private long fragmentCount;
 	private short permissions;
 	private boolean emptyFolder;
+	private FileType type;
 
 	public Metadata()
 	{
@@ -176,6 +177,22 @@ public class Metadata
 	public void setEmptyFolder(boolean emptyFolder)
 	{
 		this.emptyFolder = emptyFolder;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public FileType getType()
+	{
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(FileType type)
+	{
+		this.type = type;
 	}
 
 }

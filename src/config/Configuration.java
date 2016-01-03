@@ -10,6 +10,7 @@ import util.Constants;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import logging.Logger;
 import product.ProductMode;
@@ -17,6 +18,7 @@ import logging.LogLevel;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import algorithms.Algorithm;
 
@@ -58,7 +60,58 @@ public class Configuration {
 	
 	public static void addTrackingGroup(TrackingGroup group)
 	{
-		//TODO trackingGroup -> Group Element
+		Element groupNode = doc.createElement("Group");
+		
+		//group attributes
+		groupNode.setAttribute("algorithmPresetName", group.getAlgorithm().getPresetName());
+		groupNode.setAttribute("name", group.getName());
+		groupNode.setAttribute("securityLevel", group.getAlgorithm().getProductSecurityLevel().toString());
+		groupNode.setAttribute("usesDatabase", Boolean.toString(group.isUsingDatabase()));
+		
+		//tracked files
+		Element trackedNode = doc.createElement("Tracked");
+		for (File tracked : group.getTrackedFiles())
+		{
+			Element pathNode = doc.createElement("Path");
+			pathNode.setAttribute("value", tracked.getAbsolutePath());
+			trackedNode.appendChild(pathNode);
+		}
+		groupNode.appendChild(trackedNode);
+		
+		//untracked files
+		Element untrackedNode = doc.createElement("Untracked");
+		for (File untracked : group.getUntrackedFiles())
+		{
+			Element pathNode = doc.createElement("Path");
+			pathNode.setAttribute("value", untracked.getAbsolutePath());
+			untrackedNode.appendChild(pathNode);
+		}
+		groupNode.appendChild(untrackedNode);
+		
+		//key
+		Element keyNode = doc.createElement("Key");
+		keyNode.setAttribute("name", group.getKey().getName());
+		keyNode.setAttribute("type", group.getKey().getType());
+		
+		if (group.getKey().getType().equals("FileKey"))
+		{
+			File keyFile = ((FileKey)group.getKey()).getKeyFile();
+			Element pathNode = doc.createElement("Path");
+			pathNode.setAttribute("value", keyFile.getAbsolutePath());
+			keyNode.appendChild(pathNode);
+		}
+		groupNode.appendChild(keyNode);
+		
+		//config locations
+		Element locations = doc.createElement("Locations");
+		locations.appendChild(mkPathNode("hashdb", group.getHashDBFile().getAbsolutePath()));
+		locations.appendChild(mkPathNode("extraction", group.getExtractionFolder().getAbsolutePath()));
+		locations.appendChild(mkPathNode("staging", group.getProductStagingFolder().getAbsolutePath()));
+		groupNode.appendChild(locations);
+		
+		//append new tracking group to the list
+		Element trackingGroupsNode = ConfigUtil.first(ConfigUtil.children(root, "TrackingGroups"));
+		trackingGroupsNode.appendChild(groupNode);
 	}
 	
 	public static File getDatabaseFile()
@@ -150,43 +203,38 @@ public class Configuration {
 			String groupName = groupNode.getAttribute("name");
 
 			//add algorithm
-			Element algoNode = ConfigUtil.first(ConfigUtil.children(groupNode, "Algorithm"));
-			if (algoNode == null)
+			String presetName = groupNode.getAttribute("algorithmPresetName");
+			Algorithm groupAlgo = getAlgorithmPreset(presetName);
+			if (groupAlgo == null)
 			{
 				Logger.log(LogLevel.k_fatal, "No algorithm node found for group: " + groupName);
 			}
 			
-			Algorithm groupAlgo = new Algorithm(algoNode);
-			
 			//add key
-			Key groupKey;
-			if (groupAlgo.getProductSecurityLevel().equals(ProductMode.NORMAL))
+			Element keyNode = ConfigUtil.first(ConfigUtil.children(groupNode, "Key"));
+			Key groupKey = null;
+			if (keyNode.getAttribute("type").equals("NullKey"))
 			{
 				groupKey = new NullKey();
 			}
+			else if (keyNode.getAttribute("type").equals("PasswordKey"))
+			{
+				groupKey = new PasswordKey(keyNode.getAttribute("name"), groupName);
+			}
 			else
 			{
-				Element keyNode = ConfigUtil.first(ConfigUtil.children(groupNode, "Key"));
-				if (keyNode == null)
+				Element keyPath = ConfigUtil.first(ConfigUtil.children(keyNode, "Path"));
+				if (keyPath != null)
 				{
-					Logger.log(LogLevel.k_error, "There was no key for the secured group: " + groupName);
-					Logger.log(LogLevel.k_warning, "Using default password key for group: " + groupName);
-					groupKey = new PasswordKey("default", groupName);
+					groupKey = new FileKey(keyNode.getAttribute("name"), groupName,
+							new File(keyPath.getAttribute("value")));
 				}
 				else
 				{
-					Element keyPath = ConfigUtil.first(ConfigUtil.children(keyNode, "Path"));
-					if (keyPath != null)
-					{
-						groupKey = new FileKey(keyNode.getAttribute("name"), groupName,
-								new File(keyPath.getAttribute("value")));
-					}
-					else
-					{
-						groupKey = new PasswordKey(keyNode.getAttribute("name"), groupName);
-					}
+					Logger.log(LogLevel.k_fatal, "The file key does not define a path in tracking group: " + groupName);
 				}
 			}
+			
 			
 			//using database
 			boolean usesDatabase = Boolean.parseBoolean(groupNode.getAttribute("usesDatabase"));
@@ -215,10 +263,37 @@ public class Configuration {
 				group.addUntrackedPath(pathNode.getAttribute("value"));
 			}
 			
+			//locations
+			Element locationsNode = ConfigUtil.first(ConfigUtil.children(groupNode, "Locations"));
+			String hashDBPath = ConfigUtil.first(
+							ConfigUtil.filterByAttribute(
+								ConfigUtil.children(locationsNode, "Path"), "name", "hashdb"))
+									.getAttribute("value");
+			if (hashDBPath.length() == 0)
+				hashDBPath = "hashdb.db";
+			group.setHashDBFile(new File(hashDBPath));
+			
+			String extractionPath = ConfigUtil.first(
+							ConfigUtil.filterByAttribute(
+								ConfigUtil.children(locationsNode, "Path"), "name", "extraction"))
+									.getAttribute("value");
+			if (extractionPath.length() == 0)
+				extractionPath = "extraction";
+			group.setHashDBFile(new File(extractionPath));
+			
+			String stagingPath = ConfigUtil.first(
+							ConfigUtil.filterByAttribute(
+								ConfigUtil.children(locationsNode, "Path"), "name", "staging"))
+									.getAttribute("value");
+			if (stagingPath.length() == 0)
+				stagingPath = "staging";
+			group.setHashDBFile(new File(stagingPath));
+			
+			
 			trackingGroups.add(group);
 		}
 	}
-	/**
+	
 	public static TrackingGroup findTrackingGroup(String groupName)
 	{
 		for (TrackingGroup tg:trackingGroups)
@@ -228,21 +303,43 @@ public class Configuration {
 		Logger.log(LogLevel.k_error, "Could not find tracking group: " + groupName);
 		return null;
 	}
-	*/
-	private static Element getAlgorithm(String name)
+	
+	public static Algorithm getAlgorithmPreset(String presetName)
 	{
-		Element supportedAlgosNode = ConfigUtil.first(
-						ConfigUtil.children(root, "SupportedAlgorithms"));
+		return new Algorithm(getAlgorithmPresetElement(presetName));
+	}
+	
+	public static List<String> getAlgorithmPresetNames()
+	{
+		List<String> presetNames = new LinkedList<String>();
+		Element algoPresetsNode = ConfigUtil.first(
+						ConfigUtil.children(root, "AlgorithmPresets"));
+		for (Element algoPreset : ConfigUtil.children(algoPresetsNode, "Algorithm"))
+		{
+			String presetName = algoPreset.getAttribute("presetName");
+			if (presetName.length() != 0)
+			{
+				presetNames.add(presetName);
+			}
+		}
+		
+		return presetNames;
+	}
+	
+	private static Element getAlgorithmPresetElement(String presetName)
+	{
+		Element algoPresetsNode = ConfigUtil.first(
+						ConfigUtil.children(root, "AlgorithmPresets"));
 		Element algoNode = ConfigUtil.first(
 				ConfigUtil.filterByAttribute(
-						ConfigUtil.children(supportedAlgosNode, "Algorithm"), "name", name));
+						ConfigUtil.children(algoPresetsNode, "Algorithm"), "presetName", presetName));
 		
 		if (algoNode == null)
 		{
-			Logger.log(LogLevel.k_error, "Could not find algorithm: " + name);
+			Logger.log(LogLevel.k_error, "Could not find algorithm: " + presetName);
 			return null;
 		}
-			
+		
 		return algoNode;
 	}
 	
@@ -261,12 +358,6 @@ public class Configuration {
 		return paramNode.getAttribute("value");
 	}
 
-	public static Integer getTextBlockBlockSize()
-	{
-		String value = getParameter(getAlgorithm("TextBlock"), "blockSize");
-		return Integer.parseInt(value);
-	}
-
 	/**
 	 * @update_comment
 	 * @return
@@ -275,5 +366,29 @@ public class Configuration {
 	{
 		// TODO Set this at installation
 		return "default";
+	}
+	
+	public static void addAlgorithmPreset(Algorithm algo)
+	{
+		Element algoPresetsNode = ConfigUtil.first(
+						ConfigUtil.children(root, "AlgorithmPresets"));
+		algoPresetsNode.appendChild(algo.toElement(doc));
+	}
+	
+	public static void deleteAlgorithmPreset(String presetName)
+	{
+		Element algoPresetsNode = ConfigUtil.first(
+						ConfigUtil.children(root, "AlgorithmPresets"));
+		Element toRemove = getAlgorithmPresetElement(presetName);
+		algoPresetsNode.removeChild(toRemove);
+	}
+	
+	private static Element mkPathNode(String name, String value)
+	{
+		Element element = doc.createElement("Path");
+		if (name != null)
+			element.setAttribute("name", name);
+		element.setAttribute("value", value);
+		return element;
 	}
 }

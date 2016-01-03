@@ -11,7 +11,7 @@ import util.ByteConversionTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-				// FullPNGTest.class,
+				 FullPNGTest.class,
 				// ByteConversionTest.class
 				// TextBlockTest.class,
 				// StealthPNGTest.class

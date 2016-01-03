@@ -1,5 +1,8 @@
 package algorithms.fullpng;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
@@ -52,10 +55,12 @@ public class Definition implements algorithms.Definition
 
 		{
 			// product mode
-			Parameter param = new Parameter("ProductMode", "string", "Secure", false);
+			Parameter param = new Parameter("ProductMode", "string", "Normal", false);
 			if (includeOptions)
 			{
+				param.addOption(new Option("Normal"));
 				param.addOption(new Option("Secure"));
+				param.addOption(new Option("Stealth"));
 			}
 			algo.addParameter(param);
 		}
@@ -113,6 +118,22 @@ public class Definition implements algorithms.Definition
 				return new FullPNGFactory(algo, key);
 			}
 		};
+	}
+
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getAlgorithmPresets()
+	 */
+	@Override
+	public List<Algorithm> getAlgorithmPresets()
+	{
+		List<Algorithm> presets = new LinkedList<Algorithm>();
+		
+		//plain default
+		Algorithm fullpngNormal = construct(false);
+		fullpngNormal.setPresetName("fullpng_basic");
+		presets.add(fullpngNormal);
+		
+		return presets;
 	}
 
 }

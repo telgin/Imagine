@@ -52,6 +52,16 @@ public class AlgorithmRegistry
 		return definitions.get(name).getAlgorithmSpec();
 	}
 	
+	/**
+	 * @update_comment
+	 * @param algoName
+	 * @return
+	 */
+	public static List<Algorithm> getAlgorithmPresets(String name)
+	{
+		return definitions.get(name).getAlgorithmPresets();
+	}
+	
 	public static ProductReaderFactory<? extends ProductReader> getProductReaderFactory(Algorithm algo, Key key) //make this a part of the algorithm class?
 	{
 		if (!definitions.containsKey(algo.getName()))
@@ -69,4 +79,6 @@ public class AlgorithmRegistry
 		return definitions.get(algo.getName()).getProductFactoryCreation()
 				.createWriter(algo, key);
 	}
+
+	
 }

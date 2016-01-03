@@ -1,5 +1,8 @@
 package algorithms.stealthpng;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
@@ -55,7 +58,9 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter("ProductMode", "string", "Normal", false);
 			if (includeOptions)
 			{
+				param.addOption(new Option("Normal"));
 				param.addOption(new Option("Secure"));
+				param.addOption(new Option("Stealth"));
 			}
 			algo.addParameter(param);
 		}
@@ -115,6 +120,22 @@ public class Definition implements algorithms.Definition
 				return new StealthPNGFactory(algo, key);
 			}
 		};
+	}
+
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getAlgorithmPresets()
+	 */
+	@Override
+	public List<Algorithm> getAlgorithmPresets()
+	{
+		List<Algorithm> presets = new LinkedList<Algorithm>();
+		
+		//plain default
+		Algorithm stealthpngNormal = construct(false);
+		stealthpngNormal.setPresetName("stealthpng_basic");
+		presets.add(stealthpngNormal);
+		
+		return presets;
 	}
 
 }

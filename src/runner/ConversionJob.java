@@ -29,7 +29,6 @@ public class ConversionJob implements Runnable
 	private Thread[] workerThreads;
 	private int productWorkerCount;
 	private TreeGenerator generator;
-	private static final int DEFAULT_PRODUCT_WORKER_COUNT = 3;
 
 	public ConversionJob(TrackingGroup group, int productWorkerCount)
 	{
@@ -45,11 +44,6 @@ public class ConversionJob implements Runnable
 		generator = new TreeGenerator(group);
 
 		addProductWorkers();
-	}
-	
-	public ConversionJob(TrackingGroup group)
-	{
-		this(group, DEFAULT_PRODUCT_WORKER_COUNT);
 	}
 
 	private void addProductWorkers()
@@ -83,6 +77,9 @@ public class ConversionJob implements Runnable
 		generator.generateTree();
 		Element root = generator.getRoot();
 		Element pcElement = (Element) root.getFirstChild();
+		
+		//initial save: TODO remove this
+		generator.save(new File("testing/highlevel/tree.xml"));
 		
 		//setup index worker
 		indexWorker = new IndexWorker(queue, pcElement, group);
@@ -153,7 +150,8 @@ public class ConversionJob implements Runnable
 
 		
 		//save tree
-		generator.save(new File("trees/" + group.getName() + "_" + System.currentTimeMillis() + ".tree"));
+		//TODO change to correct path
+		generator.save(new File("testing/highlevel/tree.xml"));
 		
 		finished = true;
 	}

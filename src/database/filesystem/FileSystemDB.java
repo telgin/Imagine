@@ -29,8 +29,8 @@ public class FileSystemDB implements ActiveComponent
 
 		// the index metadata might be null if the file is new
 		// and doesn't exist there yet
-		if (indexMetadata == null)
-			System.err.println("METADATA FOR " + f.getName() + " WAS NULL!!!");
+		//if (indexMetadata == null)
+		//	System.err.println("METADATA FOR " + f.getName() + " WAS NULL!!!");
 
 		return indexMetadata;
 	}

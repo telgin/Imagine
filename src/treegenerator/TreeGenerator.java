@@ -14,6 +14,7 @@ import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
 import util.ConfigUtil;
+import util.Constants;
 import util.FileSystemUtil;
 
 /**
@@ -151,6 +152,10 @@ public class TreeGenerator
 	private Element mkFolder(File included)
 	{
 		if (!included.exists())
+			return null;
+		
+		//don't index the index folders
+		if (included.getName().equals(Constants.INDEX_FOLDER_NAME))
 			return null;
 		
 		if (group.getUntrackedFiles().contains(included))

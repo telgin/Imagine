@@ -1,5 +1,8 @@
 package algorithms.textblock;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
@@ -83,6 +86,8 @@ public class Definition implements algorithms.Definition
 			if (includeOptions)
 			{
 				param.addOption(new Option("Normal"));
+				param.addOption(new Option("Secure"));
+				param.addOption(new Option("Stealth"));
 			}
 			algo.addParameter(param);
 		}
@@ -124,6 +129,22 @@ public class Definition implements algorithms.Definition
 				return new TextBlockFactory(algo, key);
 			}
 		};
+	}
+
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getAlgorithmPresets()
+	 */
+	@Override
+	public List<Algorithm> getAlgorithmPresets()
+	{
+		List<Algorithm> presets = new LinkedList<Algorithm>();
+		
+		//plain default
+		Algorithm textblockNormal = construct(false);
+		textblockNormal.setPresetName("textblock_basic");
+		presets.add(textblockNormal);
+		
+		return presets;
 	}
 
 }

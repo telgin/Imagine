@@ -17,7 +17,8 @@ import database.Database;
 import product.FileContents;
 import product.ProductContents;
 import product.ProductExtractor;
-import runner.BackupJob;
+import runner.ConversionJob;
+import runner.ConversionRunner;
 import runner.SystemManager;
 import testing.TestFileTrees;
 import util.ByteConversion;
@@ -31,20 +32,20 @@ public class ProductIOTest
 	private static File outputFolder = new File("testing/output/");
 	private static File extractionFolder = new File("testing/extraction/");
 	private static File assemblyFolder = new File("testing/assembly/");
+	private static File hashdbFile = new File("testing/resources/hashdb.db");
 	private static boolean shutdownCalled = true;
-	private static ArrayList<BackupJob> jobs = new ArrayList<BackupJob>();
+	private static ArrayList<ConversionJob> jobs = new ArrayList<ConversionJob>();
 
 	private static void shutdown()
 	{
 		SystemManager.shutdown();
-		for (BackupJob job : jobs)
+		for (ConversionJob job : jobs)
 			job.shutdown();
-		jobs = new ArrayList<BackupJob>();
+		jobs = new ArrayList<ConversionJob>();
 		shutdownCalled = true;
 	}
 
-	public static void testNoFiles(TrackingGroup group, int indexWorkers,
-					int productWorkers)
+	public static void testNoFiles(TrackingGroup group, int threads)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -54,16 +55,18 @@ public class ProductIOTest
 		String treeName = "noFiles";
 		File inputFolder = TestFileTrees.getRoot(homeFolder, treeName);
 		reset(treeName);
-		System.out.println("Running test for tree: " + treeName + "(" + indexWorkers
-						+ ", " + productWorkers + ")");
+		System.out.println("Running test for tree: " + treeName + "(threads=" + threads + ")");
 
+		//set temp hashdb location
+		group.setHashDBFile(hashdbFile);
+		
 		// set tracked paths
 		group.clearTrackedPaths();
 		group.clearUntrackedPaths();
 		group.addTrackedPath(inputFolder);
 		group.setProductStagingFolder(outputFolder);
 
-		runJob(group, indexWorkers, productWorkers);
+		runJob(group, threads);
 
 		// see what we got:
 		// should be nothing
@@ -76,8 +79,7 @@ public class ProductIOTest
 		shutdown();
 	}
 
-	public static void testSmallFile(TrackingGroup group, int indexWorkers,
-					int productWorkers)
+	public static void testSmallFile(TrackingGroup group, int threads)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -87,25 +89,29 @@ public class ProductIOTest
 		String treeName = "smallFile";
 		File inputFolder = TestFileTrees.getRoot(homeFolder, treeName);
 		reset(treeName);
-		System.out.println("Running test for tree: " + treeName + "(" + indexWorkers
-						+ ", " + productWorkers + ")");
+		System.out.println("Running test for tree: " + treeName + "(threads=" + threads + ")");
 
+		//set temp hashdb location
+		group.setHashDBFile(hashdbFile);
+		
 		// set tracked paths
 		group.clearTrackedPaths();
 		group.clearUntrackedPaths();
 		group.addTrackedPath(inputFolder);
 		group.setProductStagingFolder(outputFolder);
+		
+		//set temp hashdb location
+		group.setHashDBFile(hashdbFile);
 
 		// specify the original single test file
 		File testFile = inputFolder.listFiles()[0];
 
-		runJob(group, indexWorkers, productWorkers);
+		runJob(group, threads);
 
 		// get the metadata of our single test file now
 		// that it should have been saved
 		Metadata previousMetadata = Database.getFileMetadata(testFile, group);
 		compareMetadataFile(testFile, previousMetadata);
-		assertFalse(previousMetadata.isMetadataUpdate());
 
 		// see what we got:
 		// should be only one file
@@ -145,8 +151,7 @@ public class ProductIOTest
 		shutdown();
 	}
 
-	public static void testSmallTree(TrackingGroup group, int indexWorkers,
-					int productWorkers)
+	public static void testSmallTree(TrackingGroup group, int threads)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -156,9 +161,11 @@ public class ProductIOTest
 		String treeName = "smallTree";
 		File inputFolder = TestFileTrees.getRoot(homeFolder, treeName);
 		reset(treeName);
-		System.out.println("Running test for tree: " + treeName + "(" + indexWorkers
-						+ ", " + productWorkers + ")");
+		System.out.println("Running test for tree: " + treeName + "(threads=" + threads + ")");
 
+		//set temp hashdb location
+		group.setHashDBFile(hashdbFile);
+				
 		// set tracked paths
 		group.clearTrackedPaths();
 		group.clearUntrackedPaths();
@@ -217,7 +224,7 @@ public class ProductIOTest
 		// specify the test file (all files are the same)
 		File testFile = u1_r;
 
-		runJob(group, indexWorkers, productWorkers);
+		runJob(group, threads);
 
 		// verify all metadata is correct
 		try
@@ -228,7 +235,7 @@ public class ProductIOTest
 
 				if (!file.getParentFile().getName().equals(Constants.INDEX_FOLDER_NAME))
 				{
-					System.out.println("Walked: " + file.getAbsolutePath());
+					//System.out.println("Walked: " + file.getAbsolutePath());
 					Metadata previousMetadata = Database.getFileMetadata(file, group);
 					if (file.getName().startsWith("u"))
 					{
@@ -237,7 +244,6 @@ public class ProductIOTest
 					else
 					{
 						compareMetadataFile(file, previousMetadata);
-						assertFalse(previousMetadata.isMetadataUpdate());
 					}
 				}
 			});
@@ -291,8 +297,7 @@ public class ProductIOTest
 		shutdown();
 	}
 
-	public static void testBigFile(TrackingGroup group, int indexWorkers,
-					int productWorkers)
+	public static void testBigFile(TrackingGroup group, int threads)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -302,9 +307,10 @@ public class ProductIOTest
 		String treeName = "bigFile";
 		File inputFolder = TestFileTrees.getRoot(homeFolder, treeName);
 		reset(treeName);
-		System.out.println("Running test for tree: " + treeName + "(" + indexWorkers
-						+ ", " + productWorkers + ")");
-
+		System.out.println("Running test for tree: " + treeName + "(threads=" + threads + ")");
+		//set temp hashdb location
+		group.setHashDBFile(hashdbFile);
+				
 		// set tracked paths
 		group.clearTrackedPaths();
 		group.clearUntrackedPaths();
@@ -314,13 +320,12 @@ public class ProductIOTest
 		// specify the original single test file
 		File testFile = inputFolder.listFiles()[0];
 
-		runJob(group, indexWorkers, productWorkers);
+		runJob(group, threads);
 
 		// get the metadata of our single test file now
 		// that it should have been saved
 		Metadata previousMetadata = Database.getFileMetadata(testFile, group);
 		compareMetadataFile(testFile, previousMetadata);
-		assertFalse(previousMetadata.isMetadataUpdate());
 
 		// see what we got:
 		// should be only one file
@@ -374,10 +379,9 @@ public class ProductIOTest
 	 * 
 	 * @param group
 	 * @param indexWorkers
-	 * @param productWorkers
+	 * @param threads
 	 */
-	public static void testBigTree(TrackingGroup group, int indexWorkers,
-					int productWorkers)
+	public static void testBigTree(TrackingGroup group, int threads)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -387,9 +391,11 @@ public class ProductIOTest
 		String treeName = "bigTree";
 		File inputFolder = TestFileTrees.getRoot(homeFolder, treeName);
 		reset(treeName);
-		System.out.println("Running test for tree: " + treeName + "(" + indexWorkers
-						+ ", " + productWorkers + ")");
-
+		System.out.println("Running test for tree: " + treeName + "(threads=" + threads + ")");
+		
+		//set temp hashdb location
+		group.setHashDBFile(hashdbFile);
+		
 		// set tracked paths
 		group.clearTrackedPaths();
 		group.clearUntrackedPaths();
@@ -433,7 +439,7 @@ public class ProductIOTest
 			fail();
 		}
 
-		runJob(group, indexWorkers, productWorkers);
+		runJob(group, threads);
 
 		// verify all metadata is correct
 		try
@@ -444,11 +450,10 @@ public class ProductIOTest
 
 				if (!file.getParentFile().getName().equals(Constants.INDEX_FOLDER_NAME))
 				{
-					if (file.getAbsolutePath().endsWith(".lock"))
-						System.out.println("Walked: " + file.getAbsolutePath());
+					//if (file.getAbsolutePath().endsWith(".lock"))
+					//	System.out.println("Walked: " + file.getAbsolutePath());
 					Metadata previousMetadata = Database.getFileMetadata(file, group);
 					compareMetadataFile(file, previousMetadata);
-					assertFalse(previousMetadata.isMetadataUpdate());
 				}
 			});
 		}
@@ -487,8 +492,7 @@ public class ProductIOTest
 				compareMetadata(Database.getFileMetadata(extractedMetadata.getFile(),
 								group), extractedMetadata);
 
-				if (!extractedMetadata.isMetadataUpdate() && 
-						!extractionFolders.containsKey(fc.getExtractedFile()))
+				if (!extractionFolders.containsKey(fc.getExtractedFile()))
 				{
 					// specify assembled file name
 					String relativized =
@@ -552,6 +556,11 @@ public class ProductIOTest
 		clearFolder(outputFolder);
 		clearFolder(extractionFolder);
 		clearFolder(assemblyFolder);
+		try
+		{
+			Files.delete(hashdbFile.toPath());
+		}
+		catch (IOException e){}
 		TestFileTrees.reset(homeFolder, treeName);
 	}
 
@@ -586,13 +595,11 @@ public class ProductIOTest
 		assertEquals(FileSystemUtil.getDateModified(f), m.getDateModified());
 	}
 
-	private static void runJob(TrackingGroup group, int indexWorkers, int productWorkers)
+	private static void runJob(TrackingGroup group, int threads)
 	{
-		// create a backup job
-		BackupJob job = new BackupJob(group, indexWorkers, productWorkers);
+		// create a conversion job
+		ConversionJob job = ConversionRunner.runConversion(group, threads);
 		jobs.add(job);
-		Thread jobThread = new Thread(job);
-		jobThread.start();
 
 		// wait for the job to finish
 		while (!job.isFinished())

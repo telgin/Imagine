@@ -1,5 +1,7 @@
 package algorithms;
 
+import java.util.List;
+
 import product.ProductFactoryCreation;
 
 public interface Definition
@@ -9,6 +11,8 @@ public interface Definition
 	public Algorithm getDefaultAlgorithm();
 
 	public Algorithm getAlgorithmSpec();
+	
+	public List<Algorithm> getAlgorithmPresets();
 
 	public ProductFactoryCreation getProductFactoryCreation();
 }

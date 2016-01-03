@@ -76,24 +76,33 @@ public class ProductDB implements ActiveComponent
 		queued.remove(hashString);
 	}
 	
-	public boolean containsFileHash(byte[] hash)
+	public synchronized boolean containsFileHash(byte[] hash)
 	{
-		return containsFileHash(ByteConversion.bytesToBase64(hash));
+		return db.containsKey(ByteConversion.bytesToHex(hash));
 	}
 	
-	public synchronized void queueFileHash(String hash)
+	public synchronized void queueFileHash(byte[] hash)
 	{
-		queued.add(hash);
+		queued.add(ByteConversion.bytesToHex(hash));
 	}
 	
-	public synchronized boolean isQueued(String hash)
+	public synchronized boolean isQueued(byte[] hash)
 	{
-		return queued.contains(hash);
+		return queued.contains(ByteConversion.bytesToHex(hash));
 	}
 	
-	public boolean containsFileHash(String hash)
+	public synchronized long getFragmentCount(byte[] hash)
 	{
-		return db.containsKey(hash);
+		String record = db.get(ByteConversion.bytesToHex(hash));
+		String count = record.split(FIELD_DELIMETER)[1];
+		return Long.parseLong(count);
+	}
+	
+	public synchronized byte[] getF1UUID(byte[] hash)
+	{
+		String record = db.get(ByteConversion.bytesToHex(hash));
+		String f1uuid = record.split(FIELD_DELIMETER)[0];
+		return ByteConversion.hexToBytes(f1uuid);
 	}
 
 	/* (non-Javadoc)

@@ -1,9 +1,16 @@
 package config;
 
+import java.io.File;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
+import data.FileKey;
+import data.Key;
+import data.TrackingGroup;
 import util.ConfigUtil;
 import util.Constants;
 
@@ -14,20 +21,60 @@ class DefaultConfigGenerator
 	public static void main(String[] args)
 	{
 		// save new default config to default location
-		ConfigUtil.saveConfig(makeDefaultConfig(), Constants.configFile);
+		ConfigUtil.saveConfig(makeBasicConfig(), Constants.configFile);
+		
+		//reload the config
+		Configuration.reloadConfig();
+		
+		//add algorithm presets
+		for (String algoName : AlgorithmRegistry.getAlgorithmNames())
+		{
+			for (Algorithm preset : AlgorithmRegistry.getAlgorithmPresets(algoName))
+			{
+				Configuration.addAlgorithmPreset(preset);
+			}
+		}
+		
+		//add test tracking group
+		addTestTrackingGroup();
+		
+		//save configuration
+		Configuration.saveConfig();
+	}
+	
+	private static void addTestTrackingGroup()
+	{
+		//initialize
+		String name = "Test";
+		String presetName = "textblock_basic";
+		Algorithm algo = Configuration.getAlgorithmPreset(presetName);
+		boolean usesDatabase = true;
+		Key key = new FileKey("potatoes", name, new File("keys/key1.txt"));
+		TrackingGroup testGroup = new TrackingGroup(name, usesDatabase, algo, key);
+		
+		//add paths
+		testGroup.addTrackedPath("testing/scratch");
+		testGroup.addUntrackedPath("testing/scratch/tree2.xml");
+		
+		//add locations
+		testGroup.setHashDBFile(new File("testing/scratch/hashdb.db"));
+		testGroup.setExtractionFolder(new File("extractions"));
+		testGroup.setProductStagingFolder(new File("staging"));
+		
+		Configuration.addTrackingGroup(testGroup);
 	}
 
-	public static Document makeDefaultConfig()
+	public static Document makeBasicConfig()
 	{
 		// create new doc
 		doc = ConfigUtil.getNewDocument();
 
+		//setup basic nodes
 		Element root = mkElement("Configuration");
 
-		root.appendChild(mkSupportedAlgorithmsNode());
-		root.appendChild(mkDatabaseNode());
+		root.appendChild(mkElement("AlgorithmPresets"));
+		root.appendChild(mkElement("TrackingGroups"));
 		root.appendChild(mkFileSystemNode());
-		root.appendChild(mkTrackingGroupsNode());
 
 		doc.appendChild(root);
 
@@ -42,8 +89,6 @@ class DefaultConfigGenerator
 	private static Element mkFileSystemNode()
 	{
 		Element fileSystem = mkElement("FileSystem");
-		fileSystem.appendChild(mkPathNode("ProductStagingFolder", "products"));
-		fileSystem.appendChild(mkPathNode("ExtractionFolder", "extractions"));
 		fileSystem.appendChild(mkPathNode("LogFolder", "logs"));
 		return fileSystem;
 	}
@@ -55,90 +100,6 @@ class DefaultConfigGenerator
 			element.setAttribute("name", name);
 		element.setAttribute("value", value);
 		return element;
-	}
-
-	private static Element mkDatabaseNode()
-	{
-		Element database = mkElement("Database");
-		database.appendChild(mkPathNode("DatabaseFile", "FileIndex.sqlite"));
-		return database;
-	}
-
-	private static Element mkSupportedAlgorithmsNode()
-	{
-		Element algorithms = mkElement("SupportedAlgorithms");
-		for (String algoName : AlgorithmRegistry.getAlgorithmNames())
-			algorithms.appendChild(
-							AlgorithmRegistry.getAlgorithmSpec(algoName).toElement(doc));
-		return algorithms;
-	}
-
-	private static Element mkParameterNode(String name, String value, boolean optional,
-					boolean enabled)
-	{
-		Element element = mkElement("Parameter");
-		element.setAttribute("name", name);
-		element.setAttribute("value", value);
-		element.setAttribute("optional", Boolean.toString(optional));
-		if (optional)
-			element.setAttribute("enabled", Boolean.toString(enabled));
-		return element;
-	}
-
-	private static Element mkTrackingGroupsNode()
-	{
-		Element trackingGroups = mkElement("TrackingGroups");
-
-		// Create Temporary Test Group
-		trackingGroups.appendChild(mkTestTrackingGroup());
-
-		return trackingGroups;
-	}
-
-	private static Element mkTestTrackingGroup()
-	{
-		// test tracking group:
-		Element testGroup = mkTrackingGroup("Test", "Normal", false);
-
-		// tracked paths
-		Element tracked = mkElement("Tracked");
-		tracked.appendChild(mkPathNode(null, "testGroupInput"));
-		testGroup.appendChild(tracked);
-
-		// untracked paths
-		Element untracked = mkElement("Untracked");
-		untracked.appendChild(mkPathNode(null, "testGroupInput/folder/untracked.txt"));
-		untracked.appendChild(mkPathNode(null, "testGroupInput/folder/untracked"));
-		testGroup.appendChild(untracked);
-
-		Element key = mkElement("Key");
-		key.setAttribute("name", "potatoes");
-		key.appendChild(mkParameterNode("Key File", "keys/key1.txt", true, true));
-		testGroup.appendChild(key);
-
-		testGroup.appendChild(AlgorithmRegistry.getDefaultAlgorithm("TextBlock")
-						.toElement(doc));
-
-		return testGroup;
-	}
-
-	/**
-	 * TODO: add params for working dir for temp files, special output dir that
-	 * otherwise defaults to filesystem one
-	 * 
-	 * @param groupName
-	 * @param isSecured
-	 * @param usesDatabase
-	 * @return
-	 */
-	private static Element mkTrackingGroup(String groupName, String securityLevel,
-					boolean usesDatabase)
-	{
-		Element trackingGroup = mkElement("Group");
-		trackingGroup.setAttribute("name", groupName);
-		trackingGroup.setAttribute("securityLevel", securityLevel);
-		trackingGroup.setAttribute("usesDatabase", Boolean.toString(usesDatabase));
-		return trackingGroup;
 	}
 
 }

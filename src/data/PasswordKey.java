@@ -9,6 +9,7 @@ public class PasswordKey implements Key
 	private String name;
 	private String groupName;
 	private byte[] keyHash;
+	private final String TYPE = "PasswordKey";
 
 	public PasswordKey(String keyName, String groupName)
 	{
@@ -47,6 +48,15 @@ public class PasswordKey implements Key
 	public String getName()
 	{
 		return name;
+	}
+
+	/* (non-Javadoc)
+	 * @see data.Key#getType()
+	 */
+	@Override
+	public String getType()
+	{
+		return TYPE;
 	}
 
 }
