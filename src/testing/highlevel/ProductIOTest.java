@@ -417,21 +417,21 @@ public class ProductIOTest
 		try
 		{
 			Files.walk(eclipse_installer.toPath()).filter(Files::isRegularFile)
-							.forEach((f) ->
-							{
-								File file = f.toFile();
+				.forEach((f) ->
+				{
+					File file = f.toFile();
 
-								if (!file.getParentFile().getName()
-												.equals(Constants.INDEX_FOLDER_NAME))
-								{
-									String relativized = inputFolder.toURI()
-													.relativize(file.toURI()).getPath();
-									if (relativized.endsWith(".lock"))
-										System.err.println("Relativized: " + relativized);
-									hashes.put(relativized, Hashing.hash(file));
-									oldFileCount[0] += 1;
-								}
-							});
+					if (!file.getParentFile().getName()
+									.equals(Constants.INDEX_FOLDER_NAME))
+					{
+						String relativized = inputFolder.toURI()
+										.relativize(file.toURI()).getPath();
+						if (relativized.endsWith(".lock"))
+							System.err.println("Relativized: " + relativized);
+						hashes.put(relativized, Hashing.hash(file));
+						oldFileCount[0] += 1;
+					}
+				});
 		}
 		catch (IOException e)
 		{
@@ -469,9 +469,9 @@ public class ProductIOTest
 		{
 			// read the file, make sure the fields are all the same
 			ProductExtractor reader =
-							new ProductExtractor(group.getProductReaderFactory());
-			reader.setExtractionFolder(extractionFolder);
-			ProductContents productContents = reader.extractAll(productFile);
+							new ProductExtractor(group, outputFolder);
+			group.setExtractionFolder(extractionFolder);
+			ProductContents productContents = reader.viewAll(productFile);
 			System.out.println(productFile.getPath());
 			System.out.println(productContents.toString());
 

@@ -2,10 +2,15 @@ package product;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.Queue;
+
+import algorithms.ProductIOException;
 import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
@@ -13,83 +18,36 @@ import util.Constants;
 import util.Hashing;
 import data.FileType;
 import data.Metadata;
+import data.PartAssembler;
+import data.TrackingGroup;
 
 public class ProductExtractor {
-
-	//delete factory member? can the factory ever become null?
-	//do we ever need another product?
-	//private final ProductFactory<? extends Product> factory;
 	
 	private ProductReader product;
 	private byte[] curFileHash;
 	private long curFragmentNumber;
-	private File extractionFolder;
 	private byte[] buffer;
+	private TrackingGroup group;
+	private File enclosingFolder;
+	private File curProductFile;
 	
-	public ProductExtractor(ProductReaderFactory<? extends ProductReader> factory)
+	
+	public ProductExtractor(TrackingGroup group, File enclosingFolder)
 	{
-		//this.factory = factory;
-		product = factory.createReader();
+		this.group = group;
+		setEnclosingFolder(enclosingFolder);
+		product = group.getProductReaderFactory().createReader();
 		
 		buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
 	}
-	/*
-	public ProductContents getProductHeader(File productFile)
-	{
-		assert(productFile.exists() && !productFile.isDirectory());
-		
-		if (!loadProduct(productFile))
-			return null;
 	
-		return readProductHeader(true);
+	public void setEnclosingFolder(File folder)
+	{
+		enclosingFolder = folder;
 	}
 	
-	
-	public ProductContents getProductContents(File productFile)
+	public ProductContents viewAll(File productFile)
 	{
-		assert(productFile.exists() && !productFile.isDirectory());
-		
-		if (!loadProduct(productFile))
-			return null;
-		
-		ProductContents contents = null;
-		
-		try
-		{
-			contents = readProductHeader(true);
-			while (product.getRemainingBytes() >= Constants.FRAGMENT_NUMBER_SIZE)
-			{
-				
-				FileContents fileContents = readNextFileHeader(true);
-				if (fileContents != null)
-				{
-					readNextFileData(false, fileContents.getMetadata().getFile());
-					
-					//at least get the metadata even if a failure occurred
-					contents.addFileContents(fileContents);
-				}
-				else
-				{
-					Logger.log(LogLevel.k_error, "Failed to extract next file from product: " + productFile.getPath());
-					break; // the metadata of a file was corrupted, probably not going to get back on track
-				}
-			}
-				
-		}
-		catch(Exception e)
-		{
-			System.out.println("Here1");
-			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
-		}
-		
-		return contents;
-	}
-	*/
-	
-	public ProductContents extractAll(File productFile)
-	{
-		assert(productFile.exists() && !productFile.isDirectory());
-		
 		//try to load the product file
 		if (!loadProduct(productFile))
 		{
@@ -97,8 +55,8 @@ public class ProductExtractor {
 		}
 		
 		//try to read the product header
-		ProductContents contents = readProductHeader(true);
-		if (contents == null)
+		ProductContents productContents = readProductHeader(true);
+		if (productContents == null)
 		{
 			Logger.log(LogLevel.k_debug, "The product header cannot be read: " + productFile.getName());
 			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
@@ -109,44 +67,478 @@ public class ProductExtractor {
 		FileContents fileContents = readNextFileHeader(true);
 		while (fileContents != null)
 		{
-			File extracted = readNextFileData(true, fileContents);
-			if (extracted != null)
-			{
-				fileContents.setExtractedFile(extracted.getParentFile());
-				contents.addFileContents(fileContents);
-			}
-			else
-			{
-				Logger.log(LogLevel.k_error, "Failed to extract file: " + fileContents.getMetadata().getPath());
-				//don't break, the file header was good so the next file might be ok?
-				//questionably the metadata without the attached file could be added here,
-				//but it's probably corrupted.
-			}
+			//add header information to product contents
+			productContents.addFileContents(fileContents);
 			
-			//try to get the next one
+			//skip over the file data
+			skipNextFileData(fileContents);
+			
+			//try to get the next header
 			fileContents = readNextFileHeader(true);
 		}
 			
-		//There were no files beyond the product header. This shouldn't happen, so it's probably
-		//a corrupted header.
-		if (contents.getFileContents().isEmpty())
+		if (productContents.getFileContents().isEmpty())
 		{
+			//There were no files beyond the product header. This shouldn't happen, so it's probably
+			//a corrupted header.
 			Logger.log(LogLevel.k_debug, "There were no files recovered from " + productFile.getPath());
 			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
+			
+			//return null even though the product header got parsed into something... it's
+			//probably not useful.
 			return null;
 		}
 		
-		return contents;
+		return productContents;
+	}
+	
+	private File assembleCurrentFileData(ProductContents origProductContents, FileContents origFileContents)
+	{
+		//create temporary hidden assembly folder
+		//TODO make this path configurable or put it on the same drive as the product files
+		File assemblyFolder = new File(".assembly");
+		if (assemblyFolder.exists())
+			assemblyFolder.mkdir();
+		
+		//create temporary file for loading all fragment data into
+		File assembling = new File(assemblyFolder, "assembling");
+		if (assembling.exists())
+		{
+			try
+			{
+				Files.delete(assembling.toPath());
+			}
+			catch (IOException e){}
+		}
+		
+		
+		BufferedOutputStream outStream = null;
+		try
+		{
+			outStream = new BufferedOutputStream(new FileOutputStream(assembling));
+			
+			FileContents curFileContents = origFileContents;
+			ProductContents curProductContents = origProductContents;
+			
+			//read the current file data
+			long bytesWritten = readNextFileData(curFileContents, outStream);
+			
+			//not finished unless all the bytes were read
+			boolean finished = bytesWritten == curFileContents.getRemainingData();
+			int increment = 1;
+			ProductExtractor curExtractor = this;
+			while (!finished)
+			{
+				//there are other fragments that need to be added,
+				//find the next product file
+				File nextProductFile = PartAssembler.findProductFile(curProductContents.getStreamUUID(),
+								curProductContents.getProductSequenceNumber() + increment,
+								curExtractor.enclosingFolder,
+								curExtractor.curProductFile.getAbsoluteFile().getParentFile());
+				
+				//the fragment we're looking for will be the first file in the next product
+				curExtractor = new ProductExtractor(group, enclosingFolder);
+				finished = curExtractor.extractFragmentData(nextProductFile, outStream);
+				
+				//now looking for the next next product file...
+				++increment;
+			}
+			
+			return assembling;
+		}
+		catch (IOException e)
+		{
+			Logger.log(LogLevel.k_error, "Failed to read file data.");
+			Logger.log(LogLevel.k_error, e, false);
+			
+			try
+			{
+				outStream.close();
+			}
+			catch (IOException | NullPointerException e2){}
+			
+			try 
+			{
+				Files.delete(assembling.toPath());
+			}
+			catch (IOException e2)
+			{
+				Logger.log(LogLevel.k_error, "The failed part file cannot be deleted: " + assembling.getAbsolutePath());
+				Logger.log(LogLevel.k_error, e2, false);
+			}
+			
+			return null;
+		}
+	}
+	
+	
+
+	/**
+	 * Pulls in the data from the first file only. It is assumed that this
+	 * will be a fragment from a previous file.
+	 * @param nextProductFile
+	 * @param outStream
+	 * @return True if this was the last fragment of that file, false 
+	 * if there's more data in a later file.
+	 * @throws ProductIOException 
+	 */
+	private boolean extractFragmentData(File productFile,
+					BufferedOutputStream outStream) throws ProductIOException
+	{
+		if (productFile.isDirectory())
+		{
+			Logger.log(LogLevel.k_error, "The product file is a "
+							+ "folder, use \"extractAllRecursive\": " + productFile.getName());
+			throw new ProductIOException("The product file is a folder: " + productFile.getAbsolutePath());
+		}
+		
+		//try to load the product file
+		if (!loadProduct(productFile))
+		{
+			throw new ProductIOException("Failed to load product file: " + productFile.getAbsolutePath());
+		}
+		
+		//try to read the product header
+		ProductContents productContents = readProductHeader(true);
+		if (productContents == null)
+		{
+			//if the product header can't be read,
+			//it's assumed that nothing else can be read
+			Logger.log(LogLevel.k_debug, "The product header cannot be read: " + productFile.getName());
+			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
+			throw new ProductIOException("Failed to extract product header from: " + productFile.getAbsolutePath());
+		}
+		
+		//this product contents will be the fragment we're looking for
+		FileContents fileContents = readNextFileHeader(true);
+
+		if (fileContents.getMetadata().getType().equals(FileType.k_file))
+		{
+			try
+			{
+				long bytesRead = readNextFileData(fileContents, outStream);
+				return bytesRead >= fileContents.getRemainingData();
+			}
+			catch (IOException e)
+			{
+				throw new ProductIOException("Failed to read first file data: " + 
+								fileContents.getMetadata().getFile().getPath());
+			}	
+		}
+		else
+		{
+			//the first thing in this product wasn't a file, so something's wrong
+			throw new ProductIOException("The first file in this product "
+							+ "was not a k_file type: " + productFile.getAbsolutePath());
+		}
+	}
+
+	public boolean extractAllFromProduct(File productFile)
+	{
+		if (productFile.isDirectory())
+		{
+			Logger.log(LogLevel.k_error, "The product file is a "
+							+ "folder, use \"extractAllRecursive\": " + productFile.getName());
+			return false;
+		}
+		
+		//try to load the product file
+		if (!loadProduct(productFile))
+		{
+			return false;
+		}
+		
+		//try to read the product header
+		ProductContents productContents = readProductHeader(true);
+		if (productContents == null)
+		{
+			//if the product header can't be read,
+			//it's assumed that nothing else can be read
+			Logger.log(LogLevel.k_debug, "The product header cannot be read: " + productFile.getName());
+			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
+			return false;
+		}
+		
+		//keep trying to read files until one can't be read
+		FileContents fileContents = readNextFileHeader(true);
+		while (fileContents != null)
+		{
+			if (fileContents.getMetadata().getType().equals(FileType.k_file))
+			{
+				
+				if (fileContents.getFragmentNumber() != Constants.FIRST_FRAGMENT_CODE)
+				{
+					//file fragments which are not the first fragment will be ignored
+					//it is assumed that these will be picked up later when we find
+					//the first fragment
+					skipNextFileData(fileContents);
+					
+					continue;
+				}
+				else
+				{
+					//assemble this file, if it has other fragments, follow the trail of products
+					File assembled = assembleCurrentFileData(productContents, fileContents);
+					
+					if (assembled != null)
+					{
+						PartAssembler.moveToExtractionFolder(assembled, fileContents, group);
+					}
+					else
+					{
+						Logger.log(LogLevel.k_error, "Failed to extract file: " +
+										fileContents.getMetadata().getPath());
+					}
+				}
+					
+			}
+			else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
+			{
+				PartAssembler.moveFolderToExtractionFolder(fileContents, group);
+			}
+			else //k_reference
+			{
+				byte[] refHash = fileContents.getMetadata().getFileHash();
+				byte[] refUUID = fileContents.getMetadata().getRefProductUUID();
+				long refStreamUUID = ByteConversion.getStreamUUID(refUUID);
+				int refSequenceNum = ByteConversion.getProductSequenceNumber(refUUID);
+				
+				File refProductFile = PartAssembler.findProductFile(refStreamUUID,
+								refSequenceNum, enclosingFolder, productFile.getParentFile());
+				
+				if (refProductFile == null)
+				{
+					Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
+									refStreamUUID + "_" + refSequenceNum);
+					continue;
+				}
+				else
+				{
+					ProductExtractor subExtractor = new ProductExtractor(group, enclosingFolder);
+					subExtractor.extractFileByFirstHashMatch(refProductFile, refHash);
+				}
+					
+			}
+			
+			//read next header
+			fileContents = readNextFileHeader(true);
+		}
+
+		return true;
+	}
+
+	
+
+	public boolean extractAllFromProductFolder(File productFolder)
+	{
+		if (!productFolder.isDirectory())
+		{
+			Logger.log(LogLevel.k_error, "The product folder is a "
+							+ "file, use \"extractAll\": " + productFolder.getName());
+			return false;
+		}
+		
+		//bfs through folders for product files
+		Queue<File> folders = new LinkedList<File>();
+		folders.add(productFolder);
+		
+		while (folders.size() > 0)
+		{
+			File folder = folders.poll();
+			for (File sub : folder.listFiles())
+			{
+				if (sub.isDirectory())
+					folders.add(sub);
+				else
+					extractAllFromProduct(sub);
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean extractFileByIndex(File productFile, int index)
+	{
+		if (productFile.isDirectory())
+		{
+			Logger.log(LogLevel.k_error, "The product file is a "
+							+ "folder, use \"extractAllRecursive\": " + productFile.getName());
+			return false;
+		}
+		
+		//try to load the product file
+		if (!loadProduct(productFile))
+		{
+			return false;
+		}
+		
+		//try to read the product header
+		ProductContents productContents = readProductHeader(true);
+		if (productContents == null)
+		{
+			//if the product header can't be read,
+			//it's assumed that nothing else can be read
+			Logger.log(LogLevel.k_debug, "The product header cannot be read: " + productFile.getName());
+			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
+			return false;
+		}
+		
+		int curIndex = 0;
+		
+		//keep trying to read files until one can't be read
+		FileContents fileContents = readNextFileHeader(true);
+		while (fileContents != null)
+		{
+			//wait until we're at the correct index
+			if (curIndex == index)
+			{
+				if (fileContents.getMetadata().getType().equals(FileType.k_file))
+				{
+					
+					//assemble this file, if it has other fragments, follow the trail of products
+					File assembled = assembleCurrentFileData(productContents, fileContents);
+					
+					if (assembled != null)
+					{
+						PartAssembler.moveToExtractionFolder(assembled, fileContents, group);
+					}
+					else
+					{
+						Logger.log(LogLevel.k_error, "Failed to extract file: " +
+										fileContents.getMetadata().getPath());
+					}	
+				}
+				else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
+				{
+					PartAssembler.moveFolderToExtractionFolder(fileContents, group);
+				}
+				else //k_reference
+				{
+					byte[] refHash = fileContents.getMetadata().getFileHash();
+					byte[] refUUID = fileContents.getMetadata().getRefProductUUID();
+					long refStreamUUID = ByteConversion.getStreamUUID(refUUID);
+					int refSequenceNum = ByteConversion.getProductSequenceNumber(refUUID);
+					
+					File refProductFile = PartAssembler.findProductFile(refStreamUUID,
+									refSequenceNum, enclosingFolder, productFile.getParentFile());
+					
+					if (refProductFile == null)
+					{
+						Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
+										refStreamUUID + "_" + refSequenceNum);
+						continue;
+					}
+					else
+					{
+						ProductExtractor subExtractor = new ProductExtractor(group, enclosingFolder);
+						subExtractor.extractFileByFirstHashMatch(refProductFile, refHash);
+					}	
+				}
+			}
+			else //this wasn't the correct index, just skip the data
+			{
+				skipNextFileData(fileContents);
+				continue;
+			}
+
+			//read next header
+			fileContents = readNextFileHeader(true);
+			
+			++curIndex;
+		}
+
+		return true;
+	}
+	
+	
+	/**
+	 * @update_comment
+	 * @param refProductFile
+	 * @param fileHash
+	 */
+	private boolean extractFileByFirstHashMatch(File productFile, byte[] fileHash)
+	{
+		if (productFile.isDirectory())
+		{
+			Logger.log(LogLevel.k_error, "The product file is a "
+							+ "folder, use \"extractAllRecursive\": " + productFile.getName());
+			return false;
+		}
+		
+		//try to load the product file
+		if (!loadProduct(productFile))
+		{
+			return false;
+		}
+		
+		//try to read the product header
+		ProductContents productContents = readProductHeader(true);
+		if (productContents == null)
+		{
+			//if the product header can't be read,
+			//it's assumed that nothing else can be read
+			Logger.log(LogLevel.k_debug, "The product header cannot be read: " + productFile.getName());
+			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
+			return false;
+		}
+		
+		//keep trying to read files until one can't be read
+		FileContents fileContents = readNextFileHeader(true);
+		while (fileContents != null)
+		{
+			if (fileContents.getMetadata().getType().equals(FileType.k_file))
+			{
+				byte[] curHash = fileContents.getMetadata().getFileHash();
+				if (ByteConversion.bytesEqual(curHash, fileHash))
+				{
+					//assemble this file, if it has other fragments, follow the trail of products
+					File assembled = assembleCurrentFileData(productContents, fileContents);
+					
+					if (assembled != null)
+					{
+						PartAssembler.moveToExtractionFolder(assembled, fileContents, group);
+						return true;
+					}
+					else
+					{
+						Logger.log(LogLevel.k_error, "Failed to extract file: " +
+										fileContents.getMetadata().getPath());
+						return false;
+					}
+				}
+				else
+				{
+					//skip on to the next file if this one didn't match
+					skipNextFileData(fileContents);
+				}	
+			}
+			
+			//file types which aren't k_file don't have file data,
+			//so, nothing to skip
+			
+			//read next header
+			fileContents = readNextFileHeader(true);
+		}
+
+		//couldn't find the file
+		Logger.log(LogLevel.k_error, "Failed to find file with hash: " +
+						ByteConversion.bytesToHex(fileHash) + " in product file: " +
+						productFile.getName());
+		return false;
 	}
 	
 	private boolean loadProduct(File productFile)
 	{
-		try {
+		curProductFile = productFile;
+		
+		try
+		{
 			product.loadFile(productFile);
 			Logger.log(LogLevel.k_debug, "Loaded Product File for Reading: " + productFile.getName());
 		}
 		catch (IOException e)
 		{
+			curProductFile = null;
 			Logger.log(LogLevel.k_error, "Failed to load product file " + productFile.getName());
 			Logger.log(LogLevel.k_error, e, false);
 			return false;
@@ -154,56 +546,6 @@ public class ProductExtractor {
 		
 		return true;
 	}
-
-	/*
-	public FileContents extractFile(byte[] hash, File productFile)
-	{
-		assert(productFile.exists() && !productFile.isDirectory());
-		
-		if (!loadProduct(productFile))
-			return null;
-		
-		try
-		{
-			readProductHeader(false);
-			
-			while (product.getRemainingBytes() >= Constants.FRAGMENT_NUMBER_SIZE)
-			{
-				FileContents fileContents = readNextFileHeader(true);
-				if (fileContents != null)
-				{
-					if (ByteConversion.bytesEqual(fileContents.getMetadata().getFileHash(), hash))
-					{
-						File extracted = readNextFileData(true, fileContents.getMetadata().getFile());
-						if (extracted != null)
-						{
-							fileContents.setExtractedFile(extracted);
-							return fileContents;
-						}
-						else
-						{
-							Logger.log(LogLevel.k_error, "Failed to extract file: " + fileContents.getMetadata().getPath());
-							break;
-						}
-					}
-				}
-				else
-				{
-					//either we've reached the end of the product file, or it was corrupted
-					break;
-				}
-			}
-				
-		}
-		catch(Exception e)
-		{
-			System.out.println("Here3");
-			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
-		}
-		
-		return null;
-	}
-	*/
 	
 	private boolean readFull(int length)
 	{
@@ -234,16 +576,7 @@ public class ProductExtractor {
 			}
 			
 			//setup contents
-			ProductContents contents;
-			if (parseData)
-			{
-				contents = new ProductContents();
-			}
-			else
-			{
-				contents = null;
-			}
-			
+			ProductContents contents = new ProductContents();
 
 			//product version
 			if (parseData)
@@ -389,7 +722,6 @@ public class ProductExtractor {
 				contents.setFragmentNumber(curFragmentNumber);
 			}
 			
-			System.out.println("End code? " + (curFragmentNumber == Constants.END_CODE) + " " + curFragmentNumber);
 			//if end code, no more files
 			if (curFragmentNumber == Constants.END_CODE)
 			{
@@ -560,116 +892,47 @@ public class ProductExtractor {
 		}
 	}
 	
-	private File readNextFileData(boolean saveData, FileContents fileContents)
+	
+	private void skipNextFileData(FileContents fileContents)
 	{
 		long fileLengthRemaining = fileContents.getRemainingData();
 		
-		if (saveData)
-		{	
-			//create part file
-			File partFile = getPartFileName(fileContents.getMetadata().getFile(), curFragmentNumber);
-			if (!partFile.getParentFile().exists())
-				partFile.getParentFile().mkdir();
-			
-			BufferedOutputStream bos = null;
-			try
-			{
-				bos = new BufferedOutputStream(new FileOutputStream(partFile));
-				while (fileLengthRemaining > 0)
-				{
-					//read from product
-					int dataLength = (int) Math.min(buffer.length, fileLengthRemaining);
-					int bytesRead = product.read(buffer, 0, dataLength);
-					
-					if (bytesRead == 0)
-					{
-						//no more data can be read from the product
-						break;
-					}
-					
-					fileLengthRemaining -= bytesRead;
-					
-					//write out to part file
-					bos.write(buffer, 0, bytesRead);
-				}
-				
-				bos.close();
-				Logger.log(LogLevel.k_info, "Extracted part file: " + partFile.getAbsolutePath());
-				return partFile;
-			}
-			catch (Exception e)
-			{
-				Logger.log(LogLevel.k_error, "Failed to read file data.");
-				Logger.log(LogLevel.k_error, e, false);
-				
-				//try to close the stream
-				if (bos != null)
-				{
-					try {
-						bos.close();
-					} catch (IOException e1) {
-						Logger.log(LogLevel.k_error, "The output stream cannot be closed.");
-						Logger.log(LogLevel.k_error, e1, false);
-					}
-				}
-				
-				//try to remove the failed part file
-				if (partFile.exists())
-				{
-					Path partFilePath = partFile.getAbsoluteFile().toPath();
-					if (partFile.isDirectory())
-					{
-						Logger.log(LogLevel.k_debug, "The partfile is a directory, something is wrong: " + partFilePath.toString());
-					}
-					else
-					{
-						try {
-							Files.delete(partFilePath);
-						} catch (IOException e1) {
-							Logger.log(LogLevel.k_error, "The failed part file cannot be deleted: " + partFilePath.toString());
-							Logger.log(LogLevel.k_error, e1, false);
-						}
-					}
-				}
-				return null;
-			}
-		}
-		else
+		//This might try to over-read because fileLengthRemaining could be more
+		//than what's left in the product if the file continues on in the next
+		//product. If it does, nothing bad should happen.
+		skipFull(fileLengthRemaining);
+	}
+	
+	private long readNextFileData(FileContents fileContents, BufferedOutputStream output) throws IOException
+	{
+		long fileLengthRemaining = fileContents.getRemainingData();
+		long totalBytesRead = 0;
+
+		while (fileLengthRemaining > 0)
 		{
-			//This might try to over-read because fileLengthRemaining could be more
-			//than what's left in the product if the file continues on in the next
-			//product. If it does, nothing bad should happen.
-			skipFull(fileLengthRemaining);
-	
-			//returning null regardless
-			return null;
+			//read from product
+			int dataLength = (int) Math.min(buffer.length, fileLengthRemaining);
+			int bytesRead = product.read(buffer, 0, dataLength);
+			totalBytesRead += bytesRead;
+			
+			if (bytesRead == 0)
+			{
+				//no more data can be read from the product
+				//this is a normal, it happens when there is
+				//an additional fragment after this one.
+				break;
+			}
+			
+			fileLengthRemaining -= bytesRead;
+			
+			//write out to part file
+			output.write(buffer, 0, bytesRead);
 		}
-	}
-	
-
-	private File getPartFileName(File origFile, long fragmentNumber)
-	{
-		byte[] pathHash = Hashing.hash(origFile.getAbsolutePath().getBytes());
-		String fileID = Integer.toString(Math.abs(ByteConversion.bytesToInt(pathHash, 0)));
-		String path = extractionFolder.getAbsolutePath() + "/" + fileID + "/" + fileID +
-				"_" + fragmentNumber + ".part";
 		
-		return new File(path);
-	}
-
-	/**
-	 * @return the extractionFolder
-	 */
-	public File getExtractionFolder()
-	{
-		return extractionFolder;
-	}
-
-	/**
-	 * @param extractionFolder the extractionFolder to set
-	 */
-	public void setExtractionFolder(File extractionFolder)
-	{
-		this.extractionFolder = extractionFolder;
+		output.flush();
+		
+		Logger.log(LogLevel.k_info, "Extracted file data belonging to: " + 
+						fileContents.getMetadata().getFile().getPath());
+		return totalBytesRead;
 	}
 }

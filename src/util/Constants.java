@@ -30,9 +30,10 @@ public abstract class Constants
 	public static final int MAX_READ_BUFFER_SIZE = 50000000;
 	public static final long END_CODE = Long.MAX_VALUE;
 	public static final long END_CODE_SIZE = 8;
-	public static final long EMPTY_FOLDER_CODE = -5;
 	public static final String INDEX_FOLDER_NAME =
 					"." + Constants.APPLICATION_NAME_SHORT.toLowerCase();
+	public static final long FIRST_FRAGMENT_CODE = 1;
+	public static final long NOT_FRAGMENT_CODE = -1;
 
 	// io data field lengths
 	public static final int STREAM_UUID_SIZE = 8;
@@ -54,6 +55,8 @@ public abstract class Constants
 	public static final int FILE_PERMISSIONS_SIZE = 1;
 	public static final int FILE_LENGTH_REMAINING_SIZE = 8;
 	public static final int FILE_TYPE_SIZE = 1;
+	
+	
 	
 	
 	

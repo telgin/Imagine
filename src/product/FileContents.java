@@ -3,10 +3,10 @@ package product;
 import java.io.File;
 
 import data.Metadata;
+import util.Constants;
 
 public class FileContents
 {
-	private boolean fragment;
 	private long fragmentNumber;
 	private long remainingData;
 	private File extractedFile;
@@ -15,7 +15,6 @@ public class FileContents
 	public String toString()
 	{
 		String text = "FileContents:";
-		text += "\nFragment? " + fragment;
 		text += "\nfragmentNumber " + fragmentNumber;
 		text += "\nremainingData " + remainingData;
 		if (extractedFile == null)
@@ -24,23 +23,6 @@ public class FileContents
 			text += "\nextractedFile " + extractedFile.getName();
 		text += "\n" + metadata.toString();
 		return text;
-	}
-
-	/**
-	 * @return the fragment
-	 */
-	public boolean isFragment()
-	{
-		return fragment;
-	}
-
-	/**
-	 * @param fragment
-	 *            the fragment to set
-	 */
-	private void setFragment(boolean fragment)
-	{
-		this.fragment = fragment;
 	}
 
 	/**
@@ -58,7 +40,6 @@ public class FileContents
 	public void setFragmentNumber(long fragmentNumber)
 	{
 		this.fragmentNumber = fragmentNumber;
-		setFragment(fragmentNumber != 0);
 	}
 
 	/**

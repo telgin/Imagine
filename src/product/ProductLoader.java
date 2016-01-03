@@ -229,8 +229,7 @@ public class ProductLoader
 			reader = null;
 		}
 		
-		//fragment number starts at 1
-		long fragmentNumber = 1;
+		long fragmentNumber = Constants.FIRST_FRAGMENT_CODE;
 
 		// save off the first product uuid where we're saving the file
 		// it might actually start in the next one if we're out of space in this
@@ -388,15 +387,15 @@ public class ProductLoader
 
 		do
 		{
-			System.out.println("Bytes requested to be written: " + (dataLength));
+			//System.out.println("Bytes requested to be written: " + (dataLength));
 			int bytesWritten = currentProduct.write(buffer, dataOffset, dataLength);
-			System.out.println("Buffer length: " + buffer.length);
-			System.out.println("bytes written: " + bytesWritten);
+			//System.out.println("Buffer length: " + buffer.length);
+			//System.out.println("bytes written: " + bytesWritten);
 			dataOffset += bytesWritten;
 			dataLength -= bytesWritten;
 			fileLengthRemaining -= bytesWritten;
 
-			System.out.println("File length remaining: " + fileLengthRemaining);
+			//System.out.println("File length remaining: " + fileLengthRemaining);
 
 			if (dataOffset == buffer.length)
 			{

@@ -1,4 +1,4 @@
-package testing;
+package scratch;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,6 +34,7 @@ import data.TrackingGroup;
 import database.derby.EmbeddedDB;
 import product.ProductContents;
 import product.ProductLoader;
+import treegenerator.TreeGenerator;
 import product.ProductExtractor;
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
@@ -52,37 +53,65 @@ public class Scratch {
 		
 		
 		
+
 		
-		EmbeddedDB db = new EmbeddedDB();
-		
-		
-		Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("TextBlock");
 		
 		//tracking group setup
+		Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("TextBlock");
 		String keyName = "testKeyName";
 		String groupName = "Cheese and other Cheese";
 		Key key = new FileKey(keyName, groupName, new File("testing/keys/key1.txt"));
-
 		TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
-		
-		Metadata fileMetadata = FileSystemUtil.loadMetadataFromFile(new File("testing/keys/key1.txt"));
-		db.saveFileHash(fileMetadata, group);
-		
-		fileMetadata.setProductUUID(new byte[64]);
-		db.saveProductUUID(fileMetadata, group);
-		
-		//System.out.println();
+		group.addTrackedPath("testing/scratch/bigTree");
 		
 		
-		db.display();
-		
-		
-		db.shutdown();
+		File treeFile = new File("testing/scratch/tree3.xml");
+		TreeGenerator tg = new TreeGenerator(group);
+		tg.generateTree();
+		tg.save(treeFile);
 		
 		
 		
 		
-	}
+		
+		
+		
+		
+		
+		
+		
+	}		
+		
+//		EmbeddedDB db = new EmbeddedDB();
+//		
+//		
+//		Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("TextBlock");
+//		
+//		//tracking group setup
+//		String keyName = "testKeyName";
+//		String groupName = "Cheese and other Cheese";
+//		Key key = new FileKey(keyName, groupName, new File("testing/keys/key1.txt"));
+//
+//		TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
+//		
+//		Metadata fileMetadata = FileSystemUtil.loadMetadataFromFile(new File("testing/keys/key1.txt"));
+//		db.saveFileHash(fileMetadata, group);
+//		
+//		fileMetadata.setProductUUID(new byte[64]);
+//		db.saveProductUUID(fileMetadata, group);
+//		
+//		//System.out.println();
+//		
+//		
+//		db.display();
+//		
+//		
+//		db.shutdown();
+		
+		
+		
+		
+	
 		
 		
 		
