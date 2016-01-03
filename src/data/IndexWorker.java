@@ -3,6 +3,7 @@ package data;
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import org.w3c.dom.Element;
@@ -27,6 +28,8 @@ public class IndexWorker implements Runnable
 	private boolean shuttingDown;
 	private boolean active;
 	private Element root;
+	private List<Metadata> deferred;
+	private DeferredQueuer dq;
 
 	public IndexWorker(BlockingQueue<Metadata> queue, Element tree,
 					TrackingGroup trackingGroup)
@@ -36,6 +39,8 @@ public class IndexWorker implements Runnable
 		shuttingDown = false;
 		active = true;
 		root = tree;
+		deferred = new LinkedList<Metadata>();
+		dq = new DeferredQueuer();
 	}
 
 
@@ -48,6 +53,10 @@ public class IndexWorker implements Runnable
 	public void run()
 	{
 		active = true;
+		
+		//start the thread which adds deferred references when
+		//after the original file is updated in the database
+		new Thread(dq).start();
 
 		Logger.log(LogLevel.k_debug, "Index worker running, " + 
 						root.getElementsByTagName("file").getLength() +
@@ -62,15 +71,6 @@ public class IndexWorker implements Runnable
 		}
 
 		active = false;
-
-		// wait to check again for more files
-		try
-		{
-			Thread.sleep(1000);
-		}
-		catch (InterruptedException e)
-		{
-		}
 	}
 
 	/**
@@ -107,11 +107,25 @@ public class IndexWorker implements Runnable
 //				if (trackingGroup.isUsingDatabase())
 //				{
 				
-				
+				//TODO stuff that is queued only needs to wait for the db
+				//to update the record before queuing a reference
 				
 				//check to see if the file hash was already added earlier
-				if (!Database.containsFileHash(fileMetadata.getFileHash(), trackingGroup) && 
-								!Database.isQueued(fileMetadata, trackingGroup))
+				if (Database.isQueued(fileMetadata, trackingGroup))
+				{
+					//the file to which a reference will be made to hasn't
+					//been loaded yet. we must wait until it's loaded.
+					fileMetadata.setType(FileType.k_reference);
+					
+					Logger.log(LogLevel.k_debug, "Deferring metadata reference for file: " + 
+									fileMetadata.getFile().getAbsolutePath());
+					
+					deferred.add(fileMetadata);
+					
+					//show on the element that the file will not be converted directly
+					ele.setAttribute("reference", "1");
+				}
+				else if (!Database.containsFileHash(fileMetadata.getFileHash(), trackingGroup))
 				{
 					fileMetadata.setType(FileType.k_file);
 					
@@ -126,9 +140,10 @@ public class IndexWorker implements Runnable
 				}
 				else
 				{
+					//this file is contained within the database already, so it's a reference
 					fileMetadata.setType(FileType.k_reference);
 					
-					//the fall was alread queued or added, so just add a reference
+					//the file was already queued or added, so just add a reference
 					Logger.log(LogLevel.k_debug, "Queueing metadata reference for file: " + 
 									fileMetadata.getFile().getAbsolutePath());
 					queue.add(fileMetadata);
@@ -172,6 +187,57 @@ public class IndexWorker implements Runnable
 	{
 		// System.out.println("Returning active state: " + active + ", " +
 		// initialFolders.size() + " initialFolders left");
-		return active;
+		return active || dq.isActive();
+	}
+	
+	private class DeferredQueuer implements Runnable
+	{
+
+		private boolean deferredActive = false;
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run()
+		{
+			deferredActive = true;
+			
+			while (!shuttingDown)
+			{
+				deferredActive = !deferred.isEmpty();
+				
+				for (int i=0; i<deferred.size(); ++i)
+				{
+					Metadata metadata = deferred.get(i);
+					if (Database.containsFileHash(metadata.getFileHash(), trackingGroup))
+					{
+						Logger.log(LogLevel.k_debug, "Queueing metadata reference for file: " + 
+										metadata.getFile().getAbsolutePath());
+						queue.add(metadata);
+						
+						//remove metadata from deferred list
+						deferred.remove(i);
+						--i;
+					}
+				}
+				
+				try
+				{
+					Thread.sleep(1000);
+				}
+				catch (InterruptedException e){}
+			}
+			
+			deferredActive = false;
+		}
+
+		/**
+		 * @return the active
+		 */
+		public boolean isActive()
+		{
+			return deferredActive;
+		}
 	}
 }
