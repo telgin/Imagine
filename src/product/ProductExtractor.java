@@ -11,6 +11,7 @@ import logging.Logger;
 import util.ByteConversion;
 import util.Constants;
 import util.Hashing;
+import data.FileType;
 import data.Metadata;
 
 public class ProductExtractor {
@@ -143,7 +144,9 @@ public class ProductExtractor {
 		try {
 			product.loadFile(productFile);
 			Logger.log(LogLevel.k_debug, "Loaded Product File for Reading: " + productFile.getName());
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			Logger.log(LogLevel.k_error, "Failed to load product file " + productFile.getName());
 			Logger.log(LogLevel.k_error, e, false);
 			return false;
@@ -230,128 +233,130 @@ public class ProductExtractor {
 				product.secureStream();
 			}
 			
-			//in this case, the code for reading and skipping is substantially different
+			//setup contents
+			ProductContents contents;
 			if (parseData)
 			{
-				ProductContents contents = new ProductContents();
+				contents = new ProductContents();
+			}
+			else
+			{
+				contents = null;
+			}
+			
 
-				//product version
+			//product version
+			if (parseData)
+			{
 				if (!readFull(Constants.PRODUCT_VERSION_NUMBER_SIZE))
 					return null;
 				contents.setProductVersionNumber(ByteConversion.byteToInt(buffer[0]));
-				
-				//algorithm name length
-				if (!readFull(Constants.ALGORITHM_NAME_LENGTH_SIZE))
+			}
+			else
+			{
+				if (!skipFull(Constants.PRODUCT_VERSION_NUMBER_SIZE))
 					return null;
-				short algorithmNameLength = ByteConversion.bytesToShort(buffer, 0);
+			}
 				
-				//algorithm name
+			//algorithm name length
+			if (!readFull(Constants.ALGORITHM_NAME_LENGTH_SIZE))
+				return null;
+			short algorithmNameLength = ByteConversion.bytesToShort(buffer, 0);
+				
+			//algorithm name
+			if (parseData)
+			{
 				if (!readFull(algorithmNameLength))
 					return null;
 				contents.setAlgorithmName(new String(buffer, 0, algorithmNameLength));
+			}
+			else
+			{
+				if (!skipFull(algorithmNameLength))
+					return null;
+			}
 				
-				//algorithm version
+			//algorithm version
+			if (parseData)
+			{
 				if (!readFull(Constants.ALGORITHM_VERSION_NUMBER_SIZE))
 					return null;
 				contents.setAlgorithmVersionNumber(ByteConversion.byteToInt(buffer[0]));
-
-				//stream uuid
-				contents.setStreamUUID(ByteConversion.getStreamUUID(product.getUUID()));
-				
-				//product sequence number
-				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(product.getUUID()));
-				
-				//group name length
-				if (!readFull(Constants.GROUP_NAME_LENGTH_SIZE))
+			}
+			else
+			{
+				if (!skipFull(Constants.ALGORITHM_VERSION_NUMBER_SIZE))
 					return null;
-				short groupNameLength = ByteConversion.bytesToShort(buffer, 0);
-				System.out.println("groupNameLength: " + groupNameLength);
+			}
+			
+			//stream uuid
+			if (parseData)
+			{
+				contents.setStreamUUID(ByteConversion.getStreamUUID(product.getUUID()));
+			}
+			else
+			{
+				if (!skipFull(Constants.STREAM_UUID_SIZE))
+					return null;
+			}
 				
-				//group name
+			//product sequence number
+			if (parseData)
+			{
+				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(product.getUUID()));
+			}
+			else
+			{
+				if (!skipFull(Constants.PRODUCT_SEQUENCE_NUMBER_SIZE))
+					return null;
+			}
+				
+			//group name length
+			if (!readFull(Constants.GROUP_NAME_LENGTH_SIZE))
+				return null;
+			short groupNameLength = ByteConversion.bytesToShort(buffer, 0);
+			System.out.println("groupNameLength: " + groupNameLength);
+				
+			//group name
+			if (parseData)
+			{
 				if (!readFull(groupNameLength))
 					return null;
 				contents.setGroupName(new String(buffer, 0, groupNameLength));
-				
-				//group key name length
-				if (!readFull(Constants.GROUP_KEY_NAME_LENGTH_SIZE))
+			}
+			else
+			{
+				if (!skipFull(groupNameLength))
 					return null;
-				short groupKeyNameLength = ByteConversion.bytesToShort(buffer, 0);
-				System.out.println("Read group key name length of: " + groupKeyNameLength);
+			}
+			
+			//group key name length
+			if (!readFull(Constants.GROUP_KEY_NAME_LENGTH_SIZE))
+				return null;
+			short groupKeyNameLength = ByteConversion.bytesToShort(buffer, 0);
+			//System.out.println("Read group key name length of: " + groupKeyNameLength);
 				
-				//group key name
+			//group key name
+			if (parseData)
+			{
 				if (!readFull(groupKeyNameLength))
 					return null;
 				contents.setGroupKeyName(new String(buffer, 0, groupKeyNameLength));
 				System.out.println("Read group key name of: " + new String(buffer, 0, groupKeyNameLength));
-				
-				//secure products secure the stream now
-				if (product.getProductMode().equals(ProductMode.SECURE))
-				{
-					product.secureStream();
-				}
-				
-				System.out.println(contents);
-				
-				return contents;
 			}
-			else // don't parse, skip when possible
+			else
 			{
-				//if a product used the uuid when the loader first set it, it will have
-				//retrieved it upon reset
-				//TODO this won't work, combine reading and skipping sections, include stream securing
-				
-				//product version
-				if (!skipFull(1))
-					return null;
-				
-				//algorithm name length
-				if (!readFull(Constants.ALGORITHM_NAME_LENGTH_SIZE))
-					return null;
-				short groupAlgorithmLength = ByteConversion.bytesToShort(buffer, 0);
-				
-				//algorithm name
-				if (!skipFull(groupAlgorithmLength))
-					return null;
-				
-				//algorithm version
-				if (!skipFull(1))
-					return null;
-				
-				//product uuid:
-				//stream uuid
-				if (!skipFull(Constants.STREAM_UUID_SIZE))
-					return null;
-				
-				//product sequence number
-				if (!skipFull(Constants.PRODUCT_SEQUENCE_NUMBER_SIZE))
-					return null;
-				
-				//group name length
-				if (!readFull(Constants.GROUP_NAME_LENGTH_SIZE))
-					return null;
-				short groupNameLength = ByteConversion.bytesToShort(buffer, 0);
-				
-				//group name
-				if (!skipFull(groupNameLength))
-					return null;
-				
-				//group key name length
-				if (!readFull(Constants.GROUP_KEY_NAME_LENGTH_SIZE))
-					return null;
-				short groupKeyNameLength = ByteConversion.bytesToShort(buffer, 0);
-				
-				//group key name
 				if (!skipFull(groupKeyNameLength))
 					return null;
-				
-				//secure products secure the stream now
-				if (product.getProductMode().equals(ProductMode.SECURE))
-				{
-					product.secureStream();
-				}
-				
-				return null;
 			}
+				
+			//secure products secure the stream now
+			if (product.getProductMode().equals(ProductMode.SECURE))
+			{
+				product.secureStream();
+			}
+				
+			return contents;
 		}
 		catch (Exception e)
 		{
@@ -384,7 +389,7 @@ public class ProductExtractor {
 				contents.setFragmentNumber(curFragmentNumber);
 			}
 			
-			System.out.println("End code? " + curFragmentNumber + " " + (curFragmentNumber == Constants.END_CODE));
+			System.out.println("End code? " + (curFragmentNumber == Constants.END_CODE) + " " + curFragmentNumber);
 			//if end code, no more files
 			if (curFragmentNumber == Constants.END_CODE)
 			{
@@ -392,85 +397,153 @@ public class ProductExtractor {
 				return null;
 			}
 			
-			//file hash
-			if (parseData)
-			{
-				if (!readFull(Constants.FILE_HASH_SIZE))
-					return null;
-				curFileHash = ByteConversion.subArray(buffer, 0, Constants.FILE_HASH_SIZE);
-				System.out.println(ByteConversion.bytesToHex((curFileHash)));
-				contents.getMetadata().setFileHash(curFileHash);
-			}
-			else
-			{
-				if (!skipFull(Constants.FILE_HASH_SIZE))
-					return null;
-			}
-			
-			//file name length
-			if (!readFull(Constants.FILE_NAME_LENGTH_SIZE))
+			//file type
+			if (!readFull(Constants.FILE_TYPE_SIZE))
 				return null;
-			short fileNameLength = ByteConversion.bytesToShort(buffer, 0);
+			int fileTypeNum = ByteConversion.byteToInt(buffer[0]);
+			System.out.println("File type number: " + fileTypeNum);
+			FileType fileType = FileType.toFileType(fileTypeNum);
+			contents.getMetadata().setType(fileType);
 			
-			System.out.println("Read file name length of " + fileNameLength);
-			
-			//file name
-			if (parseData)
+			//file or reference type:
+			if (fileType.equals(FileType.k_file) || fileType.equals(FileType.k_reference))
 			{
-				if (!readFull(fileNameLength))
+				//file hash
+				if (parseData)
+				{
+					if (!readFull(Constants.FILE_HASH_SIZE))
+						return null;
+					curFileHash = ByteConversion.subArray(buffer, 0, Constants.FILE_HASH_SIZE);
+					System.out.println(ByteConversion.bytesToHex((curFileHash)));
+					contents.getMetadata().setFileHash(curFileHash);
+				}
+				else
+				{
+					if (!skipFull(Constants.FILE_HASH_SIZE))
+						return null;
+				}
+				
+				//file name length
+				if (!readFull(Constants.FILE_NAME_LENGTH_SIZE))
 					return null;
-				contents.getMetadata().setFile(new File(new String(buffer, 0, fileNameLength)));
+				short fileNameLength = ByteConversion.bytesToShort(buffer, 0);
+				
+				System.out.println("Read file name length of " + fileNameLength);
+				
+				//file name
+				if (parseData)
+				{
+					if (!readFull(fileNameLength))
+						return null;
+					contents.getMetadata().setFile(new File(new String(buffer, 0, fileNameLength)));
+				}
+				else
+				{
+					if (!skipFull(fileNameLength))
+						return null;
+				}
+				
+				//date created
+				if (parseData)
+				{
+					if (!readFull(Constants.DATE_CREATED_SIZE))
+						return null;
+					contents.getMetadata().setDateCreated(ByteConversion.bytesToLong(buffer, 0));
+				}
+				else
+				{
+					if (!skipFull(Constants.DATE_CREATED_SIZE))
+						return null;
+				}
+				
+				//date modified
+				if (parseData)
+				{
+					if (!readFull(Constants.DATE_MODIFIED_SIZE))
+						return null;
+					contents.getMetadata().setDateModified(ByteConversion.bytesToLong(buffer, 0));
+				}
+				else
+				{
+					if (!skipFull(Constants.DATE_MODIFIED_SIZE))
+						return null;
+				}
+				
+				//permissions
+				if (parseData)
+				{
+					if (!readFull(Constants.PERMISSIONS_SIZE))
+						return null;
+					contents.getMetadata().setPermissions(ByteConversion.bytesToShort(buffer, 0));
+				}
+				else
+				{
+					if (!skipFull(Constants.PERMISSIONS_SIZE))
+						return null;
+				}
+				
+				//file length remaining
+				if (!readFull(Constants.FILE_LENGTH_REMAINING_SIZE))
+					return null;
+				contents.setRemainingData(ByteConversion.bytesToLong(buffer, 0));
+				
+				if (fileType.equals(FileType.k_reference))
+				{
+					//pf1uuid
+					if (parseData)
+					{
+						if (!readFull(Constants.PRODUCT_UUID_SIZE))
+							return null;
+						
+						contents.getMetadata().setRefProductUUID(
+										ByteConversion.subArray(buffer, 0, Constants.PRODUCT_UUID_SIZE));
+					}
+					else
+					{
+						if (!skipFull(Constants.PRODUCT_UUID_SIZE))
+							return null;
+					}
+					
+					//fragment count
+					if (parseData)
+					{
+						if (!readFull(Constants.FRAGMENT_NUMBER_SIZE))
+							return null;
+						
+						contents.getMetadata().setFragmentCount(ByteConversion.bytesToLong(buffer, 0));
+					}
+					else
+					{
+						if (!skipFull(Constants.FRAGMENT_NUMBER_SIZE))
+							return null;
+					}
+				}
 			}
 			else
 			{
-				if (!skipFull(fileNameLength))
+				//folder type:
+				
+				//file name length
+				if (!readFull(Constants.FILE_NAME_LENGTH_SIZE))
 					return null;
+				short fileNameLength = ByteConversion.bytesToShort(buffer, 0);
+				
+				System.out.println("Read file name length of " + fileNameLength);
+				
+				//file name
+				if (parseData)
+				{
+					if (!readFull(fileNameLength))
+						return null;
+					contents.getMetadata().setFile(new File(new String(buffer, 0, fileNameLength)));
+				}
+				else
+				{
+					if (!skipFull(fileNameLength))
+						return null;
+				}
 			}
-			
-			//date created
-			if (parseData)
-			{
-				if (!readFull(Constants.DATE_CREATED_SIZE))
-					return null;
-				contents.getMetadata().setDateCreated(ByteConversion.bytesToLong(buffer, 0));
-			}
-			else
-			{
-				if (!skipFull(Constants.DATE_CREATED_SIZE))
-					return null;
-			}
-			
-			//date modified
-			if (parseData)
-			{
-				if (!readFull(Constants.DATE_MODIFIED_SIZE))
-					return null;
-				contents.getMetadata().setDateModified(ByteConversion.bytesToLong(buffer, 0));
-			}
-			else
-			{
-				if (!skipFull(Constants.DATE_MODIFIED_SIZE))
-					return null;
-			}
-			
-			//permissions
-			if (parseData)
-			{
-				if (!readFull(Constants.PERMISSIONS_SIZE))
-					return null;
-				contents.getMetadata().setPermissions(ByteConversion.bytesToShort(buffer, 0));
-			}
-			else
-			{
-				if (!skipFull(Constants.PERMISSIONS_SIZE))
-					return null;
-			}
-			
-			//file length remaining
-			if (!readFull(Constants.FILE_LENGTH_REMAINING_SIZE))
-				return null;
-			contents.setRemainingData(ByteConversion.bytesToLong(buffer, 0));
-			
+				
 			System.out.println("parse data? " + parseData);
 			if (contents != null)
 				System.out.println(contents.toString());

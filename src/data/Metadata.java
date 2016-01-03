@@ -10,6 +10,7 @@ public class Metadata
 	private byte[] fileHash;
 	private File file;
 	private byte[] productUUID;
+	private byte[] refProductUUID;
 	private long fragmentCount;
 	private short permissions;
 	private boolean emptyFolder;
@@ -193,6 +194,22 @@ public class Metadata
 	public void setType(FileType type)
 	{
 		this.type = type;
+	}
+
+	/**
+	 * @return the refProductUUID
+	 */
+	public byte[] getRefProductUUID()
+	{
+		return refProductUUID;
+	}
+
+	/**
+	 * @param refProductUUID the refProductUUID to set
+	 */
+	public void setRefProductUUID(byte[] refProductUUID)
+	{
+		this.refProductUUID = refProductUUID;
 	}
 
 }

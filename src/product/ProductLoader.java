@@ -223,20 +223,10 @@ public class ProductLoader
 			fileLengthRemaining = fileMetadata.getFile().length();
 			reader = new DataInputStream(new FileInputStream(fileMetadata.getFile()));
 		}
-		else if (fileMetadata.getType().equals(FileType.k_folder))//k_folder
+		else //k_folder or k_reference
 		{
 			fileLengthRemaining = 0;
 			reader = null;
-		}
-		else //k_reference
-		{
-			//file data for a reference is the previous f1uuid plus the number of fragments
-			fileLengthRemaining = Constants.PRODUCT_UUID_SIZE + Constants.FRAGMENT_NUMBER_SIZE;
-			byte[] data = ByteConversion.concat(
-							Database.getCachedF1UUID(fileMetadata.getFileHash(), group),
-							ByteConversion.longToBytes(
-								Database.getCachedFragmentCount(fileMetadata.getFileHash(), group)));
-			reader = new DataInputStream(new ByteArrayInputStream(data));
 		}
 		
 		//fragment number starts at 1
@@ -322,6 +312,10 @@ public class ProductLoader
 	private boolean writeFileHeader(Metadata fileMetadata, long fragmentNumber,
 					long fileLengthRemaining)
 	{
+		System.out.println("Fragment number: " + fragmentNumber);
+		// fragment number
+		if (!writeFull(ByteConversion.longToBytes(fragmentNumber)))
+			return false;
 		
 		//file type
 		if (!writeFull(ByteConversion.intToByte(fileMetadata.getType().toInt())))
@@ -330,12 +324,6 @@ public class ProductLoader
 		if (fileMetadata.getType().equals(FileType.k_file) ||
 						fileMetadata.getType().equals(FileType.k_reference))
 		{
-		
-			System.out.println("Fragment number: " + fragmentNumber);
-			// fragment number
-			if (!writeFull(ByteConversion.longToBytes(fragmentNumber)))
-				return false;
-	
 			// file hash
 			if (!writeFull(fileMetadata.getFileHash()))
 				return false;
@@ -364,6 +352,18 @@ public class ProductLoader
 			// length of data that still needs to be written
 			if (!writeFull(ByteConversion.longToBytes(fileLengthRemaining)))
 				return false;
+			
+			if (fileMetadata.getType().equals(FileType.k_reference))
+			{
+				//pf1uuid
+				if (!writeFull(Database.getCachedF1UUID(fileMetadata.getFileHash(), group)))
+					return false;
+				
+				//fragment count
+				if (!writeFull(ByteConversion.longToBytes(
+								Database.getCachedFragmentCount(fileMetadata.getFileHash(), group))))
+					return false;
+			}
 		}
 		else
 		{
