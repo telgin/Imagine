@@ -1,4 +1,4 @@
-package algorithms.stealthpng;
+package algorithms.imageoverlay;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import javax.imageio.ImageIO;
 
 import algorithms.Algorithm;
 import algorithms.ProductIOException;
-import algorithms.stealthpng.patterns.Pattern;
+import algorithms.imageoverlay.patterns.Pattern;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
@@ -15,10 +15,10 @@ import product.ProductReader;
 import scratch.Scratch;
 import util.ByteConversion;
 
-public class StealthPNGReader extends StealthPNG implements ProductReader
+public class ImageOverlayReader extends ImageOverlay implements ProductReader
 {
 
-	public StealthPNGReader(Algorithm algo, Key key)
+	public ImageOverlayReader(Algorithm algo, Key key)
 	{
 		super(algo, key);
 	}

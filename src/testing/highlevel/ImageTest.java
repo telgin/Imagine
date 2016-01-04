@@ -13,7 +13,7 @@ import data.Key;
 import data.TrackingGroup;
 
 @RunWith(Enclosed.class)
-public class FullPNGTest
+public class ImageTest
 {
 	/**
 	 * Default parameters
@@ -22,7 +22,7 @@ public class FullPNGTest
 	 */
 	public static class TreeTest
 	{
-		static Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("FullPNG");
+		static Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("Image");
 		static
 		{
 			algorithm.setParameter("width", "566");

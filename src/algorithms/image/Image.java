@@ -1,4 +1,4 @@
-package algorithms.fullpng;
+package algorithms.image;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -25,7 +25,7 @@ import algorithms.Algorithm;
 import algorithms.Parameter;
 import algorithms.ProductIOException;
 
-public class FullPNG implements Product
+public class Image implements Product
 {
 	protected Algorithm algorithm;
 	protected BufferedImage img;
@@ -38,7 +38,7 @@ public class FullPNG implements Product
 	protected int width;
 	protected int height;
 
-	public FullPNG(Algorithm algo, Key key)
+	public Image(Algorithm algo, Key key)
 	{
 		this.algorithm = algo;
 		this.key = key;

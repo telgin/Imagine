@@ -1,4 +1,4 @@
-package algorithms.textblock;
+package algorithms.text;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import util.algorithms.UniqueRandomRange;
 import config.Configuration;
 import data.Key;
 
-public abstract class TextBlock implements Product
+public abstract class Text implements Product
 {
 	protected Algorithm algorithm;
 	private Key key;
@@ -27,7 +27,7 @@ public abstract class TextBlock implements Product
 	protected HashRandom random;
 	protected UniqueRandomRange order;
 
-	public TextBlock(Algorithm algo, Key key)
+	public Text(Algorithm algo, Key key)
 	{
 		algorithm = algo;
 		this.key = key;

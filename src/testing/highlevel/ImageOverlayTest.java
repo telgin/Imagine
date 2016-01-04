@@ -13,7 +13,7 @@ import data.Key;
 import data.TrackingGroup;
 
 @RunWith(Enclosed.class)
-public class StealthPNGTest
+public class ImageOverlayTest
 {
 	/**
 	 * Default parameters

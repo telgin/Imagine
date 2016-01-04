@@ -22,14 +22,14 @@ public class AlgorithmRegistry
 	{
 		definitions = new HashMap<String, Definition>();
 		
-		definitions.put(algorithms.textblock.Definition.getInstance().getName(),
-				algorithms.textblock.Definition.getInstance());
+		definitions.put(algorithms.text.Definition.getInstance().getName(),
+				algorithms.text.Definition.getInstance());
 		
-		definitions.put(algorithms.fullpng.Definition.getInstance().getName(),
-				algorithms.fullpng.Definition.getInstance());
+		definitions.put(algorithms.image.Definition.getInstance().getName(),
+				algorithms.image.Definition.getInstance());
 		
-		definitions.put(algorithms.stealthpng.Definition.getInstance().getName(),
-				algorithms.stealthpng.Definition.getInstance());
+		definitions.put(algorithms.imageoverlay.Definition.getInstance().getName(),
+				algorithms.imageoverlay.Definition.getInstance());
 	}
 	
 	/**

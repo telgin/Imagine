@@ -1,4 +1,4 @@
-package algorithms.stealthpng;
+package algorithms.image;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,6 +8,7 @@ import algorithms.Option;
 import algorithms.Parameter;
 import data.Key;
 import product.ProductFactoryCreation;
+import product.ProductMode;
 import product.ProductReader;
 import product.ProductReaderFactory;
 import product.ProductWriter;
@@ -15,7 +16,7 @@ import product.ProductWriterFactory;
 
 public class Definition implements algorithms.Definition
 {
-	private static final String NAME = "StealthPNG";
+	private static final String NAME = "Image";
 	private static final int VERSION_NUMBER = 1;
 	private static Definition self;
 
@@ -55,45 +56,54 @@ public class Definition implements algorithms.Definition
 
 		{
 			// product mode
-			Parameter param = new Parameter("ProductMode", "string", "Normal", false);
+			Parameter param = new Parameter("ProductMode", "string", 
+							ProductMode.NORMAL.toString(), false);
 			if (includeOptions)
 			{
-				param.addOption(new Option("Normal"));
-				param.addOption(new Option("Secure"));
-				param.addOption(new Option("Stealth"));
+				param.addOption(new Option(ProductMode.NORMAL.toString()));
+				param.addOption(new Option(ProductMode.SECURE.toString()));
+				param.addOption(new Option(ProductMode.STEALTH.toString()));
 			}
 			algo.addParameter(param);
 		}
 
 		{
-			// pattern
-			Parameter param = new Parameter("Pattern", "string", "1", false);
+			// colors
+			Parameter param = new Parameter("Colors", "string", "rgb", false);
 			if (includeOptions)
 			{
-				param.addOption(new Option("1"));
-				param.addOption(new Option("2"));
+				param.addOption(new Option("rgb"));
+				param.addOption(new Option("rgba"));
 			}
 			algo.addParameter(param);
 		}
 
 		{
-			// input image folder
-			Parameter param = new Parameter("ImageFolder", "string", "./inputImages/",
-							false);
+			// width
+			Parameter param = new Parameter("Width", "int", "1820", false);
 			if (includeOptions)
 			{
-				param.addOption(new Option("*"));
+				param.addOption(new Option("0", "10000"));
 			}
 			algo.addParameter(param);
 		}
 
 		{
-			// working folder
-			Parameter param = new Parameter("ImageFolder", "string",
-							"./.StealthPNG_working/", false);
+			// height
+			Parameter param = new Parameter("Height", "int", "980", false);
 			if (includeOptions)
 			{
-				param.addOption(new Option("*"));
+				param.addOption(new Option("0", "10000"));
+			}
+			algo.addParameter(param);
+		}
+		
+		{
+			// image type
+			Parameter param = new Parameter("ImageType", "string", "png", false);
+			if (includeOptions)
+			{
+				param.addOption(new Option("png"));
 			}
 			algo.addParameter(param);
 		}
@@ -110,14 +120,14 @@ public class Definition implements algorithms.Definition
 			public ProductReaderFactory<? extends ProductReader> createReader(
 							Algorithm algo, Key key)
 			{
-				return new StealthPNGFactory(algo, key);
+				return new ImageFactory(algo, key);
 			}
 
 			@Override
 			public ProductWriterFactory<? extends ProductWriter> createWriter(
 							Algorithm algo, Key key)
 			{
-				return new StealthPNGFactory(algo, key);
+				return new ImageFactory(algo, key);
 			}
 		};
 	}
@@ -131,9 +141,9 @@ public class Definition implements algorithms.Definition
 		List<Algorithm> presets = new LinkedList<Algorithm>();
 		
 		//plain default
-		Algorithm stealthpngNormal = construct(false);
-		stealthpngNormal.setPresetName("stealthpng_basic");
-		presets.add(stealthpngNormal);
+		Algorithm imageNormal = construct(false);
+		imageNormal.setPresetName("image_basic");
+		presets.add(imageNormal);
 		
 		return presets;
 	}

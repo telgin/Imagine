@@ -39,8 +39,8 @@ import product.ProductExtractor;
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
 import algorithms.ProductIOException;
-import algorithms.fullpng.FullPNG;
-import algorithms.fullpng.FullPNGFactory;
+import algorithms.image.Image;
+import algorithms.image.ImageFactory;
 
 public class Scratch {
 	public static int x = 0;

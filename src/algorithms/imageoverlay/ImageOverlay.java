@@ -1,4 +1,4 @@
-package algorithms.stealthpng;
+package algorithms.imageoverlay;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -13,8 +13,8 @@ import com.google.common.io.Files;
 
 import algorithms.Algorithm;
 import algorithms.ProductIOException;
-import algorithms.stealthpng.patterns.Pattern;
-import algorithms.stealthpng.patterns.Pattern2;
+import algorithms.imageoverlay.patterns.Pattern;
+import algorithms.imageoverlay.patterns.Pattern2;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
@@ -29,7 +29,7 @@ import util.algorithms.HashRandom;
 import util.algorithms.ImageUtil;
 import util.algorithms.UniqueRandomRange;
 
-public class StealthPNG implements Product
+public class ImageOverlay implements Product
 {
 	protected Algorithm algorithm;
 	protected BufferedImage img;
@@ -45,7 +45,7 @@ public class StealthPNG implements Product
 	protected int[] pv;
 	private boolean incrementFailed = false;
 
-	public StealthPNG(Algorithm algo, Key key)
+	public ImageOverlay(Algorithm algo, Key key)
 	{
 		this.algorithm = algo;
 		this.key = key;

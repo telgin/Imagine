@@ -1,4 +1,4 @@
-package algorithms.stealthpng.patterns;
+package algorithms.imageoverlay.patterns;
 
 import java.util.HashMap;
 

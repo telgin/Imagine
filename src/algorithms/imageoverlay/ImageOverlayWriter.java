@@ -1,4 +1,4 @@
-package algorithms.stealthpng;
+package algorithms.imageoverlay;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 
 import algorithms.Algorithm;
 import algorithms.ProductIOException;
-import algorithms.stealthpng.patterns.Pattern;
+import algorithms.imageoverlay.patterns.Pattern;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
@@ -21,11 +21,11 @@ import util.ByteConversion;
 import util.myUtilities;
 import util.algorithms.ImageUtil;
 
-public class StealthPNGWriter extends StealthPNG implements ProductWriter
+public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 {
 	private File inputImages;
 
-	public StealthPNGWriter(Algorithm algo, Key key)
+	public ImageOverlayWriter(Algorithm algo, Key key)
 	{
 		super(algo, key);
 		inputImages = new File(algo.getParameterValue("imageFolder"));
@@ -70,7 +70,7 @@ public class StealthPNGWriter extends StealthPNG implements ProductWriter
 		// remains to be seen how this will affect png compression
 		// 21MB may become larger? There's technically 47MB of rgb's
 		// would then become 25%
-		// though maybe not that bad because won't be as random as fullpng
+		// though maybe not that bad because won't be as random as image
 		// everything will still be close
 		// could be even more confusing and switch modes from 1,4,16
 		// based on space available

@@ -1,4 +1,4 @@
-package algorithms.stealthpng;
+package algorithms.imageoverlay;
 
 import java.io.File;
 

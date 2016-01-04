@@ -1,4 +1,4 @@
-package algorithms.fullpng;
+package algorithms.image;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -26,10 +26,10 @@ import algorithms.Algorithm;
 import algorithms.Parameter;
 import algorithms.ProductIOException;
 
-public class FullPNGWriter extends FullPNG implements ProductWriter
+public class ImageWriter extends Image implements ProductWriter
 {
 
-	public FullPNGWriter(Algorithm algo, Key key)
+	public ImageWriter(Algorithm algo, Key key)
 	{
 		super(algo, key);
 	}

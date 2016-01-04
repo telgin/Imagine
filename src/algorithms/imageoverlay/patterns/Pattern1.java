@@ -1,4 +1,4 @@
-package algorithms.stealthpng.patterns;
+package algorithms.imageoverlay.patterns;
 
 public class Pattern1 extends Pattern
 {

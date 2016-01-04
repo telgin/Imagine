@@ -13,7 +13,7 @@ import data.Key;
 import data.TrackingGroup;
 
 @RunWith(Enclosed.class)
-public class TextBlockTest
+public class TextTest
 {
 		/**
 		 * Default parameters

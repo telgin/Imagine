@@ -1,4 +1,4 @@
-package algorithms.textblock;
+package algorithms.text;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +16,9 @@ import stats.Stat;
 import util.ByteConversion;
 import util.Constants;
 
-public class TextBlockWriter extends TextBlock implements ProductWriter
+public class TextWriter extends Text implements ProductWriter
 {
-	public TextBlockWriter(Algorithm algo, Key key)
+	public TextWriter(Algorithm algo, Key key)
 	{
 		super(algo, key);
 	}

@@ -1,4 +1,4 @@
-package algorithms.fullpng;
+package algorithms.image;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,10 +14,10 @@ import data.Key;
 import algorithms.Algorithm;
 import algorithms.ProductIOException;
 
-public class FullPNGReader extends FullPNG implements ProductReader
+public class ImageReader extends Image implements ProductReader
 {
 
-	public FullPNGReader(Algorithm algo, Key key)
+	public ImageReader(Algorithm algo, Key key)
 	{
 		super(algo, key);
 	}

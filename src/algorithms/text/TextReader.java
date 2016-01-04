@@ -1,4 +1,4 @@
-package algorithms.textblock;
+package algorithms.text;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +13,9 @@ import product.ProductMode;
 import product.ProductReader;
 import util.ByteConversion;
 
-public class TextBlockReader extends TextBlock implements ProductReader{
+public class TextReader extends Text implements ProductReader{
 
-	public TextBlockReader(Algorithm algo, Key key) {
+	public TextReader(Algorithm algo, Key key) {
 		super(algo, key);
 	}
 	
