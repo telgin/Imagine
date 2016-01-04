@@ -49,8 +49,12 @@ public class TextBlockReader extends TextBlock implements ProductReader{
 	@Override
 	public void loadFile(File f) throws IOException
 	{
-		String base64 = new String(Files.readAllBytes(f.toPath()));
-		buffer = ByteConversion.base64ToBytes(base64);
+		String encoded = new String(Files.readAllBytes(f.toPath()));
+		if (algorithm.getParameter("encoding").getValue().equals(Definition.base64Encoding))
+			buffer = ByteConversion.base64ToBytes(encoded);
+		else
+			buffer = ByteConversion.hexToBytes(encoded);
+		
 		blockSize = buffer.length;
 		reset();
 	}

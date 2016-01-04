@@ -14,6 +14,7 @@ import product.ProductWriter;
 import stats.ProgressMonitor;
 import stats.Stat;
 import util.ByteConversion;
+import util.Constants;
 
 public class TextBlockWriter extends TextBlock implements ProductWriter
 {
@@ -72,7 +73,11 @@ public class TextBlockWriter extends TextBlock implements ProductWriter
 							"Saving product file: " + toSave.getAbsolutePath());
 
 			PrintWriter writer = new PrintWriter(toSave);
-			writer.print(ByteConversion.bytesToBase64(buffer));
+			if (algorithm.getParameter("encoding").getValue().equals(Definition.base64Encoding))
+				writer.print(ByteConversion.bytesToBase64(buffer));
+			else
+				writer.print(ByteConversion.bytesToHex(buffer));
+
 			writer.close();
 
 			// update progress

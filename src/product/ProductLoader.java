@@ -168,7 +168,7 @@ public class ProductLoader
 						.intToByte(currentProduct.getAlgorithmVersionNumber())))
 			return false;
 
-		// write group name len
+		// write group name length
 		String groupName = group.getName();
 		if (!writeFull(ByteConversion.shortToBytes((short) groupName.getBytes().length)))
 			return false;

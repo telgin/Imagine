@@ -47,22 +47,9 @@ public class ProductExtractor {
 		enclosingFolder = folder;
 	}
 	
-	public ProductContents viewAll(File productFile)
+	public ProductContents viewAll(File productFile) throws IOException
 	{
-		//try to load the product file
-		if (!loadProduct(productFile))
-		{
-			return null;
-		}
-		
-		//try to read the product header
-		ProductContents productContents = readProductHeader(true);
-		if (productContents == null)
-		{
-			Logger.log(LogLevel.k_debug, "The product header cannot be read: " + productFile.getName());
-			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
-			return null;
-		}
+		ProductContents productContents = parseProductContents(productFile);
 		
 		//keep trying to read files until one can't be read
 		FileContents fileContents = readNextFileHeader(true);
@@ -96,8 +83,7 @@ public class ProductExtractor {
 	private File assembleCurrentFileData(ProductContents origProductContents, FileContents origFileContents)
 	{
 		//create temporary hidden assembly folder
-		//TODO make this path configurable or put it on the same drive as the product files
-		File assemblyFolder = new File(group.getExtractionFolder(), ".assembly");
+		File assemblyFolder = new File(group.getExtractionFolder(), Constants.ASSEMBLY_FOLDER_NAME);
 		if (!assemblyFolder.exists())
 			assemblyFolder.mkdir();
 		
@@ -182,34 +168,12 @@ public class ProductExtractor {
 	 * @param outStream
 	 * @return True if this was the last fragment of that file, false 
 	 * if there's more data in a later file.
-	 * @throws ProductIOException 
+	 * @throws IOException 
 	 */
 	private boolean extractFragmentData(File productFile,
-					BufferedOutputStream outStream) throws ProductIOException
+					BufferedOutputStream outStream) throws IOException
 	{
-		if (productFile.isDirectory())
-		{
-			Logger.log(LogLevel.k_error, "The product file is a "
-							+ "folder, use \"extractAllRecursive\": " + productFile.getName());
-			throw new ProductIOException("The product file is a folder: " + productFile.getAbsolutePath());
-		}
-		
-		//try to load the product file
-		if (!loadProduct(productFile))
-		{
-			throw new ProductIOException("Failed to load product file: " + productFile.getAbsolutePath());
-		}
-		
-		//try to read the product header
-		ProductContents productContents = readProductHeader(true);
-		if (productContents == null)
-		{
-			//if the product header can't be read,
-			//it's assumed that nothing else can be read
-			Logger.log(LogLevel.k_debug, "The product header cannot be read: " + productFile.getName());
-			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
-			throw new ProductIOException("Failed to extract product header from: " + productFile.getAbsolutePath());
-		}
+		parseProductContents(productFile);
 		
 		//this product contents will be the fragment we're looking for
 		FileContents fileContents = readNextFileHeader(true);
@@ -235,31 +199,9 @@ public class ProductExtractor {
 		}
 	}
 
-	public boolean extractAllFromProduct(File productFile)
+	public boolean extractAllFromProduct(File productFile) throws IOException
 	{
-		if (productFile.isDirectory())
-		{
-			Logger.log(LogLevel.k_error, "The product file is a "
-							+ "folder, use \"extractAllRecursive\": " + productFile.getName());
-			return false;
-		}
-		
-		//try to load the product file
-		if (!loadProduct(productFile))
-		{
-			return false;
-		}
-		
-		//try to read the product header
-		ProductContents productContents = readProductHeader(true);
-		if (productContents == null)
-		{
-			//if the product header can't be read,
-			//it's assumed that nothing else can be read
-			Logger.log(LogLevel.k_debug, "The product header cannot be read: " + productFile.getName());
-			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
-			return false;
-		}
+		ProductContents productContents = parseProductContents(productFile);
 		
 		//keep trying to read files until one can't be read
 		FileContents fileContents = readNextFileHeader(true);
@@ -348,6 +290,8 @@ public class ProductExtractor {
 			return false;
 		}
 		
+		boolean success = true;
+		
 		//bfs through folders for product files
 		Queue<File> folders = new LinkedList<File>();
 		folders.add(productFolder);
@@ -358,40 +302,31 @@ public class ProductExtractor {
 			for (File sub : folder.listFiles())
 			{
 				if (sub.isDirectory())
+				{
 					folders.add(sub);
+				}
 				else
-					extractAllFromProduct(sub);
+				{
+					try
+					{
+						extractAllFromProduct(sub);
+					}
+					catch (IOException e)
+					{
+						Logger.log(LogLevel.k_error, "Failed to extract all files from " + sub.getAbsolutePath());
+						Logger.log(LogLevel.k_debug, e, false);
+						success = false;
+					}
+				}
 			}
 		}
 		
-		return true;
+		return success;
 	}
 	
-	public boolean extractFileByIndex(File productFile, int index)
+	public boolean extractFileByIndex(File productFile, int index) throws IOException
 	{
-		if (productFile.isDirectory())
-		{
-			Logger.log(LogLevel.k_error, "The product file is a "
-							+ "folder, use \"extractAllRecursive\": " + productFile.getName());
-			return false;
-		}
-		
-		//try to load the product file
-		if (!loadProduct(productFile))
-		{
-			return false;
-		}
-		
-		//try to read the product header
-		ProductContents productContents = readProductHeader(true);
-		if (productContents == null)
-		{
-			//if the product header can't be read,
-			//it's assumed that nothing else can be read
-			Logger.log(LogLevel.k_debug, "The product header cannot be read: " + productFile.getName());
-			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
-			return false;
-		}
+		ProductContents productContents = parseProductContents(productFile);
 		
 		int curIndex = 0;
 		
@@ -416,6 +351,8 @@ public class ProductExtractor {
 					{
 						Logger.log(LogLevel.k_error, "Failed to extract file: " +
 										fileContents.getMetadata().getFile().getPath());
+						
+						return false;
 					}	
 				}
 				else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
@@ -437,7 +374,7 @@ public class ProductExtractor {
 					{
 						Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
 										refStreamUUID + "_" + refSequenceNum);
-						continue;
+						return false;
 					}
 					else
 					{
@@ -445,53 +382,56 @@ public class ProductExtractor {
 						subExtractor.extractFileByFirstHashMatch(refProductFile, refHash);
 					}	
 				}
+				
+				return true;
 			}
 			else //this wasn't the correct index, just skip the data
 			{
 				skipNextFileData(fileContents);
-				continue;
+				
+				//read next header
+				fileContents = readNextFileHeader(true);
+				
+				++curIndex;
 			}
-
-			//read next header
-			fileContents = readNextFileHeader(true);
-			
-			++curIndex;
 		}
 
-		return true;
+		return false;
 	}
 	
 	
-	/**
-	 * @update_comment
-	 * @param refProductFile
-	 * @param fileHash
-	 */
-	private boolean extractFileByFirstHashMatch(File productFile, byte[] fileHash)
+	private ProductContents parseProductContents(File productFile) throws IOException
 	{
 		if (productFile.isDirectory())
 		{
-			Logger.log(LogLevel.k_error, "The product file is a "
+			throw new ProductIOException( "The product file is a "
 							+ "folder, use \"extractAllRecursive\": " + productFile.getName());
-			return false;
 		}
 		
 		//try to load the product file
-		if (!loadProduct(productFile))
-		{
-			return false;
-		}
-		
+		loadProduct(productFile);
+
 		//try to read the product header
 		ProductContents productContents = readProductHeader(true);
 		if (productContents == null)
 		{
 			//if the product header can't be read,
 			//it's assumed that nothing else can be read
-			Logger.log(LogLevel.k_debug, "The product header cannot be read: " + productFile.getName());
-			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
-			return false;
+			throw new ProductIOException("The product header cannot be read: " + productFile.getName());
 		}
+		
+		return productContents;
+	}
+	
+	/**
+	 * @update_comment
+	 * @param refProductFile
+	 * @param fileHash
+	 * @throws IOException 
+	 */
+	private boolean extractFileByFirstHashMatch(File productFile, byte[] fileHash) throws IOException
+	{
+		ProductContents productContents = parseProductContents(productFile);
 		
 		//keep trying to read files until one can't be read
 		FileContents fileContents = readNextFileHeader(true);
@@ -538,7 +478,7 @@ public class ProductExtractor {
 		return false;
 	}
 	
-	private boolean loadProduct(File productFile)
+	private void loadProduct(File productFile) throws IOException
 	{
 		curProductFile = productFile;
 		
@@ -551,11 +491,8 @@ public class ProductExtractor {
 		{
 			curProductFile = null;
 			Logger.log(LogLevel.k_error, "Failed to load product file " + productFile.getName());
-			Logger.log(LogLevel.k_error, e, false);
-			return false;
+			throw e;
 		}
-		
-		return true;
 	}
 	
 	private boolean readFull(int length)
@@ -568,115 +505,113 @@ public class ProductExtractor {
 		return product.skip(skip) == skip;
 	}
 	
-	private ProductContents readProductHeader(boolean parseData)
+	private ProductContents readProductHeader(boolean parseData) throws ProductIOException
 	{
-		System.err.println("Reading product header");
+		Logger.log(LogLevel.k_debug, "Reading product header");
 		try
 		{
+			//setup contents
+			ProductContents contents = null;
+			if (parseData)
+			{
+				contents = new ProductContents();
+			}
+			
 			//product uuid:
+			//always read this b/c the product may need it to de-secure stream
 			if (!readFull(Constants.PRODUCT_UUID_SIZE))
-				return null;
+				throw new ProductIOException("Could not read product uuid.");
+			
 			product.setUUID(ByteConversion.subArray(buffer, 0, Constants.PRODUCT_UUID_SIZE));
-			System.out.println("Read " + ByteConversion.getStreamUUID(product.getUUID()));
-			System.out.println("Read " + ByteConversion.getProductSequenceNumber(product.getUUID()));
+			
+			if (parseData)
+			{
+				contents.setStreamUUID(ByteConversion.getStreamUUID(product.getUUID()));
+				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(product.getUUID()));
+			}
+			
+			//System.out.println("Read " + ByteConversion.getStreamUUID(product.getUUID()));
+			//System.out.println("Read " + ByteConversion.getProductSequenceNumber(product.getUUID()));
 				
 			//stealth secure stream now
 			if (product.getProductMode().equals(ProductMode.STEALTH))
 			{
 				product.secureStream();
 			}
-			
-			//setup contents
-			ProductContents contents = new ProductContents();
 
 			//product version
 			if (parseData)
 			{
 				if (!readFull(Constants.PRODUCT_VERSION_NUMBER_SIZE))
-					return null;
+					throw new ProductIOException("Could not read product version number.");
+				
 				contents.setProductVersionNumber(ByteConversion.byteToInt(buffer[0]));
 			}
 			else
 			{
 				if (!skipFull(Constants.PRODUCT_VERSION_NUMBER_SIZE))
-					return null;
+					throw new ProductIOException("Could not skip product version number.");
 			}
 				
 			//algorithm name length
 			if (!readFull(Constants.ALGORITHM_NAME_LENGTH_SIZE))
-				return null;
+				throw new ProductIOException("Could not read algorithm length.");
+			
 			short algorithmNameLength = ByteConversion.bytesToShort(buffer, 0);
 				
 			//algorithm name
 			if (parseData)
 			{
 				if (!readFull(algorithmNameLength))
-					return null;
+					throw new ProductIOException("Could not read algorithm name.");
+				
 				contents.setAlgorithmName(new String(buffer, 0, algorithmNameLength));
 			}
 			else
 			{
 				if (!skipFull(algorithmNameLength))
-					return null;
+					throw new ProductIOException("Could not skip algorithm name.");
 			}
 				
 			//algorithm version
 			if (parseData)
 			{
 				if (!readFull(Constants.ALGORITHM_VERSION_NUMBER_SIZE))
-					return null;
+					throw new ProductIOException("Could not read algorithm version number.");
+				
 				contents.setAlgorithmVersionNumber(ByteConversion.byteToInt(buffer[0]));
 			}
 			else
 			{
 				if (!skipFull(Constants.ALGORITHM_VERSION_NUMBER_SIZE))
-					return null;
-			}
-			
-			//stream uuid
-			if (parseData)
-			{
-				contents.setStreamUUID(ByteConversion.getStreamUUID(product.getUUID()));
-			}
-			else
-			{
-				if (!skipFull(Constants.STREAM_UUID_SIZE))
-					return null;
-			}
-				
-			//product sequence number
-			if (parseData)
-			{
-				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(product.getUUID()));
-			}
-			else
-			{
-				if (!skipFull(Constants.PRODUCT_SEQUENCE_NUMBER_SIZE))
-					return null;
+					throw new ProductIOException("Could not skip algorithm version number.");
 			}
 				
 			//group name length
 			if (!readFull(Constants.GROUP_NAME_LENGTH_SIZE))
-				return null;
+				throw new ProductIOException("Could not read group name length.");
+			
 			short groupNameLength = ByteConversion.bytesToShort(buffer, 0);
-			System.out.println("groupNameLength: " + groupNameLength);
+			//System.out.println("groupNameLength: " + groupNameLength);
 				
 			//group name
 			if (parseData)
 			{
 				if (!readFull(groupNameLength))
-					return null;
+					throw new ProductIOException("Could not read group name.");
+				
 				contents.setGroupName(new String(buffer, 0, groupNameLength));
 			}
 			else
 			{
 				if (!skipFull(groupNameLength))
-					return null;
+					throw new ProductIOException("Could not skip group name.");
 			}
 			
 			//group key name length
 			if (!readFull(Constants.GROUP_KEY_NAME_LENGTH_SIZE))
-				return null;
+				throw new ProductIOException("Could not read group key name length.");
+			
 			short groupKeyNameLength = ByteConversion.bytesToShort(buffer, 0);
 			//System.out.println("Read group key name length of: " + groupKeyNameLength);
 				
@@ -684,14 +619,15 @@ public class ProductExtractor {
 			if (parseData)
 			{
 				if (!readFull(groupKeyNameLength))
-					return null;
+					throw new ProductIOException("Could not read group key name.");
+				
 				contents.setGroupKeyName(new String(buffer, 0, groupKeyNameLength));
 				System.out.println("Read group key name of: " + new String(buffer, 0, groupKeyNameLength));
 			}
 			else
 			{
 				if (!skipFull(groupKeyNameLength))
-					return null;
+					throw new ProductIOException("Could not skip group key name.");
 			}
 				
 			//secure products secure the stream now
@@ -699,14 +635,20 @@ public class ProductExtractor {
 			{
 				product.secureStream();
 			}
-				
+
 			return contents;
+		}
+		catch (ProductIOException e)
+		{
+			throw e;
 		}
 		catch (Exception e)
 		{
-			Logger.log(LogLevel.k_error, "Failed to read product header.");
-			Logger.log(LogLevel.k_error, e, false);
-			return null;
+			Logger.log(LogLevel.k_debug, e, false);
+			
+			//there are lots of bad things that can happen when parsing
+			//random data. A general product IO exception will suffice.
+			throw new ProductIOException("Failed to read product header.");
 		}
 	}
 	
@@ -887,9 +829,9 @@ public class ProductExtractor {
 				}
 			}
 				
-			System.out.println("parse data? " + parseData);
-			if (contents != null)
-				System.out.println(contents.toString());
+			//System.out.println("parse data? " + parseData);
+			//if (contents != null)
+			//	System.out.println(contents.toString());
 				
 			
 			return contents;

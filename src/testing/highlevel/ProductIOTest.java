@@ -343,7 +343,16 @@ public class ProductIOTest
 		for (File productFile : outputFolder.listFiles())
 		{
 			// read the file, make sure the fields are all the same
-			ProductContents productContents = reader.viewAll(productFile);
+			ProductContents productContents = null;
+			try
+			{
+				productContents = reader.viewAll(productFile);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+				fail();
+			}
 			// System.out.println(productContents.toString());
 			assertEquals(productContents.getAlgorithmName(),
 							group.getAlgorithm().getName());

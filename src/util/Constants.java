@@ -1,6 +1,8 @@
 package util;
 
 import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public abstract class Constants
 {
@@ -20,12 +22,15 @@ public abstract class Constants
 
 	// file names
 	public static final File configFile = new File("config.xml");
+	public static final String ASSEMBLY_FOLDER_NAME = "." +
+					APPLICATION_NAME_SHORT.toLowerCase() + "_assembly";
 	
 	// misc system configuration
-	public static final String TEMP_RESERVED_GROUP_NAME = APPLICATION_NAME_SHORT.toLowerCase()
-					+ "reserved_temp";
+	public static final String TEMP_RESERVED_GROUP_NAME = APPLICATION_NAME_SHORT.toLowerCase() +
+					"_reserved_temp";
 	public static final int DEFAULT_THREAD_COUNT = 3;
-
+	public static final Charset charset = StandardCharsets.UTF_8;
+	
 	// io system configuration
 	public static final int MAX_READ_BUFFER_SIZE = 50000000;
 	public static final long END_CODE = Long.MAX_VALUE;
@@ -55,6 +60,7 @@ public abstract class Constants
 	public static final int FILE_PERMISSIONS_SIZE = 1;
 	public static final int FILE_LENGTH_REMAINING_SIZE = 8;
 	public static final int FILE_TYPE_SIZE = 1;
+
 	
 	
 	

@@ -18,6 +18,9 @@ public class Definition implements algorithms.Definition
 	private static final String NAME = "TextBlock";
 	private static final int VERSION_NUMBER = 1;
 	private static Definition self;
+	
+	public static final String base64Encoding = "Base64";
+	public static final String hexEncoding = "Hex";
 
 	/**
 	 * @update_comment
@@ -98,6 +101,17 @@ public class Definition implements algorithms.Definition
 			if (includeOptions)
 			{
 				param.addOption(new Option("500", Integer.toString(Integer.MAX_VALUE)));
+			}
+			algo.addParameter(param);
+		}
+		
+		{
+			// encoding
+			Parameter param = new Parameter("encoding", "string", base64Encoding, false);
+			if (includeOptions)
+			{
+				param.addOption(new Option(base64Encoding));
+				param.addOption(new Option(hexEncoding));
 			}
 			algo.addParameter(param);
 		}
