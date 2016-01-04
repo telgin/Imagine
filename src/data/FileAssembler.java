@@ -21,11 +21,10 @@ public class FileAssembler
 	 * @param enclosingFolder2
 	 * @return
 	 */
-	public static File findProductFile(long streamUUID, int productSequenceNumber,
+	public static File findProductFile(String productSearchName,
 					File enclosingFolder, File curProductFolder)
 	{
-		
-		String searchName = Long.toString(streamUUID) + "_" + Integer.toString(productSequenceNumber);
+		Logger.log(LogLevel.k_debug, "Looking for product file: " + productSearchName);
 		
 		//bfs through folders for product files
 		Queue<File> folders = new LinkedList<File>();
@@ -48,15 +47,21 @@ public class FileAssembler
 				else
 				{
 					//check the file to see if its name matches
-					String fileName = sub.getName().split(".")[0];
-					if (fileName.equals(searchName))
+					String subName = sub.getName();
+					if (subName.contains("."))
+						subName = subName.substring(0, subName.indexOf("."));
+					
+					if (subName.equals(productSearchName))
+					{
+						Logger.log(LogLevel.k_debug, "Found product file match: " + sub.getName());
 						return sub;
+					}
 				}
 			}
 		}
 		
 		//couldn't find the file, notify user (TODO)
-		Logger.log(LogLevel.k_debug, "Could not find next product file: " + searchName);
+		Logger.log(LogLevel.k_debug, "Could not find next product file: " + productSearchName);
 		return null;
 	}
 

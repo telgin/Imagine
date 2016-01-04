@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import data.Metadata;
+import data.TrackingGroup;
 import database.filesystem.FileSystemDB;
 
 public class FileSystemUtil
@@ -367,6 +368,17 @@ public class FileSystemUtil
 		{
 		    return null;
 		}
+	}
+	
+	public static String getProductName(TrackingGroup group, long streamUUID, long sequenceNumber)
+	{
+		return group.getName() + "_" + streamUUID + "_" + sequenceNumber;
+	}
+	
+	public static String getProductName(TrackingGroup group, byte[] productUUID)
+	{
+		return getProductName(group, ByteConversion.getStreamUUID(productUUID),
+						ByteConversion.getProductSequenceNumber(productUUID));
 	}
 
 //	/**

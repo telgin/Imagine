@@ -15,6 +15,7 @@ import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
 import util.Constants;
+import util.FileSystemUtil;
 import util.Hashing;
 import data.FileType;
 import data.Metadata;
@@ -131,8 +132,9 @@ public class ProductExtractor {
 			{
 				//there are other fragments that need to be added,
 				//find the next product file
-				File nextProductFile = FileAssembler.findProductFile(curProductContents.getStreamUUID(),
-								curProductContents.getProductSequenceNumber() + increment,
+				File nextProductFile = FileAssembler.findProductFile(
+								FileSystemUtil.getProductName(group, curProductContents.getStreamUUID(),
+												curProductContents.getProductSequenceNumber() + increment),
 								curExtractor.enclosingFolder,
 								curExtractor.curProductFile.getAbsoluteFile().getParentFile());
 				
@@ -273,6 +275,9 @@ public class ProductExtractor {
 					//the first fragment
 					skipNextFileData(fileContents);
 					
+					//read next header
+					fileContents = readNextFileHeader(true);
+					
 					continue;
 				}
 				else
@@ -303,13 +308,18 @@ public class ProductExtractor {
 				long refStreamUUID = ByteConversion.getStreamUUID(refUUID);
 				int refSequenceNum = ByteConversion.getProductSequenceNumber(refUUID);
 				
-				File refProductFile = FileAssembler.findProductFile(refStreamUUID,
-								refSequenceNum, enclosingFolder, productFile.getParentFile());
+				File refProductFile = FileAssembler.findProductFile(
+								FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum),
+								enclosingFolder, productFile.getParentFile());
 				
 				if (refProductFile == null)
 				{
 					Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
 									refStreamUUID + "_" + refSequenceNum);
+					
+					//read next header
+					fileContents = readNextFileHeader(true);
+					
 					continue;
 				}
 				else
@@ -419,8 +429,9 @@ public class ProductExtractor {
 					long refStreamUUID = ByteConversion.getStreamUUID(refUUID);
 					int refSequenceNum = ByteConversion.getProductSequenceNumber(refUUID);
 					
-					File refProductFile = FileAssembler.findProductFile(refStreamUUID,
-									refSequenceNum, enclosingFolder, productFile.getParentFile());
+					File refProductFile = FileAssembler.findProductFile(
+									FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum),
+									enclosingFolder, productFile.getParentFile());
 					
 					if (refProductFile == null)
 					{

@@ -1,19 +1,20 @@
 package logging;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import runner.SystemManager;
-
-import util.myUtilities;
-
 import config.Configuration;
 
 public class Logger
 {
 	private static File logFile;
-	private static List<String> lines;
+	private static PrintWriter logFileStream;
 	private static LogLevel messageLevel;
 	private static LogLevel exceptionLevel;
 	private static final LogLevel defaultMessageLevel = LogLevel.k_debug;
@@ -23,13 +24,22 @@ public class Logger
 	{
 		messageLevel = defaultMessageLevel;
 		exceptionLevel = defaultExceptionLevel;
-		lines = new ArrayList<String>();
 
 		String path = Configuration.getLogFolder().getPath() + "/"
 						+ System.currentTimeMillis() + ".log";
-
+		
 		logFile = new File(path);
 		logFile.getAbsoluteFile().getParentFile().mkdirs();
+
+		try
+		{
+			logFileStream = new PrintWriter(logFile);
+		}
+		catch (FileNotFoundException e)
+		{
+			Logger.log(LogLevel.k_fatal, "Logger error :( Can't open log file stream.");
+		}
+
 	}
 
 	public static void setMessageLogLevel(LogLevel logLevel)
@@ -48,7 +58,9 @@ public class Logger
 		{
 			String line = LogLevel.getLogHeader(level) + message;
 			System.out.println(line);
-			lines.add(line);
+
+			logFileStream.write(line + System.lineSeparator());
+			logFileStream.flush();
 
 			if (level.equals(LogLevel.k_fatal))
 			{
@@ -65,8 +77,10 @@ public class Logger
 			System.out.print(header);
 			e.printStackTrace();
 
-			lines.add(header + e.getMessage());// TODO add the stack trace to
-												// the log file
+			logFileStream.write(header + e.getMessage());
+			e.printStackTrace(logFileStream);
+			logFileStream.flush();
+			
 
 			if (level.equals(LogLevel.k_fatal))
 			{
@@ -82,6 +96,7 @@ public class Logger
 
 	private static void saveFile()
 	{
-		myUtilities.writeListToFile(logFile, lines);
+		logFileStream.flush();
+		logFileStream.close();
 	}
 }
