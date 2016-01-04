@@ -45,7 +45,7 @@ public class IndexFile
 		}
 
 		// update all fields
-		record.setFilePathHash(Hashing.hash(metadata.getPath().getBytes()));
+		record.setFilePathHash(pathHash);
 		record.setFileHash(metadata.getFileHash());
 		record.setDateCreated(metadata.getDateCreated());
 		record.setDateModified(metadata.getDateModified());

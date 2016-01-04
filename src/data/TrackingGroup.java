@@ -20,21 +20,29 @@ public class TrackingGroup
 	private String name;
 	private HashSet<File> trackedFiles;
 	private HashSet<File> untrackedFiles;
-	private boolean usingDatabase;
 	private Algorithm algorithm;
 	private Key key;
 	private File productStagingFolder;
 	private File extractionFolder;
 	private File hashDBFile;
+	
+	//always turn this off for temporary tracking groups,
+	//otherwise it's optional
+	private boolean usingIndexFiles;
+	
+	//turn this off for temporary tracking groups,
+	//otherwise leave it on
+	private boolean usingAbsolutePaths;
 
-	public TrackingGroup(String name, boolean usesDatabase, Algorithm algo, Key key)
+	public TrackingGroup(String name, boolean usesIndexFiles, Algorithm algo, Key key)
 	{
 		setName(name);
-		setUsingDatabase(usesDatabase);
+		setUsingIndexFiles(usesIndexFiles);
 		this.algorithm = algo;
 		this.key = key;
 		trackedFiles = new HashSet<File>();
 		untrackedFiles = new HashSet<File>();
+		usingAbsolutePaths = true;
 	}
 
 	public void addTrackedPath(String path)
@@ -53,7 +61,10 @@ public class TrackingGroup
 		}
 		else
 		{
-			trackedFiles.add(file);
+			if (usingAbsolutePaths)
+				trackedFiles.add(file.getAbsoluteFile());
+			else
+				trackedFiles.add(file);
 		}
 	}
 
@@ -73,7 +84,10 @@ public class TrackingGroup
 		}
 		else
 		{
-			untrackedFiles.add(file);
+			if (usingAbsolutePaths)
+				untrackedFiles.add(file.getAbsoluteFile());
+			else
+				untrackedFiles.add(file);
 		}
 	}
 
@@ -154,18 +168,18 @@ public class TrackingGroup
 	/**
 	 * @return the usingDatabase
 	 */
-	public boolean isUsingDatabase()
+	public boolean isUsingIndexFiles()
 	{
-		return usingDatabase;
+		return usingIndexFiles;
 	}
 
 	/**
 	 * @param usingDatabase
 	 *            if the group uses a database
 	 */
-	public void setUsingDatabase(boolean usingDatabase)
+	public void setUsingIndexFiles(boolean usingDatabase)
 	{
-		this.usingDatabase = usingDatabase;
+		this.usingIndexFiles = usingDatabase;
 	}
 
 	public Algorithm getAlgorithm()
@@ -255,5 +269,21 @@ public class TrackingGroup
 			}
 			catch (IOException e){}
 		}
+	}
+
+	/**
+	 * @return the usesAbsolutePaths
+	 */
+	public boolean usesAbsolutePaths()
+	{
+		return usingAbsolutePaths;
+	}
+
+	/**
+	 * @param usesAbsolutePaths the usesAbsolutePaths to set
+	 */
+	public void setUsesAbsolutePaths(boolean usesAbsolutePaths)
+	{
+		this.usingAbsolutePaths = usesAbsolutePaths;
 	}
 }

@@ -45,23 +45,6 @@ public class Metadata
 	}
 
 	/**
-	 * @return the path
-	 */
-	public String getPath()
-	{
-		return file.getAbsolutePath();
-	}
-
-	/**
-	 * @param path
-	 *            the path to set
-	 */
-	public void setPath(String path)
-	{
-		file = new File(path);
-	}
-
-	/**
 	 * @return the dateModified
 	 */
 	public long getDateModified()

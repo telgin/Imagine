@@ -80,8 +80,7 @@ public class FullPNGWriter extends FullPNG implements ProductWriter
 	{
 		try
 		{
-			File imgFile = new File(productStagingFolder.getAbsolutePath() + "/"
-							+ fileName + ".png");
+			File imgFile = new File(productStagingFolder.getAbsolutePath(), fileName + ".png");
 			Logger.log(LogLevel.k_info,
 							"Saving product file: " + imgFile.getAbsolutePath());
 			if (!imgFile.getParentFile().exists())

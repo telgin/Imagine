@@ -89,7 +89,8 @@ public class FileSystemDB implements ActiveComponent
 	public void save()
 	{
 		Logger.log(LogLevel.k_debug,
-						"Saving Database (" + loadedIndexFiles.size() + " index files)");
+						"Saving Database (" + loadedIndexFiles.size() + " index file" + 
+										(loadedIndexFiles.size() == 1 ? "" : "s") + ")");
 		
 		while (loadedIndexFiles.size() > 0)
 		{

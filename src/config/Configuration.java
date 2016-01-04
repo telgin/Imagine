@@ -66,14 +66,19 @@ public class Configuration {
 		groupNode.setAttribute("algorithmPresetName", group.getAlgorithm().getPresetName());
 		groupNode.setAttribute("name", group.getName());
 		groupNode.setAttribute("securityLevel", group.getAlgorithm().getProductSecurityLevel().toString());
-		groupNode.setAttribute("usesDatabase", Boolean.toString(group.isUsingDatabase()));
+		groupNode.setAttribute("usesDatabase", Boolean.toString(group.isUsingIndexFiles()));
 		
 		//tracked files
 		Element trackedNode = doc.createElement("Tracked");
 		for (File tracked : group.getTrackedFiles())
 		{
 			Element pathNode = doc.createElement("Path");
-			pathNode.setAttribute("value", tracked.getAbsolutePath());
+			
+			if (group.usesAbsolutePaths())
+				pathNode.setAttribute("value", tracked.getAbsolutePath());
+			else
+				pathNode.setAttribute("value", tracked.getPath());
+			
 			trackedNode.appendChild(pathNode);
 		}
 		groupNode.appendChild(trackedNode);
@@ -83,7 +88,12 @@ public class Configuration {
 		for (File untracked : group.getUntrackedFiles())
 		{
 			Element pathNode = doc.createElement("Path");
-			pathNode.setAttribute("value", untracked.getAbsolutePath());
+			
+			if (group.usesAbsolutePaths())
+				pathNode.setAttribute("value", untracked.getAbsolutePath());
+			else
+				pathNode.setAttribute("value", untracked.getPath());
+			
 			untrackedNode.appendChild(pathNode);
 		}
 		groupNode.appendChild(untrackedNode);

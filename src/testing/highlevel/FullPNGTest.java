@@ -25,7 +25,7 @@ public class FullPNGTest
 		static Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("FullPNG");
 		static
 		{
-			algorithm.setParameter("width", "485");
+			algorithm.setParameter("width", "566");
 			algorithm.setParameter("height", "485");
 			algorithm.setParameter("ProductMode", "Stealth");
 		}
@@ -39,10 +39,10 @@ public class FullPNGTest
 		
 //		@Test(timeout = 120000)
 //		public void testNoFiles_1(){ ProductIOTest.testNoFiles(group, 1); }
-//		@Test(timeout = 120000)
-//		public void testSmallFile_1(){ ProductIOTest.testSmallFile(group, 1); }
 		@Test(timeout = 120000)
-		public void testSmallTree_1(){ ProductIOTest.testSmallTree(group, 1); }
+		public void testSmallFile_1(){ ProductIOTest.testSmallFile(group, 1); }
+//		@Test(timeout = 120000)
+//		public void testSmallTree_1(){ ProductIOTest.testSmallTree(group, 1); }
 //		@Test(timeout = 120000)
 //		public void testBigFile_1(){ ProductIOTest.testBigFile(group, 1); }
 //		@Test(timeout = 120000)

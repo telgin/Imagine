@@ -369,32 +369,32 @@ public class FileSystemUtil
 		}
 	}
 
-	/**
-	 * @update_comment
-	 * @param included
-	 * @return
-	 */
-	public static String getDriveUUID(File included)
-	{
-		//get the drive file
-		File parent = included.getParentFile();
-		while (parent.getParentFile() != null)
-			parent = parent.getParentFile();
-		
-		//look for the pre-existing drive uuid file
-		File uuidFile = new File(parent, ".imagine_drive_uuid");
-		if (uuidFile.exists())
-		{
-			String uuid = myUtilities.readStringFromFile(included).trim();
-			return uuid;
-		}
-		else
-		{
-			//create a new drive uuid if one wasn't found
-			byte[] newUUID = Hashing.hash(ByteConversion.longToBytes(Clock.getUniqueTime()));
-			String truncated = ByteConversion.bytesToHex(newUUID).substring(16);
-			myUtilities.writeStringToFile(uuidFile, truncated);
-			return truncated;
-		}
-	}
+//	/**
+//	 * @update_comment
+//	 * @param included
+//	 * @return
+//	 */
+//	public static String getDriveUUID(File included)
+//	{
+//		//get the drive file
+//		File parent = included.getParentFile();
+//		while (parent.getParentFile() != null)
+//			parent = parent.getParentFile();
+//		
+//		//look for the pre-existing drive uuid file
+//		File uuidFile = new File(parent, ".imagine_drive_uuid");
+//		if (uuidFile.exists())
+//		{
+//			String uuid = myUtilities.readStringFromFile(included).trim();
+//			return uuid;
+//		}
+//		else
+//		{
+//			//create a new drive uuid if one wasn't found
+//			byte[] newUUID = Hashing.hash(ByteConversion.longToBytes(Clock.getUniqueTime()));
+//			String truncated = ByteConversion.bytesToHex(newUUID).substring(16);
+//			myUtilities.writeStringToFile(uuidFile, truncated);
+//			return truncated;
+//		}
+//	}
 }

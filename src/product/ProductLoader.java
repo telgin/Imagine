@@ -329,11 +329,11 @@ public class ProductLoader
 	
 			// file name length
 			if (!writeFull(ByteConversion
-							.shortToBytes((short) fileMetadata.getPath().length())))
+							.shortToBytes((short) fileMetadata.getFile().getPath().length())))
 				return false;
 	
 			// file name
-			if (!writeFull(fileMetadata.getPath().getBytes()))
+			if (!writeFull(fileMetadata.getFile().getPath().getBytes()))
 				return false;
 	
 			// date created
@@ -370,11 +370,11 @@ public class ProductLoader
 			
 			// file name length
 			if (!writeFull(ByteConversion
-							.shortToBytes((short) fileMetadata.getPath().length())))
+							.shortToBytes((short) fileMetadata.getFile().getPath().length())))
 				return false;
 	
 			// file name
-			if (!writeFull(fileMetadata.getPath().getBytes()))
+			if (!writeFull(fileMetadata.getFile().getPath().getBytes()))
 				return false;
 		}
 

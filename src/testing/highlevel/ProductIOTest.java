@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import data.Metadata;
-import data.PartAssembler;
+import data.FileAssembler;
 import data.TrackingGroup;
 import database.Database;
 import product.FileContents;
@@ -105,6 +105,8 @@ public class ProductIOTest
 
 		// specify the original single test file
 		File testFile = inputFolder.listFiles()[0];
+		if (group.usesAbsolutePaths())
+			testFile = testFile.getAbsoluteFile();
 
 		runJob(group, threads);
 
@@ -120,9 +122,9 @@ public class ProductIOTest
 		File productFile = outputFolder.listFiles()[0];
 
 		// read the file, make sure the fields are all the same
-		ProductExtractor reader = new ProductExtractor(group.getProductReaderFactory());
-		reader.setExtractionFolder(extractionFolder);
-		ProductContents productContents = reader.extractAll(productFile);
+		ProductExtractor reader = new ProductExtractor(group, outputFolder);
+		group.setExtractionFolder(extractionFolder);
+		ProductContents productContents = reader.viewAll(productFile);
 		// System.out.println(productContents.toString());
 		assertEquals(productContents.getAlgorithmName(), group.getAlgorithm().getName());
 		assertEquals(productContents.getAlgorithmVersionNumber(),
@@ -138,9 +140,9 @@ public class ProductIOTest
 		Metadata extractedMetadata = fileContents.getMetadata();
 		compareMetadata(previousMetadata, extractedMetadata);
 
-		File assembled = new File(assemblyFolder.getAbsolutePath() + "/"
-						+ previousMetadata.getFile().getName());
-		PartAssembler.assemble(fileContents.getExtractedFile(), assembled);
+		assertTrue(reader.extractAllFromProductFolder(outputFolder));
+		File assembled = extractionFolder.listFiles()[0].listFiles()[0];
+
 		assertTrue(ByteConversion.bytesEqual(Hashing.hash(assembled),
 						Hashing.hash(testFile)));
 
@@ -258,9 +260,9 @@ public class ProductIOTest
 		{
 			// read the file, make sure the fields are all the same
 			ProductExtractor reader =
-							new ProductExtractor(group.getProductReaderFactory());
-			reader.setExtractionFolder(extractionFolder);
-			ProductContents productContents = reader.extractAll(productFile);
+							new ProductExtractor(group, outputFolder);
+			group.setExtractionFolder(extractionFolder);
+			ProductContents productContents = reader.viewAll(productFile);
 
 			assertEquals(productContents.getAlgorithmName(),
 							group.getAlgorithm().getName());
@@ -283,7 +285,7 @@ public class ProductIOTest
 				// extract file
 				File assembled = new File(assemblyFolder.getAbsolutePath() + "/"
 								+ extractedMetadata.getFile().getName());
-				PartAssembler.assemble(fc.getExtractedFile(), assembled);
+				//FileAssembler.assemble(fc.getExtractedFile(), assembled);
 				assertTrue(ByteConversion.bytesEqual(Hashing.hash(assembled),
 								Hashing.hash(testFile)));
 
@@ -332,13 +334,13 @@ public class ProductIOTest
 		assertTrue(outputFolder.listFiles().length > 1);
 
 		// extract from all files in the output folder
-		ProductExtractor reader = new ProductExtractor(group.getProductReaderFactory());
-		reader.setExtractionFolder(extractionFolder);
+		ProductExtractor reader = new ProductExtractor(group, outputFolder);
+		group.setExtractionFolder(extractionFolder);
 		File extractedFolder = null;
 		for (File productFile : outputFolder.listFiles())
 		{
 			// read the file, make sure the fields are all the same
-			ProductContents productContents = reader.extractAll(productFile);
+			ProductContents productContents = reader.viewAll(productFile);
 			// System.out.println(productContents.toString());
 			assertEquals(productContents.getAlgorithmName(),
 							group.getAlgorithm().getName());
@@ -355,14 +357,14 @@ public class ProductIOTest
 			Metadata extractedMetadata = fileContents.getMetadata();
 			compareMetadata(previousMetadata, extractedMetadata);
 
-			if (extractedFolder == null)
-				extractedFolder = fileContents.getExtractedFile();
+			//if (extractedFolder == null)
+			//	extractedFolder = fileContents.getExtractedFile();
 		}
 
 		// assemble all part files into the specified extracted filename
 		File assembled = new File(assemblyFolder.getAbsolutePath() + "/"
 						+ previousMetadata.getFile().getName());
-		PartAssembler.assemble(extractedFolder, assembled);
+		//FileAssembler.assemble(extractedFolder, assembled);
 		assertTrue(ByteConversion.bytesEqual(Hashing.hash(assembled),
 						Hashing.hash(testFile)));
 
@@ -492,21 +494,21 @@ public class ProductIOTest
 				compareMetadata(Database.getFileMetadata(extractedMetadata.getFile(),
 								group), extractedMetadata);
 
-				if (!extractionFolders.containsKey(fc.getExtractedFile()))
-				{
-					// specify assembled file name
-					String relativized =
-									inputFolder.toURI()
-													.relativize(extractedMetadata
-																	.getFile().toURI())
-									.getPath();
-					File assembledFile = new File(assemblyFolder.getAbsolutePath(),
-									relativized);
-
-					// associate the extraction folder with the assembled file
-					// path
-					extractionFolders.put(fc.getExtractedFile(), assembledFile);
-				}
+//				if (!extractionFolders.containsKey(fc.getExtractedFile()))
+//				{
+//					// specify assembled file name
+//					String relativized =
+//									inputFolder.toURI()
+//													.relativize(extractedMetadata
+//																	.getFile().toURI())
+//									.getPath();
+//					File assembledFile = new File(assemblyFolder.getAbsolutePath(),
+//									relativized);
+//
+//					// associate the extraction folder with the assembled file
+//					// path
+//					extractionFolders.put(fc.getExtractedFile(), assembledFile);
+//				}
 			}
 		}
 
@@ -518,7 +520,7 @@ public class ProductIOTest
 			File assembleTo = extractionFolders.get(partFolder);
 			if (!assembleTo.getParentFile().exists())
 				assembleTo.getParentFile().mkdirs();
-			PartAssembler.assemble(partFolder, assembleTo);
+			//FileAssembler.assemble(partFolder, assembleTo);
 
 			// make sure the files are the same
 			String relativized = assemblyFolder.toURI().relativize(assembleTo.toURI())
@@ -577,7 +579,7 @@ public class ProductIOTest
 	{
 		assertEquals(m1.getFile().getAbsolutePath(), m2.getFile().getAbsolutePath());
 		assertArrayEquals(m1.getFileHash(), m2.getFileHash());
-		assertEquals(m1.getPath(), m2.getPath());
+		assertEquals(m1.getFile().getPath(), m2.getFile().getPath());
 		assertEquals(m1.getPermissions(), m2.getPermissions());
 		assertEquals(m1.getDateCreated(), m2.getDateCreated());
 		assertEquals(m1.getDateModified(), m2.getDateModified());
@@ -589,7 +591,7 @@ public class ProductIOTest
 		System.err.println(f + ", " + m.getFile());
 		assertEquals(f.getAbsolutePath(), m.getFile().getAbsolutePath());
 		assertTrue(ByteConversion.bytesEqual(Hashing.hash(f), m.getFileHash()));
-		assertEquals(f.getAbsolutePath(), m.getPath());
+		assertEquals(f.getPath(), m.getFile().getPath());
 		assertEquals(FileSystemUtil.getNumericFilePermissions(f), m.getPermissions());
 		assertEquals(FileSystemUtil.getDateCreated(f), m.getDateCreated());
 		assertEquals(FileSystemUtil.getDateModified(f), m.getDateModified());

@@ -9,7 +9,6 @@ public class FileContents
 {
 	private long fragmentNumber;
 	private long remainingData;
-	private File extractedFile;
 	private Metadata metadata;
 
 	public String toString()
@@ -17,11 +16,7 @@ public class FileContents
 		String text = "FileContents:";
 		text += "\nfragmentNumber " + fragmentNumber;
 		text += "\nremainingData " + remainingData;
-		if (extractedFile == null)
-			text += "\nextractedFile null";
-		else
-			text += "\nextractedFile " + extractedFile.getName();
-		text += "\n" + metadata.toString();
+		text += "\nfilename " + metadata.toString();
 		return text;
 	}
 
@@ -57,23 +52,6 @@ public class FileContents
 	public void setRemainingData(long remainingData)
 	{
 		this.remainingData = remainingData;
-	}
-
-	/**
-	 * @return the extractedFile
-	 */
-	public File getExtractedFile()
-	{
-		return extractedFile;
-	}
-
-	/**
-	 * @param extractedFile
-	 *            the extractedFile to set
-	 */
-	public void setExtractedFile(File extractedFile)
-	{
-		this.extractedFile = extractedFile;
 	}
 
 	/**

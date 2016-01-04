@@ -67,8 +67,7 @@ public class TextBlockWriter extends TextBlock implements ProductWriter
 
 		try
 		{
-			File toSave = new File(productStagingFolder.getAbsolutePath() + "/" + filename
-							+ ".txt");
+			File toSave = new File(productStagingFolder.getAbsolutePath(), filename + ".txt");
 			Logger.log(LogLevel.k_info,
 							"Saving product file: " + toSave.getAbsolutePath());
 

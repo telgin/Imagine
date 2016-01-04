@@ -18,7 +18,7 @@ import util.Constants;
 import util.Hashing;
 import data.FileType;
 import data.Metadata;
-import data.PartAssembler;
+import data.FileAssembler;
 import data.TrackingGroup;
 
 public class ProductExtractor {
@@ -96,8 +96,8 @@ public class ProductExtractor {
 	{
 		//create temporary hidden assembly folder
 		//TODO make this path configurable or put it on the same drive as the product files
-		File assemblyFolder = new File(".assembly");
-		if (assemblyFolder.exists())
+		File assemblyFolder = new File(group.getExtractionFolder(), ".assembly");
+		if (!assemblyFolder.exists())
 			assemblyFolder.mkdir();
 		
 		//create temporary file for loading all fragment data into
@@ -131,7 +131,7 @@ public class ProductExtractor {
 			{
 				//there are other fragments that need to be added,
 				//find the next product file
-				File nextProductFile = PartAssembler.findProductFile(curProductContents.getStreamUUID(),
+				File nextProductFile = FileAssembler.findProductFile(curProductContents.getStreamUUID(),
 								curProductContents.getProductSequenceNumber() + increment,
 								curExtractor.enclosingFolder,
 								curExtractor.curProductFile.getAbsoluteFile().getParentFile());
@@ -282,19 +282,19 @@ public class ProductExtractor {
 					
 					if (assembled != null)
 					{
-						PartAssembler.moveToExtractionFolder(assembled, fileContents, group);
+						FileAssembler.moveToExtractionFolder(assembled, fileContents, group);
 					}
 					else
 					{
 						Logger.log(LogLevel.k_error, "Failed to extract file: " +
-										fileContents.getMetadata().getPath());
+										fileContents.getMetadata().getFile().getPath());
 					}
 				}
 					
 			}
 			else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
 			{
-				PartAssembler.moveFolderToExtractionFolder(fileContents, group);
+				FileAssembler.moveFolderToExtractionFolder(fileContents, group);
 			}
 			else //k_reference
 			{
@@ -303,7 +303,7 @@ public class ProductExtractor {
 				long refStreamUUID = ByteConversion.getStreamUUID(refUUID);
 				int refSequenceNum = ByteConversion.getProductSequenceNumber(refUUID);
 				
-				File refProductFile = PartAssembler.findProductFile(refStreamUUID,
+				File refProductFile = FileAssembler.findProductFile(refStreamUUID,
 								refSequenceNum, enclosingFolder, productFile.getParentFile());
 				
 				if (refProductFile == null)
@@ -400,17 +400,17 @@ public class ProductExtractor {
 					
 					if (assembled != null)
 					{
-						PartAssembler.moveToExtractionFolder(assembled, fileContents, group);
+						FileAssembler.moveToExtractionFolder(assembled, fileContents, group);
 					}
 					else
 					{
 						Logger.log(LogLevel.k_error, "Failed to extract file: " +
-										fileContents.getMetadata().getPath());
+										fileContents.getMetadata().getFile().getPath());
 					}	
 				}
 				else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
 				{
-					PartAssembler.moveFolderToExtractionFolder(fileContents, group);
+					FileAssembler.moveFolderToExtractionFolder(fileContents, group);
 				}
 				else //k_reference
 				{
@@ -419,7 +419,7 @@ public class ProductExtractor {
 					long refStreamUUID = ByteConversion.getStreamUUID(refUUID);
 					int refSequenceNum = ByteConversion.getProductSequenceNumber(refUUID);
 					
-					File refProductFile = PartAssembler.findProductFile(refStreamUUID,
+					File refProductFile = FileAssembler.findProductFile(refStreamUUID,
 									refSequenceNum, enclosingFolder, productFile.getParentFile());
 					
 					if (refProductFile == null)
@@ -496,13 +496,13 @@ public class ProductExtractor {
 					
 					if (assembled != null)
 					{
-						PartAssembler.moveToExtractionFolder(assembled, fileContents, group);
+						FileAssembler.moveToExtractionFolder(assembled, fileContents, group);
 						return true;
 					}
 					else
 					{
 						Logger.log(LogLevel.k_error, "Failed to extract file: " +
-										fileContents.getMetadata().getPath());
+										fileContents.getMetadata().getFile().getPath());
 						return false;
 					}
 				}

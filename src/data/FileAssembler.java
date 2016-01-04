@@ -12,10 +12,8 @@ import logging.LogLevel;
 import logging.Logger;
 import product.FileContents;
 
-public class PartAssembler
+public class FileAssembler
 {
-	
-
 	/**
 	 * @update_comment
 	 * @param streamUUID
@@ -61,105 +59,6 @@ public class PartAssembler
 		Logger.log(LogLevel.k_debug, "Could not find next product file: " + searchName);
 		return null;
 	}
-	
-	
-	
-	
-	/**
-	 * Assembles the parts seen in the part folder into the output file
-	 * 
-	 * @param partFolder
-	 *            It is assumed that this folder only contains the parts of one
-	 *            file.
-	 * @param outputFile
-	 * @return True if it seems to be successful
-	 */
-	public static boolean assemble(File partFolder, File outputFile)
-	{
-		try
-		{
-			for (File partFile : partFolder.listFiles())
-			{
-				if (partFile.getName().endsWith("_1.part"))
-				{
-					FileOutputStream fos = new FileOutputStream(outputFile);
-					File curPart = partFile;
-					while (curPart != null)
-					{
-						fos.write(Files.readAllBytes(curPart.toPath()));
-
-						// get the next part
-						curPart = getNextPartFile(curPart);
-					}
-					fos.close();
-
-					break;
-				}
-			}
-			return true;
-		}
-		catch (IOException e)
-		{
-			Logger.log(LogLevel.k_error,
-							"Exception while writing files: " + e.getMessage());
-			return false;
-		}
-
-	}
-
-	private static File getNextPartFile(File partFile)
-	{
-		if (partFile.isDirectory())
-		{
-			Logger.log(LogLevel.k_debug,
-							"The partfile supplied is a folder: " + partFile.getPath());
-			return null;
-		}
-		else
-		{
-			// format: fileID_partNum.part
-			String filename = partFile.getName();
-			if (filename.contains(".part"))
-			{
-				String[] nameParts = filename.split("_");
-				String filenameID = nameParts[0];
-				String partNumberString = nameParts[1].split("\\.")[0];
-
-				try
-				{
-					int partNumber = Integer.parseInt(partNumberString);
-					File nextFile = new File(partFile.getParentFile().getAbsolutePath()
-									+ "/" + filenameID + "_" + (partNumber + 1)
-									+ ".part");
-
-					if (nextFile.exists())
-						return nextFile;
-					else
-					{
-						Logger.log(LogLevel.k_debug,
-										"Could not find the next part file, assuming we're done. : "
-														+ partFile.getPath());
-						return null;
-					}
-				}
-				catch (Exception e)
-				{
-					Logger.log(LogLevel.k_debug, "The partfile name could not be parsed: "
-									+ partFile.getPath());
-					return null;
-				}
-			}
-			else
-			{
-				Logger.log(LogLevel.k_debug, "The partfile does not contain '.part': "
-								+ partFile.getPath());
-				return null;
-			}
-		}
-	}
-
-
-
 
 	/**
 	 * @update_comment
@@ -170,8 +69,8 @@ public class PartAssembler
 	public static void moveToExtractionFolder(File assembled, FileContents fileContents,
 					TrackingGroup group)
 	{
-		File created = new File(group.getExtractionFolder().toURI()
-						.relativize(fileContents.getMetadata().getFile().toURI()));
+		File created = new File(group.getExtractionFolder(),
+						fileContents.getMetadata().getFile().getPath());
 		
 		File parent = created.getParentFile();
 		if (!parent.exists())
@@ -180,6 +79,8 @@ public class PartAssembler
 		try
 		{
 			Files.move(assembled.toPath(), created.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			Logger.log(LogLevel.k_debug, "Assembled file moved to: "
+							+ created.getAbsolutePath());
 		}
 		catch (IOException e)
 		{

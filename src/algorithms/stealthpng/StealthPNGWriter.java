@@ -308,8 +308,7 @@ public class StealthPNGWriter extends StealthPNG implements ProductWriter
 		// myUtilities.writeListToFile(new File("/home/tom/diffs.csv"), diffs);
 		try
 		{
-			File imgFile = new File(productStagingFolder.getAbsolutePath() + "/"
-							+ fileName + ".png");
+			File imgFile = new File(productStagingFolder.getAbsolutePath(), fileName + ".png");
 			Logger.log(LogLevel.k_info,
 							"Saving product file: " + imgFile.getAbsolutePath());
 			if (!imgFile.getParentFile().exists())

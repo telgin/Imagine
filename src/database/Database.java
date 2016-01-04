@@ -105,7 +105,7 @@ public class Database
 		
 		
 		//only be using the fsb if the group uses a database
-		if (group.isUsingDatabase() && !fileMetadata.getType().equals(FileType.k_folder))
+		if (group.isUsingIndexFiles() && !fileMetadata.getType().equals(FileType.k_folder))
 		{
 			//update the index file
 			fsdb.saveMetadata(fileMetadata, group);

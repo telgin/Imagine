@@ -186,7 +186,7 @@ public class TreeGenerator
 			return null;
 		
 		boolean update = false;
-		if (group.isUsingDatabase())
+		if (group.isUsingIndexFiles())
 		{
 			long lastModified = FileSystemUtil.getDateModified(included);
 			Metadata cachedMetadata = Database.getFileMetadata(included, group);
