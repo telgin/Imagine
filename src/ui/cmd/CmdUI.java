@@ -1,9 +1,7 @@
-package gui.cmd;
+package ui.cmd;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.List;
 
 import algorithms.Algorithm;
 import config.Configuration;
@@ -12,22 +10,26 @@ import data.Key;
 import data.NullKey;
 import data.PasswordKey;
 import data.TrackingGroup;
-
-import gui.GUI;
-import logging.LogLevel;
-import logging.Logger;
 import product.ProductMode;
-import runner.ConversionRunner;
-import stats.ProgressMonitor;
+import ui.UI;
 
-public class CmdGUI extends GUI
+public class CmdUI extends UI
 {
-	private BufferedReader cin;
-	private ConversionRunner backupRunner;
-
-	public CmdGUI()
+	private List<String> args;
+	
+	public CmdUI(List<String> args)
 	{
-		cin = new BufferedReader(new InputStreamReader(System.in));
+		this.args = args;
+	}
+	
+	/* (non-Javadoc)
+	 * @see ui.UI#processArgs()
+	 */
+	@Override
+	public void processArgs()
+	{
+		if (args.isEmpty())
+			mainMenu();
 	}
 
 	@Override
@@ -41,24 +43,30 @@ public class CmdGUI extends GUI
 	{
 
 		p("Main Menu:");
-		p("\t1\trun backup");
-		p("\t2\tget file information");
-		p("\t3\tcreate new tracking group");
-		p("\t4\texit");
+		p("\t1\tmanage tracking groups");
+		p("\t2\tmanage algorithm presets");
+		p("\t3\topen archive to view contents");
+		p("\t4\tembed data");
+		p("\t5\textract data");
+		p("\t6\texit");
 
 		int choice = 0;
 		while (choice == 0)
 		{
 			try
 			{
-				choice = Integer.parseInt(getInput(""));
+				choice = Integer.parseInt(promptInput(""));
 				if (choice == 1)
-					runAllBackups();
+					manageTrackingGroupsMenu();
 				else if (choice == 2)
-					fileInfoMenu();
+					manageAlgorithmsMenu();
 				else if (choice == 3)
-					createTrackingGroupPrompts();
+					openArchiveMenu();
 				else if (choice == 4)
+					embedDataMenu();
+				else if (choice == 5)
+					extractDataMenu();
+				else if (choice == 6)
 					shutdown();
 				else
 				{
@@ -74,18 +82,63 @@ public class CmdGUI extends GUI
 		}
 	}
 
+	/**
+	 * @update_comment
+	 */
+	private void extractDataMenu()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * @update_comment
+	 */
+	private void embedDataMenu()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * @update_comment
+	 */
+	private void openArchiveMenu()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * @update_comment
+	 */
+	private void manageAlgorithmsMenu()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * @update_comment
+	 */
+	private void manageTrackingGroupsMenu()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void createTrackingGroupPrompts()
 	{
 
 		// name
-		String groupName = getInput("Enter a new name for the tracking group: ");
+		String groupName = promptInput("Enter a new name for the tracking group: ");
 
 		// mode
-		ProductMode mode = ProductMode.getMode(getInput("Enter the security level: "));
+		ProductMode mode = ProductMode.getMode(promptInput("Enter the security level: "));
 
 		// database
 		boolean usesDatabase =
-						getInput("Should files belonging to this group be tracked within the file system? [y/n]: ")
+						promptInput("Should files belonging to this group be tracked within the file system? [y/n]: ")
 										.toLowerCase().equals("y");
 
 		// agorithm
@@ -109,7 +162,7 @@ public class CmdGUI extends GUI
 		Key key;
 
 		// key name
-		String keyName = getInput(
+		String keyName = promptInput(
 						"Enter a name for your password or key file (like a hint): ");
 
 		if (mode.equals(ProductMode.NORMAL))
@@ -118,12 +171,12 @@ public class CmdGUI extends GUI
 		}
 		else
 		{
-			if (getInput("Would you like to use a key file? [y/n]: ").toLowerCase()
+			if (promptInput("Would you like to use a key file? [y/n]: ").toLowerCase()
 							.equals("y"))
 			{
 				// key file
 				File keyFile = null;
-				String input = getInput(
+				String input = promptInput(
 								"Enter key file location (or return to have the system prompt for it when needed): ");
 				if (input.length() > 0)
 				{
@@ -147,53 +200,19 @@ public class CmdGUI extends GUI
 		return null;
 	}
 
-	public void runBackup(TrackingGroup group)
-	{
-		try
-		{
-			if (backupRunner == null)
-				backupRunner = new ConversionRunner();
-
-			setRunner(backupRunner);
-			backupRunner.runBackup(group);
-			waitForBackup();
-		}
-		catch (Exception e)
-		{
-			Logger.log(LogLevel.k_error, e, false);
-		}
-	}
-
-	private void runAllBackups()
-	{
-		try
-		{
-			if (backupRunner == null)
-				backupRunner = new ConversionRunner();
-
-			setRunner(backupRunner);
-			backupRunner.runAllBackups();
-			waitForBackup();
-		}
-		catch (Exception e)
-		{
-			Logger.log(LogLevel.k_error, e, false);
-		}
-	}
-
-	private void waitForBackup() throws InterruptedException
-	{
-		while (backupRunner.isRunning())
-		{
-			Thread.sleep(1000);
-			int filesProcessed = (int) ProgressMonitor.getStat("filesProcessed")
-							.getNumericProgress().doubleValue();
-			int productsCreated = (int) ProgressMonitor.getStat("productsCreated")
-							.getNumericProgress().doubleValue();
-			Logger.log(LogLevel.k_info, "Files Processed: " + filesProcessed
-							+ ", Products Created: " + productsCreated);
-		}
-	}
+//	private void waitForBackup() throws InterruptedException
+//	{
+//		while (backupRunner.isRunning())
+//		{
+//			Thread.sleep(1000);
+//			int filesProcessed = (int) ProgressMonitor.getStat("filesProcessed")
+//							.getNumericProgress().doubleValue();
+//			int productsCreated = (int) ProgressMonitor.getStat("productsCreated")
+//							.getNumericProgress().doubleValue();
+//			Logger.log(LogLevel.k_info, "Files Processed: " + filesProcessed
+//							+ ", Products Created: " + productsCreated);
+//		}
+//	}
 
 	private void fileInfoMenu()
 	{
@@ -207,7 +226,7 @@ public class CmdGUI extends GUI
 		{
 			try
 			{
-				choice = Integer.parseInt(getInput(""));
+				choice = Integer.parseInt(promptInput(""));
 				if (choice == 1)
 					fileStatusPrompt();
 				else if (choice == 2)
@@ -233,7 +252,7 @@ public class CmdGUI extends GUI
 		String path = "";
 		while (true)
 		{
-			path = getInput("Enter the path of a file: ");
+			path = promptInput("Enter the path of a file: ");
 			File file = new File(path);
 			if (file.exists())
 			{
@@ -257,7 +276,7 @@ public class CmdGUI extends GUI
 		String imagePath = "";
 		while (true)
 		{
-			imagePath = getInput("Enter the path of an image product: ");
+			imagePath = promptInput("Enter the path of an image product: ");
 			File imageFile = new File(imagePath);
 			if (imageFile.exists())
 			{
@@ -282,23 +301,28 @@ public class CmdGUI extends GUI
 		p("Incorrect Input: " + what);
 	}
 
-	private String getInput(String prompt)
+	private String promptInput(String prompt)
 	{
 		System.out.print(prompt);
-		try
-		{
-			return cin.readLine();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-			return "";
-		}
+		return CMDInput.getLine();
 	}
 
+	/**
+	 * typing this sucks
+	 * @param print
+	 */
 	private final void p(String print)
 	{
 		System.out.println(print);
+	}
+	
+	/**
+	 * typing this sucks
+	 * @param print
+	 */
+	private final void err(String print)
+	{
+		System.err.println(print);
 	}
 
 	@Override
@@ -323,14 +347,33 @@ public class CmdGUI extends GUI
 	@Override
 	public File promptKeyFileLocation(String keyName, String groupName)
 	{
-		return new File(getInput("Enter key (" + keyName
+		return new File(promptInput("Enter key (" + keyName
 						+ ") file location for tracking group '" + groupName + "': "));
 	}
 
 	@Override
 	public String promptKey(String keyName, String groupName)
 	{
-		return getInput("Enter key (" + keyName + ") for tracking group '" + groupName
+		return promptInput("Enter key (" + keyName + ") for tracking group '" + groupName
 						+ "': ");
 	}
+	
+	private void usage(String message)
+	{
+		if (message != null)
+			err(message);
+		
+		err("Usage:");
+		err("(See 'imagine --help' for more details.)");
+		err("imagine --gui\n");
+		err("imagine --open -g <groupname> -i <file>");
+		err("imagine --open -a <presetname> -i <file> [-k <keyfile>]\n");
+		err("imagine --embed -g <groupname> -i <file/folder> -o <folder>");
+		err("imagine --embed -a <presetname> -i <file/folder> -o <folder> [-k <keyfile>]\n");
+		err("imagine --extract -g <groupname> -i <file/folder> -o <folder>");
+		err("imagine --extract -a <presetname> -i <file/folder> -o <folder> [-k <keyfile>]");
+		
+	}
+
+
 }

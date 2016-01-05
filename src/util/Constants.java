@@ -30,6 +30,7 @@ public abstract class Constants
 					"_reserved_temp";
 	public static final int DEFAULT_THREAD_COUNT = 3;
 	public static final Charset CHARSET = StandardCharsets.UTF_8;
+	public static final long DEFAULT_SEED = 1337;
 	
 	// io system configuration
 	public static final int MAX_READ_BUFFER_SIZE = 50000000;

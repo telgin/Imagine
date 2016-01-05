@@ -5,10 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import data.Key;
-import data.TrackingGroup;
 import logging.LogLevel;
 import logging.Logger;
-import product.Product;
 import product.ProductReader;
 import product.ProductReaderFactory;
 import product.ProductWriter;

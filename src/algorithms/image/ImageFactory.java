@@ -1,8 +1,6 @@
 package algorithms.image;
 
 import algorithms.Algorithm;
-import algorithms.text.TextReader;
-import algorithms.text.TextWriter;
 import data.Key;
 import product.ProductReaderFactory;
 import product.ProductWriterFactory;

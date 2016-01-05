@@ -69,8 +69,8 @@ public class ImageOverlay implements Product
 
 	public void reset()
 	{
-		// any constant seed
-		random = new HashRandom(1337l);
+		// use any constant seed to start
+		random = new HashRandom(Constants.DEFAULT_SEED);
 
 		// obtain a random order
 		randOrder = new UniqueRandomRange(random, img.getWidth() * img.getHeight());

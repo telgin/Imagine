@@ -304,6 +304,8 @@ public class Configuration {
 			}
 		}
 		
+		presetNames.sort(null);
+		
 		return presetNames;
 	}
 	
@@ -315,6 +317,8 @@ public class Configuration {
 		List<String> names = new LinkedList<String>();
 		for (TrackingGroup group : tempList)
 			names.add(group.getName());
+		
+		names.sort(null);
 		
 		return names;
 	}

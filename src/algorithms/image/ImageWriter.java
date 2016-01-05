@@ -3,28 +3,18 @@ package algorithms.image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import javax.imageio.ImageIO;
 
 import logging.LogLevel;
 import logging.Logger;
-import product.Product;
 import product.ProductIOException;
-import product.ProductMode;
 import product.ProductWriter;
 import stats.ProgressMonitor;
 import stats.Stat;
 import util.ByteConversion;
-import util.Constants;
-import util.algorithms.HashRandom;
 import util.algorithms.ImageUtil;
-import util.algorithms.UniqueRandomRange;
-import config.Configuration;
 import data.Key;
 import algorithms.Algorithm;
-import algorithms.Parameter;
 
 public class ImageWriter extends Image implements ProductWriter
 {

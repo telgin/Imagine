@@ -4,7 +4,7 @@ import java.io.File;
 
 import logging.LogLevel;
 import logging.Logger;
-import runner.Runner;
+import ui.UIContext;
 import util.Hashing;
 
 public class FileKey implements Key
@@ -50,7 +50,7 @@ public class FileKey implements Key
 	{
 		if (keyLocation == null)
 		{
-			keyLocation = Runner.getActiveGUI().promptKeyFileLocation(name, groupName);
+			keyLocation = UIContext.getUI().promptKeyFileLocation(name, groupName);
 		}
 
 		if (keyLocation == null)

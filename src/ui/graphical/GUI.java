@@ -1,15 +1,18 @@
-package gui.background;
+package ui.graphical;
 
 import java.io.File;
+import java.util.List;
 
 import data.TrackingGroup;
-import gui.GUI;
+import ui.UI;
 
-public class BackgroundGUI extends GUI
+public class GUI extends UI
 {
-
-	public BackgroundGUI()
+	private List<String> args;
+	
+	public GUI(List<String> args)
 	{
+		this.args = args;
 	}
 
 	@Override
@@ -53,4 +56,15 @@ public class BackgroundGUI extends GUI
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see ui.UI#processArgs()
+	 */
+	@Override
+	public void processArgs()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }

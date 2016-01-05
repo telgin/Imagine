@@ -1,6 +1,6 @@
 package data;
 
-import runner.Runner;
+import ui.UIContext;
 import util.Hashing;
 
 public class PasswordKey implements Key
@@ -40,7 +40,7 @@ public class PasswordKey implements Key
 		if (keyHash == null)
 		{
 			keyHash = Hashing.hash(
-							Runner.getActiveGUI().promptKey(name, groupName).getBytes());
+							UIContext.getUI().promptKey(name, groupName).getBytes());
 		}
 	}
 

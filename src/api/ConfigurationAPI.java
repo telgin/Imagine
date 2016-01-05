@@ -19,6 +19,12 @@ public abstract class ConfigurationAPI
 	{
 		//create a config file
 		DefaultConfigGenerator.create(Constants.CONFIG_FILE);
+		
+		//create these folders now, because it's better to show
+		//they exist and are empty as opposed to creating them
+		//when they're needed
+		Configuration.getDatabaseFolder().mkdir();
+		Configuration.getLogFolder().mkdir();
 	}
 	
 	//Algorithm Preset Operations------------------------

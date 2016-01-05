@@ -12,6 +12,7 @@ import product.ProductMode;
 import stats.ProgressMonitor;
 import stats.Stat;
 import util.ByteConversion;
+import util.Constants;
 import util.algorithms.HashRandom;
 import util.algorithms.UniqueRandomRange;
 import config.Configuration;
@@ -37,7 +38,8 @@ public abstract class Text implements Product
 
 	protected void reset()
 	{
-		random = new HashRandom(1337l);
+		// use any constant seed to start
+		random = new HashRandom(Constants.DEFAULT_SEED);
 		order = new UniqueRandomRange(random, blockSize);
 	}
 
