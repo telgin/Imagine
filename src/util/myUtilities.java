@@ -112,7 +112,7 @@ public abstract class myUtilities
 		try
 		{
 			byte[] bytes = Files.readAllBytes(in.toPath());
-			return new String(bytes);
+			return new String(bytes, Constants.CHARSET);
 		}
 		catch (IOException e)
 		{

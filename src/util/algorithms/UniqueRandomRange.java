@@ -1,6 +1,6 @@
 package util.algorithms;
 
-import algorithms.ProductIOException;
+import product.ProductIOException;
 import util.ByteConversion;
 
 public class UniqueRandomRange

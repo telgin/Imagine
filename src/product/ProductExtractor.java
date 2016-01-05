@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import algorithms.ProductIOException;
 import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
@@ -565,7 +564,7 @@ public class ProductExtractor {
 				if (!readFull(algorithmNameLength))
 					throw new ProductIOException("Could not read algorithm name.");
 				
-				contents.setAlgorithmName(new String(buffer, 0, algorithmNameLength));
+				contents.setAlgorithmName(new String(buffer, 0, algorithmNameLength, Constants.CHARSET));
 			}
 			else
 			{
@@ -600,7 +599,7 @@ public class ProductExtractor {
 				if (!readFull(groupNameLength))
 					throw new ProductIOException("Could not read group name.");
 				
-				contents.setGroupName(new String(buffer, 0, groupNameLength));
+				contents.setGroupName(new String(buffer, 0, groupNameLength, Constants.CHARSET));
 			}
 			else
 			{
@@ -621,8 +620,8 @@ public class ProductExtractor {
 				if (!readFull(groupKeyNameLength))
 					throw new ProductIOException("Could not read group key name.");
 				
-				contents.setGroupKeyName(new String(buffer, 0, groupKeyNameLength));
-				System.out.println("Read group key name of: " + new String(buffer, 0, groupKeyNameLength));
+				contents.setGroupKeyName(new String(buffer, 0, groupKeyNameLength, Constants.CHARSET));
+				System.out.println("Read group key name of: " + new String(buffer, 0, groupKeyNameLength, Constants.CHARSET));
 			}
 			else
 			{
@@ -720,7 +719,7 @@ public class ProductExtractor {
 				{
 					if (!readFull(fileNameLength))
 						return null;
-					contents.getMetadata().setFile(new File(new String(buffer, 0, fileNameLength)));
+					contents.getMetadata().setFile(new File(new String(buffer, 0, fileNameLength, Constants.CHARSET)));
 				}
 				else
 				{
@@ -820,7 +819,7 @@ public class ProductExtractor {
 				{
 					if (!readFull(fileNameLength))
 						return null;
-					contents.getMetadata().setFile(new File(new String(buffer, 0, fileNameLength)));
+					contents.getMetadata().setFile(new File(new String(buffer, 0, fileNameLength, Constants.CHARSET)));
 				}
 				else
 				{

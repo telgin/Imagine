@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import algorithms.Algorithm;
-import algorithms.ProductIOException;
 import algorithms.imageoverlay.patterns.Pattern;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
+import product.ProductIOException;
 import product.ProductWriter;
 import scratch.Scratch;
 import stats.ProgressMonitor;

@@ -31,14 +31,13 @@ import data.Key;
 import data.Metadata;
 import data.ProductWorker;
 import data.TrackingGroup;
-import database.derby.EmbeddedDB;
 import product.ProductContents;
 import product.ProductLoader;
 import treegenerator.TreeGenerator;
 import product.ProductExtractor;
+import product.ProductIOException;
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
-import algorithms.ProductIOException;
 import algorithms.image.Image;
 import algorithms.image.ImageFactory;
 

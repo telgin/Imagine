@@ -1,22 +1,17 @@
-package runner;
+package api;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import algorithms.Algorithm;
 import logging.LogLevel;
 import logging.Logger;
-import stats.ProgressMonitor;
-import stats.StateStat;
+import runner.ConversionJob;
 import util.Constants;
 import config.Configuration;
 import data.Key;
 import data.NullKey;
 import data.TrackingGroup;
 
-public abstract class ConversionRunner
+public abstract class ConversionAPI
 {
 
 	public static TrackingGroup createTemporaryTrackingGroup(String algoPresetName, Key key, File selection)

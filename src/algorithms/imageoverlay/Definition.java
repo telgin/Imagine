@@ -80,7 +80,7 @@ public class Definition implements algorithms.Definition
 
 		{
 			// input image folder
-			Parameter param = new Parameter("ImageFolder", "string", "./inputImages/",
+			Parameter param = new Parameter("ImageFolder", "string", "inputImages",
 							false);
 			if (includeOptions)
 			{
@@ -92,7 +92,7 @@ public class Definition implements algorithms.Definition
 		{
 			// working folder
 			Parameter param = new Parameter("WorkingFolder", "string",
-							"./.image_overlay_working/", false);
+							".image_overlay_working", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("*"));

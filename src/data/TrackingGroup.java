@@ -43,6 +43,8 @@ public class TrackingGroup
 		trackedFiles = new HashSet<File>();
 		untrackedFiles = new HashSet<File>();
 		usingAbsolutePaths = true;
+		productStagingFolder = new File(".");
+		extractionFolder = new File(".");
 	}
 
 	public void addTrackedPath(String path)

@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import logging.LogLevel;
 import logging.Logger;
 import product.Product;
+import product.ProductIOException;
 import product.ProductMode;
 import stats.ProgressMonitor;
 import stats.Stat;
@@ -23,7 +24,6 @@ import config.Configuration;
 import data.Key;
 import algorithms.Algorithm;
 import algorithms.Parameter;
-import algorithms.ProductIOException;
 
 public class Image implements Product
 {

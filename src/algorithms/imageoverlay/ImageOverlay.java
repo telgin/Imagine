@@ -12,13 +12,13 @@ import javax.imageio.ImageIO;
 import com.google.common.io.Files;
 
 import algorithms.Algorithm;
-import algorithms.ProductIOException;
 import algorithms.imageoverlay.patterns.Pattern;
 import algorithms.imageoverlay.patterns.Pattern2;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.Product;
+import product.ProductIOException;
 import product.ProductMode;
 import scratch.Scratch;
 import stats.ProgressMonitor;

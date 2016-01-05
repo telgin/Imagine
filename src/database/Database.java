@@ -10,23 +10,18 @@ import java.util.Map;
 import data.FileType;
 import data.Metadata;
 import data.TrackingGroup;
-import database.derby.EmbeddedDB;
 import database.filesystem.FileSystemDB;
 import database.memory.ProductDB;
 
 public class Database
 {
 	private static FileSystemDB fsdb;
-	//private static EmbeddedDB embdb;
 	private static Map<String, ProductDB> pdbs;
 
 	static
 	{
 		fsdb = new FileSystemDB();
 		SystemManager.registerActiveComponent(fsdb);
-		
-//		embdb = new EmbeddedDB();
-//		SystemManager.registerActiveComponent(embdb);
 		
 		pdbs = new HashMap<String, ProductDB>();
 	}
@@ -40,21 +35,6 @@ public class Database
 	{
 		fsdb.saveMetadata(metadata, group);
 	}
-	
-//	public static void saveProductUUID(Metadata fileMetadata, TrackingGroup group)
-//	{
-//		embdb.saveProductUUID(fileMetadata, group);
-//	}
-//
-//	public static void saveFileHash(Metadata fileMetadata, TrackingGroup group)
-//	{
-//		embdb.saveFileHash(fileMetadata, group);
-//	}
-//
-//	public static Integer addTrackingGroup(TrackingGroup group)
-//	{
-//		return embdb.addTrackingGroup(group);
-//	}
 
 	public static boolean containsFileHash(byte[] hash, TrackingGroup group)
 	{
@@ -71,17 +51,6 @@ public class Database
 		
 		//embdb.save();
 	}
-
-	/**
-	 * @update_comment
-	 * @param fileHash
-	 * @param trackingGroup
-	 * @return
-	 */
-//	public static byte[] getFragment1ProductUUID(byte[] fileHash, TrackingGroup group)
-//	{
-//		return EmbeddedDB.getFragment1ProductUUID(fileHash, group);
-//	}
 
 	/**
 	 * @update_comment

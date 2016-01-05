@@ -1,28 +1,20 @@
 package data;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import database.Database;
-import database.derby.EmbeddedDB;
-import database.filesystem.FileSystemDB;
 import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
-import util.Constants;
 import util.FileSystemUtil;
-import util.Hashing;
 
 public class IndexWorker implements Runnable
 {
-
 	private BlockingQueue<Metadata> queue;
 	private TrackingGroup trackingGroup;
 	private boolean shuttingDown;
@@ -82,7 +74,6 @@ public class IndexWorker implements Runnable
 	{
 		if (!shuttingDown)
 		{
-		
 			if (ele.getTagName().equals("folder"))
 			{
 				//recurse through the folders
@@ -102,14 +93,7 @@ public class IndexWorker implements Runnable
 				fileMetadata.setDateModified(Long.parseLong(ele.getAttribute("modified")));
 				fileMetadata.setFileHash(ByteConversion.hexToBytes(ele.getAttribute("hash")));
 				fileMetadata.setPermissions(Short.parseShort(ele.getAttribute("perms")));
-				
-				
-//				if (trackingGroup.isUsingDatabase())
-//				{
-				
-				//TODO stuff that is queued only needs to wait for the db
-				//to update the record before queuing a reference
-				
+							
 				//check to see if the file hash was already added earlier
 				if (Database.isQueued(fileMetadata, trackingGroup))
 				{

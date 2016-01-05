@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import logging.LogLevel;
 import logging.Logger;
 import product.Product;
+import product.ProductIOException;
 import product.ProductMode;
 import product.ProductWriter;
 import stats.ProgressMonitor;
@@ -24,7 +25,6 @@ import config.Configuration;
 import data.Key;
 import algorithms.Algorithm;
 import algorithms.Parameter;
-import algorithms.ProductIOException;
 
 public class ImageWriter extends Image implements ProductWriter
 {

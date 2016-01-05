@@ -7,12 +7,12 @@ import javax.imageio.ImageIO;
 
 import logging.LogLevel;
 import logging.Logger;
+import product.ProductIOException;
 import product.ProductReader;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
 import data.Key;
 import algorithms.Algorithm;
-import algorithms.ProductIOException;
 
 public class ImageReader extends Image implements ProductReader
 {

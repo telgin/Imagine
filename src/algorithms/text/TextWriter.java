@@ -6,10 +6,10 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 
 import algorithms.Algorithm;
-import algorithms.ProductIOException;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
+import product.ProductIOException;
 import product.ProductWriter;
 import stats.ProgressMonitor;
 import stats.Stat;

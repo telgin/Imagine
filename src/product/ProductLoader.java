@@ -1,23 +1,21 @@
 package product;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import algorithms.ProductIOException;
 import logging.LogLevel;
 import logging.Logger;
 import stats.ProgressMonitor;
 import stats.Stat;
-import config.Configuration;
 import data.FileType;
 import data.Metadata;
 import data.TrackingGroup;
 import database.Database;
 import util.ByteConversion;
 import util.Constants;
+import util.FileSystemUtil;
 
 public class ProductLoader
 {
@@ -40,7 +38,6 @@ public class ProductLoader
 
 	private boolean fileWritten = false;
 	private boolean writingFile = false;
-	private boolean needsReset = true;
 
 	public ProductLoader(ProductWriterFactory<? extends ProductWriter> factory,
 					TrackingGroup group)
@@ -51,8 +48,6 @@ public class ProductLoader
 		this.group = group;
 
 		productStagingFolder = group.getProductStagingFolder();
-		if (productStagingFolder == null)
-			productStagingFolder = Configuration.getProductStagingFolder();
 
 		currentProduct = factory.createWriter();
 
@@ -64,8 +59,7 @@ public class ProductLoader
 		}
 		catch (ProductIOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.log(LogLevel.k_fatal, e, true);
 		}
 	}
 
@@ -155,7 +149,7 @@ public class ProductLoader
 			return false;
 
 		// write algorithm name length
-		byte[] algorithmName = currentProduct.getAlgorithmName().getBytes();
+		byte[] algorithmName = currentProduct.getAlgorithmName().getBytes(Constants.CHARSET);
 		if (!writeFull(ByteConversion.shortToBytes((short) algorithmName.length)))
 			return false;
 
@@ -170,20 +164,20 @@ public class ProductLoader
 
 		// write group name length
 		String groupName = group.getName();
-		if (!writeFull(ByteConversion.shortToBytes((short) groupName.getBytes().length)))
+		if (!writeFull(ByteConversion.shortToBytes((short) groupName.getBytes(Constants.CHARSET).length)))
 			return false;
 
 		// write group name
-		if (!writeFull(groupName.getBytes()))
+		if (!writeFull(groupName.getBytes(Constants.CHARSET)))
 			return false;
 
 		// write group key name / length
 		if (group.getKey().isSecure())
 		{
-			System.out.println("Writing key name: " + group.getKey().getName()
-							+ " of length: "
-							+ group.getKey().getName().getBytes().length);
-			byte[] groupKeyName = group.getKey().getName().getBytes();
+			//System.out.println("Writing key name: " + group.getKey().getName()
+			//				+ " of length: "
+			//				+ group.getKey().getName().getBytes(Constants.CHARSET).length);
+			byte[] groupKeyName = group.getKey().getName().getBytes(Constants.CHARSET);
 			if (!writeFull(ByteConversion.shortToBytes((short) groupKeyName.length)))
 				return false;
 			if (!writeFull(groupKeyName))
@@ -201,9 +195,9 @@ public class ProductLoader
 
 	private String getSaveName()
 	{
-		return new String(group.getName()) + "_"
-						+ Long.toString(ByteConversion.bytesToLong(streamUUID)) + "_"
-						+ (sequenceNumber - 1);
+		return FileSystemUtil.getProductName(group, 
+						ByteConversion.bytesToLong(streamUUID), (sequenceNumber - 1));
+
 	}
 
 	public void writeFile(Metadata fileMetadata) throws IOException
@@ -289,6 +283,7 @@ public class ProductLoader
 			stat.incrementNumericProgress(1);
 	}
 
+	//TODO maybe use this function to increase reader speed
 	private void writeFileHeaderSize(int fileHeaderSize) throws ProductIOException
 	{
 		if (!writeFull(ByteConversion.intToBytes(fileHeaderSize)))
@@ -333,7 +328,7 @@ public class ProductLoader
 				return false;
 	
 			// file name
-			if (!writeFull(fileMetadata.getFile().getPath().getBytes()))
+			if (!writeFull(fileMetadata.getFile().getPath().getBytes(Constants.CHARSET)))
 				return false;
 	
 			// date created
@@ -374,7 +369,7 @@ public class ProductLoader
 				return false;
 	
 			// file name
-			if (!writeFull(fileMetadata.getFile().getPath().getBytes()))
+			if (!writeFull(fileMetadata.getFile().getPath().getBytes(Constants.CHARSET)))
 				return false;
 		}
 

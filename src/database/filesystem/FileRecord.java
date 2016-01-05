@@ -13,7 +13,7 @@ import util.ByteConversion;
 public class FileRecord
 {
 
-	private static final String FILE_RECORD_DELIMETER = "<~>";
+	private static final String FILE_RECORD_DELIMETER = ":";
 
 	private byte[] filePathHash;
 	private byte[] fileHash;

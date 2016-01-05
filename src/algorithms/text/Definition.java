@@ -156,9 +156,9 @@ public class Definition implements algorithms.Definition
 		List<Algorithm> presets = new LinkedList<Algorithm>();
 		
 		//plain default
-		Algorithm textblockNormal = construct(false);
-		textblockNormal.setPresetName("textblock_basic");
-		presets.add(textblockNormal);
+		Algorithm textNormal = construct(false);
+		textNormal.setPresetName("text_basic");
+		presets.add(textNormal);
 		
 		return presets;
 	}

@@ -21,7 +21,7 @@ public abstract class Constants
 									+ Integer.toString(APPLICATION_UPDATE_VERSION);
 
 	// file names
-	public static final File configFile = new File("config.xml");
+	public static final File CONFIG_FILE = new File("config.xml");
 	public static final String ASSEMBLY_FOLDER_NAME = "." +
 					APPLICATION_NAME_SHORT.toLowerCase() + "_assembly";
 	
@@ -29,7 +29,7 @@ public abstract class Constants
 	public static final String TEMP_RESERVED_GROUP_NAME = APPLICATION_NAME_SHORT.toLowerCase() +
 					"_reserved_temp";
 	public static final int DEFAULT_THREAD_COUNT = 3;
-	public static final Charset charset = StandardCharsets.UTF_8;
+	public static final Charset CHARSET = StandardCharsets.UTF_8;
 	
 	// io system configuration
 	public static final int MAX_READ_BUFFER_SIZE = 50000000;

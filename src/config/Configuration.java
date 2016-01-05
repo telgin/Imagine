@@ -13,23 +13,19 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import logging.Logger;
-import product.ProductMode;
 import logging.LogLevel;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import algorithms.Algorithm;
 
 public class Configuration {
 	private static Document doc;
 	private static Element root;
 	
-	private static File databaseFile;
-	private static File productStagingFolder;
-	private static File extractionFolder;
+	private static File databaseFolder;
 	private static File logFolder;
+	private static String installationUUID;
 	private static List<TrackingGroup> trackingGroups;
 
 	static
@@ -39,10 +35,15 @@ public class Configuration {
 	
 	public static void reloadConfig()
 	{
-		doc = ConfigUtil.loadConfig(Constants.configFile);
+		doc = ConfigUtil.loadConfig(Constants.CONFIG_FILE);
 		doc.getDocumentElement().normalize();
 		
 		root = doc.getDocumentElement();
+		
+		//everything will be reloaded when needed
+		trackingGroups = null;
+		databaseFolder = null;
+		logFolder = null;
 	}
 	
 	public static void loadConfig(Document document)
@@ -53,10 +54,16 @@ public class Configuration {
 	
 	public static void saveConfig()
 	{
-		ConfigUtil.saveConfig(doc, Constants.configFile);
+		ConfigUtil.saveConfig(doc, Constants.CONFIG_FILE);
 	}
 	
-	//TODO add setters
+	public static void deleteTrackingGroup(String groupName)
+	{
+		Element trackingGroupsNode = ConfigUtil.first(
+						ConfigUtil.children(root, "TrackingGroups"));
+		Element toRemove = getTrackingGroupElement(groupName);
+		trackingGroupsNode.removeChild(toRemove);
+	}
 	
 	public static void addTrackingGroup(TrackingGroup group)
 	{
@@ -124,65 +131,29 @@ public class Configuration {
 		trackingGroupsNode.appendChild(groupNode);
 	}
 	
-	public static File getDatabaseFile()
+	public static File getDatabaseFolder()
 	{
-		if (databaseFile == null)
+		if (databaseFolder == null)
 		{
-			Element databaseNode = ConfigUtil.first(ConfigUtil.children(root, "Database"));
-			if (databaseNode != null)
-			{
-				Element databaseFileNode = ConfigUtil.first(
-						ConfigUtil.filterByAttribute(ConfigUtil.children(databaseNode, "Path"),
-								"name", "DatabaseFile"));
-				
-				databaseFile = new File(databaseFileNode.getAttribute("value"));	
-			}
-		}
-
-		return databaseFile;
-	}
-	
-	public static File getProductStagingFolder()
-	{
-		if (productStagingFolder == null)
-		{
-			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(root, "FileSystem"));
+			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(root, "System"));
 			if (fileSystemNode != null)
 			{
 				Element prodStagFoldNode = ConfigUtil.first(
 						ConfigUtil.filterByAttribute(ConfigUtil.children(fileSystemNode, "Path"),
-								"name", "ProductStagingFolder"));
+								"name", "DatabaseFolder"));
 				
-				productStagingFolder = new File(prodStagFoldNode.getAttribute("value"));	
+				databaseFolder = new File(prodStagFoldNode.getAttribute("value"));	
 			}
 		}
 
-		return productStagingFolder;
-	}
-	
-	public static File getExtractionFolder()
-	{
-		if (extractionFolder == null)
-		{
-			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(root, "FileSystem"));
-			if (fileSystemNode != null)
-			{
-				Element extrFoldNode = ConfigUtil.first(
-						ConfigUtil.filterByAttribute(ConfigUtil.children(fileSystemNode, "Path"),
-								"name", "ExtractionFolder"));
-				
-				extractionFolder = new File(extrFoldNode.getAttribute("value"));	
-			}
-		}
-
-		return extractionFolder;
+		return databaseFolder;
 	}
 	
 	public static File getLogFolder()
 	{
 		if (logFolder == null)
 		{
-			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(root, "FileSystem"));
+			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(root, "System"));
 			if (fileSystemNode != null)
 			{
 				Element logFoldNode = ConfigUtil.first(
@@ -304,7 +275,7 @@ public class Configuration {
 		}
 	}
 	
-	public static TrackingGroup findTrackingGroup(String groupName)
+	public static TrackingGroup getTrackingGroup(String groupName)
 	{
 		for (TrackingGroup tg:trackingGroups)
 			if (tg.getName().equals(groupName))
@@ -336,6 +307,18 @@ public class Configuration {
 		return presetNames;
 	}
 	
+	public static List<String> getTrackingGroupNames()
+	{
+		//easy way to load if null
+		List<TrackingGroup> tempList = getTrackingGroups();
+		
+		List<String> names = new LinkedList<String>();
+		for (TrackingGroup group : tempList)
+			names.add(group.getName());
+		
+		return names;
+	}
+	
 	private static Element getAlgorithmPresetElement(String presetName)
 	{
 		Element algoPresetsNode = ConfigUtil.first(
@@ -353,19 +336,21 @@ public class Configuration {
 		return algoNode;
 	}
 	
-	private static String getParameter(Element config, String name)
+	private static Element getTrackingGroupElement(String groupName)
 	{
-		Element paramNode = ConfigUtil.first(
+		Element trackingGroupsNode = ConfigUtil.first(
+						ConfigUtil.children(root, "TrackingGroups"));
+		Element groupNode = ConfigUtil.first(
 				ConfigUtil.filterByAttribute(
-						ConfigUtil.children(config, "Parameter"), "name", name));
+						ConfigUtil.children(trackingGroupsNode, "Group"), "name", groupName));
 		
-		if (paramNode == null)
+		if (groupNode == null)
 		{
-			Logger.log(LogLevel.k_error, "Could not find parameter: " + name);
+			Logger.log(LogLevel.k_error, "Could not find tracking group element: " + groupName);
 			return null;
 		}
-			
-		return paramNode.getAttribute("value");
+		
+		return groupNode;
 	}
 
 	/**
@@ -374,8 +359,18 @@ public class Configuration {
 	 */
 	public static String getInstallationUUID()
 	{
-		// TODO Set this at installation
-		return "default";
+		if (installationUUID == null)
+		{
+			Element systemNode = ConfigUtil.first(ConfigUtil.children(root, "System"));
+			if (systemNode != null)
+			{
+				Element uuidNode = ConfigUtil.first(ConfigUtil.children(systemNode, "InstallationUUID"));
+				
+				installationUUID = uuidNode.getAttribute("value");	
+			}
+		}
+
+		return installationUUID;
 	}
 	
 	public static void addAlgorithmPreset(Algorithm algo)

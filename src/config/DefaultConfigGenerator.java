@@ -14,14 +14,20 @@ import data.TrackingGroup;
 import util.ConfigUtil;
 import util.Constants;
 
-class DefaultConfigGenerator
+public abstract class DefaultConfigGenerator
 {
 	private static Document doc;
 
 	public static void main(String[] args)
 	{
+		//creates a config file at current location
+		create(Constants.CONFIG_FILE);
+	}
+	
+	public static void create(File configFile)
+	{
 		// save new default config to default location
-		ConfigUtil.saveConfig(makeBasicConfig(), Constants.configFile);
+		ConfigUtil.saveConfig(makeBasicConfig(), configFile);
 		
 		//reload the config
 		Configuration.reloadConfig();
@@ -46,7 +52,7 @@ class DefaultConfigGenerator
 	{
 		//initialize
 		String name = "Test";
-		String presetName = "textblock_basic";
+		String presetName = "text_basic";
 		Algorithm algo = Configuration.getAlgorithmPreset(presetName);
 		boolean usesDatabase = true;
 		Key key = new FileKey("potatoes", name, new File("keys/key1.txt"));
@@ -64,7 +70,7 @@ class DefaultConfigGenerator
 		Configuration.addTrackingGroup(testGroup);
 	}
 
-	public static Document makeBasicConfig()
+	private static Document makeBasicConfig()
 	{
 		// create new doc
 		doc = ConfigUtil.getNewDocument();
@@ -74,7 +80,7 @@ class DefaultConfigGenerator
 
 		root.appendChild(mkElement("AlgorithmPresets"));
 		root.appendChild(mkElement("TrackingGroups"));
-		root.appendChild(mkFileSystemNode());
+		root.appendChild(mkSystemNode());
 
 		doc.appendChild(root);
 
@@ -86,11 +92,21 @@ class DefaultConfigGenerator
 		return doc.createElement(tagName);
 	}
 
-	private static Element mkFileSystemNode()
+	private static Element mkSystemNode()
 	{
-		Element fileSystem = mkElement("FileSystem");
-		fileSystem.appendChild(mkPathNode("LogFolder", "logs"));
-		return fileSystem;
+		Element system = mkElement("System");
+		
+		//folders
+		system.appendChild(mkPathNode("LogFolder", "logs"));
+		system.appendChild(mkPathNode("DatabaseFolder", "databases"));
+		
+		//installation uuid
+		Element installationUUID = mkElement("InstallationUUID");
+		String uuid = Long.toString(System.currentTimeMillis());
+		installationUUID.setAttribute("value", uuid);
+		system.appendChild(installationUUID);
+		
+		return system;
 	}
 
 	private static Node mkPathNode(String name, String value)

@@ -5,13 +5,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import algorithms.Algorithm;
-import algorithms.ProductIOException;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
+import product.ProductIOException;
 import product.ProductMode;
 import product.ProductReader;
 import util.ByteConversion;
+import util.Constants;
 
 public class TextReader extends Text implements ProductReader{
 
