@@ -1,8 +1,6 @@
 package database;
 
 
-import runner.SystemManager;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +10,7 @@ import data.Metadata;
 import data.TrackingGroup;
 import database.filesystem.FileSystemDB;
 import database.memory.ProductDB;
+import system.SystemManager;
 
 public class Database
 {

@@ -2,8 +2,8 @@ package database.filesystem;
 
 import logging.LogLevel;
 import logging.Logger;
-import runner.ActiveComponent;
-import runner.SystemManager;
+import system.ActiveComponent;
+import system.SystemManager;
 
 import java.io.File;
 import java.util.LinkedList;

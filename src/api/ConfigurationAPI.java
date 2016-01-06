@@ -6,7 +6,6 @@ import algorithms.Algorithm;
 import config.Configuration;
 import config.DefaultConfigGenerator;
 import data.TrackingGroup;
-import runner.UsageException;
 import util.Constants;
 
 /**

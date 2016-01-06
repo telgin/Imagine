@@ -7,7 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import testing.highlevel.ImageTest;
 import testing.highlevel.ImageOverlayTest;
 import testing.highlevel.TextTest;
-import util.ByteConversionTest;
+import util.test.ByteConversionTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({

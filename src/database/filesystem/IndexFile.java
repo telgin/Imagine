@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import data.FileType;
 import data.Metadata;
 import data.TrackingGroup;
 import util.ByteConversion;
@@ -103,6 +104,9 @@ public class IndexFile
 			metadata.setDateModified(record.getDateModified());
 			metadata.setFileHash(record.getFileHash());
 			metadata.setPermissions(record.getPermissions());
+			
+			//index files only record data on files, not folders
+			metadata.setType(FileType.k_file);
 
 			return metadata;
 		}

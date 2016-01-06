@@ -1,4 +1,4 @@
-package runner;
+package product;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -61,7 +61,7 @@ public class ConversionJob implements Runnable
 
 	public void stopBackup()
 	{
-
+		//TODO
 	}
 
 	public boolean isFinished()

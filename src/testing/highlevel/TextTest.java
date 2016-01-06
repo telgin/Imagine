@@ -33,8 +33,8 @@ public class TextTest
 			
 //			@Test(timeout = 120000)
 //			public void testNoFiles_1(){ ProductIOTest.testNoFiles(group, 1); }
-			@Test(timeout = 120000)
-			public void testSmallFile_1(){ ProductIOTest.testSmallFile(group, 1); }
+//			@Test(timeout = 120000)
+//			public void testSmallFile_1(){ ProductIOTest.testSmallFile(group, 1); }
 //			@Test(timeout = 120000)
 //			public void testSmallTree_1(){ ProductIOTest.testSmallTree(group, 1); }
 //			@Test(timeout = 120000)

@@ -12,7 +12,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -49,25 +51,102 @@ public class Scratch {
 	public static void main(String args[]) throws IOException, InterruptedException, SQLException
 	{
 		
+		File originalRoot = new File("/home/tom/temp/original_root");
+		File extractedRoot = new File("/home/tom/temp/extracted_root");
+		
+		listFiles(originalRoot);
+		listFiles(extractedRoot);
+		
+		File run1 = new File("/home/tom/temp/original_root/1/run1");
+		File run2 = new File("/home/tom/temp/original_root/1/run2");
+		
+		System.out.println("absolutePaths == false");
+		File r1_1 = new File(run1.toURI().relativize(originalRoot.toURI()));
+		String r1_2 = originalRoot.toURI().relativize(run1.toURI()).getPath();
+		File f_r1_2 = new File(r1_2);
+		File expectedRel = new File(extractedRoot, r1_2);
+		System.out.println(expectedRel.getPath());
+		
+		File expectedAbs = new File(extractedRoot, run1.getPath());
+		System.out.println(expectedAbs.getPath());
+		
+	}
+	
+	
+	
+	
+	private static void listFiles(File root)
+	{
+		System.out.println("Contents of: " + root.getAbsolutePath());
+		int count = 0;
+		
+		//bfs through folders
+		Queue<File> folders = new LinkedList<File>();
+		folders.add(root);
+		
+		while (folders.size() > 0)
+		{
+			File folder = folders.poll();
+			for (File sub : folder.listFiles())
+			{
+				if (sub.isDirectory())
+				{
+					folders.add(sub);
+				}
+				else
+				{
+					++count;
+				}
+				
+				System.out.println(sub.getPath());
+			}
+		}
+		
+		System.out.println("total files = " + count + "\n");
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+//		//tracking group setup
+//		Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("TextBlock");
+//		String keyName = "testKeyName";
+//		String groupName = "Cheese and other Cheese";
+//		Key key = new FileKey(keyName, groupName, new File("testing/keys/key1.txt"));
+//		TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
+//		group.addTrackedPath("testing/scratch/bigTree");
+//		
+//		
+//		File treeFile = new File("testing/scratch/tree3.xml");
+//		TreeGenerator tg = new TreeGenerator(group);
+//		tg.generateTree();
+//		tg.save(treeFile);
 		
 		
 		
-
-		
-		
-		//tracking group setup
-		Algorithm algorithm = AlgorithmRegistry.getDefaultAlgorithm("TextBlock");
-		String keyName = "testKeyName";
-		String groupName = "Cheese and other Cheese";
-		Key key = new FileKey(keyName, groupName, new File("testing/keys/key1.txt"));
-		TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
-		group.addTrackedPath("testing/scratch/bigTree");
-		
-		
-		File treeFile = new File("testing/scratch/tree3.xml");
-		TreeGenerator tg = new TreeGenerator(group);
-		tg.generateTree();
-		tg.save(treeFile);
 		
 		
 		
@@ -77,9 +156,22 @@ public class Scratch {
 		
 		
 		
-		
-		
-	}		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 		
 //		EmbeddedDB db = new EmbeddedDB();
 //		

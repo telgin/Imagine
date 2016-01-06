@@ -1,8 +1,10 @@
-package util;
+package util.test;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import util.ByteConversion;
 
 public class ByteConversionTest
 {

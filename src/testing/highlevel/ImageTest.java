@@ -37,14 +37,14 @@ public class ImageTest
 
 		static TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
 		
-//		@Test(timeout = 120000)
-//		public void testNoFiles_1(){ ProductIOTest.testNoFiles(group, 1); }
+		@Test(timeout = 120000)
+		public void testNoFiles_1(){ ProductIOTest.testEmptyFolder(group, 1); }
 //		@Test(timeout = 120000)
 //		public void testSmallFile_1(){ ProductIOTest.testSmallFile(group, 1); }
 //		@Test(timeout = 120000)
 //		public void testSmallTree_1(){ ProductIOTest.testSmallTree(group, 1); }
-		@Test(timeout = 120000)
-		public void testBigFile_1(){ ProductIOTest.testBigFile(group, 1); }
+//		@Test(timeout = 120000)
+//		public void testBigFile_1(){ ProductIOTest.testBigFile(group, 1); }
 //		@Test(timeout = 120000)
 //		public void testBigTree_1(){ ProductIOTest.testBigTree(group, 1); }
 //		

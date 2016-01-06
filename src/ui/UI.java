@@ -2,7 +2,7 @@ package ui;
 
 import java.io.File;
 
-import runner.SystemManager;
+import system.SystemManager;
 
 public abstract class UI
 {

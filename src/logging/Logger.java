@@ -8,8 +8,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-import runner.SystemManager;
 import config.Configuration;
+import system.SystemManager;
 
 public class Logger
 {

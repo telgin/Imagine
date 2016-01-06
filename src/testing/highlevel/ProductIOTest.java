@@ -10,16 +10,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import api.ConversionAPI;
 import data.Metadata;
 import data.FileAssembler;
+import data.FileType;
 import data.TrackingGroup;
 import database.Database;
+import product.ConversionJob;
 import product.FileContents;
 import product.ProductContents;
 import product.ProductExtractor;
-import runner.ConversionJob;
-import runner.ConversionRunner;
-import runner.SystemManager;
+import system.SystemManager;
+import testing.Comparisons;
 import testing.TestFileTrees;
 import util.ByteConversion;
 import util.Constants;
@@ -45,7 +48,7 @@ public class ProductIOTest
 		shutdownCalled = true;
 	}
 
-	public static void testNoFiles(TrackingGroup group, int threads)
+	public static void testEmptyFolder(TrackingGroup group, int threads)
 	{
 		if (!shutdownCalled)
 			shutdown();
@@ -65,20 +68,44 @@ public class ProductIOTest
 		group.clearUntrackedPaths();
 		group.addTrackedPath(inputFolder);
 		group.setProductStagingFolder(outputFolder);
+		group.setExtractionFolder(extractionFolder);
 
 		runJob(group, threads);
 
 		// see what we got:
-		// should be nothing
-		assertEquals(0, outputFolder.listFiles().length);
+		// should be 1, just an empty folder was added
+		assertEquals(1, outputFolder.listFiles().length);
 
-		// something's pretty wrong if these aren't empty too
-		assertEquals(0, extractionFolder.listFiles().length);
+		// should get the one folder
+		ProductExtractor extractor = new ProductExtractor(group, outputFolder);
+		File productFile = outputFolder.listFiles()[0];
+		try
+		{
+			ProductContents productContents = extractor.viewAll(productFile);
+			assertEquals(1, productContents.getFileContents().size());
+			
+			FileContents fileContents = productContents.getFileContents().get(0);
+			assertEquals(FileType.k_folder, fileContents.getMetadata().getType());
+			assertEquals(inputFolder.getName(), fileContents.getMetadata().getFile().getName());
+			
+			extractor.extractAllFromProduct(productFile);
+			
+			File expected = Comparisons.getExpectedExtractionFile(
+							inputFolder.getParentFile(), extractionFolder, inputFolder, true);
+			assertTrue(expected.exists());
+			assertTrue(expected.isDirectory());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		assertEquals(1, extractionFolder.listFiles().length);
 		assertEquals(0, assemblyFolder.listFiles().length);
 
 		shutdown();
 	}
-
+/**
 	public static void testSmallFile(TrackingGroup group, int threads)
 	{
 		if (!shutdownCalled)
@@ -114,7 +141,7 @@ public class ProductIOTest
 		// get the metadata of our single test file now
 		// that it should have been saved
 		Metadata previousMetadata = Database.getFileMetadata(testFile, group);
-		compareMetadataFile(testFile, previousMetadata);
+		Comparisons.compareMetadataFile(testFile, previousMetadata);
 
 		// see what we got:
 		// should be only one file
@@ -138,7 +165,7 @@ public class ProductIOTest
 		FileContents fileContents = files.get(0);
 
 		Metadata extractedMetadata = fileContents.getMetadata();
-		compareMetadata(previousMetadata, extractedMetadata);
+		Comparisons.compareMetadata(previousMetadata, extractedMetadata);
 
 		assertTrue(reader.extractAllFromProductFolder(outputFolder));
 		
@@ -152,8 +179,8 @@ public class ProductIOTest
 		//assertEquals(1, assemblyFolder.listFiles().length);
 
 		shutdown();
-	}
-
+	}*/
+/**
 	public static void testSmallTree(TrackingGroup group, int threads)
 	{
 		if (!shutdownCalled)
@@ -173,7 +200,7 @@ public class ProductIOTest
 		group.clearTrackedPaths();
 		group.clearUntrackedPaths();
 
-		// more complicated now: folder/file names indicate tracked status
+		// more complicated one: folder/file names indicate tracked status
 		// t=tracked, u=untracked, _r=set it explicitly as a rule for the
 		// tracking group
 		// t files go from 1 to 15, u files go from 1 to 10
@@ -246,7 +273,7 @@ public class ProductIOTest
 					}
 					else
 					{
-						compareMetadataFile(file, previousMetadata);
+						Comparisons.compareMetadataFile(file, previousMetadata);
 					}
 				}
 			});
@@ -280,7 +307,7 @@ public class ProductIOTest
 				Metadata extractedMetadata = fc.getMetadata();
 
 				// verify all file contents are correct
-				compareMetadata(Database.getFileMetadata(extractedMetadata.getFile(),
+				Comparisons.compareMetadata(Database.getFileMetadata(extractedMetadata.getFile(),
 								group), extractedMetadata);
 
 				// extract file
@@ -298,7 +325,7 @@ public class ProductIOTest
 		assertEquals(15, assemblyFolder.listFiles().length);
 
 		shutdown();
-	}
+	}*/
 
 	public static void testBigFile(TrackingGroup group, int threads)
 	{
@@ -332,10 +359,10 @@ public class ProductIOTest
 		// get the metadata of our single test file now
 		// that it should have been saved
 		Metadata previousMetadata = Database.getFileMetadata(testFile, group);
-		compareMetadataFile(testFile, previousMetadata);
+		Comparisons.compareMetadataFile(testFile, previousMetadata);
 
 		// see what we got:
-		// should be only one file
+		// should be only one product file
 		assertTrue(outputFolder.listFiles().length > 1);
 
 		// extract from all files in the output folder
@@ -369,7 +396,7 @@ public class ProductIOTest
 			FileContents fileContents = files.get(0);
 
 			Metadata extractedMetadata = fileContents.getMetadata();
-			compareMetadata(previousMetadata, extractedMetadata);
+			Comparisons.compareMetadata(previousMetadata, extractedMetadata);
 
 			//if (extractedFolder == null)
 			//	extractedFolder = fileContents.getExtractedFile();
@@ -377,13 +404,10 @@ public class ProductIOTest
 
 		// assemble all part files into the specified extracted filename
 		assertTrue(reader.extractAllFromProductFolder(outputFolder));
+		
+		Comparisons.compareExtractedFileStructure(inputFolder,
+						extractionFolder, group.usesAbsolutePaths());
 
-//		assertTrue(ByteConversion.bytesEqual(Hashing.hash(assembled),
-//						Hashing.hash(testFile)));
-//
-//		assertEquals(assembled.getParentFile().getAbsolutePath(),
-//						assemblyFolder.getAbsolutePath());
-//		assertEquals(1, assemblyFolder.listFiles().length);
 
 		shutdown();
 	}
@@ -395,7 +419,7 @@ public class ProductIOTest
 	 * @param group
 	 * @param indexWorkers
 	 * @param threads
-	 */
+	 *//**
 	public static void testBigTree(TrackingGroup group, int threads)
 	{
 		if (!shutdownCalled)
@@ -468,7 +492,7 @@ public class ProductIOTest
 					//if (file.getAbsolutePath().endsWith(".lock"))
 					//	System.out.println("Walked: " + file.getAbsolutePath());
 					Metadata previousMetadata = Database.getFileMetadata(file, group);
-					compareMetadataFile(file, previousMetadata);
+					Comparisons.compareMetadataFile(file, previousMetadata);
 				}
 			});
 		}
@@ -504,24 +528,8 @@ public class ProductIOTest
 				Metadata extractedMetadata = fc.getMetadata();
 
 				// verify all file contents are correct
-				compareMetadata(Database.getFileMetadata(extractedMetadata.getFile(),
+				Comparisons.compareMetadata(Database.getFileMetadata(extractedMetadata.getFile(),
 								group), extractedMetadata);
-
-//				if (!extractionFolders.containsKey(fc.getExtractedFile()))
-//				{
-//					// specify assembled file name
-//					String relativized =
-//									inputFolder.toURI()
-//													.relativize(extractedMetadata
-//																	.getFile().toURI())
-//									.getPath();
-//					File assembledFile = new File(assemblyFolder.getAbsolutePath(),
-//									relativized);
-//
-//					// associate the extraction folder with the assembled file
-//					// path
-//					extractionFolders.put(fc.getExtractedFile(), assembledFile);
-//				}
 			}
 		}
 
@@ -541,8 +549,6 @@ public class ProductIOTest
 			extractedFileSet.add(relativized);
 			// TODO shouldn't be recording absolute paths when crawling,
 			// should be relativizing there based on root folder
-			if (relativized.endsWith(".lock"))
-				System.err.println("Relativized: " + relativized);
 			byte[] oldHash = hashes.get(relativized);
 			byte[] newHash = Hashing.hash(assembleTo);
 			assertArrayEquals(oldHash, newHash);
@@ -564,7 +570,7 @@ public class ProductIOTest
 		assertEquals(oldFileCount[0], newFileCount);
 
 		shutdown();
-	}
+	}*/
 
 	private static void reset(String treeName)
 	{
@@ -588,32 +594,12 @@ public class ProductIOTest
 		}
 	}
 
-	private static void compareMetadata(Metadata m1, Metadata m2)
-	{
-		assertEquals(m1.getFile().getAbsolutePath(), m2.getFile().getAbsolutePath());
-		assertArrayEquals(m1.getFileHash(), m2.getFileHash());
-		assertEquals(m1.getFile().getPath(), m2.getFile().getPath());
-		assertEquals(m1.getPermissions(), m2.getPermissions());
-		assertEquals(m1.getDateCreated(), m2.getDateCreated());
-		assertEquals(m1.getDateModified(), m2.getDateModified());
-		assertEquals(m1.getProductUUID(), m2.getProductUUID());
-	}
-
-	private static void compareMetadataFile(File f, Metadata m)
-	{
-		System.err.println(f + ", " + m.getFile());
-		assertEquals(f.getAbsolutePath(), m.getFile().getAbsolutePath());
-		assertTrue(ByteConversion.bytesEqual(Hashing.hash(f), m.getFileHash()));
-		assertEquals(f.getPath(), m.getFile().getPath());
-		assertEquals(FileSystemUtil.getNumericFilePermissions(f), m.getPermissions());
-		assertEquals(FileSystemUtil.getDateCreated(f), m.getDateCreated());
-		assertEquals(FileSystemUtil.getDateModified(f), m.getDateModified());
-	}
+	
 
 	private static void runJob(TrackingGroup group, int threads)
 	{
 		// create a conversion job
-		ConversionJob job = ConversionRunner.runConversion(group, threads);
+		ConversionJob job = ConversionAPI.runConversion(group, threads);
 		jobs.add(job);
 
 		// wait for the job to finish
