@@ -6,6 +6,7 @@ import java.util.HashSet;
 
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
+import config.Configuration;
 import logging.LogLevel;
 import logging.Logger;
 import product.Product;
@@ -22,8 +23,7 @@ public class TrackingGroup
 	private HashSet<File> untrackedFiles;
 	private Algorithm algorithm;
 	private Key key;
-	private File productStagingFolder;
-	private File extractionFolder;
+	private File staticOutputFolder;
 	private File hashDBFile;
 	
 	//always turn this off for temporary tracking groups,
@@ -43,8 +43,7 @@ public class TrackingGroup
 		trackedFiles = new HashSet<File>();
 		untrackedFiles = new HashSet<File>();
 		usingAbsolutePaths = true;
-		productStagingFolder = new File(".");
-		extractionFolder = new File(".");
+		hashDBFile = new File(Configuration.getDatabaseFolder(), name + "_hashdb");
 	}
 
 	public void addTrackedPath(String path)
@@ -205,37 +204,20 @@ public class TrackingGroup
 	}
 
 	/**
-	 * @return the extractionFolder
-	 */
-	public File getExtractionFolder()
-	{
-		return extractionFolder;
-	}
-
-	/**
-	 * @param extractionFolder
-	 *            the extractionFolder to set
-	 */
-	public void setExtractionFolder(File extractionFolder)
-	{
-		this.extractionFolder = extractionFolder;
-	}
-
-	/**
 	 * @return the productStagingFolder
 	 */
-	public File getProductStagingFolder()
+	public File getStaticOutputFolder()
 	{
-		return productStagingFolder;
+		return staticOutputFolder;
 	}
 
 	/**
 	 * @param productStagingFolder
 	 *            the productStagingFolder to set
 	 */
-	public void setProductStagingFolder(File productStagingFolder)
+	public void setStaticOutputFolder(File productStagingFolder)
 	{
-		this.productStagingFolder = productStagingFolder;
+		this.staticOutputFolder = productStagingFolder;
 	}
 
 	public void clearTrackedPaths()

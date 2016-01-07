@@ -19,9 +19,12 @@ public class Definition implements algorithms.Definition
 	private static final String NAME = "ImageOverlay";
 	private static final int VERSION_NUMBER = 1;
 	private static Definition self;
+	private String description;
 
 	private Definition()
 	{
+		description = "Data is encoded in the slightly "
+						+ "modified pixels of another image file.";
 	}
 
 	public static Definition getInstance()
@@ -148,6 +151,15 @@ public class Definition implements algorithms.Definition
 		presets.add(imageOverlayNormal);
 		
 		return presets;
+	}
+
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getDescription()
+	 */
+	@Override
+	public String getDescription()
+	{
+		return description;
 	}
 
 }

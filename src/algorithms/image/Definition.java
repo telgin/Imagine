@@ -19,9 +19,11 @@ public class Definition implements algorithms.Definition
 	private static final String NAME = "Image";
 	private static final int VERSION_NUMBER = 1;
 	private static Definition self;
+	private String description;
 
 	private Definition()
 	{
+		description = "Data is encoded in the pixels of an image file.";
 	}
 
 	public static Definition getInstance()
@@ -58,6 +60,11 @@ public class Definition implements algorithms.Definition
 			// product mode
 			Parameter param = new Parameter("ProductMode", "string", 
 							ProductMode.NORMAL.toString(), false);
+			param.setDescription("Created product files can optionally show "
+							+ "product metadata in the clear before using the key "
+							+ "to secure file data. Information like the group name "
+							+ "or key name may help you remember the correct key to "
+							+ "use to extract data from the product file.");
 			if (includeOptions)
 			{
 				param.addOption(new Option(ProductMode.NORMAL.toString()));
@@ -146,6 +153,15 @@ public class Definition implements algorithms.Definition
 		presets.add(imageNormal);
 		
 		return presets;
+	}
+
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getDescription()
+	 */
+	@Override
+	public String getDescription()
+	{
+		return description;
 	}
 
 }

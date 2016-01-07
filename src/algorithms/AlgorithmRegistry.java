@@ -78,5 +78,15 @@ public class AlgorithmRegistry
 				.createWriter(algo, key);
 	}
 
+	/**
+	 * @update_comment
+	 * @param algoDefName
+	 * @return
+	 */
+	public static String getAlgorithmDefinitionDescription(String algoName)
+	{
+		return definitions.get(algoName).getDescription();
+	}
+
 	
 }

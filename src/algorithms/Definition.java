@@ -7,6 +7,8 @@ import product.ProductFactoryCreation;
 public interface Definition
 {
 	public String getName();
+	
+	public String getDescription();
 
 	public Algorithm getDefaultAlgorithm();
 

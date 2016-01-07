@@ -72,10 +72,9 @@ public class FileAssembler
 	 * @param group
 	 */
 	public static void moveToExtractionFolder(File assembled, FileContents fileContents,
-					TrackingGroup group)
+					File extractionFolder)
 	{
-		File created = new File(group.getExtractionFolder(),
-						fileContents.getMetadata().getFile().getPath());
+		File created = new File(extractionFolder, fileContents.getMetadata().getFile().getPath());
 		
 		File parent = created.getParentFile();
 		if (!parent.exists())
@@ -104,10 +103,9 @@ public class FileAssembler
 	 * @param group
 	 */
 	public static void moveFolderToExtractionFolder(FileContents fileContents,
-					TrackingGroup group)
+					File extractionFolder)
 	{
-		File created = new File(group.getExtractionFolder(),
-						fileContents.getMetadata().getFile().getPath());
+		File created = new File(extractionFolder, fileContents.getMetadata().getFile().getPath());
 		
 		created.mkdirs();
 	}

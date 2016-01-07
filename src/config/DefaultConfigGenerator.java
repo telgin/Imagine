@@ -64,8 +64,7 @@ public abstract class DefaultConfigGenerator
 		
 		//add locations
 		testGroup.setHashDBFile(new File("testing/scratch/hashdb.db"));
-		testGroup.setExtractionFolder(new File("extractions"));
-		testGroup.setProductStagingFolder(new File("staging"));
+		//testGroup.setStaticOutputFolder(new File("output"));
 		
 		Configuration.addTrackingGroup(testGroup);
 	}

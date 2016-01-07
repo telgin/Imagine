@@ -47,7 +47,7 @@ public class ProductLoader
 
 		this.group = group;
 
-		productStagingFolder = group.getProductStagingFolder();
+		productStagingFolder = group.getStaticOutputFolder();
 
 		currentProduct = factory.createWriter();
 

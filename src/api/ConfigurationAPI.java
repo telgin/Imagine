@@ -3,6 +3,7 @@ package api;
 import java.util.List;
 
 import algorithms.Algorithm;
+import algorithms.AlgorithmRegistry;
 import config.Configuration;
 import config.DefaultConfigGenerator;
 import data.TrackingGroup;
@@ -99,7 +100,7 @@ public abstract class ConfigurationAPI
 			throw new UsageException("The group name must be defined.");
 		
 		if (!Configuration.getTrackingGroupNames().contains(groupName))
-			throw new UsageException("An tracking group by the given name does not exist.");
+			throw new UsageException("A tracking group by the given name does not exist.");
 		
 		Configuration.deleteTrackingGroup(groupName);
 		Configuration.addTrackingGroup(group);
@@ -113,7 +114,7 @@ public abstract class ConfigurationAPI
 			throw new UsageException("The group name must be defined.");
 		
 		if (!Configuration.getTrackingGroupNames().contains(groupName))
-			throw new UsageException("An tracking group by the given name does not exist.");
+			throw new UsageException("A tracking group by the given name does not exist.");
 		
 		Configuration.deleteTrackingGroup(groupName);
 		Configuration.saveConfig();
@@ -131,8 +132,35 @@ public abstract class ConfigurationAPI
 			throw new UsageException("The group name must be defined.");
 		
 		if (!Configuration.getTrackingGroupNames().contains(groupName))
-			throw new UsageException("An tracking group by the given name does not exist.");
+			throw new UsageException("A tracking group by the given name does not exist.");
 		
 		return Configuration.getTrackingGroup(groupName);
+	}
+	
+	public static List<String> getAlgorithmDefinitionNames()
+	{
+		return AlgorithmRegistry.getAlgorithmNames();
+	}
+	
+	public static String getAlgorithmDefinitionDescription(String algoDefName) throws UsageException
+	{
+		if (algoDefName == null || algoDefName.length() == 0)
+			throw new UsageException("The algorithm definition name must be defined.");
+		
+		if (!AlgorithmRegistry.getAlgorithmNames().contains(algoDefName))
+			throw new UsageException("An algorithm definition by the given name does not exist.");
+		
+		return AlgorithmRegistry.getAlgorithmDefinitionDescription(algoDefName);
+	}
+	
+	public static Algorithm getAlgorithmDefinition(String algoDefName) throws UsageException
+	{
+		if (algoDefName == null || algoDefName.length() == 0)
+			throw new UsageException("The algorithm definition name must be defined.");
+		
+		if (!AlgorithmRegistry.getAlgorithmNames().contains(algoDefName))
+			throw new UsageException("An algorithm definition by the given name does not exist.");
+		
+		return AlgorithmRegistry.getAlgorithmSpec(algoDefName);
 	}
 }

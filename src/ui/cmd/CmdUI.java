@@ -2,20 +2,80 @@ package ui.cmd;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 import algorithms.Algorithm;
+import api.ConfigurationAPI;
+import api.UsageException;
 import config.Configuration;
 import data.FileKey;
 import data.Key;
 import data.NullKey;
 import data.PasswordKey;
 import data.TrackingGroup;
+import logging.LogLevel;
+import logging.Logger;
 import product.ProductMode;
 import ui.UI;
 
 public class CmdUI extends UI
 {
 	private List<String> args;
+	
+	//menu definitions
+	private static CallbackMenu mainMenu;
+	private static CallbackMenu manageTrackingGroupsMenu;
+	private static CallbackMenu manageAlgorithmsMenu;
+	private static CallbackMenu openArchiveMenu;
+	private static Menu nextMenu;
+	
+	//menu display functions
+//	private static void mainMenu(Void v) { mainMenu.display(); }
+//	private static void manageTrackingGroupsMenu(Void v) { manageTrackingGroupsMenu.display(); }
+//	private static void manageAlgorithmsMenu(Void v) { manageAlgorithmsMenu.display(); }
+//	private static void openArchiveMenu(Void v) { openArchiveMenu.display(); }
+//	private static void embedDataMenu(Void v) { embedDataMenu.display(); }
+//	private static void extractDataMenu(Void v) { extractDataMenu.display(); }
+	
+	//menu options
+	static
+	{
+		mainMenu = new CallbackMenu("Main Menu");
+		manageTrackingGroupsMenu = new CallbackMenu("Manage Tracking Groups Menu");
+		manageAlgorithmsMenu = new CallbackMenu("Manage Algorithms Menu");
+		openArchiveMenu = new CallbackMenu("Open Archive Menu");
+		
+		mainMenu.addOption("Manage Tracking Groups", manageTrackingGroupsMenu);
+		mainMenu.addOption("Manage Algorithm Presets", manageAlgorithmsMenu);
+		mainMenu.addOption("Embed Data", CmdUI::embedDataPrompts);
+		mainMenu.addOption("Open Archive (View / Extract Data)", openArchiveMenu);
+		mainMenu.addOption("Exit", CmdUI::shutdown);
+		
+		manageTrackingGroupsMenu.addOption("View Tracking Group", CmdUI::viewTrackingGroupPrompts);
+		manageTrackingGroupsMenu.addOption("Create Tracking Group", CmdUI::createTrackingGroupPrompts);
+		manageTrackingGroupsMenu.addOption("Edit Tracking Group", CmdUI::editTrackingGroupPrompts);
+		manageTrackingGroupsMenu.addOption("Delete Tracking Group", CmdUI::deleteTrackingGroupPrompts);
+		manageTrackingGroupsMenu.addOption("Back To Previous Menu", mainMenu);
+		
+		manageAlgorithmsMenu.addOption("View Algorithm", CmdUI::viewAlgorithmPrompts);
+		manageAlgorithmsMenu.addOption("Create Algorithm", CmdUI::createAlgorithmPrompts);
+		manageAlgorithmsMenu.addOption("Edit Algorithm", CmdUI::editAlgorithmPrompts);
+		manageAlgorithmsMenu.addOption("Delete Algorithm", CmdUI::deleteAlgorithmPrompts);
+		manageAlgorithmsMenu.addOption("Back To Previous Menu", mainMenu);
+		
+		openArchiveMenu.addOption("View Product File Contents and Selectivly Extract Data", CmdUI::viewProductFilePrompts);
+		openArchiveMenu.addOption("Extract All Data From One or More Product Files", CmdUI::extractAllPrompts);
+		openArchiveMenu.addOption("Back To Previous Menu", mainMenu);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
 	
 	public CmdUI(List<String> args)
 	{
@@ -29,63 +89,62 @@ public class CmdUI extends UI
 	public void processArgs()
 	{
 		if (args.isEmpty())
-			mainMenu();
-	}
-
-	@Override
-	public void runnerStartupMessage()
-	{
-		p("The system is starting up...");
-		mainMenu();
-	}
-
-	private void mainMenu()
-	{
-
-		p("Main Menu:");
-		p("\t1\tmanage tracking groups");
-		p("\t2\tmanage algorithm presets");
-		p("\t3\topen archive to view contents");
-		p("\t4\tembed data");
-		p("\t5\textract data");
-		p("\t6\texit");
-
-		int choice = 0;
-		while (choice == 0)
+			nextMenu = mainMenu;
+		
+		
+		while (nextMenu != null)
 		{
-			try
-			{
-				choice = Integer.parseInt(promptInput(""));
-				if (choice == 1)
-					manageTrackingGroupsMenu();
-				else if (choice == 2)
-					manageAlgorithmsMenu();
-				else if (choice == 3)
-					openArchiveMenu();
-				else if (choice == 4)
-					embedDataMenu();
-				else if (choice == 5)
-					extractDataMenu();
-				else if (choice == 6)
-					shutdown();
-				else
-				{
-					incorrectInput("Enter one of the numbers in the menu.");
-					choice = 0;
-				}
-			}
-			catch (Exception e)
-			{
-				incorrectInput("Enter one of the numbers in the menu.");
-				choice = 0;
-			}
+			Menu menu = nextMenu;
+			nextMenu = null;
+			menu.display();
 		}
 	}
 
 	/**
 	 * @update_comment
 	 */
-	private void extractDataMenu()
+	private static void viewTrackingGroupPrompts(Void v)
+	{
+		CallbackMenu viewTrackingGroupsMenu = new CallbackMenu("Select A Name For More Details");
+		//viewTrackingGroupsMenu.setSubtext("Select a number or type in the name of a tracking group:");
+		
+		List<String> groupNames = ConfigurationAPI.getTrackingGroupNames();
+		for (String name : groupNames)
+			viewTrackingGroupsMenu.addOption(name);
+		
+		String back = "Back to Tracking Group Menu";
+		viewTrackingGroupsMenu.addOption(back, manageTrackingGroupsMenu);
+		viewTrackingGroupsMenu.display();
+		
+		
+		int index = viewTrackingGroupsMenu.getChosenIndex();
+		
+		if (viewTrackingGroupsMenu.getIndexOfOption(back) == index)
+		{
+			nextMenu = manageTrackingGroupsMenu;
+		}
+		else
+		{
+			try
+			{
+				TrackingGroup selected = ConfigurationAPI.getTrackingGroup(groupNames.get(index));
+				
+				System.out.println(selected.toString());
+				nextMenu = manageTrackingGroupsMenu;
+			}
+			catch (UsageException e)
+			{
+				Logger.log(LogLevel.k_error, e, false);
+				nextMenu = manageTrackingGroupsMenu;
+			}
+		}
+		
+	}
+
+	/**
+	 * @update_comment
+	 */
+	private static void editTrackingGroupPrompts(Void v)
 	{
 		// TODO Auto-generated method stub
 		
@@ -94,7 +153,7 @@ public class CmdUI extends UI
 	/**
 	 * @update_comment
 	 */
-	private void embedDataMenu()
+	private static void deleteTrackingGroupPrompts(Void v)
 	{
 		// TODO Auto-generated method stub
 		
@@ -103,7 +162,7 @@ public class CmdUI extends UI
 	/**
 	 * @update_comment
 	 */
-	private void openArchiveMenu()
+	private static void viewAlgorithmPrompts(Void v)
 	{
 		// TODO Auto-generated method stub
 		
@@ -112,7 +171,15 @@ public class CmdUI extends UI
 	/**
 	 * @update_comment
 	 */
-	private void manageAlgorithmsMenu()
+	private static void createAlgorithmPrompts(Void v)
+	{
+		
+	}
+
+	/**
+	 * @update_comment
+	 */
+	private static void editAlgorithmPrompts(Void v)
 	{
 		// TODO Auto-generated method stub
 		
@@ -121,83 +188,189 @@ public class CmdUI extends UI
 	/**
 	 * @update_comment
 	 */
-	private void manageTrackingGroupsMenu()
+	private static void deleteAlgorithmPrompts(Void v)
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
-	private void createTrackingGroupPrompts()
+	/**
+	 * @update_comment
+	 */
+	private static void extractAllPrompts(Void v)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * @update_comment
+	 */
+	private static void embedDataPrompts(Void v)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void createTrackingGroupPrompts(Void v)
 	{
 
 		// name
 		String groupName = promptInput("Enter a new name for the tracking group: ");
-
-		// mode
-		ProductMode mode = ProductMode.getMode(promptInput("Enter the security level: "));
+		
+		// algorithm
+		Algorithm algorithm = chooseAlgorithmPrompts();
+		
+		// key
+		Key key = chooseKeyPrompts(groupName, algorithm.getProductSecurityLevel());
 
 		// database
+		p("Enabling tracking will cause file records from previous runs to be cached,");
+		p("meaning that only unique/new files will be added to products.");
 		boolean usesDatabase =
 						promptInput("Should files belonging to this group be tracked within the file system? [y/n]: ")
 										.toLowerCase().equals("y");
 
-		// agorithm
-		Algorithm algorithm = chooseAlgorithmPrompts();
+		
 
-		// key
-		Key key = chooseKeyPrompts(mode, groupName);
+		boolean chooseFiles = promptInput("Would you like to specify "
+						+ "paths/files to add to the tracking group now? [y/n]: ").toLowerCase().equals("y");
+		
+		
+		TrackingGroup created = new TrackingGroup(groupName, usesDatabase, algorithm, key);
+		
+		//hashdb file
 
-		// TODO: add files here???
-
-		// review and save?
-
-		Configuration.addTrackingGroup(
-						new TrackingGroup(groupName, usesDatabase, algorithm, key));
-
-		Configuration.saveConfig();
+		// tracked/untracked files
+		if (chooseFiles)
+		{
+			addTrackedFilesPrompts(created);
+			addUrackedFilesPrompts(created);
+		}
+		
+		try
+		{
+			ConfigurationAPI.addNewTrackingGroup(created);
+		}
+		catch (UsageException e)
+		{
+			Logger.log(LogLevel.k_error, e, false);
+			p("An error occured and the tracking group could not be saved:");
+			p(e.getMessage());
+		}
+		
+		nextMenu = manageTrackingGroupsMenu;
 	}
 
-	private Key chooseKeyPrompts(ProductMode mode, String groupName)
+	/**
+	 * @update_comment
+	 * @param created
+	 */
+	private static void addTrackedFilesPrompts(TrackingGroup created)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * @update_comment
+	 * @param created
+	 */
+	private static void addUrackedFilesPrompts(TrackingGroup created)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static Key chooseKeyPrompts(String groupName, ProductMode mode)
 	{
 		Key key;
-
-		// key name
-		String keyName = promptInput(
-						"Enter a name for your password or key file (like a hint): ");
-
+		
 		if (mode.equals(ProductMode.NORMAL))
 		{
 			key = new NullKey();
 		}
 		else
 		{
-			if (promptInput("Would you like to use a key file? [y/n]: ").toLowerCase()
-							.equals("y"))
-			{
-				// key file
-				File keyFile = null;
-				String input = promptInput(
-								"Enter key file location (or return to have the system prompt for it when needed): ");
-				if (input.length() > 0)
-				{
-					keyFile = new File(input);
-				}
-				key = new FileKey(keyName, groupName, keyFile);
-			}
-			else
+			Menu securityMenu = new Menu("Security Menu");
+			securityMenu.setSubtext("How would you like to secure product files generated by this group?");
+			securityMenu.addOption("Use Password");
+			securityMenu.addOption("Use Key File");
+			securityMenu.display();
+	
+			String keyName = promptInput(
+						"Enter a name for your password or key file (like a hint): ");
+			
+			if (securityMenu.getChosenIndex() == 0)
 			{
 				p("The system will prompt you for your password when it is needed.");
 				key = new PasswordKey(keyName, groupName);
+			}
+			else
+			{
+				File keyFile = null;
+				
+				while (keyFile == null)
+				{
+					String input = promptInput(
+									"Enter key file location (or return to have the "
+									+ "system prompt for it when needed): ");
+					keyFile = new File(input);
+					if (!keyFile.exists())
+					{
+						p("Sorry, a file by that name could not be located.");
+						keyFile = null;
+					}
+				}
+				
+				key = new FileKey(keyName, groupName, keyFile);
 			}
 		}
 
 		return key;
 	}
 
-	private Algorithm chooseAlgorithmPrompts()
+	private static Algorithm chooseAlgorithmPrompts()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		List<String> presetNames = ConfigurationAPI.getAlgorithmPresetNames();
+		
+		CallbackMenu algoMenu = new CallbackMenu("Choose an algorithm preset");
+		for (String presetName : presetNames)
+		{
+			try
+			{
+				ProductMode mode = ConfigurationAPI.getAlgorithmPreset(presetName)
+								.getProductSecurityLevel();
+				
+				String security = null;
+				if (mode.equals(ProductMode.NORMAL))
+					security = "not secured";
+				else if (mode.equals(ProductMode.SECURE))
+					security = "clear headers";
+				else
+					security = "secured";
+				
+				algoMenu.addOption(presetName + " (" + security + ")");
+			}
+			catch (UsageException e)
+			{
+				Logger.log(LogLevel.k_error, e, false);
+			}
+		}
+		
+		algoMenu.display();
+		
+		try
+		{
+			Algorithm chosen = ConfigurationAPI.getAlgorithmPreset(
+							presetNames.get(algoMenu.getChosenIndex()));
+			return chosen;
+		}
+		catch (UsageException e)
+		{
+			Logger.log(LogLevel.k_error, e, false);
+			return null;
+		}
 	}
 
 //	private void waitForBackup() throws InterruptedException
@@ -214,64 +387,7 @@ public class CmdUI extends UI
 //		}
 //	}
 
-	private void fileInfoMenu()
-	{
-		p("File Info Menu:");
-		p("\t1\tget status of file");
-		p("\t2\tlist the contents of an image");
-		p("\t3\tback to main menu");
-
-		int choice = 0;
-		while (choice == 0)
-		{
-			try
-			{
-				choice = Integer.parseInt(promptInput(""));
-				if (choice == 1)
-					fileStatusPrompt();
-				else if (choice == 2)
-					imageContentsPrompt();
-				else if (choice == 3)
-					mainMenu();
-				else
-				{
-					incorrectInput("Enter one of the numbers in the menu.");
-					choice = 0;
-				}
-			}
-			catch (Exception e)
-			{
-				incorrectInput("Enter one of the numbers in the menu.");
-				choice = 0;
-			}
-		}
-	}
-
-	private void fileStatusPrompt()
-	{
-		String path = "";
-		while (true)
-		{
-			path = promptInput("Enter the path of a file: ");
-			File file = new File(path);
-			if (file.exists())
-			{
-				p("File status???");
-				break;
-			}
-			else if (path.equals("exit"))
-			{
-				break;
-			}
-			else
-			{
-				p("The file '" + file.getAbsolutePath() + "' does not exist.");
-				p("Re-enter a file name, or type 'exit' to exit.");
-			}
-		}
-	}
-
-	private void imageContentsPrompt()
+	private static void viewProductFilePrompts(Void v)
 	{
 		String imagePath = "";
 		while (true)
@@ -293,7 +409,6 @@ public class CmdUI extends UI
 				p("Re-enter a file name, or type 'exit' to exit.");
 			}
 		}
-
 	}
 
 	private void incorrectInput(String what)
@@ -301,7 +416,7 @@ public class CmdUI extends UI
 		p("Incorrect Input: " + what);
 	}
 
-	private String promptInput(String prompt)
+	private static String promptInput(String prompt)
 	{
 		System.out.print(prompt);
 		return CMDInput.getLine();
@@ -311,7 +426,7 @@ public class CmdUI extends UI
 	 * typing this sucks
 	 * @param print
 	 */
-	private final void p(String print)
+	private final static void p(String print)
 	{
 		System.out.println(print);
 	}
@@ -323,25 +438,6 @@ public class CmdUI extends UI
 	private final void err(String print)
 	{
 		System.err.println(print);
-	}
-
-	@Override
-	public void showControlPanel()
-	{
-		mainMenu();
-	}
-
-	@Override
-	public void showBackupPanel()
-	{
-		p("Starting backup...");
-	}
-
-	@Override
-	public String promptTrackingGroup()
-	{
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

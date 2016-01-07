@@ -19,6 +19,7 @@ public class Definition implements algorithms.Definition
 	private static final String NAME = "Text";
 	private static final int VERSION_NUMBER = 1;
 	private static Definition self;
+	private String description;
 	
 	public static final String base64Encoding = "Base64";
 	public static final String hexEncoding = "Hex";
@@ -28,6 +29,8 @@ public class Definition implements algorithms.Definition
 	 */
 	private Definition()
 	{
+		description = "Data is encoded into text files such "
+						+ "that all characters are ascii.";
 	}
 
 	/**
@@ -161,6 +164,15 @@ public class Definition implements algorithms.Definition
 		presets.add(textNormal);
 		
 		return presets;
+	}
+
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getDescription()
+	 */
+	@Override
+	public String getDescription()
+	{
+		return description;
 	}
 
 }

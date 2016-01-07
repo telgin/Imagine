@@ -122,8 +122,8 @@ public class Configuration {
 		//config locations
 		Element locations = doc.createElement("Locations");
 		locations.appendChild(mkPathNode("hashdb", group.getHashDBFile().getAbsolutePath()));
-		locations.appendChild(mkPathNode("extraction", group.getExtractionFolder().getAbsolutePath()));
-		locations.appendChild(mkPathNode("staging", group.getProductStagingFolder().getAbsolutePath()));
+		if (group.getStaticOutputFolder() != null)
+			locations.appendChild(mkPathNode("output", group.getStaticOutputFolder().getAbsolutePath()));
 		groupNode.appendChild(locations);
 		
 		//append new tracking group to the list
@@ -254,21 +254,12 @@ public class Configuration {
 				hashDBPath = "hashdb.db";
 			group.setHashDBFile(new File(hashDBPath));
 			
-			String extractionPath = ConfigUtil.first(
+			Element staticOutputElement = ConfigUtil.first(
 							ConfigUtil.filterByAttribute(
-								ConfigUtil.children(locationsNode, "Path"), "name", "extraction"))
-									.getAttribute("value");
-			if (extractionPath.length() == 0)
-				extractionPath = "extraction";
-			group.setHashDBFile(new File(extractionPath));
+								ConfigUtil.children(locationsNode, "Path"), "name", "output"));
 			
-			String stagingPath = ConfigUtil.first(
-							ConfigUtil.filterByAttribute(
-								ConfigUtil.children(locationsNode, "Path"), "name", "staging"))
-									.getAttribute("value");
-			if (stagingPath.length() == 0)
-				stagingPath = "staging";
-			group.setHashDBFile(new File(stagingPath));
+			if (staticOutputElement != null)
+				group.setStaticOutputFolder(new File(staticOutputElement.getAttribute("value")));
 			
 			
 			trackingGroups.add(group);

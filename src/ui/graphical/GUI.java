@@ -16,34 +16,6 @@ public class GUI extends UI
 	}
 
 	@Override
-	public void runnerStartupMessage()
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void showControlPanel()
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void showBackupPanel()
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public String promptTrackingGroup()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public File promptKeyFileLocation(String keyName, String groupName)
 	{
 		// TODO Auto-generated method stub

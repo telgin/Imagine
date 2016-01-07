@@ -15,6 +15,7 @@ public class Parameter
 	private String name;
 	private String type;
 	private String value;
+	private String description;
 	private boolean optional;
 	private boolean enabled;
 
@@ -28,6 +29,7 @@ public class Parameter
 		setValue(value);
 		setOptional(optional);
 		setEnabled(enabled);
+		setDescription("");
 	}
 
 	public Parameter(String name, String type, String value, boolean optional)
@@ -40,6 +42,7 @@ public class Parameter
 		options = new ArrayList<Option>();
 
 		setName(paramElement.getAttribute("name"));
+		setDescription(paramElement.getAttribute("description"));
 		setType(paramElement.getAttribute("type"));
 		setValue(paramElement.getAttribute("value"));
 		setOptional(Boolean.parseBoolean(paramElement.getAttribute("optional")));
@@ -122,6 +125,7 @@ public class Parameter
 	{
 		Element element = doc.createElement("Parameter");
 		element.setAttribute("name", name);
+		element.setAttribute("description", description);
 		element.setAttribute("type", type);
 		element.setAttribute("value", value);
 		element.setAttribute("optional", Boolean.toString(optional));
@@ -178,5 +182,21 @@ public class Parameter
 			Logger.log(LogLevel.k_fatal, "Parameter " + other.getName()
 							+ " has invalid value: " + other.getValue());
 		}
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
 	}
 }

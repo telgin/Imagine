@@ -59,7 +59,7 @@ public abstract class ConversionAPI
 		return extractor.viewAll(productFile);
 	}
 	
-	public static void extractAll(TrackingGroup group, File productFile) throws IOException, UsageException
+	public static void extractAll(TrackingGroup group, File productFile, File extractionFolder) throws IOException, UsageException
 	{
 		if (!productFile.exists())
 			throw new UsageException("The specified product file cannot be found.");
@@ -68,12 +68,12 @@ public abstract class ConversionAPI
 						productFile.getAbsoluteFile().getParentFile());
 		
 		if (productFile.isDirectory())
-			extractor.extractAllFromProductFolder(productFile);
+			extractor.extractAllFromProductFolder(productFile, extractionFolder);
 		else
-			extractor.extractAllFromProduct(productFile);
+			extractor.extractAllFromProduct(productFile, extractionFolder);
 	}
 	
-	public static void extractFile(TrackingGroup group, File productFile, int index) throws IOException, UsageException
+	public static void extractFile(TrackingGroup group, File productFile, File extractionFolder, int index) throws IOException, UsageException
 	{
 		if (!productFile.exists())
 			throw new UsageException("The specified product file cannot be found.");
@@ -84,6 +84,6 @@ public abstract class ConversionAPI
 		ProductExtractor extractor = new ProductExtractor(group,
 						productFile.getAbsoluteFile().getParentFile());
 		
-		extractor.extractFileByIndex(productFile, index);
+		extractor.extractFileByIndex(productFile, extractionFolder, index);
 	}
 }

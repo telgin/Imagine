@@ -6,18 +6,10 @@ import system.SystemManager;
 
 public abstract class UI
 {
-	public abstract void runnerStartupMessage();
-
-	public void shutdown()
+	public static void shutdown(Void v)
 	{
 		SystemManager.shutdown();
 	}
-
-	public abstract void showControlPanel();
-
-	public abstract void showBackupPanel();
-
-	public abstract String promptTrackingGroup();
 
 	public abstract File promptKeyFileLocation(String keyName, String groupName);
 

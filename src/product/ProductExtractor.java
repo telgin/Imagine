@@ -79,10 +79,10 @@ public class ProductExtractor {
 		return productContents;
 	}
 	
-	private File assembleCurrentFileData(ProductContents origProductContents, FileContents origFileContents)
+	private File assembleCurrentFileData(ProductContents origProductContents, FileContents origFileContents, File extractionFolder)
 	{
 		//create temporary hidden assembly folder
-		File assemblyFolder = new File(group.getExtractionFolder(), Constants.ASSEMBLY_FOLDER_NAME);
+		File assemblyFolder = new File(extractionFolder, Constants.ASSEMBLY_FOLDER_NAME);
 		if (!assemblyFolder.exists())
 			assemblyFolder.mkdir();
 		
@@ -198,7 +198,7 @@ public class ProductExtractor {
 		}
 	}
 
-	public boolean extractAllFromProduct(File productFile) throws IOException
+	public boolean extractAllFromProduct(File productFile, File extractionFolder) throws IOException
 	{
 		ProductContents productContents = parseProductContents(productFile);
 		
@@ -224,11 +224,11 @@ public class ProductExtractor {
 				else
 				{
 					//assemble this file, if it has other fragments, follow the trail of products
-					File assembled = assembleCurrentFileData(productContents, fileContents);
+					File assembled = assembleCurrentFileData(productContents, fileContents, extractionFolder);
 					
 					if (assembled != null)
 					{
-						FileAssembler.moveToExtractionFolder(assembled, fileContents, group);
+						FileAssembler.moveToExtractionFolder(assembled, fileContents, extractionFolder);
 					}
 					else
 					{
@@ -240,7 +240,7 @@ public class ProductExtractor {
 			}
 			else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
 			{
-				FileAssembler.moveFolderToExtractionFolder(fileContents, group);
+				FileAssembler.moveFolderToExtractionFolder(fileContents, extractionFolder);
 			}
 			else //k_reference
 			{
@@ -266,7 +266,7 @@ public class ProductExtractor {
 				else
 				{
 					ProductExtractor subExtractor = new ProductExtractor(group, enclosingFolder);
-					subExtractor.extractFileByFirstHashMatch(refProductFile, refHash);
+					subExtractor.extractFileByFirstHashMatch(refProductFile, extractionFolder, refHash);
 				}
 					
 			}
@@ -280,7 +280,7 @@ public class ProductExtractor {
 
 	
 
-	public boolean extractAllFromProductFolder(File productFolder)
+	public boolean extractAllFromProductFolder(File productFolder, File extractionFolder)
 	{
 		if (!productFolder.isDirectory())
 		{
@@ -308,7 +308,7 @@ public class ProductExtractor {
 				{
 					try
 					{
-						extractAllFromProduct(sub);
+						extractAllFromProduct(sub, extractionFolder);
 					}
 					catch (IOException e)
 					{
@@ -323,7 +323,7 @@ public class ProductExtractor {
 		return success;
 	}
 	
-	public boolean extractFileByIndex(File productFile, int index) throws IOException
+	public boolean extractFileByIndex(File productFile, File extractionFolder, int index) throws IOException
 	{
 		ProductContents productContents = parseProductContents(productFile);
 		
@@ -340,11 +340,11 @@ public class ProductExtractor {
 				{
 					
 					//assemble this file, if it has other fragments, follow the trail of products
-					File assembled = assembleCurrentFileData(productContents, fileContents);
+					File assembled = assembleCurrentFileData(productContents, fileContents, extractionFolder);
 					
 					if (assembled != null)
 					{
-						FileAssembler.moveToExtractionFolder(assembled, fileContents, group);
+						FileAssembler.moveToExtractionFolder(assembled, fileContents, extractionFolder);
 					}
 					else
 					{
@@ -356,7 +356,7 @@ public class ProductExtractor {
 				}
 				else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
 				{
-					FileAssembler.moveFolderToExtractionFolder(fileContents, group);
+					FileAssembler.moveFolderToExtractionFolder(fileContents, extractionFolder);
 				}
 				else //k_reference
 				{
@@ -378,7 +378,7 @@ public class ProductExtractor {
 					else
 					{
 						ProductExtractor subExtractor = new ProductExtractor(group, enclosingFolder);
-						subExtractor.extractFileByFirstHashMatch(refProductFile, refHash);
+						subExtractor.extractFileByFirstHashMatch(refProductFile, extractionFolder, refHash);
 					}	
 				}
 				
@@ -428,7 +428,7 @@ public class ProductExtractor {
 	 * @param fileHash
 	 * @throws IOException 
 	 */
-	private boolean extractFileByFirstHashMatch(File productFile, byte[] fileHash) throws IOException
+	private boolean extractFileByFirstHashMatch(File productFile, File extractionFolder, byte[] fileHash) throws IOException
 	{
 		ProductContents productContents = parseProductContents(productFile);
 		
@@ -442,11 +442,11 @@ public class ProductExtractor {
 				if (ByteConversion.bytesEqual(curHash, fileHash))
 				{
 					//assemble this file, if it has other fragments, follow the trail of products
-					File assembled = assembleCurrentFileData(productContents, fileContents);
+					File assembled = assembleCurrentFileData(productContents, fileContents, extractionFolder);
 					
 					if (assembled != null)
 					{
-						FileAssembler.moveToExtractionFolder(assembled, fileContents, group);
+						FileAssembler.moveToExtractionFolder(assembled, fileContents, extractionFolder);
 						return true;
 					}
 					else

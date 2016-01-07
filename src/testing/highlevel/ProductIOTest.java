@@ -67,7 +67,7 @@ public class ProductIOTest
 		group.clearTrackedPaths();
 		group.clearUntrackedPaths();
 		group.addTrackedPath(inputFolder);
-		group.setProductStagingFolder(outputFolder);
+		group.setStaticOutputFolder(outputFolder);
 		group.setExtractionFolder(extractionFolder);
 
 		runJob(group, threads);
@@ -346,7 +346,7 @@ public class ProductIOTest
 		group.clearTrackedPaths();
 		group.clearUntrackedPaths();
 		group.addTrackedPath(inputFolder);
-		group.setProductStagingFolder(outputFolder);
+		group.setStaticOutputFolder(outputFolder);
 		group.setExtractionFolder(extractionFolder);
 
 		// specify the original single test file
