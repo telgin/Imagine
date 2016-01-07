@@ -1,5 +1,6 @@
 package ui.cmd;
 
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -18,19 +19,23 @@ import data.PasswordKey;
 import data.TrackingGroup;
 import logging.LogLevel;
 import logging.Logger;
+import product.ConversionJob;
 import product.FileContents;
 import product.ProductContents;
 import product.ProductMode;
+import stats.ProgressMonitor;
 import ui.UI;
 import util.Constants;
 
 public class CmdUI extends UI
 {
 	private List<String> args;
+	private boolean outputPaused;
 
 	public CmdUI(List<String> args)
 	{
 		this.args = args;
+		outputPaused = false;
 	}
 	
 	private void usage(String message)
@@ -41,12 +46,12 @@ public class CmdUI extends UI
 		err("Usage:");
 		err("(See 'imagine --help' for more details.)");
 		err("imagine --gui\n");
-		err("imagine --open -p <profilename> -i <file>");
-		err("imagine --open -a <algo-pre-name> -i <file> [-k <keyfile>]\n");
-		err("imagine --embed -p <profilename> -i <file/folder> -o <folder>");
-		err("imagine --embed -a <algo-pre-name> -i <file/folder> -o <folder> [-k <keyfile>]\n");
-		err("imagine --extract -p <profilename> -i <file/folder> -o <folder>");
-		err("imagine --extract -a <algo-pre-name> -i <file/folder> -o <folder> [-k <keyfile>]");
+		err("imagine --open -p <profile> -i <file> [-o <folder>]");
+		err("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k <keyfile>]\n");
+		err("imagine --embed -p <profile> [-o <folder>]");
+		err("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k <keyfile>]\n");
+		err("imagine --extract -p <profile> -i <file/folder> [-o <folder>]");
+		err("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k <keyfile>]");
 	}
 	
 	/* (non-Javadoc)
@@ -66,17 +71,23 @@ public class CmdUI extends UI
 		else if (args.contains("--open"))
 		{
 			args.remove("--open");
-			openArchiveParse(args);
+			CmdParseResult result = cmdParse(CmdAction.k_open, args);
+			if (result != null)
+				openArchive(result);
 		}
 		else if (args.contains("--embed"))
 		{
 			args.remove("--embed");
-			embedSection();
+			CmdParseResult result = cmdParse(CmdAction.k_embed, args);
+			if (result != null)
+				embed(result);
 		}
 		else if (args.contains("--extract"))
 		{
 			args.remove("--extract");
-			extractSection(args);
+			CmdParseResult result = cmdParse(CmdAction.k_extract, args);
+			if (result != null)
+				extract(result);
 		}
 		else
 		{
@@ -94,12 +105,12 @@ public class CmdUI extends UI
 		p("configuration edits (editing profiles or algorithms) must be done in the GUI.\n");
 		
 		p("Command Syntax:");
-		p("imagine --open -p <profilename> -i <file>");
-		p("imagine --open -a <algo-pre-name> -i <file> [-k <keyfile>]\n");
-		p("imagine --embed -p <profilename> -i <file/folder> -o <folder>");
-		p("imagine --embed -a <algo-pre-name> -i <file/folder> -o <folder> [-k <keyfile>]\n");
-		p("imagine --extract -p <profilename> -i <file/folder> -o <folder>");
-		p("imagine --extract -a <algo-pre-name> -i <file/folder> -o <folder> [-k <keyfile>]\n");
+		p("imagine --open -p <profile> -i <file> [-o <folder>]");
+		p("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k <keyfile>]\n");
+		p("imagine --embed -p <profile> [-o <folder>]");
+		p("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k <keyfile>]\n");
+		p("imagine --extract -p <profile> -i <file/folder> [-o <folder>]");
+		p("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k <keyfile>]\n");
 		
 		p("--open     ");
 		p("    open an archive and selectively extract its contents");
@@ -119,11 +130,15 @@ public class CmdUI extends UI
 	 * @update_comment
 	 * @param subargs
 	 */
-	private void openArchiveParse(List<String> subargs)
+	private CmdParseResult cmdParse(CmdAction action, List<String> subargs)
 	{
 		if (!subargs.contains("-p") && !subargs.contains("-a"))
 		{
 			usage("Either a profile name (-p) or an algorithm preset name (-a) must be specified.");
+		}
+		else if (action.equals(CmdAction.k_embed) && subargs.contains("-p") && subargs.contains("-i"))
+		{
+			usage("Profiles have a locked set of data input locations. Seperate input cannot be specified.");
 		}
 		else if (!subargs.contains("-i"))
 		{
@@ -133,28 +148,32 @@ public class CmdUI extends UI
 		{
 			usage("Either specify an algorithm preset name or a profile name, not both.");
 		}
+		else if (subargs.contains("-p") && subargs.contains("-k"))
+		{
+			usage("You cannot specify both a profile and a key. Keys are contained within profiles.");
+		}
 		else
 		{
-			String profileName = null;
-			String presetName = null;
-			File inputFile = null;
-			File keyFile = null;
-			
 			try
 			{
+				CmdParseResult result = new CmdParseResult();
+				
 				if (subargs.contains("-p"))
-					profileName = subargs.get(subargs.indexOf("-p")+1);
+					result.profileName = subargs.get(subargs.indexOf("-p")+1);
 				
 				if (subargs.contains("-a"))
-					presetName = subargs.get(subargs.indexOf("-a")+1);
+					result.presetName = subargs.get(subargs.indexOf("-a")+1);
 				
 				if (subargs.contains("-i"))
-					inputFile = new File(subargs.get(subargs.indexOf("-i")+1));
+					result.inputFile = new File(subargs.get(subargs.indexOf("-i")+1));
 				
+				if (subargs.contains("-o"))
+					result.outputFolder = new File(subargs.get(subargs.indexOf("-o")+1));
+					
 				if (subargs.contains("-k"))
-					keyFile = new File(subargs.get(subargs.indexOf("-k")+1));
+					result.keyFile = new File(subargs.get(subargs.indexOf("-k")+1));
 				
-				openArchive(profileName, presetName, inputFile, keyFile);
+				return result;
 			}
 			catch (Exception e)
 			{
@@ -162,41 +181,17 @@ public class CmdUI extends UI
 				usage(null);
 			}
 		}
+		
+		return null;
 	}
 	
-	private void openArchive(String profileName, String presetName, File inputFile, File keyFile)
+	private void openArchive(CmdParseResult result)
 	{
 		try
 		{
-			TrackingGroup group = null;
-			if (profileName != null)
-			{
-				group = ConfigurationAPI.getTrackingGroup(profileName);
-				
-			}
-			else
-			{
-				Algorithm preset = ConfigurationAPI.getAlgorithmPreset(presetName);
-				
-				if (preset.getProductSecurityLevel().equals(ProductMode.NORMAL))
-				{
-					group = ConversionAPI.createTemporaryTrackingGroup(presetName);
-				}
-				else if (keyFile == null)
-				{
-					Key passKey = new PasswordKey(Constants.TEMP_KEY_NAME, Constants.TEMP_RESERVED_GROUP_NAME);
-					group = ConversionAPI.createTemporaryTrackingGroup(presetName, passKey);
-				}
-				else
-				{
-					Key fileKey = new FileKey(Constants.TEMP_KEY_NAME,
-									Constants.TEMP_RESERVED_GROUP_NAME, keyFile);
-					group = ConversionAPI.createTemporaryTrackingGroup(presetName, fileKey);
-				}
-			}
+			TrackingGroup group = getTrackingGroup(result);
 			
-			
-			ProductContents productContents = ConversionAPI.openArchive(group, inputFile);
+			ProductContents productContents = ConversionAPI.openArchive(group, result.inputFile);
 			
 			Menu contentsMenu = new Menu("File Contents");
 			contentsMenu.setSubtext("Select a file to extract it.");
@@ -220,15 +215,24 @@ public class CmdUI extends UI
 			
 			int choice = contentsMenu.getChosenIndex();
 			
-			File outputFile = group.getStaticOutputFolder();
-			if (outputFile == null)
-				outputFile = new File(".");
+			//try static output folder first
+			if (result.outputFolder == null)
+				result.outputFolder = group.getStaticOutputFolder();
 			
-			ConversionAPI.extractFile(group, inputFile, outputFile, choice);
+			//otherwise use local dir
+			if (result.outputFolder == null)
+				result.outputFolder = new File(".");
+			
+			ConversionAPI.extractFile(group, result.inputFile, result.outputFolder, choice);
 		}
 		catch (IOException | UsageException e)
 		{
 			usage(e.getMessage());
+			Logger.log(LogLevel.k_debug, e, false);
+		}
+		catch (Exception e)
+		{
+			usage(null);
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 		
@@ -237,320 +241,120 @@ public class CmdUI extends UI
 	/**
 	 * @update_comment
 	 */
-	private void embedSection()
+	private void embed(CmdParseResult result)
 	{
-		// TODO Auto-generated method stub
-		
+		try
+		{
+			TrackingGroup group = getTrackingGroup(result);
+			group.addTrackedPath(result.inputFile);
+			
+			//try static output folder first
+			if (result.outputFolder == null)
+				result.outputFolder = group.getStaticOutputFolder();
+			
+			//otherwise use local dir
+			if (result.outputFolder == null)
+				result.outputFolder = new File(".");
+			
+			group.setStaticOutputFolder(result.outputFolder);
+			
+			ConversionJob job = ConversionAPI.runConversion(group, Constants.DEFAULT_THREAD_COUNT);
+			
+			showStats(job);
+		}
+		catch (UsageException e)
+		{
+			usage(e.getMessage());
+			Logger.log(LogLevel.k_debug, e, false);
+		}
+		catch (Exception e)
+		{
+			usage(null);
+			Logger.log(LogLevel.k_debug, e, false);
+		}
 	}
 
 	/**
 	 * @update_comment
 	 * @param subargs
 	 */
-	private void extractSection(List<String> subargs)
+	private void extract(CmdParseResult result)
 	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * @update_comment
-	 */
-	private static void viewTrackingGroupPrompts(Void v)
-	{
-		CallbackMenu viewTrackingGroupsMenu = new CallbackMenu("Select A Name For More Details");
-		//viewTrackingGroupsMenu.setSubtext("Select a number or type in the name of a tracking group:");
-		
-		List<String> groupNames = ConfigurationAPI.getTrackingGroupNames();
-		for (String name : groupNames)
-			viewTrackingGroupsMenu.addOption(name);
-		
-		int index = viewTrackingGroupsMenu.getChosenIndex();
-
-
 		try
 		{
-			TrackingGroup selected = ConfigurationAPI.getTrackingGroup(groupNames.get(index));
-			System.out.println(selected.toString());
+			TrackingGroup group = getTrackingGroup(result);
+			
+			//try static output folder first
+			if (result.outputFolder == null)
+				result.outputFolder = group.getStaticOutputFolder();
+			
+			//otherwise use local dir
+			if (result.outputFolder == null)
+				result.outputFolder = new File(".");
+			
+			ConversionAPI.extractAll(group, result.inputFile, result.outputFolder);
 		}
-		catch (UsageException e)
+		catch (UsageException | IOException e)
 		{
-			Logger.log(LogLevel.k_error, e, false);
+			usage(e.getMessage());
+			Logger.log(LogLevel.k_debug, e, false);
 		}
-		
-	}
-
-	/**
-	 * @update_comment
-	 */
-	private static void editTrackingGroupPrompts(Void v)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * @update_comment
-	 */
-	private static void deleteTrackingGroupPrompts(Void v)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * @update_comment
-	 */
-	private static void viewAlgorithmPrompts(Void v)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * @update_comment
-	 */
-	private static void createAlgorithmPrompts(Void v)
-	{
-		
-	}
-
-	/**
-	 * @update_comment
-	 */
-	private static void editAlgorithmPrompts(Void v)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * @update_comment
-	 */
-	private static void deleteAlgorithmPrompts(Void v)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * @update_comment
-	 */
-	private static void extractAllPrompts(Void v)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * @update_comment
-	 */
-	private static void embedDataPrompts(Void v)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	private static void createTrackingGroupPrompts(Void v)
-	{
-
-		// name
-		String groupName = promptInput("Enter a new name for the tracking group: ");
-		
-		// algorithm
-		Algorithm algorithm = chooseAlgorithmPrompts();
-		
-		// key
-		Key key = chooseKeyPrompts(groupName, algorithm.getProductSecurityLevel());
-
-		// database
-		p("Enabling tracking will cause file records from previous runs to be cached,");
-		p("meaning that only unique/new files will be added to products.");
-		boolean usesDatabase =
-						promptInput("Should files belonging to this group be tracked within the file system? [y/n]: ")
-										.toLowerCase().equals("y");
-
-		
-
-		boolean chooseFiles = promptInput("Would you like to specify "
-						+ "paths/files to add to the tracking group now? [y/n]: ").toLowerCase().equals("y");
-		
-		
-		TrackingGroup created = new TrackingGroup(groupName, usesDatabase, algorithm, key);
-		
-		//hashdb file
-
-		// tracked/untracked files
-		if (chooseFiles)
+		catch (Exception e)
 		{
-			addTrackedFilesPrompts(created);
-			addUrackedFilesPrompts(created);
-		}
-		
-		try
-		{
-			ConfigurationAPI.addNewTrackingGroup(created);
-		}
-		catch (UsageException e)
-		{
-			Logger.log(LogLevel.k_error, e, false);
-			p("An error occured and the tracking group could not be saved:");
-			p(e.getMessage());
+			usage(null);
+			Logger.log(LogLevel.k_debug, e, false);
 		}
 	}
-
-	/**
-	 * @update_comment
-	 * @param created
-	 */
-	private static void addTrackedFilesPrompts(TrackingGroup created)
+	
+	private TrackingGroup getTrackingGroup(CmdParseResult result) throws UsageException
 	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * @update_comment
-	 * @param created
-	 */
-	private static void addUrackedFilesPrompts(TrackingGroup created)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	private static Key chooseKeyPrompts(String groupName, ProductMode mode)
-	{
-		Key key;
-		
-		if (mode.equals(ProductMode.NORMAL))
+		TrackingGroup group = null;
+		if (result.profileName != null)
 		{
-			key = new NullKey();
+			group = ConfigurationAPI.getTrackingGroup(result.profileName);
 		}
 		else
 		{
-			Menu securityMenu = new Menu("Security Menu");
-			securityMenu.setSubtext("How would you like to secure product files generated by this group?");
-			securityMenu.addOption("Use Password");
-			securityMenu.addOption("Use Key File");
-			securityMenu.display();
-	
-			String keyName = promptInput(
-						"Enter a name for your password or key file (like a hint): ");
+			Algorithm preset = ConfigurationAPI.getAlgorithmPreset(result.presetName);
 			
-			if (securityMenu.getChosenIndex() == 0)
+			if (preset.getProductSecurityLevel().equals(ProductMode.NORMAL))
 			{
-				p("The system will prompt you for your password when it is needed.");
-				key = new PasswordKey(keyName, groupName);
+				group = ConversionAPI.createTemporaryTrackingGroup(result.presetName);
+			}
+			else if (result.keyFile == null)
+			{
+				Key passKey = new PasswordKey(Constants.TEMP_KEY_NAME, Constants.TEMP_RESERVED_GROUP_NAME);
+				group = ConversionAPI.createTemporaryTrackingGroup(result.presetName, passKey);
 			}
 			else
 			{
-				File keyFile = null;
-				
-				while (keyFile == null)
-				{
-					String input = promptInput(
-									"Enter key file location (or return to have the "
-									+ "system prompt for it when needed): ");
-					keyFile = new File(input);
-					if (!keyFile.exists())
-					{
-						p("Sorry, a file by that name could not be located.");
-						keyFile = null;
-					}
-				}
-				
-				key = new FileKey(keyName, groupName, keyFile);
-			}
-		}
-
-		return key;
-	}
-
-	private static Algorithm chooseAlgorithmPrompts()
-	{
-		List<String> presetNames = ConfigurationAPI.getAlgorithmPresetNames();
-		
-		CallbackMenu algoMenu = new CallbackMenu("Choose an algorithm preset");
-		for (String presetName : presetNames)
-		{
-			try
-			{
-				ProductMode mode = ConfigurationAPI.getAlgorithmPreset(presetName)
-								.getProductSecurityLevel();
-				
-				String security = null;
-				if (mode.equals(ProductMode.NORMAL))
-					security = "not secured";
-				else if (mode.equals(ProductMode.SECURE))
-					security = "clear headers";
-				else
-					security = "secured";
-				
-				algoMenu.addOption(presetName + " (" + security + ")");
-			}
-			catch (UsageException e)
-			{
-				Logger.log(LogLevel.k_error, e, false);
+				Key fileKey = new FileKey(Constants.TEMP_KEY_NAME,
+								Constants.TEMP_RESERVED_GROUP_NAME, result.keyFile);
+				group = ConversionAPI.createTemporaryTrackingGroup(result.presetName, fileKey);
 			}
 		}
 		
-		algoMenu.display();
-		
-		try
-		{
-			Algorithm chosen = ConfigurationAPI.getAlgorithmPreset(
-							presetNames.get(algoMenu.getChosenIndex()));
-			return chosen;
-		}
-		catch (UsageException e)
-		{
-			Logger.log(LogLevel.k_error, e, false);
-			return null;
-		}
+		return group;
 	}
 
-//	private void waitForBackup() throws InterruptedException
-//	{
-//		while (backupRunner.isRunning())
-//		{
-//			Thread.sleep(1000);
-//			int filesProcessed = (int) ProgressMonitor.getStat("filesProcessed")
-//							.getNumericProgress().doubleValue();
-//			int productsCreated = (int) ProgressMonitor.getStat("productsCreated")
-//							.getNumericProgress().doubleValue();
-//			Logger.log(LogLevel.k_info, "Files Processed: " + filesProcessed
-//							+ ", Products Created: " + productsCreated);
-//		}
-//	}
 
-	private static void viewProductFilePrompts(Void v)
+	private void showStats(ConversionJob job) throws InterruptedException
 	{
-		String imagePath = "";
-		while (true)
+		while (!job.isFinished())
 		{
-			imagePath = promptInput("Enter the path of an image product: ");
-			File imageFile = new File(imagePath);
-			if (imageFile.exists())
+			while (!outputPaused)
 			{
-				p("Reading image???");
-				break;
+				int filesProcessed = (int) ProgressMonitor.getStat("filesProcessed")
+								.getNumericProgress().doubleValue();
+				int productsCreated = (int) ProgressMonitor.getStat("productsCreated")
+								.getNumericProgress().doubleValue();
+				Logger.log(LogLevel.k_info, "Files Processed: " + filesProcessed
+								+ ", Products Created: " + productsCreated);
+				
+				Thread.sleep(1000);
 			}
-			else if (imagePath.equals("exit"))
-			{
-				break;
-			}
-			else
-			{
-				p("The file '" + imageFile.getAbsolutePath() + "' does not exist.");
-				p("Re-enter a file name, or type 'exit' to exit.");
-			}
+			Thread.sleep(1000);
 		}
-	}
-
-	private void incorrectInput(String what)
-	{
-		p("Incorrect Input: " + what);
 	}
 
 	private static String promptInput(String prompt)
@@ -580,18 +384,51 @@ public class CmdUI extends UI
 	@Override
 	public File promptKeyFileLocation(String keyName, String groupName)
 	{
-		return new File(promptInput("Enter key (" + keyName
+		outputPaused = true;
+		File location = new File(promptInput("Enter key (" + keyName
 						+ ") file location for tracking group '" + groupName + "': "));
+		outputPaused = false;
+		return location;
 	}
 
 	@Override
 	public String promptKey(String keyName, String groupName)
 	{
-		return promptInput("Enter key (" + keyName + ") for tracking group '" + groupName
+		outputPaused = true;
+		
+		p("Enter password (" + keyName + ") for tracking group '" + groupName
 						+ "': ");
+		
+		Console console = System.console();
+		String password = null;
+		if (console == null)
+		{
+			//for testing w/ eclipse, password will not be hidden
+			password = CMDInput.getLine();
+		}
+		else
+		{
+			password = new String(console.readPassword(""));
+		}
+		
+		outputPaused = false;
+		return password;
+	}
+
+	private class CmdParseResult
+	{
+		public String profileName = null;
+		public String presetName = null;
+		public File inputFile = null;
+		public File outputFolder = null;
+		public File keyFile = null;
 	}
 	
-	
-
+	private enum CmdAction
+	{
+		k_open,
+		k_embed,
+		k_extract;
+	}
 
 }

@@ -91,7 +91,7 @@ public class Comparisons
 		else
 		{
 			assertEquals(g1.getName(), g2.getName());
-			assertEquals(g1.getExtractionFolder(), g2.getExtractionFolder());
+			assertEquals(g1.getStaticOutputFolder(), g2.getStaticOutputFolder());
 			assertEquals(g1.getHashDBFile(), g2.getHashDBFile());
 			
 			compareFileSets(g1.getTrackedFiles(), g2.getTrackedFiles());
