@@ -32,6 +32,20 @@ public abstract class ConversionAPI
 	{
 		return createTemporaryTrackingGroup(algoPresetName, new NullKey(), selection);
 	}
+	
+	public static TrackingGroup createTemporaryTrackingGroup(String algoPresetName, Key key)
+	{
+		String groupName = Constants.TEMP_RESERVED_GROUP_NAME;
+		Algorithm algorithm = Configuration.getAlgorithmPreset(algoPresetName);
+		TrackingGroup group = new TrackingGroup(groupName, true, algorithm, key);
+		
+		return group;
+	}
+	
+	public static TrackingGroup createTemporaryTrackingGroup(String algoPresetName)
+	{
+		return createTemporaryTrackingGroup(algoPresetName, new NullKey());
+	}
 
 	public static ConversionJob runConversion(TrackingGroup group, int threads)
 	{

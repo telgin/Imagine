@@ -31,6 +31,7 @@ public abstract class Constants
 	public static final int DEFAULT_THREAD_COUNT = 3;
 	public static final Charset CHARSET = StandardCharsets.UTF_8;
 	public static final long DEFAULT_SEED = 1337;
+	public static final String TEMP_KEY_NAME = "not specified";
 	
 	// io system configuration
 	public static final int MAX_READ_BUFFER_SIZE = 50000000;
@@ -61,6 +62,7 @@ public abstract class Constants
 	public static final int FILE_PERMISSIONS_SIZE = 1;
 	public static final int FILE_LENGTH_REMAINING_SIZE = 8;
 	public static final int FILE_TYPE_SIZE = 1;
+
 
 	
 	

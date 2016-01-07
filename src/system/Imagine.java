@@ -4,6 +4,7 @@ import ui.UIContext;
 import ui.cmd.CmdUI;
 import ui.graphical.GUI;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class Imagine
 		
 		//process args as gui vs. command line interface
 		String guiCode = "--gui";
-		List<String> argList = Arrays.asList(args);
+		List<String> argList = new ArrayList<String>(Arrays.asList(args));
 		
 		if (argList.contains(guiCode))
 		{
@@ -74,5 +75,8 @@ public class Imagine
 		
 		//process the args
 		UIContext.getUI().processArgs();
+		
+		//shutdown when done
+		SystemManager.shutdown();
 	}
 }

@@ -35,6 +35,7 @@ import data.ProductWorker;
 import data.TrackingGroup;
 import product.ProductContents;
 import product.ProductLoader;
+import system.Imagine;
 import treegenerator.TreeGenerator;
 import product.ProductExtractor;
 import product.ProductIOException;
@@ -51,26 +52,62 @@ public class Scratch {
 	public static void main(String args[]) throws IOException, InterruptedException, SQLException
 	{
 		
-		File originalRoot = new File("/home/tom/temp/original_root");
-		File extractedRoot = new File("/home/tom/temp/extracted_root");
 		
-		listFiles(originalRoot);
-		listFiles(extractedRoot);
 		
-		File run1 = new File("/home/tom/temp/original_root/1/run1");
-		File run2 = new File("/home/tom/temp/original_root/1/run2");
 		
-		System.out.println("absolutePaths == false");
-		File r1_1 = new File(run1.toURI().relativize(originalRoot.toURI()));
-		String r1_2 = originalRoot.toURI().relativize(run1.toURI()).getPath();
-		File f_r1_2 = new File(r1_2);
-		File expectedRel = new File(extractedRoot, r1_2);
-		System.out.println(expectedRel.getPath());
+		args = new String[]{"--open", "-a", "image_basic", "-i", "config.xml"};
 		
-		File expectedAbs = new File(extractedRoot, run1.getPath());
-		System.out.println(expectedAbs.getPath());
+		//args = new String[]{"--help"};
+		
+		Imagine.run(args);
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+//		File originalRoot = new File("/home/tom/temp/original_root");
+//		File extractedRoot = new File("/home/tom/temp/extracted_root");
+//		
+//		listFiles(originalRoot);
+//		listFiles(extractedRoot);
+//		
+//		File run1 = new File("/home/tom/temp/original_root/1/run1");
+//		File run2 = new File("/home/tom/temp/original_root/1/run2");
+//		
+//		System.out.println("absolutePaths == false");
+//		File r1_1 = new File(run1.toURI().relativize(originalRoot.toURI()));
+//		String r1_2 = originalRoot.toURI().relativize(run1.toURI()).getPath();
+//		File f_r1_2 = new File(r1_2);
+//		File expectedRel = new File(extractedRoot, r1_2);
+//		System.out.println(expectedRel.getPath());
+//		
+//		File expectedAbs = new File(extractedRoot, run1.getPath());
+//		System.out.println(expectedAbs.getPath());
+//		
+//	}
 	
 	
 	
