@@ -2,6 +2,7 @@ package database;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,8 @@ import data.Metadata;
 import data.TrackingGroup;
 import database.filesystem.FileSystemDB;
 import database.memory.ProductDB;
+import logging.LogLevel;
+import logging.Logger;
 import system.SystemManager;
 
 public class Database
@@ -118,6 +121,20 @@ public class Database
 		//load the db for this tracking group if it's not already loaded
 		if (!pdbs.containsKey(group.getName()))
 		{
+			if (!group.getHashDBFile().exists())
+			{
+				group.getHashDBFile().getParentFile().mkdirs();
+				try
+				{
+					group.getHashDBFile().createNewFile();
+				}
+				catch (IOException e)
+				{
+					Logger.log(LogLevel.k_debug, e, false);
+					Logger.log(LogLevel.k_fatal, "Cannot create hashdb file at: " +
+									group.getHashDBFile().getAbsolutePath());
+				}
+			}
 			ProductDB pdb = new ProductDB(group.getHashDBFile());
 			SystemManager.registerActiveComponent(pdb);
 			pdb.load();

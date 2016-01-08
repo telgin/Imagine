@@ -49,9 +49,9 @@ public class TreeGenerator
 			}
 			else
 			{
-				//add information about the parent or drive uuid
+				//add information about the parent
 				File parent = included.getParentFile();
-				topLevelTracked.setAttribute("parent", parent != null ? parent.getAbsolutePath() : "");
+				topLevelTracked.setAttribute("parent", parent != null ? parent.getPath() : ".");
 				//topLevelTracked.setAttribute("driveuuid", FileSystemUtil.getDriveUUID(included));
 				pc.appendChild(topLevelTracked);
 			}	

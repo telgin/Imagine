@@ -18,7 +18,6 @@ import util.FileSystemUtil;
 import util.Hashing;
 import data.FileType;
 import data.Metadata;
-import data.FileAssembler;
 import data.TrackingGroup;
 
 public class ProductExtractor {
@@ -30,15 +29,22 @@ public class ProductExtractor {
 	private TrackingGroup group;
 	private File enclosingFolder;
 	private File curProductFile;
+	private ExtractionManager manager;
 	
 	
 	public ProductExtractor(TrackingGroup group, File enclosingFolder)
+	{
+		this(group, enclosingFolder, new ExtractionManager());
+	}
+	
+	private ProductExtractor(TrackingGroup group, File enclosingFolder, ExtractionManager manager)
 	{
 		this.group = group;
 		setEnclosingFolder(enclosingFolder);
 		product = group.getProductReaderFactory().createReader();
 		
 		buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
+		this.manager = new ExtractionManager();
 	}
 	
 	public void setEnclosingFolder(File folder)
@@ -117,14 +123,18 @@ public class ProductExtractor {
 			{
 				//there are other fragments that need to be added,
 				//find the next product file
-				File nextProductFile = FileAssembler.findProductFile(
+				File nextProductFile = manager.findProductFile(
 								FileSystemUtil.getProductName(group, curProductContents.getStreamUUID(),
 												curProductContents.getProductSequenceNumber() + increment),
 								curExtractor.enclosingFolder,
 								curExtractor.curProductFile.getAbsoluteFile().getParentFile());
 				
 				//the fragment we're looking for will be the first file in the next product
-				curExtractor = new ProductExtractor(group, enclosingFolder);
+				curExtractor = new ProductExtractor(group, enclosingFolder, manager);
+				
+				//TODO, this is bad, stack increases to high, return nextProductFile,
+				//create new extractor there, call this line
+				//finished = curExtractor.extractFragmentData == null;
 				finished = curExtractor.extractFragmentData(nextProductFile, outStream);
 				
 				//now looking for the next next product file...
@@ -228,7 +238,7 @@ public class ProductExtractor {
 					
 					if (assembled != null)
 					{
-						FileAssembler.moveToExtractionFolder(assembled, fileContents, extractionFolder);
+						manager.moveFileToExtractionFolder(assembled, fileContents, extractionFolder);
 					}
 					else
 					{
@@ -240,7 +250,7 @@ public class ProductExtractor {
 			}
 			else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
 			{
-				FileAssembler.moveFolderToExtractionFolder(fileContents, extractionFolder);
+				manager.moveFolderToExtractionFolder(fileContents, extractionFolder);
 			}
 			else //k_reference
 			{
@@ -249,24 +259,34 @@ public class ProductExtractor {
 				long refStreamUUID = ByteConversion.getStreamUUID(refUUID);
 				int refSequenceNum = ByteConversion.getProductSequenceNumber(refUUID);
 				
-				File refProductFile = FileAssembler.findProductFile(
-								FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum),
-								enclosingFolder, productFile.getParentFile());
-				
-				if (refProductFile == null)
+				//a copy of the file may have already been extracted
+				//if so, copy it instead of searching for it in a product file
+				File existing = manager.getPreviouslyExtractedFile(refHash);
+				if (existing != null)
 				{
-					Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
-									refStreamUUID + "_" + refSequenceNum);
-					
-					//read next header
-					fileContents = readNextFileHeader(true);
-					
-					continue;
+					manager.copyFileToExtractionFolder(existing, fileContents, extractionFolder);
 				}
 				else
 				{
-					ProductExtractor subExtractor = new ProductExtractor(group, enclosingFolder);
-					subExtractor.extractFileByFirstHashMatch(refProductFile, extractionFolder, refHash);
+					File refProductFile = manager.findProductFile(
+									FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum),
+									enclosingFolder, productFile.getParentFile());
+					
+					if (refProductFile == null)
+					{
+						Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
+										refStreamUUID + "_" + refSequenceNum);
+						
+						//read next header
+						fileContents = readNextFileHeader(true);
+						
+						continue;
+					}
+					else
+					{
+						ProductExtractor subExtractor = new ProductExtractor(group, enclosingFolder, manager);
+						subExtractor.extractAndCopyFirstHashMatch(refProductFile, extractionFolder, refHash, fileContents);
+					}
 				}
 					
 			}
@@ -344,7 +364,7 @@ public class ProductExtractor {
 					
 					if (assembled != null)
 					{
-						FileAssembler.moveToExtractionFolder(assembled, fileContents, extractionFolder);
+						manager.moveFileToExtractionFolder(assembled, fileContents, extractionFolder);
 					}
 					else
 					{
@@ -356,7 +376,7 @@ public class ProductExtractor {
 				}
 				else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
 				{
-					FileAssembler.moveFolderToExtractionFolder(fileContents, extractionFolder);
+					manager.moveFolderToExtractionFolder(fileContents, extractionFolder);
 				}
 				else //k_reference
 				{
@@ -365,21 +385,31 @@ public class ProductExtractor {
 					long refStreamUUID = ByteConversion.getStreamUUID(refUUID);
 					int refSequenceNum = ByteConversion.getProductSequenceNumber(refUUID);
 					
-					File refProductFile = FileAssembler.findProductFile(
-									FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum),
-									enclosingFolder, productFile.getParentFile());
-					
-					if (refProductFile == null)
+					//a copy of the file may have already been extracted
+					//if so, copy it instead of searching for it in a product file
+					File existing = manager.getPreviouslyExtractedFile(refHash);
+					if (existing != null)
 					{
-						Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
-										refStreamUUID + "_" + refSequenceNum);
-						return false;
+						manager.copyFileToExtractionFolder(existing, fileContents, extractionFolder);
 					}
 					else
 					{
-						ProductExtractor subExtractor = new ProductExtractor(group, enclosingFolder);
-						subExtractor.extractFileByFirstHashMatch(refProductFile, extractionFolder, refHash);
-					}	
+						File refProductFile = manager.findProductFile(
+										FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum),
+										enclosingFolder, productFile.getParentFile());
+						
+						if (refProductFile == null)
+						{
+							Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
+											refStreamUUID + "_" + refSequenceNum);
+							return false;
+						}
+						else
+						{
+							ProductExtractor subExtractor = new ProductExtractor(group, enclosingFolder, manager);
+							subExtractor.extractAndCopyFirstHashMatch(refProductFile, extractionFolder, refHash, fileContents);
+						}
+					}
 				}
 				
 				return true;
@@ -428,7 +458,8 @@ public class ProductExtractor {
 	 * @param fileHash
 	 * @throws IOException 
 	 */
-	private boolean extractFileByFirstHashMatch(File productFile, File extractionFolder, byte[] fileHash) throws IOException
+	private boolean extractAndCopyFirstHashMatch(File productFile, 
+					File extractionFolder, byte[] fileHash, FileContents destContents) throws IOException
 	{
 		ProductContents productContents = parseProductContents(productFile);
 		
@@ -446,7 +477,7 @@ public class ProductExtractor {
 					
 					if (assembled != null)
 					{
-						FileAssembler.moveToExtractionFolder(assembled, fileContents, extractionFolder);
+						manager.moveFileToExtractionFolder(assembled, destContents, extractionFolder);
 						return true;
 					}
 					else
@@ -621,7 +652,7 @@ public class ProductExtractor {
 					throw new ProductIOException("Could not read group key name.");
 				
 				contents.setGroupKeyName(new String(buffer, 0, groupKeyNameLength, Constants.CHARSET));
-				System.out.println("Read group key name of: " + new String(buffer, 0, groupKeyNameLength, Constants.CHARSET));
+				//System.out.println("Read group key name of: " + new String(buffer, 0, groupKeyNameLength, Constants.CHARSET));
 			}
 			else
 			{
@@ -653,7 +684,7 @@ public class ProductExtractor {
 	
 	private FileContents readNextFileHeader(boolean parseData)
 	{
-		System.err.println("Reading file header");
+		Logger.log(LogLevel.k_debug, "Reading file header");
 
 		FileContents contents = null;
 		
@@ -685,7 +716,7 @@ public class ProductExtractor {
 			if (!readFull(Constants.FILE_TYPE_SIZE))
 				return null;
 			int fileTypeNum = ByteConversion.byteToInt(buffer[0]);
-			System.out.println("File type number: " + fileTypeNum);
+			//System.out.println("File type number: " + fileTypeNum);
 			FileType fileType = FileType.toFileType(fileTypeNum);
 			contents.getMetadata().setType(fileType);
 			
@@ -698,7 +729,7 @@ public class ProductExtractor {
 					if (!readFull(Constants.FILE_HASH_SIZE))
 						return null;
 					curFileHash = ByteConversion.subArray(buffer, 0, Constants.FILE_HASH_SIZE);
-					System.out.println(ByteConversion.bytesToHex((curFileHash)));
+					//System.out.println(ByteConversion.bytesToHex((curFileHash)));
 					contents.getMetadata().setFileHash(curFileHash);
 				}
 				else
@@ -712,7 +743,7 @@ public class ProductExtractor {
 					return null;
 				short fileNameLength = ByteConversion.bytesToShort(buffer, 0);
 				
-				System.out.println("Read file name length of " + fileNameLength);
+				//System.out.println("Read file name length of " + fileNameLength);
 				
 				//file name
 				if (parseData)
@@ -812,7 +843,7 @@ public class ProductExtractor {
 					return null;
 				short fileNameLength = ByteConversion.bytesToShort(buffer, 0);
 				
-				System.out.println("Read file name length of " + fileNameLength);
+				//System.out.println("Read file name length of " + fileNameLength);
 				
 				//file name
 				if (parseData)
@@ -883,8 +914,8 @@ public class ProductExtractor {
 		
 		output.flush();
 		
-		Logger.log(LogLevel.k_info, "Extracted file data belonging to: " + 
-						fileContents.getMetadata().getFile().getPath());
+		Logger.log(LogLevel.k_debug, "Extracting file data belonging to: " + 
+						fileContents.getMetadata().getFile().getName());
 		return totalBytesRead;
 	}
 }

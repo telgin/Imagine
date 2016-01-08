@@ -2,10 +2,6 @@ package util;
 
 import logging.LogLevel;
 import logging.Logger;
-import product.Clock;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +15,9 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -28,7 +26,6 @@ import java.util.Set;
 
 import data.Metadata;
 import data.TrackingGroup;
-import database.filesystem.FileSystemDB;
 
 public class FileSystemUtil
 {
@@ -63,7 +60,20 @@ public class FileSystemUtil
 		catch (IOException e)
 		{
 			Logger.log(LogLevel.k_error, e, false);
-			return 777; // you got a better idea?
+			return 444; // you got a better idea?
+		}
+	}
+	
+	public static void setNumericFilePermissions(File file, short permissions)
+	{
+		try
+		{
+			Files.setPosixFilePermissions(file.toPath(), intToPermissions(permissions));
+		}
+		catch (IOException e)
+		{
+			Logger.log(LogLevel.k_debug, e, false);
+			Logger.log(LogLevel.k_warning, "Cannot set permissions for file: " + file.getName());
 		}
 	}
 
@@ -184,6 +194,39 @@ public class FileSystemUtil
 			Logger.log(LogLevel.k_error, "Cannot date created for: " + file.getPath());
 			return -1;
 		}
+	}
+	
+	/**
+	 * @update_comment
+	 * @credit http://stackoverflow.com/questions/9198184/setting-file-creation-timestamp-in-java
+	 * @param file
+	 * @param dateModified
+	 * @param dateAccessed
+	 * @param dateCreated
+	 * @throws IOException
+	 */
+	public static void setFileDates(File file, long dateCreated, long dateModified,
+					long dateAccessed)
+	{
+
+        BasicFileAttributeView attributes = Files.getFileAttributeView(
+        				file.toPath(), BasicFileAttributeView.class);
+        try
+		{
+			attributes.setTimes(FileTime.fromMillis(dateModified), 
+							FileTime.fromMillis(dateAccessed), 
+							FileTime.fromMillis(dateCreated));
+		}
+		catch (IOException e)
+		{
+			Logger.log(LogLevel.k_debug, e, false);
+			Logger.log(LogLevel.k_warning, "Cannot set dates for file: " + file.getName());
+		}
+    }
+	
+	public static void setFileDates(File file, long dateCreated, long dateModified)
+	{
+		setFileDates(file, dateCreated, dateModified, dateModified);
 	}
 
 	public static Metadata loadMetadataFromFile(File file)

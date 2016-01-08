@@ -37,8 +37,8 @@ public class FileSystemDB implements ActiveComponent
 
 	public void saveMetadata(Metadata metadata, TrackingGroup group)
 	{
-		Logger.log(LogLevel.k_debug,
-						"Saving metadata for " + metadata.getFile().getAbsolutePath());
+		//Logger.log(LogLevel.k_debug,
+		//				"Saving metadata for " + metadata.getFile().getAbsolutePath());
 		IndexFile index = getIndexFile(metadata.getFile(), group);
 		index.saveMetadata(metadata);
 	}

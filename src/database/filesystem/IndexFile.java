@@ -121,8 +121,8 @@ public class IndexFile
 
 	public static IndexFile loadIndex(File lookup, TrackingGroup group)
 	{
-		Logger.log(LogLevel.k_debug,
-						"Trying to load index file for " + lookup.getAbsolutePath());
+		//Logger.log(LogLevel.k_debug,
+		//				"Trying to load index file for " + lookup.getAbsolutePath());
 
 		File indexFileLocation = findIndexFile(lookup, group);
 
@@ -134,8 +134,8 @@ public class IndexFile
 			return null;
 		}
 
-		Logger.log(LogLevel.k_debug,
-						"Using index file: " + indexFileLocation.getAbsolutePath());
+		//Logger.log(LogLevel.k_debug,
+		//				"Using index file: " + indexFileLocation.getAbsolutePath());
 
 		if (!indexFileLocation.exists())
 		{

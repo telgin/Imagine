@@ -62,6 +62,8 @@ public class ProductWorker implements Runnable
 			count++;
 		}
 		loader.shutdown();
+		
+		Logger.log(LogLevel.k_debug, "Product worker is shutdown.");
 	}
 
 	public void shutdown()

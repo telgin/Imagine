@@ -120,11 +120,11 @@ public class ProductLoader
 		if (!writeFull(currentUUID))
 			throw new ProductIOException("Cannot write product uuid.");
 
-		System.out.println("Was " + ByteConversion.bytesToLong(streamUUID));
-		System.out.println("Was " + (sequenceNumber - 1));
-		System.out.println("Wrote " + ByteConversion.getStreamUUID(currentUUID));
-		System.out.println(
-						"Wrote " + ByteConversion.getProductSequenceNumber(currentUUID));
+		//System.out.println("Was " + ByteConversion.bytesToLong(streamUUID));
+		//System.out.println("Was " + (sequenceNumber - 1));
+		//System.out.println("Wrote " + ByteConversion.getStreamUUID(currentUUID));
+		//System.out.println(
+		//				"Wrote " + ByteConversion.getProductSequenceNumber(currentUUID));
 
 		// set the uuid in case it is used internally by the product
 		currentProduct.setUUID(currentUUID);
@@ -185,7 +185,7 @@ public class ProductLoader
 		}
 		else
 		{
-			System.out.println("Not writing key name because the product is not secure.");
+			//System.out.println("Not writing key name because the product is not secure.");
 			if (!writeFull(ByteConversion.shortToBytes((short) 0)))
 				return false;
 		}
@@ -306,7 +306,7 @@ public class ProductLoader
 	private boolean writeFileHeader(Metadata fileMetadata, long fragmentNumber,
 					long fileLengthRemaining)
 	{
-		System.out.println("Fragment number: " + fragmentNumber);
+		//System.out.println("Fragment number: " + fragmentNumber);
 		// fragment number
 		if (!writeFull(ByteConversion.longToBytes(fragmentNumber)))
 			return false;

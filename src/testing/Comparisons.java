@@ -16,6 +16,8 @@ import algorithms.Parameter;
 import data.Key;
 import data.Metadata;
 import data.TrackingGroup;
+import logging.LogLevel;
+import logging.Logger;
 import util.ByteConversion;
 import util.Constants;
 import util.FileSystemUtil;
@@ -125,6 +127,8 @@ public class Comparisons
 	
 	public static void compareExtractedFileStructure(File originalRoot, File extractedRoot, boolean absolutePaths)
 	{
+		Logger.log(LogLevel.k_debug, "Comparing file structure...");
+		
 		//bfs through folders
 		Queue<File> folders = new LinkedList<File>();
 		folders.add(originalRoot);
@@ -142,6 +146,8 @@ public class Comparisons
 						
 						File expected = getExpectedExtractionFile(originalRoot, extractedRoot, sub, absolutePaths);
 						System.out.println("Expecting file: " + expected.getPath());
+						if (!expected.exists())
+							System.out.println("FILE NOT FOUND");
 						assertTrue(expected.exists());
 					}
 				}
@@ -149,6 +155,8 @@ public class Comparisons
 				{
 					File expected = getExpectedExtractionFile(originalRoot, extractedRoot, sub, absolutePaths);
 					System.out.println("Expecting file: " + expected.getPath());
+					if (!expected.exists())
+						System.out.println("FILE NOT FOUND");
 					assertTrue(expected.exists());
 					compareFileHashes(sub, expected);
 				}
@@ -203,8 +211,10 @@ public class Comparisons
 		}
 		else
 		{
-			String relPath = originalRoot.toURI().relativize(originalFile.toURI()).getPath();
-			return new File(extractedRoot, relPath);
+			//String relPath = originalRoot.toURI().relativize(originalFile.toURI()).getPath();
+			//return new File(extractedRoot, relPath);
+			
+			return new File(extractedRoot, originalFile.getPath());
 		}
 	}
 	

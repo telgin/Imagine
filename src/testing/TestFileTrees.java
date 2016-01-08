@@ -21,7 +21,7 @@ public class TestFileTrees
 	{
 		// trees:
 		trees = new HashMap<String, FileTree>();
-		trees.put("nofiles", getNoFilesTree());
+		trees.put("emptyfolder", getEmptyFolderTree());
 		trees.put("smallfile", getSmallFileTree());
 		trees.put("smalltree", getSmallTree());
 		trees.put("bigfile", getBigFileTree());
@@ -42,7 +42,7 @@ public class TestFileTrees
 	 * @update_comment
 	 * @return
 	 */
-	private static FileTree getNoFilesTree()
+	private static FileTree getEmptyFolderTree()
 	{
 		FileTree tree = new FileTree()
 		{
@@ -50,7 +50,7 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent.getPath() + "/noFiles/");
+				return new File(parent.getPath() + "/emptyFolder/");
 			}
 
 			@Override

@@ -13,7 +13,6 @@ import java.util.Set;
 
 import api.ConversionAPI;
 import data.Metadata;
-import data.FileAssembler;
 import data.FileType;
 import data.TrackingGroup;
 import database.Database;
@@ -34,7 +33,6 @@ public class ProductIOTest
 	static File homeFolder = new File("testing/highlevel/");
 	private static File outputFolder = new File("testing/output/");
 	private static File extractionFolder = new File("testing/extraction/");
-	private static File assemblyFolder = new File("testing/assembly/");
 	private static File hashdbFile = new File("testing/resources/hashdb.db");
 	private static boolean shutdownCalled = true;
 	private static ArrayList<ConversionJob> jobs = new ArrayList<ConversionJob>();
@@ -68,7 +66,6 @@ public class ProductIOTest
 		group.clearUntrackedPaths();
 		group.addTrackedPath(inputFolder);
 		group.setStaticOutputFolder(outputFolder);
-		group.setExtractionFolder(extractionFolder);
 
 		runJob(group, threads);
 
@@ -88,7 +85,7 @@ public class ProductIOTest
 			assertEquals(FileType.k_folder, fileContents.getMetadata().getType());
 			assertEquals(inputFolder.getName(), fileContents.getMetadata().getFile().getName());
 			
-			extractor.extractAllFromProduct(productFile);
+			extractor.extractAllFromProduct(productFile, extractionFolder);
 			
 			File expected = Comparisons.getExpectedExtractionFile(
 							inputFolder.getParentFile(), extractionFolder, inputFolder, true);
@@ -101,7 +98,6 @@ public class ProductIOTest
 		}
 		
 		assertEquals(1, extractionFolder.listFiles().length);
-		assertEquals(0, assemblyFolder.listFiles().length);
 
 		shutdown();
 	}
@@ -347,7 +343,6 @@ public class ProductIOTest
 		group.clearUntrackedPaths();
 		group.addTrackedPath(inputFolder);
 		group.setStaticOutputFolder(outputFolder);
-		group.setExtractionFolder(extractionFolder);
 
 		// specify the original single test file
 		File testFile = inputFolder.listFiles()[0];
@@ -403,7 +398,7 @@ public class ProductIOTest
 		}
 
 		// assemble all part files into the specified extracted filename
-		assertTrue(reader.extractAllFromProductFolder(outputFolder));
+		assertTrue(reader.extractAllFromProductFolder(outputFolder, extractionFolder));
 		
 		Comparisons.compareExtractedFileStructure(inputFolder,
 						extractionFolder, group.usesAbsolutePaths());
@@ -576,7 +571,6 @@ public class ProductIOTest
 	{
 		clearFolder(outputFolder);
 		clearFolder(extractionFolder);
-		clearFolder(assemblyFolder);
 		try
 		{
 			Files.delete(hashdbFile.toPath());

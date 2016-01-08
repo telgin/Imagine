@@ -5,13 +5,15 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import testing.highlevel.ImageTest;
+import testing.highlevel.CmdUITest;
 import testing.highlevel.ImageOverlayTest;
 import testing.highlevel.TextTest;
 import util.test.ByteConversionTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-				 ImageTest.class,
+                   CmdUITest.class
+				// ImageTest.class,
 				// ByteConversionTest.class
 				// TextTest.class,
 				// ImageOverlayTest.class

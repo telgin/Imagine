@@ -154,6 +154,8 @@ public class ConversionJob implements Runnable
 		generator.save(new File("testing/highlevel/tree.xml"));
 		
 		finished = true;
+		
+		Logger.log(LogLevel.k_debug, "Conversion job is shutdown.");
 	}
 
 	private boolean allWorkersInactive()

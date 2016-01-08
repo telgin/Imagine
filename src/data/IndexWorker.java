@@ -58,11 +58,19 @@ public class IndexWorker implements Runnable
 		Node topLevel = root.getFirstChild();
 		while (topLevel != null && !shuttingDown)
 		{
-			crawl((Element) topLevel, new File(((Element)topLevel).getAttribute("parent")));
+			File parentRef = null;
+			//if (trackingGroup.usesAbsolutePaths())
+				parentRef = new File(((Element)topLevel).getAttribute("parent"));
+			//else
+				//parentRef = new File(".");
+			
+			crawl((Element) topLevel, parentRef);
 			topLevel = topLevel.getNextSibling();
 		}
 
 		active = false;
+		
+		Logger.log(LogLevel.k_debug, "Index worker is shutdown.");
 	}
 
 	/**
@@ -135,19 +143,6 @@ public class IndexWorker implements Runnable
 					//show on the element that the file will not be converted directly
 					ele.setAttribute("reference", "1");
 				}
-				
-				
-				
-//				}
-//				else
-//				{
-//					//no tracking, so we'll always add the file
-//					Logger.log(LogLevel.k_debug, "Queueing metadata for file: " + fileMetadata.getFile().getAbsolutePath());
-//					queue.add(fileMetadata);
-//					
-//					//show on the element that the file will be converted
-//					ele.setAttribute("queued", "1");
-//				}
 			}
 			else
 			{
@@ -197,7 +192,7 @@ public class IndexWorker implements Runnable
 					if (Database.containsFileHash(metadata.getFileHash(), trackingGroup))
 					{
 						Logger.log(LogLevel.k_debug, "Queueing metadata reference for file: " + 
-										metadata.getFile().getAbsolutePath());
+										metadata.getFile().getPath());
 						queue.add(metadata);
 						
 						//remove metadata from deferred list

@@ -2,6 +2,7 @@ package data;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashSet;
 
 import algorithms.Algorithm;
@@ -15,6 +16,7 @@ import product.ProductReader;
 import product.ProductReaderFactory;
 import product.ProductWriter;
 import product.ProductWriterFactory;
+import util.Constants;
 
 public class TrackingGroup
 {
@@ -44,6 +46,16 @@ public class TrackingGroup
 		untrackedFiles = new HashSet<File>();
 		usingAbsolutePaths = true;
 		hashDBFile = new File(Configuration.getDatabaseFolder(), name + "_hashdb");
+		
+		//if this is a temporary group, remove the old hashdb file
+		if (name.equals(Constants.TEMP_RESERVED_GROUP_NAME))
+		{
+			try
+			{
+				Files.delete(hashDBFile.toPath());
+			}
+			catch (IOException e){}
+		}
 	}
 
 	public void addTrackedPath(String path)

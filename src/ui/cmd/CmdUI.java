@@ -3,18 +3,15 @@ package ui.cmd;
 import java.io.Console;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
-import java.util.Set;
-
 import algorithms.Algorithm;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
-import config.Configuration;
 import data.FileKey;
 import data.FileType;
 import data.Key;
-import data.NullKey;
 import data.PasswordKey;
 import data.TrackingGroup;
 import logging.LogLevel;
@@ -24,6 +21,7 @@ import product.FileContents;
 import product.ProductContents;
 import product.ProductMode;
 import stats.ProgressMonitor;
+import stats.Stat;
 import ui.UI;
 import util.Constants;
 
@@ -246,6 +244,7 @@ public class CmdUI extends UI
 		try
 		{
 			TrackingGroup group = getTrackingGroup(result);
+			
 			group.addTrackedPath(result.inputFile);
 			
 			//try static output folder first
@@ -332,6 +331,10 @@ public class CmdUI extends UI
 								Constants.TEMP_RESERVED_GROUP_NAME, result.keyFile);
 				group = ConversionAPI.createTemporaryTrackingGroup(result.presetName, fileKey);
 			}
+			
+			//temporary groups should not need/want file system tracking
+			group.setUsesAbsolutePaths(false);
+			group.setUsingIndexFiles(false);
 		}
 		
 		return group;
@@ -342,14 +345,27 @@ public class CmdUI extends UI
 	{
 		while (!job.isFinished())
 		{
-			while (!outputPaused)
+			while (!outputPaused && !job.isFinished())
 			{
-				int filesProcessed = (int) ProgressMonitor.getStat("filesProcessed")
-								.getNumericProgress().doubleValue();
-				int productsCreated = (int) ProgressMonitor.getStat("productsCreated")
-								.getNumericProgress().doubleValue();
-				Logger.log(LogLevel.k_info, "Files Processed: " + filesProcessed
-								+ ", Products Created: " + productsCreated);
+				String statOutput = "";
+				Stat stat = ProgressMonitor.getStat("filesProcessed");
+				if (stat != null)
+				{
+					int filesProcessed = (int) stat.getNumericProgress().doubleValue();
+					statOutput += "Files Processed: " + filesProcessed;
+				}
+				
+				stat = ProgressMonitor.getStat("productsCreated");
+				if (stat != null)
+				{
+					int productsCreated = (int) stat.getNumericProgress().doubleValue();
+					if (!statOutput.isEmpty())
+						statOutput += ", ";
+					statOutput += ", Products Created: " + productsCreated;
+				}
+				
+				if (!statOutput.isEmpty())
+					Logger.log(LogLevel.k_info, statOutput);
 				
 				Thread.sleep(1000);
 			}
