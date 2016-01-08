@@ -21,11 +21,12 @@ import util.FileSystemUtil;
 public class ExtractionManager
 {
 	private Map<String, File> extractedFiles;
-	//private Map<File, >
+	private Map<String, File> cachedFileNames;
 	
 	public ExtractionManager()
 	{
 		extractedFiles = new HashMap<String, File>();
+		cachedFileNames = new HashMap<String, File>();
 	}
 	
 	public void addExtractedFile(byte[] hash, File finalLocation)
@@ -40,6 +41,21 @@ public class ExtractionManager
 	
 	/**
 	 * @update_comment
+	 * @param fileName
+	 * @param productFile
+	 */
+	public void cacheHeaderLocation(String fileName, File productFile)
+	{
+		cachedFileNames.put(fileName, productFile);
+	}
+	
+	public File getCachedFile(String fileName)
+	{
+		return cachedFileNames.get(fileName);
+	}
+	
+	/**
+	 * @update_comment
 	 * @param streamUUID
 	 * @param productSequenceNumber
 	 * @param enclosingFolder2
@@ -49,6 +65,10 @@ public class ExtractionManager
 					File enclosingFolder, File curProductFolder)
 	{
 		Logger.log(LogLevel.k_debug, "Looking for product file: " + productSearchName);
+		
+		//first see if it was cached already
+		if (cachedFileNames.containsKey(productSearchName))
+			return cachedFileNames.get(productSearchName);
 		
 		//bfs through folders for product files
 		Queue<File> folders = new LinkedList<File>();

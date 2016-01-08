@@ -207,6 +207,59 @@ public class ProductExtractor {
 							+ "was not a k_file type: " + productFile.getAbsolutePath());
 		}
 	}
+	
+	public void mapHeaders(File productFile)
+	{
+		if (productFile.isDirectory())
+		{
+			//bfs through folders for product files
+			Queue<File> folders = new LinkedList<File>();
+			folders.add(productFile);
+			
+			while (folders.size() > 0)
+			{
+				File folder = folders.poll();
+				for (File sub : folder.listFiles())
+				{
+					if (sub.isDirectory())
+					{
+						folders.add(sub);
+					}
+					else
+					{
+						try
+						{
+							mapHeader(sub);
+						}
+						catch (IOException e)
+						{
+							Logger.log(LogLevel.k_warning, "Could not read product file: " + sub.getName());
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			try
+			{
+				mapHeader(productFile);
+			}
+			catch (IOException e)
+			{
+				Logger.log(LogLevel.k_warning, "Could not read product file: " + productFile.getName());
+			}
+		}
+	}
+	
+	private void mapHeader(File productFile) throws IOException
+	{
+		ProductContents productContents = parseProductContents(productFile);
+		String fileName = FileSystemUtil.getProductName(
+						group, productContents.getStreamUUID(),
+						productContents.getProductSequenceNumber());
+		manager.cacheHeaderLocation(fileName, productFile);
+	}
 
 	public boolean extractAllFromProduct(File productFile, File extractionFolder) throws IOException
 	{

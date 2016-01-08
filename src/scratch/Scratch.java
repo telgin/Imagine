@@ -55,9 +55,9 @@ public class Scratch {
 		
 		
 		
-		args = new String[]{"--open", "-a", "image_basic", "-i", "config.xml"};
+		//args = new String[]{"--open", "-a", "image_basic", "-i", "testing/output/imagine_reserved_temp_1452209731750_0.png"};
 		
-		//args = new String[]{"--help"};
+		args = new String[]{"--help"};
 		
 		Imagine.run(args);
 		
