@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -392,7 +394,38 @@ public class ProductExtractor {
 		while (folders.size() > 0)
 		{
 			File folder = folders.poll();
-			for (File sub : folder.listFiles())
+			File[] contents = folder.listFiles();
+			
+			//sort based on sequence number
+			Arrays.sort(contents, (File a, File b) ->
+			{
+				try
+				{
+					String path1 = a.getName();
+					String path2 = b.getName();
+					
+					String[] parts = path1.split("_");
+					String last = parts[parts.length-1];
+					
+					if (last.contains("."))
+						last = last.substring(0, last.indexOf('.'));
+					
+					int seq1 = Integer.parseInt(last);
+
+					parts = path2.split("_");
+					last = parts[parts.length-1];
+					if (last.contains("."))
+						last = last.substring(0, last.indexOf('.'));
+					int seq2 = Integer.parseInt(last);
+					
+					return seq1 - seq2;
+				}
+				catch (Exception e) {e.printStackTrace();}
+				
+				return Integer.MAX_VALUE;
+			});
+			
+			for (File sub : contents)
 			{
 				if (sub.isDirectory())
 				{
