@@ -35,6 +35,9 @@ public class ProductExtractor {
 	public ProductExtractor(TrackingGroup group, File enclosingFolder)
 	{
 		this(group, enclosingFolder, new ExtractionManager());
+		
+		//TODO change this to default on, instead of on
+		mapHeaders(enclosingFolder);
 	}
 	
 	private ProductExtractor(TrackingGroup group, File enclosingFolder, ExtractionManager manager)
@@ -44,7 +47,13 @@ public class ProductExtractor {
 		product = group.getProductReaderFactory().createReader();
 		
 		buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
-		this.manager = new ExtractionManager();
+		this.manager = manager;
+	}
+	
+	@Override
+	public ProductExtractor clone()
+	{
+		return new ProductExtractor(group, enclosingFolder, manager);
 	}
 	
 	public void setEnclosingFolder(File folder)
@@ -110,7 +119,7 @@ public class ProductExtractor {
 			outStream = new BufferedOutputStream(new FileOutputStream(assembling));
 			
 			FileContents curFileContents = origFileContents;
-			ProductContents curProductContents = origProductContents;
+			ProductContents curProductContents = origProductContents;//TODO this makes no sense
 			
 			//read the current file data
 			long bytesWritten = readNextFileData(curFileContents, outStream);
@@ -118,7 +127,7 @@ public class ProductExtractor {
 			//not finished unless all the bytes were read
 			boolean finished = bytesWritten == curFileContents.getRemainingData();
 			int increment = 1;
-			ProductExtractor curExtractor = this;
+			ProductExtractor curExtractor = this; 
 			while (!finished)
 			{
 				//there are other fragments that need to be added,
@@ -130,11 +139,8 @@ public class ProductExtractor {
 								curExtractor.curProductFile.getAbsoluteFile().getParentFile());
 				
 				//the fragment we're looking for will be the first file in the next product
-				curExtractor = new ProductExtractor(group, enclosingFolder, manager);
-				
-				//TODO, this is bad, stack increases to high, return nextProductFile,
-				//create new extractor there, call this line
-				//finished = curExtractor.extractFragmentData == null;
+				curExtractor = this.clone();
+
 				finished = curExtractor.extractFragmentData(nextProductFile, outStream);
 				
 				//now looking for the next next product file...
@@ -192,7 +198,16 @@ public class ProductExtractor {
 			try
 			{
 				long bytesRead = readNextFileData(fileContents, outStream);
-				return bytesRead >= fileContents.getRemainingData();
+				long totalRemainingFileBytes = fileContents.getRemainingData();
+				boolean finished = bytesRead >= totalRemainingFileBytes;
+				
+				//this file must be fully explored if we're not finished
+				if (!finished)
+				{
+					manager.setExplored(productFile);
+				}
+				
+				return finished;
 			}
 			catch (IOException e)
 			{
@@ -337,7 +352,7 @@ public class ProductExtractor {
 					}
 					else
 					{
-						ProductExtractor subExtractor = new ProductExtractor(group, enclosingFolder, manager);
+						ProductExtractor subExtractor = this.clone();
 						subExtractor.extractAndCopyFirstHashMatch(refProductFile, extractionFolder, refHash, fileContents);
 					}
 				}
@@ -347,6 +362,9 @@ public class ProductExtractor {
 			//read next header
 			fileContents = readNextFileHeader(true);
 		}
+		
+		//set this file explored since it's all been read
+		manager.setExplored(productFile);
 
 		return true;
 	}
@@ -364,6 +382,9 @@ public class ProductExtractor {
 		
 		boolean success = true;
 		
+		//reset explored files since this is a new run
+		manager.resetExploredFiles();
+		
 		//bfs through folders for product files
 		Queue<File> folders = new LinkedList<File>();
 		folders.add(productFolder);
@@ -379,15 +400,19 @@ public class ProductExtractor {
 				}
 				else
 				{
-					try
+					//check if it was already explored first
+					if (!manager.isExplored(sub))
 					{
-						extractAllFromProduct(sub, extractionFolder);
-					}
-					catch (IOException e)
-					{
-						Logger.log(LogLevel.k_error, "Failed to extract all files from " + sub.getAbsolutePath());
-						Logger.log(LogLevel.k_debug, e, false);
-						success = false;
+						try
+						{
+							extractAllFromProduct(sub, extractionFolder);
+						}
+						catch (IOException e)
+						{
+							Logger.log(LogLevel.k_error, "Failed to extract all files from " + sub.getAbsolutePath());
+							Logger.log(LogLevel.k_debug, e, false);
+							success = false;
+						}
 					}
 				}
 			}
@@ -459,7 +484,7 @@ public class ProductExtractor {
 						}
 						else
 						{
-							ProductExtractor subExtractor = new ProductExtractor(group, enclosingFolder, manager);
+							ProductExtractor subExtractor = this.clone();
 							subExtractor.extractAndCopyFirstHashMatch(refProductFile, extractionFolder, refHash, fileContents);
 						}
 					}

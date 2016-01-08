@@ -78,8 +78,14 @@ public abstract class ConversionAPI
 		if (!productFile.exists())
 			throw new UsageException("The specified product file cannot be found.");
 		
-		ProductExtractor extractor = new ProductExtractor(group,
-						productFile.getAbsoluteFile().getParentFile());
+		//specifying a directory indicates it is also the enclosing folder
+		File enclosingFolder = null;
+		if (productFile.isDirectory())
+			enclosingFolder = productFile;
+		else
+			enclosingFolder = productFile.getAbsoluteFile().getParentFile();
+		
+		ProductExtractor extractor = new ProductExtractor(group, enclosingFolder);
 		
 		if (productFile.isDirectory())
 			extractor.extractAllFromProductFolder(productFile, extractionFolder);

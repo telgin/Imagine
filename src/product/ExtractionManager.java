@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import logging.LogLevel;
 import logging.Logger;
@@ -22,11 +24,13 @@ public class ExtractionManager
 {
 	private Map<String, File> extractedFiles;
 	private Map<String, File> cachedFileNames;
+	private Set<File> exploredFiles;
 	
 	public ExtractionManager()
 	{
 		extractedFiles = new HashMap<String, File>();
 		cachedFileNames = new HashMap<String, File>();
+		exploredFiles = new HashSet<File>();
 	}
 	
 	public void addExtractedFile(byte[] hash, File finalLocation)
@@ -37,6 +41,16 @@ public class ExtractionManager
 	public File getPreviouslyExtractedFile(byte[] hash)
 	{
 		return extractedFiles.get(ByteConversion.bytesToHex(hash));
+	}
+	
+	public void setExplored(File productFile)
+	{
+		exploredFiles.add(productFile);
+	}
+	
+	public boolean isExplored(File productFile)
+	{
+		return exploredFiles.contains(productFile);
 	}
 	
 	/**
@@ -64,11 +78,11 @@ public class ExtractionManager
 	public File findProductFile(String productSearchName,
 					File enclosingFolder, File curProductFolder)
 	{
-		Logger.log(LogLevel.k_debug, "Looking for product file: " + productSearchName);
-		
 		//first see if it was cached already
 		if (cachedFileNames.containsKey(productSearchName))
 			return cachedFileNames.get(productSearchName);
+		
+		Logger.log(LogLevel.k_debug, "Looking for product file: " + productSearchName);
 		
 		//bfs through folders for product files
 		Queue<File> folders = new LinkedList<File>();
@@ -190,5 +204,13 @@ public class ExtractionManager
 		File created = new File(extractionFolder, fileContents.getMetadata().getFile().getPath());
 		
 		created.mkdirs();
+	}
+
+	/**
+	 * @update_comment
+	 */
+	public void resetExploredFiles()
+	{
+		exploredFiles = new HashSet<File>();
 	}
 }

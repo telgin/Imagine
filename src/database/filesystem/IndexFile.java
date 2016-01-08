@@ -176,8 +176,7 @@ public class IndexFile
 		while (indexFolder == null)
 		{
 			// specify the folder we'd like
-			String path = curFolder.getAbsolutePath() + "/" + Constants.INDEX_FOLDER_NAME;
-			indexFolder = new File(path);
+			indexFolder = new File(curFolder.getAbsoluteFile(), Constants.INDEX_FOLDER_NAME);
 
 			// try to create it
 			if (!indexFolder.exists() && indexFolder.getParentFile().canWrite())
@@ -206,10 +205,8 @@ public class IndexFile
 		String filename = Integer
 						.toString(Math.abs(ByteConversion.bytesToInt(nameHash, 0)));
 
-		String path = indexFolder.getAbsolutePath() + "/" + filename;
-
 		// this file may or may not already exist
 		// should be writable since parent folder is writable
-		return new File(path);
+		return new File(indexFolder.getAbsoluteFile(), filename);
 	}
 }

@@ -24,11 +24,8 @@ public class Logger
 	{
 		messageLevel = defaultMessageLevel;
 		exceptionLevel = defaultExceptionLevel;
-
-		String path = Configuration.getLogFolder().getPath() + "/"
-						+ System.currentTimeMillis() + ".log";
 		
-		logFile = new File(path);
+		logFile = new File(Configuration.getLogFolder(), System.currentTimeMillis() + ".log");
 		logFile.getAbsoluteFile().getParentFile().mkdirs();
 
 		try

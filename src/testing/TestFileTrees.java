@@ -50,7 +50,7 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent.getPath() + "/emptyFolder/");
+				return new File(parent, "emptyFolder/");
 			}
 
 			@Override
@@ -75,13 +75,13 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent.getPath() + "/smallFile/");
+				return new File(parent, "smallFile/");
 			}
 
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(bank.getPath() + "/message.txt"), getRoot(parent));
+				addFile(new File(bank, "message.txt"), getRoot(parent));
 			}
 
 		};
@@ -101,13 +101,13 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent.getPath() + "/smallTree/");
+				return new File(parent, "smallTree/");
 			}
 
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(bank.getPath(), "/tracked_topfolder_r/"),
+				addFile(new File(bank, "tracked_topfolder_r/"),
 								getRoot(parent));
 			}
 
@@ -128,13 +128,13 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent.getPath() + "/bigFile/");
+				return new File(parent, "bigFile/");
 			}
 
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(bank.getPath() + "/Computer Art.zip"), getRoot(parent));
+				addFile(new File(bank, "Computer Art.zip"), getRoot(parent));
 			}
 
 		};
@@ -154,14 +154,13 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent.getPath() + "/bigTree/");
+				return new File(parent, "bigTree/");
 			}
 
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(bank.getPath() + "/eclipse-installer/"),
-								getRoot(parent));
+				addFile(new File(bank, "eclipse-installer/"), getRoot(parent));
 			}
 
 		};
@@ -218,7 +217,7 @@ public class TestFileTrees
 	 */
 	private static void addFile(File target, File newParent)
 	{
-		File copyTo = new File(newParent.getPath() + "/" + target.getName());
+		File copyTo = new File(newParent, target.getName());
 		try
 		{
 			if (target.isDirectory())
