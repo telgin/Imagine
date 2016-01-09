@@ -48,7 +48,7 @@ public class TextWriter extends Text implements ProductWriter
 	@Override
 	public int write(byte[] bytes, int offset, int length)
 	{
-		Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
+		Logger.log(LogLevel.k_debug, "Writing " + (length) + " bytes.");
 
 		for (int x = offset; x < offset + length; ++x)
 		{

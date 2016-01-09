@@ -28,7 +28,7 @@ public class ProductLoader
 	private byte[] streamUUID;
 	private int sequenceNumber;
 	private TrackingGroup group;
-	private File productStagingFolder;
+	private FileOutputManager fileOutputManager;
 
 	private ProductWriter currentProduct;
 	private byte[] currentUUID;
@@ -40,15 +40,13 @@ public class ProductLoader
 	private boolean writingFile = false;
 
 	public ProductLoader(ProductWriterFactory<? extends ProductWriter> factory,
-					TrackingGroup group)
+					TrackingGroup group, FileOutputManager manager)
 	{
 		streamUUID = ByteConversion.longToBytes(Clock.getUniqueTime());
 		sequenceNumber = 0;
 
 		this.group = group;
-
-		productStagingFolder = group.getStaticOutputFolder();
-
+		fileOutputManager = manager;
 		currentProduct = factory.createWriter();
 
 		buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
@@ -86,13 +84,12 @@ public class ProductLoader
 		{
 			// if there's not enough space for the end code, the reader logic
 			// handles it the same as if it were written
-			System.out.print("Writing end code...");
 			if (writeFull(ByteConversion.longToBytes(Constants.END_CODE)))
-				System.out.println("success.");
+				Logger.log(LogLevel.k_debug, "End code written successfully.");
 			else
-				System.out.println("failure.");
+				Logger.log(LogLevel.k_debug, "Failed to write end code.");
 
-			currentProduct.saveFile(productStagingFolder, getSaveName());
+			currentProduct.saveFile(fileOutputManager.getOutputFolder(), getSaveName());
 		}
 	}
 
@@ -239,7 +236,7 @@ public class ProductLoader
 			if (!writeFileHeader(fileMetadata, fragmentNumber, fileLengthRemaining))
 			{
 				// there wasn't enough space, reset
-				currentProduct.saveFile(productStagingFolder, getSaveName());
+				currentProduct.saveFile(fileOutputManager.getOutputFolder(), getSaveName());
 				resetToNextProduct();
 
 				// writeFileHeaderSize(fileHeaderSize);
@@ -289,7 +286,7 @@ public class ProductLoader
 		if (!writeFull(ByteConversion.intToBytes(fileHeaderSize)))
 		{
 			// there wasn't enough space, reset
-			currentProduct.saveFile(productStagingFolder, getSaveName());
+			currentProduct.saveFile(fileOutputManager.getOutputFolder(), getSaveName());
 			resetToNextProduct();
 
 			// try again
@@ -379,13 +376,15 @@ public class ProductLoader
 	private long writeFileData(DataInputStream reader, long fileLengthRemaining)
 					throws IOException
 	{
-
 		do
 		{
 			//System.out.println("Bytes requested to be written: " + (dataLength));
 			int bytesWritten = currentProduct.write(buffer, dataOffset, dataLength);
 			//System.out.println("Buffer length: " + buffer.length);
 			//System.out.println("bytes written: " + bytesWritten);
+			Logger.log(LogLevel.k_debug, "Writing " + dataLength + " bytes was requested and " + 
+							bytesWritten + " were written.");
+			
 			dataOffset += bytesWritten;
 			dataLength -= bytesWritten;
 			fileLengthRemaining -= bytesWritten;

@@ -68,8 +68,10 @@ public class TextReader extends Text implements ProductReader{
 		{
 			for (long l = 0; l < bytes; ++l)
 			{
-				order.next();
+				//order matters
 				random.nextByte();
+				order.next();
+				
 				++skipped;
 			}
 		}

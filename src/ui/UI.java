@@ -19,4 +19,14 @@ public abstract class UI
 	 * Starts the execution of the command line arguments
 	 */
 	public abstract void processArgs();
+
+	/**
+	 * @update_comment
+	 * @param enclosingFolder
+	 * @param curProductFolder
+	 * @param productSearchName
+	 * @return
+	 */
+	public abstract File promptEnclosingFolder(File curEnclosingFolder, File curProductFolder,
+					String productSearchName);
 }

@@ -38,7 +38,6 @@ public class ProductExtractor {
 	{
 		this(group, enclosingFolder, new ExtractionManager());
 		
-		//TODO change this to default on, instead of on
 		mapHeaders(enclosingFolder);
 	}
 	
@@ -132,12 +131,14 @@ public class ProductExtractor {
 			ProductExtractor curExtractor = this; 
 			while (!finished)
 			{
+				//set the current extractor's manager's enclosing folder
+				curExtractor.manager.setEnclosingFolder(curExtractor.enclosingFolder);
+				
 				//there are other fragments that need to be added,
 				//find the next product file
 				File nextProductFile = manager.findProductFile(
 								FileSystemUtil.getProductName(group, curProductContents.getStreamUUID(),
 												curProductContents.getProductSequenceNumber() + increment),
-								curExtractor.enclosingFolder,
 								curExtractor.curProductFile.getAbsoluteFile().getParentFile());
 				
 				//the fragment we're looking for will be the first file in the next product
@@ -288,7 +289,6 @@ public class ProductExtractor {
 		{
 			if (fileContents.getMetadata().getType().equals(FileType.k_file))
 			{
-				
 				if (fileContents.getFragmentNumber() != Constants.FIRST_FRAGMENT_CODE)
 				{
 					//file fragments which are not the first fragment will be ignored
@@ -338,9 +338,11 @@ public class ProductExtractor {
 				}
 				else
 				{
+					manager.setEnclosingFolder(enclosingFolder);
+					
 					File refProductFile = manager.findProductFile(
 									FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum),
-									enclosingFolder, productFile.getParentFile());
+									productFile.getAbsoluteFile().getParentFile());
 					
 					if (refProductFile == null)
 					{
@@ -406,7 +408,6 @@ public class ProductExtractor {
 					
 					String[] parts = path1.split("_");
 					String last = parts[parts.length-1];
-					
 					if (last.contains("."))
 						last = last.substring(0, last.indexOf('.'));
 					
@@ -416,11 +417,12 @@ public class ProductExtractor {
 					last = parts[parts.length-1];
 					if (last.contains("."))
 						last = last.substring(0, last.indexOf('.'));
+					
 					int seq2 = Integer.parseInt(last);
 					
 					return seq1 - seq2;
 				}
-				catch (Exception e) {e.printStackTrace();}
+				catch (Exception e) {}
 				
 				return Integer.MAX_VALUE;
 			});
@@ -505,9 +507,11 @@ public class ProductExtractor {
 					}
 					else
 					{
+						manager.setEnclosingFolder(enclosingFolder);
+						
 						File refProductFile = manager.findProductFile(
 										FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum),
-										enclosingFolder, productFile.getParentFile());
+										productFile.getAbsoluteFile().getParentFile());
 						
 						if (refProductFile == null)
 						{
@@ -553,6 +557,7 @@ public class ProductExtractor {
 
 		//try to read the product header
 		ProductContents productContents = readProductHeader(true);
+		
 		if (productContents == null)
 		{
 			//if the product header can't be read,
@@ -816,6 +821,9 @@ public class ProductExtractor {
 				contents.setFragmentNumber(curFragmentNumber);
 			}
 			
+			//Logger.log(LogLevel.k_debug, "read fragment number: " + curFragmentNumber + 
+			//				", " + (curFragmentNumber == Constants.END_CODE));
+			
 			//if end code, no more files
 			if (curFragmentNumber == Constants.END_CODE)
 			{
@@ -973,7 +981,9 @@ public class ProductExtractor {
 			//System.out.println("parse data? " + parseData);
 			//if (contents != null)
 			//	System.out.println(contents.toString());
-				
+			
+			//if (contents != null)
+			//	System.out.println(contents.toString());
 			
 			return contents;
 

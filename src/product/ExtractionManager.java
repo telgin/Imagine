@@ -13,6 +13,7 @@ import java.util.Set;
 
 import logging.LogLevel;
 import logging.Logger;
+import ui.UIContext;
 import util.ByteConversion;
 import util.FileSystemUtil;
 
@@ -25,12 +26,18 @@ public class ExtractionManager
 	private Map<String, File> extractedFiles;
 	private Map<String, File> cachedFileNames;
 	private Set<File> exploredFiles;
+	private File enclosingFolder;
 	
 	public ExtractionManager()
 	{
 		extractedFiles = new HashMap<String, File>();
 		cachedFileNames = new HashMap<String, File>();
 		exploredFiles = new HashSet<File>();
+	}
+	
+	public void setEnclosingFolder(File folder)
+	{
+		enclosingFolder = folder;
 	}
 	
 	public void addExtractedFile(byte[] hash, File finalLocation)
@@ -75,52 +82,70 @@ public class ExtractionManager
 	 * @param enclosingFolder2
 	 * @return
 	 */
-	public File findProductFile(String productSearchName,
-					File enclosingFolder, File curProductFolder)
+	public File findProductFile(String productSearchName, File curProductFolder)
 	{
 		//first see if it was cached already
 		if (cachedFileNames.containsKey(productSearchName))
 			return cachedFileNames.get(productSearchName);
 		
-		Logger.log(LogLevel.k_debug, "Looking for product file: " + productSearchName);
-		
-		//bfs through folders for product files
-		Queue<File> folders = new LinkedList<File>();
-		folders.add(curProductFolder);
-		if (!curProductFolder.equals(enclosingFolder))
+		//search until the user provides the correct enclosing folder
+		//or the user gives up
+		while (true)
 		{
-			folders.add(enclosingFolder);
-		}
-		
-		while (folders.size() > 0)
-		{
-			File folder = folders.poll();
-			for (File sub : folder.listFiles())
+			Logger.log(LogLevel.k_debug, "Looking for product file: " + productSearchName);
+			
+			//the enclosing folder is the current product folder if it wasn't set
+			if (enclosingFolder == null)
+				enclosingFolder = curProductFolder;
+			
+			//bfs through folders for product files
+			Queue<File> folders = new LinkedList<File>();
+			folders.add(curProductFolder);
+			if (!curProductFolder.getAbsoluteFile().equals(enclosingFolder.getAbsolutePath()))
 			{
-				//check sub folders unless we're back at the current product folder
-				if (sub.isDirectory() && !sub.equals(curProductFolder))
+				folders.add(enclosingFolder);
+			}
+			
+			while (folders.size() > 0)
+			{
+				File folder = folders.poll();
+				for (File sub : folder.listFiles())
 				{
-					folders.add(sub);
-				}
-				else
-				{
-					//check the file to see if its name matches
-					String subName = sub.getName();
-					if (subName.contains("."))
-						subName = subName.substring(0, subName.indexOf("."));
-					
-					if (subName.equals(productSearchName))
+					//check sub folders unless we're back at the current product folder
+					if (sub.isDirectory() && !sub.equals(curProductFolder))
 					{
-						Logger.log(LogLevel.k_debug, "Found product file match: " + sub.getName());
-						return sub;
+						folders.add(sub);
+					}
+					else
+					{
+						//check the file to see if its name matches
+						String subName = sub.getName();
+						if (subName.contains("."))
+							subName = subName.substring(0, subName.indexOf("."));
+						
+						if (subName.equals(productSearchName))
+						{
+							Logger.log(LogLevel.k_debug, "Found product file match: " + sub.getName());
+							return sub;
+						}
 					}
 				}
 			}
+			
+			Logger.log(LogLevel.k_debug, "Could not find next product file: " + productSearchName);
+			
+			File newEnclosingFolder = UIContext.getUI().promptEnclosingFolder(
+							enclosingFolder, curProductFolder, productSearchName);
+			
+			if (newEnclosingFolder == null)
+			{
+				return null;
+			}
+			else
+			{
+				enclosingFolder = newEnclosingFolder;
+			}
 		}
-		
-		//couldn't find the file, notify user (TODO)
-		Logger.log(LogLevel.k_debug, "Could not find next product file: " + productSearchName);
-		return null;
 	}
 
 	/**

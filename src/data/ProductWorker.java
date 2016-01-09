@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 import logging.LogLevel;
 import logging.Logger;
+import product.FileOutputManager;
 import product.ProductLoader;
 
 /**
@@ -18,10 +19,11 @@ public class ProductWorker implements Runnable
 	private BlockingQueue<Metadata> queue;
 	private ProductLoader loader;
 
-	public ProductWorker(BlockingQueue<Metadata> queue, TrackingGroup group)
+	public ProductWorker(BlockingQueue<Metadata> queue, TrackingGroup group,
+					FileOutputManager manager)
 	{
 		this.queue = queue;
-		loader = new ProductLoader(group.getProductWriterFactory(), group);
+		loader = new ProductLoader(group.getProductWriterFactory(), group, manager);
 	}
 
 	public boolean isActive()

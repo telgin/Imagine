@@ -54,36 +54,96 @@ public class CmdUITest
 	private static boolean shutdownCalled = true;
 	private static ArrayList<ConversionJob> jobs = new ArrayList<ConversionJob>();
 
-	@Test(timeout = 60000)
+	//@Test(timeout = 60000)
 	public void imageBasicEmptyFolder()
 	{
 		cmdTempGroup("image_basic", "emptyFolder");
 	}
 
-	@Test(timeout = 60000)
+	//@Test(timeout = 60000)
 	public void imageBasicSmallFile()
 	{
 		cmdTempGroup("image_basic", "smallFile");
 	}
 	
-	@Test(timeout = 60000)
+	//@Test(timeout = 60000)
 	public void imageBasicSmallTree()
 	{
 		cmdTempGroup("image_basic", "smallTree");
 	}
 	
-	@Test(timeout = 60000)
+	//@Test(timeout = 60000)
 	public void imageBasicBigFile()
 	{
 		cmdTempGroup("image_basic", "bigFile");
 	}
 	
-	@Test(timeout = 60000)
+	//@Test(timeout = 60000)
 	public void imageBasicBigTree()
 	{
 		cmdTempGroup("image_basic", "bigTree");
 	}
 	
+	
+	//@Test(timeout = 60000)
+	public void imageOverlayBasicEmptyFolder()
+	{
+		cmdTempGroup("image_overlay_basic", "emptyFolder");
+	}
+
+	@Test(timeout = 60000)
+	public void imageOverlayBasicSmallFile()
+	{
+		cmdTempGroup("image_overlay_basic", "smallFile");
+	}
+	
+	//@Test(timeout = 60000)
+	public void imageOverlayBasicSmallTree()
+	{
+		cmdTempGroup("image_overlay_basic", "smallTree");
+	}
+	
+	//@Test(timeout = 60000)
+	public void imageOverlayBasicBigFile()
+	{
+		cmdTempGroup("image_overlay_basic", "bigFile");
+	}
+	
+	//@Test(timeout = 60000)
+	public void imageOverlayBasicBigTree()
+	{
+		cmdTempGroup("image_overlay_basic", "bigTree");
+	}
+	
+	//@Test(timeout = 60000)
+	public void textBasicEmptyFolder()
+	{
+		cmdTempGroup("text_basic", "emptyFolder");
+	}
+
+	//@Test(timeout = 60000)
+	public void textBasicSmallFile()
+	{
+		cmdTempGroup("text_basic", "smallFile");
+	}
+	
+	//@Test(timeout = 60000)
+	public void textBasicSmallTree()
+	{
+		cmdTempGroup("text_basic", "smallTree");
+	}
+	
+	//@Test(timeout = 60000)
+	public void textBasicBigFile()
+	{
+		cmdTempGroup("text_basic", "bigFile");
+	}
+	
+	//@Test(timeout = 60000)
+	public void textBasicBigTree()
+	{
+		cmdTempGroup("text_basic", "bigTree");
+	}
 	
 	
 	

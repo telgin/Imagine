@@ -48,7 +48,7 @@ public class Scratch {
 	public static int x = 0;
 	public static double y = 0;
 	public static HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
-	
+	private static boolean b;
 	public static void main(String args[]) throws IOException, InterruptedException, SQLException
 	{
 		
@@ -57,12 +57,14 @@ public class Scratch {
 		
 		//args = new String[]{"--open", "-a", "image_basic", "-i", "testing/output/imagine_reserved_temp_1452209731750_0.png"};
 		
-		args = new String[]{"--help"};
+		//args = new String[]{"--help"};
 		
-		Imagine.run(args);
+		//Imagine.run(args);
 		
 		
 		
+		
+		System.out.println(b);
 		
 		
 		

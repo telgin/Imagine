@@ -29,6 +29,7 @@ public class ConversionJob implements Runnable
 	private Thread[] workerThreads;
 	private int productWorkerCount;
 	private TreeGenerator generator;
+	private FileOutputManager manager;
 
 	public ConversionJob(TrackingGroup group, int productWorkerCount)
 	{
@@ -42,6 +43,7 @@ public class ConversionJob implements Runnable
 		productWorkers = new LinkedList<ProductWorker>();
 		workerThreads = new Thread[1 + productWorkerCount]; //+1 for index worker
 		generator = new TreeGenerator(group);
+		manager = new FileOutputManager(group, group.getStaticOutputFolder());
 
 		addProductWorkers();
 	}
@@ -56,7 +58,7 @@ public class ConversionJob implements Runnable
 	{
 		Logger.log(LogLevel.k_debug, "Adding new Product Worker");
 
-		return new ProductWorker(queue, group);
+		return new ProductWorker(queue, group, manager);
 	}
 
 	public void stopBackup()

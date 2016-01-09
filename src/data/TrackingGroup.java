@@ -35,6 +35,14 @@ public class TrackingGroup
 	//turn this off for temporary tracking groups,
 	//otherwise leave it on
 	private boolean usingAbsolutePaths;
+	
+	//turn this on if you expect that the number
+	//of products output will be too large for your
+	//file system to run smoothly. This will limit
+	//the number of product files per folder, creating
+	//a number of index files in the normal product
+	//output folder
+	private boolean usesStructuredProductOutput;
 
 	public TrackingGroup(String name, boolean usesIndexFiles, Algorithm algo, Key key)
 	{
@@ -281,5 +289,22 @@ public class TrackingGroup
 	public void setUsesAbsolutePaths(boolean usesAbsolutePaths)
 	{
 		this.usingAbsolutePaths = usesAbsolutePaths;
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	public boolean usesStructuredProductOutput()
+	{
+		return usesStructuredProductOutput;
+	}
+	
+	/**
+	 * @param usesStructuredProductOutput the usesStructuredProductOutput to set
+	 */
+	public void setUsesStructuredProductOutput(boolean usesStructuredProductOutput)
+	{
+		this.usesStructuredProductOutput = usesStructuredProductOutput;
 	}
 }

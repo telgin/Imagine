@@ -268,7 +268,7 @@ public class CmdUI extends UI
 		}
 		catch (Exception e)
 		{
-			usage(null);
+			usage("A failure occurred during conversion.");
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 	}
@@ -445,6 +445,63 @@ public class CmdUI extends UI
 		k_open,
 		k_embed,
 		k_extract;
+	}
+
+	/* (non-Javadoc)
+	 * @see ui.UI#promptEnclosingFolder(java.io.File, java.io.File, java.lang.String)
+	 */
+	@Override
+	public File promptEnclosingFolder(File curEnclosingFolder, File curProductFolder,
+					String productSearchName)
+	{
+		outputPaused = true;
+		
+		p("The file, " + productSearchName + ", was not found after searching in ");
+		p("The current extraction file location: " + curProductFolder.getPath());
+		
+		String path = null;
+		if (curEnclosingFolder.getAbsolutePath().equals(curProductFolder.getAbsolutePath()))
+		{
+			
+			p("Enter the name of the enclosing folder where this file may be found,");
+			path = promptInput("or hit enter to skip: ");
+		}
+		else
+		{
+			p("Or the current enclosing folder: " + curEnclosingFolder.getPath());
+			p("Enter the name of the enclosing folder where this file may be found,");
+			path = promptInput("or hit enter to skip: ");
+		}
+		
+		if (path ==  null || path.isEmpty())
+		{
+			outputPaused = false;
+			return null;
+		}
+		else
+		{
+			File newEnclosingFolder = new File(path);
+			
+			while ((!newEnclosingFolder.exists() || !newEnclosingFolder.isDirectory()) && !path.isEmpty())
+			{
+				p("The folder: " + newEnclosingFolder.getPath() + " could not be found.");
+				p("Enter the name of the enclosing folder where this file may be found,");
+				path = promptInput("or hit enter to skip: ");
+			}
+			
+			if (path ==  null || path.isEmpty())
+			{
+				outputPaused = false;
+				return null;
+			}
+			else
+			{
+				newEnclosingFolder = new File(path);
+			}
+			
+			outputPaused = false;
+			return newEnclosingFolder;
+		}
 	}
 
 }

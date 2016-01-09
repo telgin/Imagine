@@ -39,4 +39,15 @@ public class GUI extends UI
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see ui.UI#promptEnclosingFolder(java.io.File, java.io.File, java.lang.String)
+	 */
+	@Override
+	public File promptEnclosingFolder(File curEnclosingFolder, File curProductFolder,
+					String productSearchName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
