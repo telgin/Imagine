@@ -1,5 +1,6 @@
 package algorithms.imageoverlay;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -80,7 +81,7 @@ public class ImageOverlay implements Product
 		colorIndex = 0;
 		colorMod = 0;
 
-		System.out.println("Scratch.x: " + Scratch.x);
+//		System.out.println("Scratch.x: " + Scratch.x);
 
 		Scratch.x = 0;
 
@@ -92,21 +93,25 @@ public class ImageOverlay implements Product
 		if (incrementFailed)
 			throw new ProductIOException("previous increment failed");
 
-		if (pv[0] == 3044 && pv[1] == 1690)
-			System.out.println("Happened by increment color1");
-		++Scratch.x;
+//		if (pv[0] == 3044 && pv[1] == 1690)
+//			System.out.println("Happened by increment color1");
+//		++Scratch.x;
 
-		if (pv[0] == 3044 && pv[1] == 1690)
-			System.out.println("Happened by increment color2");
+//		if (pv[0] == 3044 && pv[1] == 1690)
+//			System.out.println("Happened by increment color2");
+		
+		
 		incrementColor();
 
-		if (pv[0] == 3044 && pv[1] == 1690)
-			System.out.println("Happened by increment color3");
+//		if (pv[0] == 3044 && pv[1] == 1690)
+//			System.out.println("Happened by increment color3");
+		
+		
 		if (colorIndex == 0)
 			incrementVector();
 
-		if (pv[0] == 3044 && pv[1] == 1690)
-			System.out.println("Happened by increment color4");
+//		if (pv[0] == 3044 && pv[1] == 1690)
+//			System.out.println("Happened by increment color4");
 	}
 
 	private final void incrementColor()
@@ -117,8 +122,8 @@ public class ImageOverlay implements Product
 	private final void incrementVector() throws ProductIOException
 	{
 		incrementFailed = true;
-		if (pv[0] == 3044 && pv[1] == 1690)
-			System.out.println("Happened by increment vector1");
+//		if (pv[0] == 3044 && pv[1] == 1690)
+//			System.out.println("Happened by increment vector1");
 
 		int pixel = randOrder.next();
 		pv[1] = pixel / img.getWidth();
@@ -131,14 +136,19 @@ public class ImageOverlay implements Product
 			pv[1] = pixel / img.getWidth();
 			pv[0] = pixel % img.getWidth();
 		}
+		
+		
 
-		if (pv[0] == 3044 && pv[1] == 1690)
-			System.out.println("Happening in increment");
+//		if (pv[0] == 3044 && pv[1] == 1690)
+//			System.out.println("Happening in increment");
 
 		Pattern.eval(pattern, pv, img.getWidth(), img.getHeight());
+		
+//		if (Scratch.x < 20)
+//			System.out.println(++Scratch.x + ": " + formatPVColors());
 
-		if (pv[0] == 3044 && pv[1] == 1690)
-			System.out.println("Happening after eval");
+//		if (pv[0] == 3044 && pv[1] == 1690)
+//			System.out.println("Happening after eval");
 
 		incrementFailed = false;
 	}
@@ -177,9 +187,9 @@ public class ImageOverlay implements Product
 
 	protected byte getColor(int x, int y)
 	{
-		if (x < 0 || y < 0 || x >= img.getWidth() || y >= img.getHeight())
-			System.out.println(x + ", " + y + ", " + img.getWidth() + ", "
-							+ img.getHeight());
+//		if (x < 0 || y < 0 || x >= img.getWidth() || y >= img.getHeight())
+//			System.out.println(x + ", " + y + ", " + img.getWidth() + ", "
+//							+ img.getHeight());
 
 		if (colorIndex == 0)
 		{
@@ -199,5 +209,32 @@ public class ImageOverlay implements Product
 	public byte[] getUUID()
 	{
 		return uuid;
+	}
+	
+	public String formatPoint(int x, int y)
+	{
+		return "(" + x + ", " + y + ")";
+	}
+	
+	public String formatPV()
+	{
+		return "Fill point: " + formatPoint(pv[0], pv[1]) + " | Ref 1: " + 
+						formatPoint(pv[2], pv[3]) + " | Ref 2: " + 
+						formatPoint(pv[4], pv[5]);
+	}
+	
+	public String formatPVColors()
+	{
+		return "Fill point: " + formatColor(pv[0], pv[1]) + " | Ref 1: " + 
+						formatColor(pv[2], pv[3]) + " | Ref 2: " + 
+						formatColor(pv[4], pv[5]);
+	}
+	
+	public String formatColor(int x, int y)
+	{
+		Color c = new Color(img.getRGB(x, y));
+		
+		return "(r:" + c.getRed() + ", g:" + c.getGreen() + 
+						", b:" + c.getBlue() + ", a: " + c.getAlpha() + ")";
 	}
 }

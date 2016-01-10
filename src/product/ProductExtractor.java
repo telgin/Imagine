@@ -676,8 +676,8 @@ public class ProductExtractor {
 				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(product.getUUID()));
 			}
 			
-			//System.out.println("Read " + ByteConversion.getStreamUUID(product.getUUID()));
-			//System.out.println("Read " + ByteConversion.getProductSequenceNumber(product.getUUID()));
+			System.out.println("Read stream uuid " + ByteConversion.getStreamUUID(product.getUUID()));
+			System.out.println("Read product sequence number " + ByteConversion.getProductSequenceNumber(product.getUUID()));
 				
 			//stealth secure stream now
 			if (product.getProductMode().equals(ProductMode.STEALTH))

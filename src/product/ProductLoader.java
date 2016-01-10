@@ -38,6 +38,7 @@ public class ProductLoader
 
 	private boolean fileWritten = false;
 	private boolean writingFile = false;
+	private boolean needsReset = true;
 
 	public ProductLoader(ProductWriterFactory<? extends ProductWriter> factory,
 					TrackingGroup group, FileOutputManager manager)
@@ -50,15 +51,6 @@ public class ProductLoader
 		currentProduct = factory.createWriter();
 
 		buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
-
-		try
-		{
-			resetToNextProduct();
-		}
-		catch (ProductIOException e)
-		{
-			Logger.log(LogLevel.k_fatal, e, true);
-		}
 	}
 
 	public void shutdown()
@@ -137,6 +129,8 @@ public class ProductLoader
 		// secure products will secure data beyond this point
 		if (currentProduct.getProductMode().equals(ProductMode.SECURE))
 			currentProduct.secureStream();
+		
+		needsReset = false;
 	}
 
 	private boolean writeProductHeader() throws ProductIOException
@@ -199,6 +193,12 @@ public class ProductLoader
 
 	public void writeFile(Metadata fileMetadata) throws IOException
 	{
+		//resetting causes the product header to be written
+		//don't reset unless this loader actually writes a file
+		//needs reset should only be true after initialization
+		if (needsReset)
+			resetToNextProduct();
+		
 		dataLength = 0;
 		dataOffset = buffer.length;
 

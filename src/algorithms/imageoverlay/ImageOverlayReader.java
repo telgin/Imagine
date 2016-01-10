@@ -38,12 +38,14 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 			int c1 = ByteConversion.byteToInt(getColor(pv[2], pv[3]));
 			int c2 = ByteConversion.byteToInt(getColor(pv[4], pv[5]));
 
-			if (pv[4] == 3044 && pv[5] == 1690)
-			{
-				System.out.println("Magic point group: " + c0 + ", " + c1 + ", " + c2);
-			}
+//			if (Scratch.x < 20)
+//			{
+//				System.out.println("Magic point group: " + c0 + ", " + c1 + ", " + c2);
+//			}
 
 			int min = Math.min(c1, c2);
+//			if (Scratch.x < 20)
+//				System.out.println("min: " + min);
 			if (min > 2)
 			{
 				fourVals[i] = c0 - (min - 3);
@@ -52,18 +54,23 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 			{
 				fourVals[i] = (min + 3) - c0;
 			}
-			int bytes = 3642821;
-			if ((byteCount > bytes - 5 && byteCount < bytes + 5) || fourVals[i] < 0
-							|| fourVals[i] > 3)
-			{
-				System.out.println("i: " + i);
-				System.out.println(byteCount);
-				System.out.println(fourVals[0] + ", " + fourVals[1] + ", " + fourVals[2]
-								+ ", " + fourVals[3]);
-				System.out.println(c0 + ", " + c1 + ", " + c2);
-				System.out.println(pv[0] + ", " + pv[1] + ", " + pv[2] + ", " + pv[3]
-								+ ", " + pv[4] + ", " + pv[5]);
-			}
+			
+			
+//			if (Scratch.x < 20)
+//				System.out.println("fourVals[i]: " + fourVals[i]);
+			
+			//int bytes = 3642821;
+			//if ((byteCount > bytes - 5 && byteCount < bytes + 5) || fourVals[i] < 0
+			//				|| fourVals[i] > 3)
+			//{
+			//	System.out.println("i: " + i);
+			//	System.out.println(byteCount);
+			//	System.out.println(fourVals[0] + ", " + fourVals[1] + ", " + fourVals[2]
+			//					+ ", " + fourVals[3]);
+			//	System.out.println(c0 + ", " + c1 + ", " + c2);
+			//	System.out.println(pv[0] + ", " + pv[1] + ", " + pv[2] + ", " + pv[3]
+			//					+ ", " + pv[4] + ", " + pv[5]);
+			//}
 		}
 
 		int val = (((fourVals[0] * 4) + fourVals[1]) * 16)
@@ -75,7 +82,13 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 		// ++Scratch.x;
 
 		// System.out.print(ByteConversion.bytesToHex(new byte[]{secured}));
-		return ByteConversion.intToByte(ByteConversion.intToByte(val) ^ xor);
+		byte toReturn =  ByteConversion.intToByte(ByteConversion.intToByte(val) ^ xor);
+		
+//		if (Scratch.x < 20)
+//			System.out.println(Scratch.x + ": Reading: " + ByteConversion.bytesToHex(
+//							new byte[]{ByteConversion.intToByte(toReturn)}));
+		
+		return toReturn;
 	}
 
 	// private void old()
