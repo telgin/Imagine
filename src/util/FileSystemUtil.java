@@ -22,7 +22,10 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import data.Metadata;
 import data.TrackingGroup;
@@ -422,6 +425,24 @@ public class FileSystemUtil
 	{
 		return getProductName(group, ByteConversion.getStreamUUID(productUUID),
 						ByteConversion.getProductSequenceNumber(productUUID));
+	}
+	
+	/**
+	 * @credit http://www.java2s.com/Code/Java/2D-Graphics-GUI/ListAllreaderandwriterformatssupportedbyImageIO.htm
+	 * @update_comment
+	 * @return
+	 */
+	public static void getSupportedImageIOTypes()
+	{
+		String names[] = ImageIO.getReaderFormatNames();
+	    for (int i = 0; i < names.length; ++i) {
+	      System.out.println("reader " + names[i]);
+	    }
+
+	    names = ImageIO.getWriterFormatNames();
+	    for (int i = 0; i < names.length; ++i) {
+	      System.out.println("writer " + names[i]);
+	    }
 	}
 
 //	/**

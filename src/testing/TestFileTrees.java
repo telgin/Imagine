@@ -26,6 +26,7 @@ public class TestFileTrees
 		trees.put("smalltree", getSmallTree());
 		trees.put("bigfile", getBigFileTree());
 		trees.put("bigtree", getBigTree());
+		trees.put("inputimages", getInputImages());
 	}
 
 	/**
@@ -161,6 +162,33 @@ public class TestFileTrees
 			public void create(File parent)
 			{
 				addFile(new File(bank, "eclipse-installer/"), getRoot(parent));
+			}
+
+		};
+
+		return tree;
+	}
+	
+	
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	private static FileTree getInputImages()
+	{
+		FileTree tree = new FileTree()
+		{
+
+			@Override
+			public File getRoot(File parent)
+			{
+				return new File(parent, "inputImages/");
+			}
+
+			@Override
+			public void create(File parent)
+			{
+				addFile(new File(bank, "input_images/"), getRoot(parent));
 			}
 
 		};

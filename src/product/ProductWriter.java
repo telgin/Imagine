@@ -4,7 +4,7 @@ import java.io.File;
 
 public interface ProductWriter extends Product
 {
-	public void newProduct();
+	public void newProduct() throws ProductIOException;
 
 	/**
 	 * @param b

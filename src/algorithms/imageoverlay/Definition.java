@@ -83,11 +83,24 @@ public class Definition implements algorithms.Definition
 
 		{
 			// input image folder
-			Parameter param = new Parameter("ImageFolder", "string", "inputImages",
+			Parameter param = new Parameter("ImageFolder", "string", "testing/input_images",
 							false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("*"));
+			}
+			algo.addParameter(param);
+		}
+		
+		{
+			// input image consumption mode
+			Parameter param = new Parameter("ImageConsumptionMode", "string", "cycle",
+							false);
+			if (includeOptions)
+			{
+				param.addOption(new Option("cycle"));
+				param.addOption(new Option("move"));
+				param.addOption(new Option("delete"));
 			}
 			algo.addParameter(param);
 		}
@@ -112,6 +125,8 @@ public class Definition implements algorithms.Definition
 			}
 			algo.addParameter(param);
 		}
+		
+		
 
 		return algo;
 	}

@@ -24,34 +24,56 @@ import util.algorithms.ImageUtil;
 public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 {
 	private File inputImages;
+	private InputImageManager manager;
 
 	public ImageOverlayWriter(Algorithm algo, Key key)
 	{
 		super(algo, key);
-		inputImages = new File(algo.getParameterValue("imageFolder"));
-		InputImageManager.setInputFolder(inputImages);
+		File imageFolder = new File(algo.getParameterValue("ImageFolder"));
+		ConsumptionMode mode = ConsumptionMode.parseMode(
+						algo.getParameterValue("ImageConsumptionMode"));
+		manager = InputImageManager.getInstance(imageFolder, mode);
 	}
 
 	@Override
-	public void newProduct()
+	public void newProduct() throws ProductIOException
 	{
 		// Scratch.x = 0;
 		loadCleanFile();
 		reset();
 	}
 
-	private void loadCleanFile()
+	private void loadCleanFile() throws ProductIOException
 	{
-		File imgFile = InputImageManager.nextImageFile();
-		try
+		File imgFile = manager.nextImageFile();
+		
+		//ran out of images
+		if (imgFile == null)
 		{
-			img = ImageIO.read(imgFile);
+			throw new ProductIOException("No input images remain.");
 		}
-		catch (IOException e)
+		
+		boolean foundFile = false;
+		while (imgFile != null && !foundFile)
 		{
-			// TODO how to handle no images left
-			e.printStackTrace();
+			try
+			{
+				img = ImageIO.read(imgFile);
+				foundFile = true;
+			}
+			catch (IOException e)
+			{
+				Logger.log(LogLevel.k_warning, "Could not interpret input image file: " + imgFile.getName());
+			}
 		}
+		
+		//ran out of images after trying some unsuccessfully
+		if (imgFile == null)
+		{
+			throw new ProductIOException("No input images remain.");
+		}
+		
+		
 	}
 
 	@Override
@@ -220,7 +242,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 							|| fourVals[i] < 0 || fourVals[i] > 3)
 			{
 				System.out.println("val: " + val + ", i: " + i);
-				System.out.println("toSet: " + toSet + ", c0: " + c0);
+				//xSystem.out.println("toSet: " + toSet + ", c0: " + c0);
 				System.out.println(byteCount);
 				System.out.println(fourVals[0] + ", " + fourVals[1] + ", " + fourVals[2]
 								+ ", " + fourVals[3]);

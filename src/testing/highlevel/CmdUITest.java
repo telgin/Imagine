@@ -50,6 +50,7 @@ public class CmdUITest
 	static File homeFolder = new File("testing/highlevel/");
 	private static File outputFolder = new File("testing/output/");
 	private static File extractionFolder = new File("testing/extraction/");
+	private static File imagesFolder = new File("testing/input_images/");
 	private static File hashdbFile = new File("testing/resources/hashdb.db");
 	private static boolean shutdownCalled = true;
 	private static ArrayList<ConversionJob> jobs = new ArrayList<ConversionJob>();
@@ -91,7 +92,7 @@ public class CmdUITest
 		cmdTempGroup("image_overlay_basic", "emptyFolder");
 	}
 
-	@Test(timeout = 60000)
+	//@Test(timeout = 60000)
 	public void imageOverlayBasicSmallFile()
 	{
 		cmdTempGroup("image_overlay_basic", "smallFile");
@@ -103,7 +104,7 @@ public class CmdUITest
 		cmdTempGroup("image_overlay_basic", "smallTree");
 	}
 	
-	//@Test(timeout = 60000)
+	//@Test(timeout = 120000)
 	public void imageOverlayBasicBigFile()
 	{
 		cmdTempGroup("image_overlay_basic", "bigFile");
@@ -121,7 +122,7 @@ public class CmdUITest
 		cmdTempGroup("text_basic", "emptyFolder");
 	}
 
-	//@Test(timeout = 60000)
+	@Test(timeout = 60000)
 	public void textBasicSmallFile()
 	{
 		cmdTempGroup("text_basic", "smallFile");
@@ -150,6 +151,7 @@ public class CmdUITest
 	private static void cmdTempGroup(String presetName, String testFileTreeName)
 	{
 		File inputFolder = setup(testFileTreeName);
+		setupInputImages();
 		
 		//embed
 		String[] args = new String[]{"--embed", "-i", inputFolder.getPath(),
@@ -165,7 +167,6 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
 	}
 	
-	
 	private static File setup(String treeName)
 	{
 		if (!shutdownCalled)
@@ -177,6 +178,25 @@ public class CmdUITest
 		reset(treeName);
 		
 		return inputFolder;
+	}
+	
+	private static void setupInputImages()
+	{
+
+		File root = TestFileTrees.getRoot(homeFolder, "inputImages");
+		reset("inputImages");
+		
+		for (File imageFile : root.listFiles()[0].listFiles())
+		{
+			try
+			{
+				Files.copy(imageFile.toPath(), new File(imagesFolder, imageFile.getName()).toPath());
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private static void shutdown()
@@ -191,6 +211,7 @@ public class CmdUITest
 	{
 		clearFolder(outputFolder);
 		clearFolder(extractionFolder);
+		clearFolder(imagesFolder);
 		try
 		{
 			Files.delete(hashdbFile.toPath());
