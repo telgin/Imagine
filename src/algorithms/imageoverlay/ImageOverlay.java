@@ -81,10 +81,6 @@ public class ImageOverlay implements Product
 		colorIndex = 0;
 		colorMod = 0;
 
-//		System.out.println("Scratch.x: " + Scratch.x);
-
-		Scratch.x = 0;
-
 		incrementFailed = false;
 	}
 
@@ -92,26 +88,11 @@ public class ImageOverlay implements Product
 	{
 		if (incrementFailed)
 			throw new ProductIOException("previous increment failed");
-
-//		if (pv[0] == 3044 && pv[1] == 1690)
-//			System.out.println("Happened by increment color1");
-//		++Scratch.x;
-
-//		if (pv[0] == 3044 && pv[1] == 1690)
-//			System.out.println("Happened by increment color2");
-		
 		
 		incrementColor();
-
-//		if (pv[0] == 3044 && pv[1] == 1690)
-//			System.out.println("Happened by increment color3");
-		
 		
 		if (colorIndex == 0)
 			incrementVector();
-
-//		if (pv[0] == 3044 && pv[1] == 1690)
-//			System.out.println("Happened by increment color4");
 	}
 
 	private final void incrementColor()
@@ -122,8 +103,6 @@ public class ImageOverlay implements Product
 	private final void incrementVector() throws ProductIOException
 	{
 		incrementFailed = true;
-//		if (pv[0] == 3044 && pv[1] == 1690)
-//			System.out.println("Happened by increment vector1");
 
 		int pixel = randOrder.next();
 		pv[1] = pixel / img.getWidth();
@@ -136,19 +115,8 @@ public class ImageOverlay implements Product
 			pv[1] = pixel / img.getWidth();
 			pv[0] = pixel % img.getWidth();
 		}
-		
-		
-
-//		if (pv[0] == 3044 && pv[1] == 1690)
-//			System.out.println("Happening in increment");
 
 		Pattern.eval(pattern, pv, img.getWidth(), img.getHeight());
-		
-//		if (Scratch.x < 20)
-//			System.out.println(++Scratch.x + ": " + formatPVColors());
-
-//		if (pv[0] == 3044 && pv[1] == 1690)
-//			System.out.println("Happening after eval");
 
 		incrementFailed = false;
 	}
@@ -168,8 +136,7 @@ public class ImageOverlay implements Product
 	@Override
 	public void setUUID(byte[] uuid)
 	{
-		this.uuid = uuid;// TODO remove this
-		// this.uuid = new byte []{0,0,0,0,0,0,0,0,0,0,0,0};
+		this.uuid = uuid;
 	}
 
 	@Override
@@ -187,10 +154,6 @@ public class ImageOverlay implements Product
 
 	protected byte getColor(int x, int y)
 	{
-//		if (x < 0 || y < 0 || x >= img.getWidth() || y >= img.getHeight())
-//			System.out.println(x + ", " + y + ", " + img.getWidth() + ", "
-//							+ img.getHeight());
-
 		if (colorIndex == 0)
 		{
 			return ImageUtil.getRed(img.getRGB(x, y));
