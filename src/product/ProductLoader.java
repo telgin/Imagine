@@ -37,7 +37,6 @@ public class ProductLoader
 	private int dataLength;
 
 	private boolean fileWritten = false;
-	private boolean writingFile = false;
 	private boolean needsReset = true;
 
 	public ProductLoader(ProductWriterFactory<? extends ProductWriter> factory,
@@ -55,17 +54,7 @@ public class ProductLoader
 
 	public void shutdown()
 	{
-		System.out.println("Product loader shutting down.");
-		while (writingFile)
-		{
-			try
-			{
-				Thread.sleep(500);
-			}
-			catch (InterruptedException e)
-			{
-			}
-		}
+		Logger.log(LogLevel.k_debug, "Product loader shutting down.");
 
 		// fileWritten indicates a file is written, but there is as least some
 		// space left
@@ -83,6 +72,8 @@ public class ProductLoader
 
 			currentProduct.saveFile(fileOutputManager.getOutputFolder(), getSaveName());
 		}
+		
+		Logger.log(LogLevel.k_debug, "Product loader is shut down.");
 	}
 
 	private boolean writeFull(byte[] bytes)
@@ -204,7 +195,7 @@ public class ProductLoader
 
 		Logger.log(LogLevel.k_info, "Loading file: " + fileMetadata.getFile().getPath()
 						+ " into product " + getSaveName());
-		writingFile = true;
+		
 
 		//configure based on file type
 		long fileLengthRemaining;
@@ -271,7 +262,6 @@ public class ProductLoader
 		fileMetadata.setFragmentCount(fragmentNumber-1);
 		Database.saveConversionRecord(fileMetadata, group);
 
-		writingFile = false;
 		fileWritten = true;
 
 		// update progress

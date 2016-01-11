@@ -51,16 +51,16 @@ public class ProductWorker implements Runnable
 				{
 					Logger.log(LogLevel.k_error,
 									"Product worker failed to load a file from the queue.");
-					Logger.log(LogLevel.k_error, e, false);
+					Logger.log(LogLevel.k_error, e.getMessage());
+					Logger.log(LogLevel.k_debug, e, false);
 				}
 			}
 			try
 			{
 				Thread.sleep(500);
 			}
-			catch (InterruptedException e)
-			{
-			}
+			catch (InterruptedException e){}
+			
 			count++;
 		}
 		loader.shutdown();

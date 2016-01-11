@@ -28,7 +28,7 @@ public abstract class Constants
 	// misc system configuration
 	public static final String TEMP_RESERVED_GROUP_NAME = APPLICATION_NAME_SHORT.toLowerCase() +
 					"_reserved_temp";
-	public static final int DEFAULT_THREAD_COUNT = 3;
+	public static final int DEFAULT_THREAD_COUNT = 1;
 	public static final Charset CHARSET = StandardCharsets.UTF_8;
 	public static final long DEFAULT_SEED = 1337;
 	public static final String TEMP_KEY_NAME = "not specified";

@@ -92,7 +92,7 @@ public class CmdUITest
 		cmdTempGroup("image_overlay_basic", "emptyFolder");
 	}
 
-	@Test(timeout = 60000)
+	//@Test(timeout = 60000)
 	public void imageOverlayBasicSmallFile()
 	{
 		cmdTempGroup("image_overlay_basic", "smallFile");
@@ -104,13 +104,13 @@ public class CmdUITest
 		cmdTempGroup("image_overlay_basic", "smallTree");
 	}
 	
-	//@Test(timeout = 120000)
+	@Test(timeout = 120000)
 	public void imageOverlayBasicBigFile()
 	{
 		cmdTempGroup("image_overlay_basic", "bigFile");
 	}
 	
-	//@Test(timeout = 60000)
+	//@Test//(timeout = 60000)
 	public void imageOverlayBasicBigTree()
 	{
 		cmdTempGroup("image_overlay_basic", "bigTree");

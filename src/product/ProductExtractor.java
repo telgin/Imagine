@@ -136,10 +136,17 @@ public class ProductExtractor {
 				
 				//there are other fragments that need to be added,
 				//find the next product file
-				File nextProductFile = manager.findProductFile(
-								FileSystemUtil.getProductName(group, curProductContents.getStreamUUID(),
-												curProductContents.getProductSequenceNumber() + increment),
+				String searchName = FileSystemUtil.getProductName(group, curProductContents.getStreamUUID(),
+												curProductContents.getProductSequenceNumber() + increment);
+				File nextProductFile = manager.findProductFile(searchName,
 								curExtractor.curProductFile.getAbsoluteFile().getParentFile());
+				
+				if (nextProductFile == null)
+				{
+					Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
+									searchName);
+					return null;
+				}
 				
 				//the fragment we're looking for will be the first file in the next product
 				curExtractor = this.clone();
@@ -340,14 +347,14 @@ public class ProductExtractor {
 				{
 					manager.setEnclosingFolder(enclosingFolder);
 					
-					File refProductFile = manager.findProductFile(
-									FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum),
+					String searchName = FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum);
+					File refProductFile = manager.findProductFile(searchName,
 									productFile.getAbsoluteFile().getParentFile());
 					
 					if (refProductFile == null)
 					{
 						Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
-										refStreamUUID + "_" + refSequenceNum);
+										searchName);
 						
 						//read next header
 						fileContents = readNextFileHeader(true);
@@ -509,14 +516,14 @@ public class ProductExtractor {
 					{
 						manager.setEnclosingFolder(enclosingFolder);
 						
-						File refProductFile = manager.findProductFile(
-										FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum),
+						String searchName = FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum);
+						File refProductFile = manager.findProductFile(searchName,
 										productFile.getAbsoluteFile().getParentFile());
 						
 						if (refProductFile == null)
 						{
 							Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
-											refStreamUUID + "_" + refSequenceNum);
+											searchName);
 							return false;
 						}
 						else
