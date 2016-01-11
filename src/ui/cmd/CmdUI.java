@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import algorithms.Algorithm;
+import algorithms.Option;
+import algorithms.Parameter;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
@@ -340,6 +342,17 @@ public class CmdUI extends UI
 		return group;
 	}
 
+
+	/* (non-Javadoc)
+	 * @see ui.UI#promptParameterValue(algorithms.Parameter)
+	 */
+	@Override
+	public String promptParameterValue(Parameter param)
+	{
+		p("The algorithm parameter '" + param.getName() + "' must be set.");
+		p("Parameter description: " + param.getDescription());
+		return promptInput("Please enter the parameter value: ");
+	}
 
 	private void showStats(ConversionJob job) throws InterruptedException
 	{

@@ -3,6 +3,7 @@ package ui.graphical;
 import java.io.File;
 import java.util.List;
 
+import algorithms.Parameter;
 import data.TrackingGroup;
 import ui.UI;
 
@@ -45,6 +46,16 @@ public class GUI extends UI
 	@Override
 	public File promptEnclosingFolder(File curEnclosingFolder, File curProductFolder,
 					String productSearchName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see ui.UI#promptParameterValue(algorithms.Parameter)
+	 */
+	@Override
+	public String promptParameterValue(Parameter parameter)
 	{
 		// TODO Auto-generated method stub
 		return null;

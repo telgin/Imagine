@@ -70,9 +70,12 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 			try
 			{
 				img = ImageIO.read(imgFile);
-				if (img.getColorModel().hasAlpha())
+				
+				//using the faster rgb math operations requires
+				//a standard color model
+				if (img.getType() != BufferedImage.TYPE_INT_RGB)
 				{
-					removeAlpha();
+					reinterpretColorModel();
 				}
 				foundFile = true;
 			}
@@ -87,15 +90,13 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		{
 			throw new ProductIOException("No input images remain.");
 		}
-		
-		
 	}
 	
 	/**
 	 * @credit http://stackoverflow.com/questions/26918675/removing-transparency-in-png-bufferedimage
 	 * @update_comment
 	 */
-	private void removeAlpha()
+	private void reinterpretColorModel()
 	{
 		Logger.log(LogLevel.k_debug, "Removing alpha from input image.");
 		

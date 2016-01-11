@@ -4,26 +4,11 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.IOException;
-import java.util.Random;
-
-import javax.imageio.ImageIO;
-
-import com.google.common.io.Files;
-
 import algorithms.Algorithm;
-import algorithms.imageoverlay.patterns.Pattern;
-import algorithms.imageoverlay.patterns.Pattern2;
 import data.Key;
-import logging.LogLevel;
-import logging.Logger;
 import product.Product;
 import product.ProductIOException;
 import product.ProductMode;
-import scratch.Scratch;
-import stats.ProgressMonitor;
-import stats.Stat;
 import util.ByteConversion;
 import util.Constants;
 import util.algorithms.HashRandom;

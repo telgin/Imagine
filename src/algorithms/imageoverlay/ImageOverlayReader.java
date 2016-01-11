@@ -5,14 +5,11 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import algorithms.Algorithm;
-import algorithms.imageoverlay.patterns.Pattern;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductIOException;
-import product.ProductMode;
 import product.ProductReader;
-import scratch.Scratch;
 import util.ByteConversion;
 
 public class ImageOverlayReader extends ImageOverlay implements ProductReader
@@ -70,35 +67,6 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 		return val;
 	}
 
-	private final int fourEnforcement() throws ProductIOException
-	{
-		int[] fourVals = new int[] { 0, 0, 0, 0 };
-
-		for (int i = 0; i < 4; ++i)
-		{
-			nextPair();
-
-			int c0 = ByteConversion.byteToInt(getColor(curPixelCoord[0], curPixelCoord[1]));
-			int c1 = ByteConversion.byteToInt(getColor(curPixelCoord[2], curPixelCoord[3]));
-			int c2 = ByteConversion.byteToInt(getColor(curPixelCoord[4], curPixelCoord[5]));
-
-			int avg = (c1 + c2) / 2;
-			if (avg > 2)
-			{
-				fourVals[i] = c0 - (avg - 3);
-			}
-			else
-			{
-				fourVals[i] = (avg + 3) - c0;
-			}
-		}
-
-		int val = (((fourVals[0] * 4) + fourVals[1]) * 16)
-						+ ((fourVals[2] * 4) + fourVals[3]);
-		
-		return val;
-	}
-
 	@Override
 	public int read(byte[] bytes, int offset, int length)
 	{
@@ -137,8 +105,16 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 			{
 				random.nextByte();
 				
-				for (int i = 0; i < 4; ++i)
+				if (density.equals(InsertionDensity.k_25))
 				{
+					nextPair();
+					nextPair();
+					nextPair();
+					nextPair();
+				}
+				else //k_50
+				{
+					nextPair();
 					nextPair();
 				}
 

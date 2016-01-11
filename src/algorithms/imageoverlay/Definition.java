@@ -59,8 +59,8 @@ public class Definition implements algorithms.Definition
 
 		{
 			// product mode
-			Parameter param = new Parameter("ProductMode", "string", 
-							ProductMode.NORMAL.toString(), false);
+			Parameter param = new Parameter("ProductMode",
+							Definition.PARAM_STRING_TYPE, ProductMode.NORMAL.toString(), false);
 			if (includeOptions)
 			{
 				param.addOption(new Option(ProductMode.NORMAL.toString()));
@@ -71,8 +71,9 @@ public class Definition implements algorithms.Definition
 		}
 
 		{
-			// data insertion density (use of 4x4 or 2x16)
-			Parameter param = new Parameter("InsertionDensity", "string", "25%", false);
+			// data insertion density (use of 4x4 (25%) or 2x16 (50%))
+			Parameter param = new Parameter("InsertionDensity", 
+							Definition.PARAM_STRING_TYPE, "25%", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("25%"));
@@ -83,8 +84,9 @@ public class Definition implements algorithms.Definition
 
 		{
 			// input image folder
-			Parameter param = new Parameter("ImageFolder", "string", "testing/input_images",
-							false);
+			Parameter param = new Parameter("ImageFolder",
+							Definition.PARAM_FILE_TYPE, Option.PROMPT_OPTION.getValue(), false);
+			param.setDescription("A folder of images to apply the overlay to.");
 			if (includeOptions)
 			{
 				param.addOption(new Option("*"));
@@ -94,8 +96,8 @@ public class Definition implements algorithms.Definition
 		
 		{
 			// input image consumption mode
-			Parameter param = new Parameter("ImageConsumptionMode", "string", "cycle",
-							false);
+			Parameter param = new Parameter("ImageConsumptionMode",
+							Definition.PARAM_STRING_TYPE, "cycle", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("cycle"));
@@ -104,21 +106,11 @@ public class Definition implements algorithms.Definition
 			}
 			algo.addParameter(param);
 		}
-
-		{
-			// working folder
-			Parameter param = new Parameter("WorkingFolder", "string",
-							".image_overlay_working", false);
-			if (includeOptions)
-			{
-				param.addOption(new Option("*"));
-			}
-			algo.addParameter(param);
-		}
 		
 		{
 			// image type
-			Parameter param = new Parameter("ImageType", "string", "png", false);
+			Parameter param = new Parameter("ImageType",
+							Definition.PARAM_STRING_TYPE, "png", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("png"));

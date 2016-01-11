@@ -268,7 +268,7 @@ public class Configuration {
 	
 	public static TrackingGroup getTrackingGroup(String groupName)
 	{
-		for (TrackingGroup tg:trackingGroups)
+		for (TrackingGroup tg:getTrackingGroups())
 			if (tg.getName().equals(groupName))
 				return tg;
 				

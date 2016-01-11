@@ -11,6 +11,8 @@ public class Option
 	private String value;
 	private String startRange;
 	private String endRange;
+	
+	public static final Option PROMPT_OPTION = new Option("Prompt For Value");
 
 	public Option(String value)
 	{

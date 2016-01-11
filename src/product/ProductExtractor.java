@@ -84,8 +84,8 @@ public class ProductExtractor {
 		{
 			//There were no files beyond the product header. This shouldn't happen, so it's probably
 			//a corrupted header.
-			Logger.log(LogLevel.k_debug, "There were no files recovered from " + productFile.getPath());
-			Logger.log(LogLevel.k_error, "Failed to extract from " + productFile.getName());
+			Logger.log(LogLevel.k_error, "There were no files recovered from " + productFile.getPath());
+			Logger.log(LogLevel.k_debug, "Failed to extract from " + productFile.getName());
 			
 			//return null even though the product header got parsed into something... it's
 			//probably not useful.
@@ -235,6 +235,7 @@ public class ProductExtractor {
 	
 	public void mapHeaders(File productFile)
 	{
+		Logger.log(LogLevel.k_info, "Indexing available file IDs...");
 		if (productFile.isDirectory())
 		{
 			//bfs through folders for product files
@@ -683,8 +684,8 @@ public class ProductExtractor {
 				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(product.getUUID()));
 			}
 			
-			System.out.println("Read stream uuid " + ByteConversion.getStreamUUID(product.getUUID()));
-			System.out.println("Read product sequence number " + ByteConversion.getProductSequenceNumber(product.getUUID()));
+			//System.out.println("Read stream uuid " + ByteConversion.getStreamUUID(product.getUUID()));
+			//System.out.println("Read product sequence number " + ByteConversion.getProductSequenceNumber(product.getUUID()));
 				
 			//stealth secure stream now
 			if (product.getProductMode().equals(ProductMode.STEALTH))
@@ -1042,7 +1043,7 @@ public class ProductExtractor {
 		
 		output.flush();
 		
-		Logger.log(LogLevel.k_debug, "Extracting file data belonging to: " + 
+		Logger.log(LogLevel.k_info, "Extracting file data belonging to: " + 
 						fileContents.getMetadata().getFile().getName());
 		return totalBytesRead;
 	}

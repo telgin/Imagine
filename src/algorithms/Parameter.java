@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 
 import logging.LogLevel;
 import logging.Logger;
+import ui.UIContext;
 import util.ConfigUtil;
 
 public class Parameter
@@ -74,6 +75,11 @@ public class Parameter
 
 	public String getValue()
 	{
+		if (value != null && value.equals(Option.PROMPT_OPTION.getValue()))
+		{
+			value = UIContext.getUI().promptParameterValue(this);
+		}
+		
 		return value;
 	}
 
