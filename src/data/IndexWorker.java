@@ -16,6 +16,7 @@ import util.FileSystemUtil;
 public class IndexWorker implements Runnable
 {
 	private BlockingQueue<Metadata> queue;
+	private final int MAX_QUEUE_SIZE = 2000;
 	private TrackingGroup trackingGroup;
 	private boolean shuttingDown;
 	private boolean active;
@@ -80,6 +81,16 @@ public class IndexWorker implements Runnable
 	 */
 	private void crawl(Element ele, File parentFile)
 	{
+		//wait if the queue is too full
+		while (!shuttingDown && queue.size() >= MAX_QUEUE_SIZE)
+		{
+			try
+			{
+				Thread.sleep(500);
+			}
+			catch (InterruptedException e){}
+		}
+		
 		if (!shuttingDown)
 		{
 			if (ele.getTagName().equals("folder"))
