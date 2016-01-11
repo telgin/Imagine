@@ -20,6 +20,7 @@ import util.algorithms.ImageUtil;
 public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 {
 	private InputImageManager manager;
+	private File imgFile;
 
 	public ImageOverlayWriter(Algorithm algo, Key key)
 	{
@@ -39,7 +40,23 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 
 	private void loadCleanFile() throws ProductIOException
 	{
-		File imgFile = manager.nextImageFile();
+		//set the previous file as used if it exists
+		if (imgFile != null)
+		{
+			try
+			{
+				manager.setFileUsed(imgFile);
+			}
+			catch (IOException e)
+			{
+				//probably the file doesn't exist anymore, that's ok
+				//otherwise it's a permissions problem
+				e.printStackTrace();
+			}
+		}
+		
+		//get the next image
+		imgFile = manager.nextImageFile();
 		
 		//ran out of images
 		if (imgFile == null)
@@ -93,25 +110,19 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	@Override
 	public boolean write(byte b)
 	{
-		// Note: can get 18% using 4x4 or 16% using 16x2 (vs. current of 3%)
-		// ~24% using 4x4
-		// 22.6% using binary and zeros
-		// 45.2% using '4 enforcement'
-		// remains to be seen how this will affect png compression
-		// 21MB may become larger? There's technically 47MB of rgb's
-		// would then become 25%
-		// though maybe not that bad because won't be as random as image
-		// everything will still be close
-		// could be even more confusing and switch modes from 1,4,16
-		// based on space available
-		// really complicated function, but could probably be efficient too
-		
 		try
 		{
 			int secured = ByteConversion
 							.byteToInt(ByteConversion.intToByte(b ^ random.nextByte()));
-
-			fourEnforcement(secured);
+			
+			if (density.equals(InsertionDensity.k_25))
+			{
+				steps4(secured);
+			}
+			else //k_50
+			{
+				steps16(secured);
+			}
 		}
 		catch (ProductIOException e)
 		{
@@ -119,37 +130,47 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 			return false;
 		}
 
-		++byteCount;
 		return true;
 	}
-
-	private final void fourEnforcement(int val) throws ProductIOException
+	
+	private final void steps4(int val) throws ProductIOException
 	{
 		int div16 = val / 16;
 		int mod16 = val % 16;
 
-		int[] fourVals = new int[] { div16 / 4, div16 % 4, mod16 / 4, mod16 % 4 };
+		split[0] = div16 / 4;
+		split[1] = div16 % 4;
+		split[2] = mod16 / 4;
+		split[3] = mod16 % 4;
 
 		for (int i = 0; i < 4; ++i)
 		{
 			nextPair();
 
-			int c1 = ByteConversion.byteToInt(getColor(pv[2], pv[3]));
-			int c2 = ByteConversion.byteToInt(getColor(pv[4], pv[5]));
+			int c = ByteConversion.byteToInt(getColor(curPixelCoord[0], curPixelCoord[1]));
 
-			int avg = (c1 + c2) / 2;
-			int toSet = -1;
+			int step = (c / 4) * 4;
 
-			if (avg > 2)
-			{
-				toSet = (avg - 3) + fourVals[i];
-				setColor(pv[0], pv[1], ByteConversion.intToByte(toSet));
-			}
-			else
-			{
-				toSet = (avg + 3) - fourVals[i];
-				setColor(pv[0], pv[1], ByteConversion.intToByte(toSet));
-			}
+			setColor(curPixelCoord[0], curPixelCoord[1], 
+							ByteConversion.intToByte(step + split[i]));
+		}
+	}
+	
+	private final void steps16(int val) throws ProductIOException
+	{
+		split[0] = val / 16;
+		split[1] = val % 16;
+
+		for (int i = 0; i < 2; ++i)
+		{
+			nextPair();
+
+			int c = ByteConversion.byteToInt(getColor(curPixelCoord[0], curPixelCoord[1]));
+
+			int step = (c / 16) * 16;
+
+			setColor(curPixelCoord[0], curPixelCoord[1],
+							ByteConversion.intToByte(step + split[i]));
 		}
 	}
 

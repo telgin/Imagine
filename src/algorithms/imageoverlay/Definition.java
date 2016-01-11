@@ -71,12 +71,12 @@ public class Definition implements algorithms.Definition
 		}
 
 		{
-			// pattern
-			Parameter param = new Parameter("Pattern", "string", "1", false);
+			// data insertion density (use of 4x4 or 2x16)
+			Parameter param = new Parameter("InsertionDensity", "string", "25%", false);
 			if (includeOptions)
 			{
-				param.addOption(new Option("1"));
-				param.addOption(new Option("2"));
+				param.addOption(new Option("25%"));
+				param.addOption(new Option("50%"));
 			}
 			algo.addParameter(param);
 		}

@@ -39,19 +39,30 @@ public class ImageOverlay implements Product
 	protected Key key;
 	protected boolean skippedAll = false;
 	protected byte[] uuid;
-	protected int pattern = 0;
-	protected int byteCount = 0;
+	protected InsertionDensity density;;
 	protected int colorIndex = 0;
+	protected int[] split;
 	private int colorMod = 0;
-	protected int[] pv;
+	protected int[] curPixelCoord;
 	private boolean incrementFailed = false;
 
 	public ImageOverlay(Algorithm algo, Key key)
 	{
 		this.algorithm = algo;
 		this.key = key;
-		pattern = Integer.parseInt(algo.getParameterValue("pattern"));
-		pv = new int[6];
+		density = InsertionDensity.parseDensity(algo.getParameterValue("InsertionDensity"));
+		curPixelCoord = new int[2];
+		
+		//the split array is just a stationary array
+		//for efficiency in the byte splitting operations
+		if (density.equals(InsertionDensity.k_25))
+		{
+			split = new int[4];
+		}
+		else //k_50
+		{
+			split = new int[2];
+		}
 	}
 
 	/**
@@ -75,8 +86,6 @@ public class ImageOverlay implements Product
 
 		// obtain a random order
 		randOrder = new UniqueRandomRange(random, img.getWidth() * img.getHeight());
-
-		byteCount = 0;
 
 		colorIndex = 0;
 		colorMod = 0;
@@ -105,18 +114,8 @@ public class ImageOverlay implements Product
 		incrementFailed = true;
 
 		int pixel = randOrder.next();
-		pv[1] = pixel / img.getWidth();
-		pv[0] = pixel % img.getWidth();
-
-		while (!Pattern.validIndex(pattern, pv[0], pv[1], img.getWidth(),
-						img.getHeight()))
-		{
-			pixel = randOrder.next();
-			pv[1] = pixel / img.getWidth();
-			pv[0] = pixel % img.getWidth();
-		}
-
-		Pattern.eval(pattern, pv, img.getWidth(), img.getHeight());
+		curPixelCoord[1] = pixel / img.getWidth();//y
+		curPixelCoord[0] = pixel % img.getWidth();//x
 
 		incrementFailed = false;
 	}
@@ -181,16 +180,16 @@ public class ImageOverlay implements Product
 	
 	public String formatPV()
 	{
-		return "Fill point: " + formatPoint(pv[0], pv[1]) + " | Ref 1: " + 
-						formatPoint(pv[2], pv[3]) + " | Ref 2: " + 
-						formatPoint(pv[4], pv[5]);
+		return "Fill point: " + formatPoint(curPixelCoord[0], curPixelCoord[1]) + " | Ref 1: " + 
+						formatPoint(curPixelCoord[2], curPixelCoord[3]) + " | Ref 2: " + 
+						formatPoint(curPixelCoord[4], curPixelCoord[5]);
 	}
 	
 	public String formatPVColors()
 	{
-		return "Fill point: " + formatColor(pv[0], pv[1]) + " | Ref 1: " + 
-						formatColor(pv[2], pv[3]) + " | Ref 2: " + 
-						formatColor(pv[4], pv[5]);
+		return "Fill point: " + formatColor(curPixelCoord[0], curPixelCoord[1]) + " | Ref 1: " + 
+						formatColor(curPixelCoord[2], curPixelCoord[3]) + " | Ref 2: " + 
+						formatColor(curPixelCoord[4], curPixelCoord[5]);
 	}
 	
 	public String formatColor(int x, int y)

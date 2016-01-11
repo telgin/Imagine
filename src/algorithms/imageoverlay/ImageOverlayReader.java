@@ -27,15 +27,60 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 	{
 		byte xor = random.nextByte();
 
+		if (density.equals(InsertionDensity.k_25))
+		{
+			return ByteConversion.intToByte(ByteConversion.intToByte(steps4()) ^ xor);
+		}
+		else //k_50
+		{
+			return ByteConversion.intToByte(ByteConversion.intToByte(steps16()) ^ xor);
+		}
+	}
+	
+	private final int steps4() throws ProductIOException
+	{
+		for (int i = 0; i < 4; ++i)
+		{
+			nextPair();
+
+			int c = ByteConversion.byteToInt(getColor(curPixelCoord[0], curPixelCoord[1]));
+
+			split[i] = c % 4;
+		}
+
+		int val = (((split[0] * 4) + split[1]) * 16)
+						+ ((split[2] * 4) + split[3]);
+		
+		return val;
+	}
+	
+	private final int steps16() throws ProductIOException
+	{
+		for (int i = 0; i < 2; ++i)
+		{
+			nextPair();
+
+			int c = ByteConversion.byteToInt(getColor(curPixelCoord[0], curPixelCoord[1]));
+
+			split[i] = c % 16;
+		}
+
+		int val = (split[0] * 16) + split[1];
+		
+		return val;
+	}
+
+	private final int fourEnforcement() throws ProductIOException
+	{
 		int[] fourVals = new int[] { 0, 0, 0, 0 };
 
 		for (int i = 0; i < 4; ++i)
 		{
 			nextPair();
 
-			int c0 = ByteConversion.byteToInt(getColor(pv[0], pv[1]));
-			int c1 = ByteConversion.byteToInt(getColor(pv[2], pv[3]));
-			int c2 = ByteConversion.byteToInt(getColor(pv[4], pv[5]));
+			int c0 = ByteConversion.byteToInt(getColor(curPixelCoord[0], curPixelCoord[1]));
+			int c1 = ByteConversion.byteToInt(getColor(curPixelCoord[2], curPixelCoord[3]));
+			int c2 = ByteConversion.byteToInt(getColor(curPixelCoord[4], curPixelCoord[5]));
 
 			int avg = (c1 + c2) / 2;
 			if (avg > 2)
@@ -50,14 +95,9 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 
 		int val = (((fourVals[0] * 4) + fourVals[1]) * 16)
 						+ ((fourVals[2] * 4) + fourVals[3]);
-
-		++byteCount;
-
-		byte toReturn =  ByteConversion.intToByte(ByteConversion.intToByte(val) ^ xor);
 		
-		return toReturn;
+		return val;
 	}
-
 
 	@Override
 	public int read(byte[] bytes, int offset, int length)
@@ -113,7 +153,6 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 
 		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes was requested and "
 						+ skipped + " were skipped.");
-		byteCount += bytes;
 
 		return skipped;
 

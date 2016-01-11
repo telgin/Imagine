@@ -72,6 +72,7 @@ public class InputImageManager
 			contentsIndex = -1;
 
 			//maybe it worked this time?
+			//(someone could have since modified the file system)
 			return findNextImageFile();
 		}
 		else
