@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 
 import javax.xml.bind.DatatypeConverter;
 
+import config.Constants;
+
 /**
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment

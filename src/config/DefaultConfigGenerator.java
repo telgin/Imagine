@@ -12,7 +12,6 @@ import data.FileKey;
 import data.Key;
 import data.TrackingGroup;
 import util.ConfigUtil;
-import util.Constants;
 
 public abstract class DefaultConfigGenerator
 {

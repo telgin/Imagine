@@ -4,9 +4,9 @@ import java.util.HashMap;
 
 public enum ProductMode
 {
-	NORMAL("Normal"),
-	SECURE("Secure"),
-	STEALTH("Stealth");
+	k_basic("Basic"),
+	k_trackable("Trackable"),
+	k_secure("Secure");
 
 	private String name;
 	private static HashMap<String, ProductMode> modes;
@@ -14,9 +14,9 @@ public enum ProductMode
 	static
 	{
 		modes = new HashMap<String, ProductMode>();
-		modes.put("normal", ProductMode.NORMAL);
-		modes.put("secure", ProductMode.SECURE);
-		modes.put("stealth", ProductMode.STEALTH);
+		modes.put("basic", ProductMode.k_basic);
+		modes.put("trackable", ProductMode.k_trackable);
+		modes.put("secure", ProductMode.k_secure);
 	}
 
 	ProductMode(String name)

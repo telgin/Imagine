@@ -1,7 +1,8 @@
 package data;
 
 import java.io.File;
-import util.Constants;
+
+import config.Constants;
 
 public class Metadata
 {

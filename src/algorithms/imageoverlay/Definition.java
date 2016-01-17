@@ -60,12 +60,12 @@ public class Definition implements algorithms.Definition
 		{
 			// product mode
 			Parameter param = new Parameter("ProductMode",
-							Definition.PARAM_STRING_TYPE, ProductMode.NORMAL.toString(), false);
+							Definition.PARAM_STRING_TYPE, ProductMode.k_basic.toString(), false);
 			if (includeOptions)
 			{
-				param.addOption(new Option(ProductMode.NORMAL.toString()));
-				param.addOption(new Option(ProductMode.SECURE.toString()));
-				param.addOption(new Option(ProductMode.STEALTH.toString()));
+				param.addOption(new Option(ProductMode.k_basic.toString()));
+				param.addOption(new Option(ProductMode.k_trackable.toString()));
+				param.addOption(new Option(ProductMode.k_secure.toString()));
 			}
 			algo.addParameter(param);
 		}
@@ -152,10 +152,25 @@ public class Definition implements algorithms.Definition
 	{
 		List<Algorithm> presets = new LinkedList<Algorithm>();
 		
-		//plain default
-		Algorithm imageOverlayNormal = construct(false);
-		imageOverlayNormal.setPresetName("image_overlay_basic");
-		presets.add(imageOverlayNormal);
+		//basic
+		Algorithm basic = construct(false);
+		basic.setPresetName("image_overlay_basic");
+		basic.setParameter("ImageFolder", "testing/input_images");//TODO remove this
+		presets.add(basic);
+		
+		//secure
+		Algorithm secure = construct(false);
+		secure.setPresetName("image_overlay_secure");
+		secure.setParameter("ProductMode", "secure");
+		secure.setParameter("ImageFolder", "testing/input_images");//TODO remove this
+		presets.add(secure);
+		
+		//test trackable
+		Algorithm trackable = construct(false);
+		trackable.setPresetName("test_image_overlay_trackable");
+		trackable.setParameter("ProductMode", "trackable");
+		trackable.setParameter("ImageFolder", "testing/input_images");
+		presets.add(trackable);
 		
 		return presets;
 	}

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import api.ConversionAPI;
+import config.Constants;
 import data.Metadata;
 import data.FileType;
 import data.TrackingGroup;
@@ -24,7 +25,6 @@ import system.SystemManager;
 import testing.Comparisons;
 import testing.TestFileTrees;
 import util.ByteConversion;
-import util.Constants;
 import util.FileSystemUtil;
 import util.Hashing;
 

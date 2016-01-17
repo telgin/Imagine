@@ -3,6 +3,7 @@ package system;
 import java.util.LinkedList;
 import java.util.List;
 
+import logging.LogLevel;
 import logging.Logger;
 
 public class SystemManager
@@ -11,6 +12,12 @@ public class SystemManager
 
 	static
 	{
+		reset();
+	}
+	
+	public static void reset()
+	{
+		//release pointers
 		components = new LinkedList<ActiveComponent>();
 	}
 
@@ -21,6 +28,8 @@ public class SystemManager
 
 	public static void shutdown()
 	{
+		Logger.log(LogLevel.k_debug, "System Manager shutting down.");
+		
 		for (ActiveComponent component : components)
 		{
 			component.shutdown();

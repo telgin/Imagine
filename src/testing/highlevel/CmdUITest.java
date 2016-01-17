@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import database.Database;
 import product.ConversionJob;
 import system.Imagine;
 import system.SystemManager;
@@ -45,16 +46,24 @@ import util.FileSystemUtil;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
+
 public class CmdUITest
 {
 	static File homeFolder = new File("testing/highlevel/");
 	private static File outputFolder = new File("testing/output/");
 	private static File extractionFolder = new File("testing/extraction/");
 	private static File imagesFolder = new File("testing/input_images/");
-	private static File hashdbFile = new File("testing/resources/hashdb.db");
-	private static boolean shutdownCalled = true;
+	private static File keyFile = new File("testing/keys/key1.txt");
+	private static boolean shutdownCalled = false;
 	private static ArrayList<ConversionJob> jobs = new ArrayList<ConversionJob>();
 
+	
+	//----------------------------------------
+	//Basic Tests
+	//----------------------------------------
+	
+	//Image
+	
 	//@Test(timeout = 60000)
 	public void imageBasicEmptyFolder()
 	{
@@ -84,7 +93,8 @@ public class CmdUITest
 	{
 		cmdTempGroup("image_basic", "bigTree");
 	}
-	
+
+	//Image Overlay
 	
 	//@Test(timeout = 60000)
 	public void imageOverlayBasicEmptyFolder()
@@ -104,7 +114,7 @@ public class CmdUITest
 		cmdTempGroup("image_overlay_basic", "smallTree");
 	}
 	
-	@Test(timeout = 120000)
+	//@Test(timeout = 120000)
 	public void imageOverlayBasicBigFile()
 	{
 		cmdTempGroup("image_overlay_basic", "bigFile");
@@ -115,6 +125,8 @@ public class CmdUITest
 	{
 		cmdTempGroup("image_overlay_basic", "bigTree");
 	}
+	
+	//Text
 	
 	//@Test(timeout = 60000)
 	public void textBasicEmptyFolder()
@@ -145,6 +157,127 @@ public class CmdUITest
 	{
 		cmdTempGroup("text_basic", "bigTree");
 	}
+
+	
+	//----------------------------------------
+	//Trackable Tests
+	//----------------------------------------
+	
+	//Image
+	
+	//@Test(timeout = 60000)
+	public void imageTrackableBigTree()
+	{
+		cmdTempGroup("test_image_trackable", "bigTree", keyFile.getPath());
+	}
+	
+	//ImageOverlay
+	
+	//@Test//(timeout = 60000)
+	public void imageOverlayTrackableBigTree()
+	{
+		cmdTempGroup("test_image_overlay_trackable", "bigTree", keyFile.getPath());
+	}
+		
+	//Text
+		
+	//@Test(timeout = 60000)
+	public void textTrackableEmptyFolder()
+	{
+		cmdTempGroup("test_text_trackable", "emptyFolder", keyFile.getPath());
+	}
+
+	//@Test(timeout = 60000)
+	public void textTrackableSmallFile()
+	{
+		cmdTempGroup("test_text_trackable", "smallFile", keyFile.getPath());
+	}
+	
+	//@Test(timeout = 60000)
+	public void textTrackableSmallTree()
+	{
+		cmdTempGroup("test_text_trackable", "smallTree", keyFile.getPath());
+	}
+	
+	//@Test(timeout = 60000)
+	public void textTrackableBigFile()
+	{
+		cmdTempGroup("test_text_trackable", "bigFile", keyFile.getPath());
+	}
+	
+	//@Test
+	public void textTrackableBigTree()
+	{
+		cmdTempGroup("test_text_trackable", "bigTree", keyFile.getPath());
+	}
+	
+	//----------------------------------------
+	//Secure Key Tests
+	//----------------------------------------
+	
+	//Image
+	
+	//@Test(timeout = 60000)
+	public void imageSecureBigTree()
+	{
+		cmdTempGroup("image_secure", "bigTree", keyFile.getPath());
+	}
+	
+	//ImageOverlay
+	
+	//@Test//(timeout = 60000)
+	public void imageOverlaySecureBigTree()
+	{
+		cmdTempGroup("image_overlay_secure", "bigTree", keyFile.getPath());
+	}
+		
+	//Text
+		
+	//@Test(timeout = 60000)
+	public void textSecureEmptyFolder()
+	{
+		cmdTempGroup("text_secure", "emptyFolder", keyFile.getPath());
+	}
+
+	//@Test(timeout = 60000)
+	public void textSecureSmallFile()
+	{
+		cmdTempGroup("text_secure", "smallFile", keyFile.getPath());
+	}
+	
+	//@Test(timeout = 60000)
+	public void textSecureSmallTree()
+	{
+		cmdTempGroup("text_secure", "smallTree", keyFile.getPath());
+	}
+	
+	//@Test(timeout = 60000)
+	public void textSecureBigFile()
+	{
+		cmdTempGroup("text_secure", "bigFile", keyFile.getPath());
+	}
+	
+	//@Test
+	public void textSecureBigTree()
+	{
+		cmdTempGroup("text_secure", "bigTree", keyFile.getPath());
+	}
+	
+	
+	//----------------------------------------
+	//Secure Password Tests
+	//----------------------------------------
+	
+	@Test
+	public void textSecurePasswordBigTree()
+	{
+		cmdTempGroup("text_secure", "bigTree");
+	}
+	
+		
+	
+	
+	
 	
 	
 	
@@ -167,11 +300,32 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
 	}
 	
+	private static void cmdTempGroup(String presetName, String testFileTreeName, String keyFilePath)
+	{
+		File inputFolder = setup(testFileTreeName);
+		setupInputImages();
+		
+		//embed
+		String[] args = new String[]{"--embed", "-i", inputFolder.getPath(),
+						"-a", presetName, "-o", outputFolder.getPath(),
+						"-k", keyFilePath};
+		Imagine.run(args);
+		
+		//extract
+		args = new String[]{"--extract", "-i", outputFolder.getPath(),
+						"-a", presetName, "-o", extractionFolder.getPath(),
+						"-k", keyFilePath};
+		Imagine.run(args);
+		
+		//compare
+		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+	}
+	
 	private static File setup(String treeName)
 	{
-		if (!shutdownCalled)
-			shutdown();
-		shutdownCalled = false;
+		//shutdown from previous run
+		shutdown();
+		Database.reset();
 
 		// setup
 		File inputFolder = TestFileTrees.getRoot(homeFolder, treeName);
@@ -205,6 +359,18 @@ public class CmdUITest
 		for (ConversionJob job : jobs)
 			job.shutdown();
 		jobs = new ArrayList<ConversionJob>();
+		
+		while (!SystemManager.isShutdown())
+		{
+			try
+			{
+				Thread.sleep(250);
+			}
+			catch (InterruptedException e){}
+		}
+		
+		SystemManager.reset();
+		
 		shutdownCalled = true;
 	}
 	private static void reset(String treeName)
@@ -212,11 +378,6 @@ public class CmdUITest
 		clearFolder(outputFolder);
 		clearFolder(extractionFolder);
 		clearFolder(imagesFolder);
-		try
-		{
-			Files.delete(hashdbFile.toPath());
-		}
-		catch (IOException e){}
 		TestFileTrees.reset(homeFolder, treeName);
 	}
 

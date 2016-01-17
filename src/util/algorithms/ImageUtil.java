@@ -1,5 +1,8 @@
 package util.algorithms;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import util.ByteConversion;
@@ -74,6 +77,70 @@ public class ImageUtil
 					System.out.println("Blue not right: " + b1 + ", " + b2);
 			}
 		}
+	}
+	
+	
+	public static BufferedImage constructTestWebImage1()
+	{
+		BufferedImage img = new BufferedImage(1000,500,BufferedImage.TYPE_INT_RGB);
+		Graphics g = img.getGraphics();
+		
+		//set white background
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, 1000, 500);
+		
+		for (int s=1; s<31; ++s)
+		{
+			//System.out.println(s);
+			for (int x=0; x<256; ++x)
+			{
+				int x0 = s*x;
+				int y0 = consecSum(s)-1;
+				int w = s;
+				int h = s;
+				int x1 = x0 + w;
+				int y1 = y0 + h;
+				
+				if (x1 > 1000 || y1 > 500)
+				{
+					break;
+				}
+				
+				g.setColor(new Color(0,x,0));
+				g.fillRect(x0, y0, s, s);
+			}
+		}
+
+		return img;
+	}
+	
+	public static BufferedImage constructTestWebImage2()
+	{
+		BufferedImage img = new BufferedImage(100,100,BufferedImage.TYPE_INT_RGB);
+		Graphics g = img.getGraphics();
+		
+		//set white background
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, 100, 100);
+		
+		for (int y=0; y<100; ++y)
+		{
+			for (int x=0; x<100; ++x)
+			{
+				if (x % 2 == 0 || y % 2 == 0)
+					img.setRGB(x, y, Color.BLACK.getRGB());
+			}
+		}
+
+		return img;
+	}
+	
+	private static int consecSum(int i)
+	{
+		if (i == 0)
+			return 0;
+		else
+			return i + consecSum(i-1);
 	}
 
 }

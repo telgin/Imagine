@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import config.Constants;
 import data.FileType;
 import data.Metadata;
 import data.TrackingGroup;
 import util.ByteConversion;
-import util.Constants;
 import util.Hashing;
 import util.myUtilities;
 

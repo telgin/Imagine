@@ -5,9 +5,9 @@ import java.util.List;
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
 import config.Configuration;
+import config.Constants;
 import config.DefaultConfigGenerator;
 import data.TrackingGroup;
-import util.Constants;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)

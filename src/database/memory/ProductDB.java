@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import config.Constants;
+import data.TrackingGroup;
 import system.ActiveComponent;
 import util.ByteConversion;
 import util.myUtilities;
@@ -22,9 +24,9 @@ public class ProductDB implements ActiveComponent
 	private Set<String> queued;
 	private final String FIELD_DELIMETER = ":";
 	private boolean isShutdown;
-	private File dbFile;
+	private TrackingGroup group;
 	
-	public ProductDB(File dbFile)
+	public ProductDB(TrackingGroup group)
 	{
 		//Format is: hash:f1uuid:productCount
 		//last two fields are stored as a string literal to save memory
@@ -33,7 +35,7 @@ public class ProductDB implements ActiveComponent
 		//a place for file hashes which are queued to be loaded
 		queued = new HashSet<String>();
 		
-		this.dbFile = dbFile;
+		this.group = group;
 		
 		//no db is loaded yet
 		isShutdown = true;
@@ -42,7 +44,7 @@ public class ProductDB implements ActiveComponent
 	public void load()
 	{
 		isShutdown = false;
-		List<String> lines = myUtilities.readListFromFile(dbFile);
+		List<String> lines = myUtilities.readListFromFile(group.getHashDBFile());
 		for (String line : lines)
 		{
 			if (line.length() > 0)
@@ -63,7 +65,7 @@ public class ProductDB implements ActiveComponent
 		{
 			lines.add(hash + FIELD_DELIMETER + db.get(hash));
 		}
-		myUtilities.writeListToFile(dbFile, lines);
+		myUtilities.writeListToFile(group.getHashDBFile(), lines);
 		isShutdown = true;
 	}
 	
@@ -111,7 +113,15 @@ public class ProductDB implements ActiveComponent
 	@Override
 	public void shutdown()
 	{
-		save();
+		//save the database for later if this isn't a temporary group
+		if (!group.getName().equals(Constants.TEMP_RESERVED_GROUP_NAME))
+		{
+			save();
+		}
+		else
+		{
+			isShutdown = true;
+		}
 	}
 
 	/* (non-Javadoc)

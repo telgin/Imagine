@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import config.Constants;
 import logging.LogLevel;
 import logging.Logger;
 import stats.ProgressMonitor;
@@ -14,7 +15,6 @@ import data.Metadata;
 import data.TrackingGroup;
 import database.Database;
 import util.ByteConversion;
-import util.Constants;
 import util.FileSystemUtil;
 
 public class ProductLoader
@@ -110,7 +110,7 @@ public class ProductLoader
 		currentProduct.setUUID(currentUUID);
 
 		// stealth products will encrypt data beyond this point
-		if (currentProduct.getProductMode().equals(ProductMode.STEALTH))
+		if (currentProduct.getProductMode().equals(ProductMode.k_secure))
 			currentProduct.secureStream();
 
 		// write the product header
@@ -118,7 +118,7 @@ public class ProductLoader
 			throw new ProductIOException("Cannot write product header.");
 
 		// secure products will secure data beyond this point
-		if (currentProduct.getProductMode().equals(ProductMode.SECURE))
+		if (currentProduct.getProductMode().equals(ProductMode.k_trackable))
 			currentProduct.secureStream();
 		
 		needsReset = false;

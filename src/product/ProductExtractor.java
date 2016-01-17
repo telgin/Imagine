@@ -12,10 +12,10 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import config.Constants;
 import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
-import util.Constants;
 import util.FileSystemUtil;
 import util.Hashing;
 import data.FileType;
@@ -688,7 +688,7 @@ public class ProductExtractor {
 			//System.out.println("Read product sequence number " + ByteConversion.getProductSequenceNumber(product.getUUID()));
 				
 			//stealth secure stream now
-			if (product.getProductMode().equals(ProductMode.STEALTH))
+			if (product.getProductMode().equals(ProductMode.k_secure))
 			{
 				product.secureStream();
 			}
@@ -785,7 +785,7 @@ public class ProductExtractor {
 			}
 				
 			//secure products secure the stream now
-			if (product.getProductMode().equals(ProductMode.SECURE))
+			if (product.getProductMode().equals(ProductMode.k_trackable))
 			{
 				product.secureStream();
 			}

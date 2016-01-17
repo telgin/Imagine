@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import config.Constants;
 import data.FileType;
 import data.Metadata;
 import data.TrackingGroup;
@@ -22,10 +23,7 @@ public class Database
 
 	static
 	{
-		fsdb = new FileSystemDB();
-		SystemManager.registerActiveComponent(fsdb);
-		
-		pdbs = new HashMap<String, ProductDB>();
+		reset();
 	}
 
 	public static Metadata getFileMetadata(File f, TrackingGroup group)
@@ -50,8 +48,14 @@ public class Database
 		fsdb.save();
 		for (ProductDB pdb : pdbs.values())
 			pdb.save();
+	}
+	
+	public static void reset()
+	{
+		fsdb = new FileSystemDB();
+		SystemManager.registerActiveComponent(fsdb);
 		
-		//embdb.save();
+		pdbs = new HashMap<String, ProductDB>();
 	}
 
 	/**
@@ -121,7 +125,8 @@ public class Database
 		//load the db for this tracking group if it's not already loaded
 		if (!pdbs.containsKey(group.getName()))
 		{
-			if (!group.getHashDBFile().exists())
+			if (!group.getName().equals(Constants.TEMP_RESERVED_GROUP_NAME) &&
+							!group.getHashDBFile().exists())
 			{
 				group.getHashDBFile().getParentFile().mkdirs();
 				try
@@ -135,9 +140,14 @@ public class Database
 									group.getHashDBFile().getAbsolutePath());
 				}
 			}
-			ProductDB pdb = new ProductDB(group.getHashDBFile());
+			ProductDB pdb = new ProductDB(group);
 			SystemManager.registerActiveComponent(pdb);
-			pdb.load();
+			
+			if (!group.getName().equals(Constants.TEMP_RESERVED_GROUP_NAME))
+			{
+				pdb.load();
+			}
+			
 			pdbs.put(group.getName(), pdb);
 		}
 	}

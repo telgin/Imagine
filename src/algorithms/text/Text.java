@@ -12,10 +12,10 @@ import product.ProductMode;
 import stats.ProgressMonitor;
 import stats.Stat;
 import util.ByteConversion;
-import util.Constants;
 import util.algorithms.HashRandom;
 import util.algorithms.UniqueRandomRange;
 import config.Configuration;
+import config.Constants;
 import data.Key;
 
 public abstract class Text implements Product

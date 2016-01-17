@@ -11,6 +11,7 @@ import algorithms.Parameter;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
+import config.Constants;
 import data.FileKey;
 import data.FileType;
 import data.Key;
@@ -25,7 +26,6 @@ import product.ProductMode;
 import stats.ProgressMonitor;
 import stats.Stat;
 import ui.UI;
-import util.Constants;
 
 public class CmdUI extends UI
 {
@@ -124,6 +124,7 @@ public class CmdUI extends UI
 		p("-i         input file or folder");
 		p("-o         output folder");
 		p("-k         key file (optional)");
+		p("-P         specify additional algorithm parameter");
 	}
 
 	/**
@@ -318,7 +319,7 @@ public class CmdUI extends UI
 		{
 			Algorithm preset = ConfigurationAPI.getAlgorithmPreset(result.presetName);
 			
-			if (preset.getProductSecurityLevel().equals(ProductMode.NORMAL))
+			if (preset.getProductSecurityLevel().equals(ProductMode.k_basic))
 			{
 				group = ConversionAPI.createTemporaryTrackingGroup(result.presetName);
 			}

@@ -25,6 +25,7 @@ import org.apache.derby.tools.ij;
 import util.ByteConversion;
 import util.FileSystemUtil;
 import util.algorithms.HashRandom;
+import util.algorithms.ImageUtil;
 import util.algorithms.UniqueRandomRange;
 import config.Configuration;
 import data.FileKey;
@@ -62,12 +63,17 @@ public class Scratch {
 		//Imagine.run(args);
 		
 		
+		File file = new File("testing/scratch/testWebImage2.png");
+		
+		ImageIO.write(ImageUtil.constructTestWebImage2(), "png", file);
 		
 		
-		System.out.println(b);
+		BufferedImage img = ImageUtil.constructTestWebImage2();
 		
-		
-		
+		for (int y=0; y<100; ++y)
+		{
+			System.out.println(y + ": " + new Color(img.getRGB(0, y)).getGreen());
+		}
 		
 		
 		

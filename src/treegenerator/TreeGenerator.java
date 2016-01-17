@@ -7,6 +7,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import config.Configuration;
+import config.Constants;
 import data.Metadata;
 import data.TrackingGroup;
 import database.Database;
@@ -14,7 +15,6 @@ import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
 import util.ConfigUtil;
-import util.Constants;
 import util.FileSystemUtil;
 
 /**

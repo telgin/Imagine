@@ -7,6 +7,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import algorithms.Algorithm;
+import algorithms.Option;
+import algorithms.Parameter;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
@@ -26,6 +28,14 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	{
 		super(algo, key);
 		File imageFolder = new File(algo.getParameterValue("ImageFolder"));
+		
+		//prompt for the image folder if the one listed doesn't exist
+		if (!imageFolder.exists())
+		{
+			algo.setParameter("ImageFolder", Option.PROMPT_OPTION.getValue());
+			imageFolder = new File(algo.getParameterValue("ImageFolder"));
+		}
+		
 		ConsumptionMode mode = ConsumptionMode.parseMode(
 						algo.getParameterValue("ImageConsumptionMode"));
 		manager = InputImageManager.getInstance(imageFolder, mode);

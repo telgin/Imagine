@@ -7,6 +7,8 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import config.Constants;
+
 public class Hashing
 {
 

@@ -90,12 +90,12 @@ public class Definition implements algorithms.Definition
 		{
 			// product mode
 			Parameter param = new Parameter("ProductMode", "string", 
-							ProductMode.NORMAL.toString(), false);
+							ProductMode.k_basic.toString(), false);
 			if (includeOptions)
 			{
-				param.addOption(new Option(ProductMode.NORMAL.toString()));
-				param.addOption(new Option(ProductMode.SECURE.toString()));
-				param.addOption(new Option(ProductMode.STEALTH.toString()));
+				param.addOption(new Option(ProductMode.k_basic.toString()));
+				param.addOption(new Option(ProductMode.k_trackable.toString()));
+				param.addOption(new Option(ProductMode.k_secure.toString()));
 			}
 			algo.addParameter(param);
 		}
@@ -158,10 +158,23 @@ public class Definition implements algorithms.Definition
 	{
 		List<Algorithm> presets = new LinkedList<Algorithm>();
 		
-		//plain default
-		Algorithm textNormal = construct(false);
-		textNormal.setPresetName("text_basic");
-		presets.add(textNormal);
+		//basic
+		Algorithm basic = construct(false);
+		basic.setPresetName("text_basic");
+		presets.add(basic);
+		
+		//secure
+		Algorithm secure = construct(false);
+		secure.setPresetName("text_secure");
+		secure.setParameter("ProductMode", "secure");
+		presets.add(secure);
+		
+		//test trackable
+		Algorithm trackable = construct(false);
+		trackable.setPresetName("test_text_trackable");
+		trackable.setParameter("ProductMode", "trackable");
+		presets.add(trackable);
+
 		
 		return presets;
 	}

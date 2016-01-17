@@ -59,7 +59,7 @@ public class Definition implements algorithms.Definition
 		{
 			// product mode
 			Parameter param = new Parameter("ProductMode", "string", 
-							ProductMode.NORMAL.toString(), false);
+							ProductMode.k_basic.toString(), false);
 			param.setDescription("Created product files can optionally show "
 							+ "product metadata in the clear before using the key "
 							+ "to secure file data. Information like the group name "
@@ -67,9 +67,9 @@ public class Definition implements algorithms.Definition
 							+ "use to extract data from the product file.");
 			if (includeOptions)
 			{
-				param.addOption(new Option(ProductMode.NORMAL.toString()));
-				param.addOption(new Option(ProductMode.SECURE.toString()));
-				param.addOption(new Option(ProductMode.STEALTH.toString()));
+				param.addOption(new Option(ProductMode.k_basic.toString()));
+				param.addOption(new Option(ProductMode.k_trackable.toString()));
+				param.addOption(new Option(ProductMode.k_secure.toString()));
 			}
 			algo.addParameter(param);
 		}
@@ -147,10 +147,22 @@ public class Definition implements algorithms.Definition
 	{
 		List<Algorithm> presets = new LinkedList<Algorithm>();
 		
-		//plain default
-		Algorithm imageNormal = construct(false);
-		imageNormal.setPresetName("image_basic");
-		presets.add(imageNormal);
+		//basic
+		Algorithm basic = construct(false);
+		basic.setPresetName("image_basic");
+		presets.add(basic);
+		
+		//secure
+		Algorithm secure = construct(false);
+		secure.setPresetName("image_secure");
+		secure.setParameter("ProductMode", "secure");
+		presets.add(secure);
+		
+		//test trackable
+		Algorithm trackable = construct(false);
+		trackable.setPresetName("test_image_trackable");
+		trackable.setParameter("ProductMode", "trackable");
+		presets.add(trackable);
 		
 		return presets;
 	}

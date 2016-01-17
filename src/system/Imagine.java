@@ -10,7 +10,20 @@ import java.util.List;
 
 public class Imagine
 {
-
+	static
+	{
+		//add hook so ctrl+C shuts down the system properly
+		//this is also called during a normal exit
+		Runtime.getRuntime().addShutdownHook(new Thread()
+		{
+			public void run()
+			{
+				SystemManager.shutdown();
+			}
+		});
+	}
+	
+	
 	/**
 	 * Args:
 	 * 
@@ -48,15 +61,6 @@ public class Imagine
 	 */
 	public static void run(String[] args)
 	{
-		//add hook so ctrl+C shuts down the system properly
-		Runtime.getRuntime().addShutdownHook(new Thread()
-		{
-			public void run()
-			{
-				SystemManager.shutdown();
-			}
-		});
-		
 		//process args as gui vs. command line interface
 		String guiCode = "--gui";
 		List<String> argList = new ArrayList<String>(Arrays.asList(args));
@@ -75,8 +79,5 @@ public class Imagine
 		
 		//process the args
 		UIContext.getUI().processArgs();
-		
-		//shutdown when done
-		SystemManager.shutdown();
 	}
 }

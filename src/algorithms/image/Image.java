@@ -4,11 +4,11 @@ import java.awt.image.BufferedImage;
 import product.Product;
 import product.ProductMode;
 import util.ByteConversion;
-import util.Constants;
 import util.algorithms.HashRandom;
 import util.algorithms.UniqueRandomRange;
 import data.Key;
 import algorithms.Algorithm;
+import config.Constants;
 
 public class Image implements Product
 {

@@ -2,8 +2,8 @@ package product;
 
 import java.io.File;
 
+import config.Constants;
 import data.Metadata;
-import util.Constants;
 
 public class FileContents
 {

@@ -6,7 +6,6 @@ import data.NullKey;
 import data.PasswordKey;
 import data.TrackingGroup;
 import util.ConfigUtil;
-import util.Constants;
 
 import java.io.File;
 import java.util.ArrayList;

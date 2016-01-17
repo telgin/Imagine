@@ -1,5 +1,7 @@
 package util.algorithms;
 
+import logging.LogLevel;
+import logging.Logger;
 import product.ProductIOException;
 import util.ByteConversion;
 
@@ -22,7 +24,7 @@ public class UniqueRandomRange
 
 	public void reseed(byte[] seed)
 	{
-		System.out.println("Reseed: " + ByteConversion.bytesToHex(seed));
+		Logger.log(LogLevel.k_debug, "Reseeding stream cypher: " + ByteConversion.bytesToHex(seed));
 		random = new HashRandom(seed);
 	}
 

@@ -13,13 +13,13 @@ import java.util.Set;
 
 import algorithms.Algorithm;
 import algorithms.Parameter;
+import config.Constants;
 import data.Key;
 import data.Metadata;
 import data.TrackingGroup;
 import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
-import util.Constants;
 import util.FileSystemUtil;
 import util.Hashing;
 

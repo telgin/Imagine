@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 
 import algorithms.Algorithm;
+import config.Constants;
 import data.Key;
 import logging.LogLevel;
 import logging.Logger;
@@ -14,7 +15,6 @@ import product.ProductWriter;
 import stats.ProgressMonitor;
 import stats.Stat;
 import util.ByteConversion;
-import util.Constants;
 
 public class TextWriter extends Text implements ProductWriter
 {
@@ -48,7 +48,7 @@ public class TextWriter extends Text implements ProductWriter
 	@Override
 	public int write(byte[] bytes, int offset, int length)
 	{
-		Logger.log(LogLevel.k_debug, "Writing " + (length) + " bytes.");
+		//Logger.log(LogLevel.k_debug, "Writing " + (length) + " bytes.");
 
 		for (int x = offset; x < offset + length; ++x)
 		{
@@ -62,7 +62,6 @@ public class TextWriter extends Text implements ProductWriter
 	@Override
 	public void saveFile(File productStagingFolder, String filename)
 	{
-
 		// write random bytes to fill up the buffer
 		fillToEnd();
 

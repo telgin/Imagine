@@ -25,7 +25,7 @@ public class PasswordKey implements Key
 	}
 
 	@Override
-	public byte[] getKeyHash()
+	public synchronized byte[] getKeyHash()
 	{
 		if (keyHash == null)
 		{
