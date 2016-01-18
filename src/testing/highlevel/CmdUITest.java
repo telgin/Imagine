@@ -88,7 +88,7 @@ public class CmdUITest
 		cmdTempGroup("image_basic", "bigFile");
 	}
 	
-	//@Test(timeout = 60000)
+	@Test(timeout = 60000)
 	public void imageBasicBigTree()
 	{
 		cmdTempGroup("image_basic", "bigTree");
@@ -268,7 +268,7 @@ public class CmdUITest
 	//Secure Password Tests
 	//----------------------------------------
 	
-	@Test
+	//@Test
 	public void textSecurePasswordBigTree()
 	{
 		cmdTempGroup("text_secure", "bigTree");

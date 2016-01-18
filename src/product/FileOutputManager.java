@@ -1,11 +1,9 @@
 package product;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import data.TrackingGroup;
+import util.myUtilities;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -23,19 +21,7 @@ public class FileOutputManager
 	{
 		this.group = group;
 		this.productStagingFolder = productStagingFolder;
-		this.startTime = formatTime(System.currentTimeMillis());
-	}
-	
-	/**
-	 * @update_comment
-	 * @param currentTimeMillis
-	 * @return
-	 */
-	private String formatTime(long millis)
-	{
-		Date date = new Date(millis);
-		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.SSS");
-		return formatter.format(date);
+		this.startTime = myUtilities.formatDateTimeFileSafe(System.currentTimeMillis());
 	}
 
 	public File getOutputFolder()

@@ -49,7 +49,7 @@ public abstract class ConfigurationAPI
 			throw new UsageException("The preset name must be defined.");
 		
 		if (!Configuration.getAlgorithmPresetNames().contains(presetName))
-			throw new UsageException("An algorithm by the given preset name does not exist.");
+			throw new UsageException("An algorithm by the preset name of '" + presetName + "' does not exist.");
 		
 		Configuration.deleteAlgorithmPreset(presetName);
 		Configuration.saveConfig();
@@ -62,7 +62,7 @@ public abstract class ConfigurationAPI
 			throw new UsageException("The preset name must be defined.");
 		
 		if (!Configuration.getAlgorithmPresetNames().contains(presetName))
-			throw new UsageException("An algorithm by the given preset name does not exist.");
+			throw new UsageException("An algorithm by the preset name of '" + presetName + "' does not exist.");
 		
 		return Configuration.getAlgorithmPreset(presetName);
 	}
@@ -100,7 +100,7 @@ public abstract class ConfigurationAPI
 			throw new UsageException("The group name must be defined.");
 		
 		if (!Configuration.getTrackingGroupNames().contains(groupName))
-			throw new UsageException("A tracking group by the given name does not exist.");
+			throw new UsageException("A tracking group by the name of '" + groupName + "' does not exist.");
 		
 		Configuration.deleteTrackingGroup(groupName);
 		Configuration.addTrackingGroup(group);
@@ -114,7 +114,7 @@ public abstract class ConfigurationAPI
 			throw new UsageException("The group name must be defined.");
 		
 		if (!Configuration.getTrackingGroupNames().contains(groupName))
-			throw new UsageException("A tracking group by the given name does not exist.");
+			throw new UsageException("A tracking group by the name of '" + groupName + "' does not exist.");
 		
 		Configuration.deleteTrackingGroup(groupName);
 		Configuration.saveConfig();
@@ -132,7 +132,7 @@ public abstract class ConfigurationAPI
 			throw new UsageException("The group name must be defined.");
 		
 		if (!Configuration.getTrackingGroupNames().contains(groupName))
-			throw new UsageException("A tracking group by the given name does not exist.");
+			throw new UsageException("A tracking group by the name of '" + groupName + "' does not exist.");
 		
 		return Configuration.getTrackingGroup(groupName);
 	}
@@ -148,7 +148,7 @@ public abstract class ConfigurationAPI
 			throw new UsageException("The algorithm definition name must be defined.");
 		
 		if (!AlgorithmRegistry.getAlgorithmNames().contains(algoDefName))
-			throw new UsageException("An algorithm definition by the given name does not exist.");
+			throw new UsageException("An algorithm definition by the name of '" + algoDefName + "' does not exist.");
 		
 		return AlgorithmRegistry.getAlgorithmDefinitionDescription(algoDefName);
 	}
@@ -159,7 +159,7 @@ public abstract class ConfigurationAPI
 			throw new UsageException("The algorithm definition name must be defined.");
 		
 		if (!AlgorithmRegistry.getAlgorithmNames().contains(algoDefName))
-			throw new UsageException("An algorithm definition by the given name does not exist.");
+			throw new UsageException("An algorithm definition by the name of '" + algoDefName + "' does not exist.");
 		
 		return AlgorithmRegistry.getAlgorithmSpec(algoDefName);
 	}

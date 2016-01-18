@@ -1,4 +1,4 @@
-package scratch;
+package testing.scratch;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

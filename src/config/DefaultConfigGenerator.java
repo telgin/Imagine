@@ -50,8 +50,8 @@ public abstract class DefaultConfigGenerator
 	private static void addTestTrackingGroup()
 	{
 		//initialize
-		String name = "Test";
-		String presetName = "text_basic";
+		String name = "Test Image Basic";
+		String presetName = "image_basic";
 		Algorithm algo = Configuration.getAlgorithmPreset(presetName);
 		boolean usesDatabase = true;
 		Key key = new FileKey("potatoes", name, new File("keys/key1.txt"));

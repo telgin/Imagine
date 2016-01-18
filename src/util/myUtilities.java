@@ -13,8 +13,11 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import config.Constants;
@@ -251,5 +254,29 @@ public abstract class myUtilities
 		NumberFormat format = NumberFormat.getPercentInstance();
 		format.setMinimumFractionDigits(decimals);
 		return format.format(d);
+	}
+	
+	/**
+	 * @update_comment
+	 * @param currentTimeMillis
+	 * @return
+	 */
+	public static String formatDateTimeFileSafe(long millis)
+	{
+		Date date = new Date(millis);
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss.SSS");
+		return formatter.format(date);
+	}
+	
+	/**
+	 * @update_comment
+	 * @param currentTimeMillis
+	 * @return
+	 */
+	public static String formatDateTime(long millis)
+	{
+		Date date = new Date(millis);
+		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss.SSS");
+		return formatter.format(date);
 	}
 }
