@@ -279,4 +279,16 @@ public abstract class myUtilities
 		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss.SSS");
 		return formatter.format(date);
 	}
+	
+	/**
+	 * @update_comment
+	 * @param currentTimeMillis
+	 * @return
+	 */
+	public static String formatDate(long millis)
+	{
+		Date date = new Date(millis);
+		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+		return formatter.format(date);
+	}
 }

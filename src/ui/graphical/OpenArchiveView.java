@@ -9,14 +9,15 @@ import algorithms.Algorithm;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
+import config.Constants;
 import data.FileKey;
 import data.PasswordKey;
 import data.TrackingGroup;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -26,6 +27,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -35,6 +37,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
@@ -50,7 +53,7 @@ import product.ProductMode;
  * @update_comment
  */
 @SuppressWarnings({ "rawtypes", "unchecked" }) //oracle recommends using rawtypes
-public class ArchiveView extends Application
+public class OpenArchiveView extends Application
 {
 	//state variables
 	private File file;
@@ -67,16 +70,14 @@ public class ArchiveView extends Application
 	
 	//gui elements
 	private Stage window;
-	private ChoiceBox profileSelect;
-	private ChoiceBox algorithmSelect;
+	private ChoiceBox profileSelect, algorithmSelect;
 	private PasswordField passwordField;
 	private TextField keyFilePath;
-	private Button keyFileBrowseButton;
-	private Button openButton;
+	private Button keyFileBrowseButton, openButton, extractSelectedButton, extractAllButton;
 	private ToggleGroup keySelectionButtons;
-	private RadioButton keyFileToggle;
-	private RadioButton passwordToggle;
+	private RadioButton keyFileToggle, passwordToggle;
 	private TableView table;
+	private Label passwordLabel, keyFileLabel, keySelectionLabel, algorithmLabel, profileLabel;
 	
 	
 	public static void main(String[] args)
@@ -93,7 +94,7 @@ public class ArchiveView extends Application
 	public void start(Stage primaryStage) throws Exception
 	{
 		window = primaryStage;
-		window.setTitle("Archive View");
+		window.setTitle(Constants.APPLICATION_NAME_SHORT + " Archive View");
 		file = new File(getParameters().getUnnamed().get(0));
 		
 		
@@ -119,7 +120,7 @@ public class ArchiveView extends Application
 		borderPane.setCenter(setupContentsSection());
 		
 		
-		return new Scene(borderPane, 1200, 600);
+		return new Scene(borderPane, 1000, 500);
 	}
 
 	/**
@@ -130,8 +131,8 @@ public class ArchiveView extends Application
 	private Node setupContentsSection()
 	{
 		VBox vbox = new VBox();
-		vbox.setSpacing(5);
-		vbox.setPadding(new Insets(10, 10, 10, 10));
+		vbox.setSpacing(10);
+		vbox.setPadding(new Insets(10, 20, 20, 10));
 
 		//archive contents label
 		Label archiveContentsLabel = new Label("Archive Contents");
@@ -153,30 +154,55 @@ public class ArchiveView extends Application
 		table = new TableView();
 		table.setEditable(false);
 		table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+		table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		
 		TableColumn indexColumn = new TableColumn("Index");
 		indexColumn.setCellValueFactory(new PropertyValueFactory<>("index"));
+		indexColumn.setPrefWidth(70);
 		table.getColumns().add(indexColumn);
 		
 		TableColumn typeColumn = new TableColumn("Type");
 		typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+		typeColumn.setPrefWidth(90);
 		table.getColumns().add(typeColumn);
 		
 		TableColumn nameColumn = new TableColumn("Name");
 		nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-		
+		nameColumn.setPrefWidth(250);
 		table.getColumns().add(nameColumn);
 		
 		TableColumn createdColumn = new TableColumn("Date Created");
 		createdColumn.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
+		createdColumn.setPrefWidth(110);
 		table.getColumns().add(createdColumn);
 		
 		TableColumn modifiedColumn = new TableColumn("Date Modified");
 		modifiedColumn.setCellValueFactory(new PropertyValueFactory<>("dateModified"));
+		modifiedColumn.setPrefWidth(110);
 		table.getColumns().add(modifiedColumn);
+		table.setPrefHeight(1000);
 
 		scrollPane.setContent(table);
 		vbox.getChildren().add(scrollPane);
+		vbox.setAlignment(Pos.BASELINE_LEFT);
+		
+		//extract selected button
+		extractSelectedButton = new Button();
+		extractSelectedButton.setText("Extract Selected");
+		extractSelectedButton.setOnAction(e -> extractSelected());
+		
+		//extract all button
+		extractAllButton = new Button();
+		extractAllButton.setText("Extract All");
+		extractSelectedButton.setOnAction(e -> extractAll());
+		
+		HBox extractionButtons = new HBox();
+		extractionButtons.setAlignment(Pos.CENTER);
+		extractionButtons.setSpacing(50);
+		extractionButtons.setPadding(new Insets(10, 0, 0, 0));
+		extractionButtons.getChildren().addAll(extractSelectedButton, extractAllButton);
+		vbox.getChildren().add(extractionButtons);
+		
 		
 		return vbox;
 	}
@@ -185,16 +211,38 @@ public class ArchiveView extends Application
 	 * @update_comment
 	 * @return
 	 */
+	private void extractAll()
+	{
+		
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	private void extractSelected()
+	{
+		
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private Node setupConfigSelection()
 	{
-		GridPane configSelection = new GridPane();
-		configSelection.setPadding(new Insets(20,20,20,20));
-		configSelection.setVgap(8);
-		configSelection.setHgap(10);
+		VBox configSelection = new VBox();
+		configSelection.setSpacing(3);
+		configSelection.setPadding(new Insets(14,10,20,20));
 
+		//extraction configuration label
+		Label extractionConfigurationLabel = new Label("Extraction Configuration");
+		extractionConfigurationLabel.setFont(new Font("Arial", 20));
+		extractionConfigurationLabel.setPadding(new Insets(0, 0, 10, 0));
+		configSelection.getChildren().add(extractionConfigurationLabel);
+		
 		//profile label
-		Label profileLabel = new Label("Profile:");
-		GridPane.setConstraints(profileLabel, 0, 0);
+		profileLabel = new Label("Profile:");
 		configSelection.getChildren().add(profileLabel);
 		
 		//profile select
@@ -206,12 +254,10 @@ public class ArchiveView extends Application
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
 											profileSelected(value, oldIndex, newIndex));
-		GridPane.setConstraints(profileSelect, 1, 0);
-		configSelection.getChildren().add(profileSelect);
+		configSelection.getChildren().add(indentElement(1, profileSelect));
 		
 		//profile label
-		Label algorithmLabel = new Label("Algorithm:");
-		GridPane.setConstraints(algorithmLabel, 0, 1);
+		algorithmLabel = new Label("Algorithm:");
 		configSelection.getChildren().add(algorithmLabel);
 		
 		//algorithm select
@@ -223,12 +269,10 @@ public class ArchiveView extends Application
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
 											algorithmSelected(value, oldIndex, newIndex));
-		GridPane.setConstraints(algorithmSelect, 1, 1);
-		configSelection.getChildren().add(algorithmSelect);
+		configSelection.getChildren().add(indentElement(1, algorithmSelect));
 		
 		//key selection label
-		Label keySelectionLabel = new Label("Key Selection:");
-		GridPane.setConstraints(keySelectionLabel, 0, 2);
+		keySelectionLabel = new Label("Key Selection:");
 		configSelection.getChildren().add(keySelectionLabel);
 		
 		//key selection buttons
@@ -249,45 +293,54 @@ public class ArchiveView extends Application
 		HBox radioBox = new HBox();
 		radioBox.setSpacing(10);
 		radioBox.getChildren().addAll(passwordToggle, keyFileToggle);
-		GridPane.setConstraints(radioBox, 1, 2);
-		configSelection.getChildren().add(radioBox);
+		configSelection.getChildren().add(indentElement(1, radioBox));
 		
 		//password label
-		Label passwordLabel = new Label("Password:");
-		GridPane.setConstraints(passwordLabel, 0, 3);
+		passwordLabel = new Label("Password:");
 		configSelection.getChildren().add(passwordLabel);
 		
 		//password text field
 		passwordField = new PasswordField();
-		GridPane.setConstraints(passwordField, 1, 3);
-		configSelection.getChildren().add(passwordField);
+		configSelection.getChildren().add(indentElement(1, passwordField));
 		
 		//key file path label
-		Label keyFileLabel = new Label("Key File Path:");
-		GridPane.setConstraints(keyFileLabel, 0, 4);
+		keyFileLabel = new Label("Key File Path:");
 		configSelection.getChildren().add(keyFileLabel);
 		
 		//key file path
 		keyFilePath = new TextField();
 		keyFilePath.setEditable(false);
-		GridPane.setConstraints(keyFilePath, 1, 4);
-		configSelection.getChildren().add(keyFilePath);
 		
 		//key file browse button
 		keyFileBrowseButton = new Button();
 		keyFileBrowseButton.setText("Browse");
 		keyFileBrowseButton.setOnAction(e -> chooseKeyFile());
-		GridPane.setConstraints(keyFileBrowseButton, 2, 4);
-		configSelection.getChildren().add(keyFileBrowseButton);
+		HBox keyFilePathRow = indentElement(1, keyFilePath);
+		keyFilePathRow.getChildren().add(keyFileBrowseButton);
+		configSelection.getChildren().add(keyFilePathRow);
 		
 		//open
 		openButton = new Button();
 		openButton.setText("Open");
 		openButton.setOnAction(e -> openArchive());
-		GridPane.setConstraints(openButton, 1, 5);
-		configSelection.getChildren().add(openButton);
+		HBox centered = new HBox();
+		centered.getChildren().add(openButton);
+		centered.setAlignment(Pos.CENTER);
+		centered.setPadding(new Insets(20, 0, 0, 0));
+		configSelection.getChildren().add(centered);
 
 		return configSelection;
+	}
+	
+	private HBox indentElement(int indent, Node element)
+	{
+		String indentation = "    ";
+		HBox hbox = new HBox();
+		hbox.setPadding(new Insets(10, 0, 10, 0));
+		hbox.setSpacing(10);
+		Label space = new Label(new String(new char[indent]).replace("\0", indentation));
+		hbox.getChildren().addAll(space, element);
+		return hbox;
 	}
 
 	/**
@@ -320,11 +373,13 @@ public class ArchiveView extends Application
 	{
 		keyFileToggle.disableProperty().set(!enabled);
 		passwordToggle.disableProperty().set(!enabled);
+		keySelectionLabel.disableProperty().set(!enabled);
 		
 		if (!enabled)
 		{
 			keyFileToggle.setStyle("-fx-opacity: .75");
 			passwordToggle.setStyle("-fx-opacity: .75");
+			keySelectionLabel.setStyle("-fx-opacity: .5");
 			
 			//disable everything
 			setKeyFileSectionEnabled(false);
@@ -334,6 +389,7 @@ public class ArchiveView extends Application
 		{
 			keyFileToggle.setStyle("-fx-opacity: 1");
 			passwordToggle.setStyle("-fx-opacity: 1");
+			keySelectionLabel.setStyle("-fx-opacity: 1");
 
 			//enable only the selected one
 			if (keySelectionButtons.getSelectedToggle().getUserData().equals(keyFileToggleString))
@@ -353,6 +409,7 @@ public class ArchiveView extends Application
 	{
 		try
 		{
+			openButton.disableProperty().set(true);
 			ProductContents productContents = ConversionAPI.openArchive(selectedProfile, file);
 			List<FileContentsTableRecord> records = new ArrayList<FileContentsTableRecord>();
 			
@@ -362,7 +419,7 @@ public class ArchiveView extends Application
 				records.add(new FileContentsTableRecord(count++,
 								fileContents.getMetadata().getType(),
 								fileContents.getFragmentNumber(),
-								fileContents.getMetadata().getFile().getName(),
+								fileContents.getMetadata().getFile(),
 								fileContents.getMetadata().getDateCreated(),
 								fileContents.getMetadata().getDateModified()));
 			}
@@ -373,14 +430,27 @@ public class ArchiveView extends Application
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			openButton.disableProperty().set(false);
+			clearTable();
 		}
 		catch (UsageException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			openButton.disableProperty().set(false);
+			clearTable();
 		}
 	}
 	
+	/**
+	 * @update_comment
+	 */
+	private void clearTable()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * @update_comment
 	 * @param b
@@ -389,16 +459,19 @@ public class ArchiveView extends Application
 	{
 		keyFilePath.disableProperty().set(!enabled);
 		keyFileBrowseButton.disableProperty().set(!enabled);
+		keyFileLabel.disableProperty().set(!enabled);
 		
 		if (!enabled)
 		{
 			keyFilePath.setStyle("-fx-opacity: .75");
 			keyFileBrowseButton.setStyle("-fx-opacity: .75");
+			keyFileLabel.setStyle("-fx-opacity: .5");
 		}
 		else
 		{
 			keyFilePath.setStyle("-fx-opacity: 1");
 			keyFileBrowseButton.setStyle("-fx-opacity: 1");
+			keyFileLabel.setStyle("-fx-opacity: 1");
 		}
 		
 	}
@@ -410,14 +483,18 @@ public class ArchiveView extends Application
 	private void setPasswordSectionEnabled(boolean enabled)
 	{
 		passwordField.disableProperty().set(!enabled);
+		passwordLabel.disableProperty().set(!enabled);
+		
 		System.out.println("Password section enabled: " + enabled);
 		if (!enabled)
 		{
 			passwordField.setStyle("-fx-opacity: .75");
+			passwordLabel.setStyle("-fx-opacity: .5");
 		}
 		else
 		{
 			passwordField.setStyle("-fx-opacity: 1");
+			passwordLabel.setStyle("-fx-opacity: 1");
 		}
 	}
 	
@@ -528,20 +605,28 @@ public class ArchiveView extends Application
 				algorithmSelect.setValue(selectedAlgorithm.getPresetName());
 				//TODO handle case where preset name not found
 				
-				setKeySectionEnabled(true);
 				
-				if (selectedProfile.getKey() instanceof FileKey)
+				if (selectedAlgorithm.getProductSecurityLevel().isSecured())
 				{
-					keySelectionButtons.selectToggle(keyFileToggle);
+					setKeySectionEnabled(true);
 					
-					FileKey key = (FileKey) selectedProfile.getKey();
-					keyFilePath.setText(key.getKeyFile().getAbsolutePath());
-					//TODO handle case where key file not found
+					if (selectedProfile.getKey() instanceof FileKey)
+					{
+						keySelectionButtons.selectToggle(keyFileToggle);
+						
+						FileKey key = (FileKey) selectedProfile.getKey();
+						keyFilePath.setText(key.getKeyFile().getAbsolutePath());
+						//TODO handle case where key file not found
+					}
+					else if(selectedProfile.getKey() instanceof PasswordKey)
+					{
+						keySelectionButtons.selectToggle(passwordToggle);
+						passwordField.setPromptText(selectedProfile.getKey().getName());
+					}
 				}
-				else if(selectedProfile.getKey() instanceof PasswordKey)
+				else
 				{
-					keySelectionButtons.selectToggle(passwordToggle);
-					passwordField.setPromptText(selectedProfile.getKey().getName());
+					setKeySectionEnabled(false);
 				}
 			}
 			catch (UsageException e)

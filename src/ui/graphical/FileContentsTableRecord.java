@@ -1,5 +1,7 @@
 package ui.graphical;
 
+import java.io.File;
+
 import data.FileType;
 import javafx.beans.property.SimpleStringProperty;
 import util.myUtilities;
@@ -27,7 +29,7 @@ public class FileContentsTableRecord
 	 * @param fragmentNumber
 	 */
 	public FileContentsTableRecord(int index, FileType type, long fragmentNumber,
-					String name, long dateCreated, long dateModified)
+					File file, long dateCreated, long dateModified)
 	{
 		this.index = new SimpleStringProperty(Integer.toString(index));
 		
@@ -49,9 +51,9 @@ public class FileContentsTableRecord
 			displayType += " (Fragment #" + Long.toString(fragmentNumber) + ")";
 		
 		this.type = new SimpleStringProperty(displayType);
-		this.name = new SimpleStringProperty(name);
-		this.dateCreated = new SimpleStringProperty(myUtilities.formatDateTime(dateCreated));
-		this.dateModified = new SimpleStringProperty(myUtilities.formatDateTime(dateModified));
+		this.name = new SimpleStringProperty(file.getName());
+		this.dateCreated = new SimpleStringProperty(myUtilities.formatDate(dateCreated));
+		this.dateModified = new SimpleStringProperty(myUtilities.formatDate(dateModified));
 	}
 
 	/**

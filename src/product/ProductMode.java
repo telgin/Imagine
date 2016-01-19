@@ -33,4 +33,13 @@ public enum ProductMode
 	{
 		return modes.get(name.toLowerCase());
 	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	public boolean isSecured()
+	{
+		return this.equals(k_secure) || this.equals(k_trackable);
+	}
 }
