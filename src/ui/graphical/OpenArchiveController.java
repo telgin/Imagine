@@ -8,7 +8,10 @@ import algorithms.Algorithm;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
+import config.Constants;
 import data.FileKey;
+import data.Key;
+import data.NullKey;
 import data.PasswordKey;
 import data.TrackingGroup;
 import logging.LogLevel;
@@ -27,7 +30,7 @@ public class OpenArchiveController
 	private GUI gui;
 	
 	//state variables
-	private File file;
+	private File inputFile;
 	private List<String> profiles;
 	private List<String> algorithms;
 	private TrackingGroup selectedProfile = null;
@@ -44,12 +47,11 @@ public class OpenArchiveController
 	 * @update_comment
 	 * @param file
 	 */
-	public OpenArchiveController(OpenArchiveView view)
+	public OpenArchiveController(OpenArchiveView view, File inputFile)
 	{
 		this.view = view;
 		this.gui = (GUI) UIContext.getUI();
-		
-		setInputFile(processArgs());
+		this.inputFile = inputFile;
 		
 		reloadProfiles();
 		setDefaultProfileSelection(tempProfileString);
@@ -57,17 +59,6 @@ public class OpenArchiveController
 		reloadAlgorithmPresets();
 		setDefaultAlgorithmSelection(noSelectionString);
 	}
-	
-	/**
-	 * @update_comment
-	 */
-	private File processArgs()
-	{
-		int fileIndex = view.getParameters().getUnnamed().indexOf("-i") + 1;
-		return new File(view.getParameters().getUnnamed().get(fileIndex));
-	}
-	
-	
 
 	/**
 	 * @update_comment
@@ -156,15 +147,7 @@ public class OpenArchiveController
 	 */
 	public File getInputFile()
 	{
-		return file;
-	}
-
-	/**
-	 * @param file the file to set
-	 */
-	public void setInputFile(File file)
-	{
-		this.file = file;
+		return inputFile;
 	}
 	
 	void openArchive()
@@ -172,8 +155,11 @@ public class OpenArchiveController
 		try
 		{
 			view.setOpenButtonEnabled(false);
-			ProductContents productContents = ConversionAPI.openArchive(selectedProfile, file);
+			view.setProfileSelectionEnabled(false);
+			view.setAlgorithmSelectionEnabled(false);
+			ProductContents productContents = ConversionAPI.openArchive(getTrackingGroup(), inputFile);
 			view.setTableData(productContents.getFileContents());
+			view.setExtractionButtonsEnabled(true);
 		}
 		catch (IOException | UsageException e)
 		{
@@ -181,6 +167,8 @@ public class OpenArchiveController
 			Logger.log(LogLevel.k_error, e.getMessage());
 			
 			view.setOpenButtonEnabled(true);
+			view.setProfileSelectionEnabled(true);
+			view.setAlgorithmSelectionEnabled(false);
 			view.clearTable();
 		}
 		
@@ -215,7 +203,7 @@ public class OpenArchiveController
 		{
 			try
 			{
-				ConversionAPI.extractAll(getTrackingGroup(), file, extractionLocation);
+				ConversionAPI.extractAll(getTrackingGroup(), inputFile, extractionLocation);
 			}
 			catch (IOException | UsageException e)
 			{
@@ -243,8 +231,30 @@ public class OpenArchiveController
 		}
 		else
 		{
-			//TODO
-			return null;
+			Key key = null;
+			if (view.keyFileEnabled())
+			{
+				key = new FileKey(Constants.TEMP_KEY_NAME, 
+								Constants.TEMP_RESERVED_GROUP_NAME,
+								new File(view.getKeyFilePath()));
+			}
+			else if (view.passwordEnabled())
+			{
+				key = new PasswordKey(Constants.TEMP_KEY_NAME, Constants.TEMP_RESERVED_GROUP_NAME);
+			}
+			else //key section not enabled
+			{
+				key = new NullKey();
+			}
+			
+			TrackingGroup tempProfile = ConversionAPI.createTemporaryTrackingGroup(
+							selectedAlgorithm.getPresetName(), key);
+			
+			//temporary groups should not need/want file system tracking
+			tempProfile.setUsesAbsolutePaths(false);
+			tempProfile.setUsingIndexFiles(false);
+			
+			return tempProfile;
 		}
 	}
 
@@ -254,7 +264,30 @@ public class OpenArchiveController
 	 */
 	public void extractSelected()
 	{
+		List<Integer> indices = view.getSelectedRows();
 		
+		File extractionLocation = view.chooseFolder();
+		if (extractionLocation != null)
+		{
+			for (int index : indices)
+			{
+				try
+				{
+					ConversionAPI.extractFile(getTrackingGroup(), inputFile, extractionLocation, index);
+				}
+				catch (IOException | UsageException e)
+				{
+					Logger.log(LogLevel.k_debug, e, false);
+					Logger.log(LogLevel.k_error, e.getMessage());
+				}
+			}
+		}
+		
+		if (gui.hasErrors())
+		{
+			view.showErrors(gui.getErrors(), "data extraction");
+			gui.clearErrors();
+		}
 	}
 	
 	public void algorithmSelected(int index)
@@ -263,6 +296,11 @@ public class OpenArchiveController
 		{
 			//'no selection' selected
 			view.setKeySectionEnabled(false);
+			
+			if (selectedProfile == null)
+			{
+				view.setOpenButtonEnabled(false);
+			}
 		}
 		else
 		{
@@ -278,6 +316,8 @@ public class OpenArchiveController
 				{
 					view.setKeySectionEnabled(true);
 				}
+				
+				view.setOpenButtonEnabled(true);
 			}
 			catch (UsageException e)
 			{

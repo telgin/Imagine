@@ -5,13 +5,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 import algorithms.Parameter;
+import config.Constants;
 import data.TrackingGroup;
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import ui.UI;
 
 public class GUI extends UI
 {
 	private List<String> args;
 	private List<String> errors;
+	private View view;
 	
 	public GUI(List<String> args)
 	{
@@ -29,8 +36,7 @@ public class GUI extends UI
 	@Override
 	public String promptKey(String keyName, String groupName)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return view.getPassword();
 	}
 
 	/* (non-Javadoc)
@@ -39,7 +45,13 @@ public class GUI extends UI
 	@Override
 	public void processArgs()
 	{
-		OpenArchiveView.launch(OpenArchiveView.class, args.toArray(new String[0]));
+		int fileIndex = args.indexOf("-i") + 1;
+		File inputFile = new File(args.get(fileIndex));
+		
+		view = new OpenArchiveView(inputFile);
+
+		
+		ApplicationWindow.launch(ApplicationWindow.class);
 	}
 
 	/* (non-Javadoc)
@@ -49,8 +61,9 @@ public class GUI extends UI
 	public File promptEnclosingFolder(File curEnclosingFolder, File curProductFolder,
 					String productSearchName)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		//TODO make this better, handle case where folder selected
+		//but file still wasn't found. (right now it just prompts again)
+		return view.getEnclosingFolder();
 	}
 
 	/* (non-Javadoc)
@@ -96,6 +109,15 @@ public class GUI extends UI
 		//for the moment, there's nothing better to do
 		//some kinds of notifications are handled elsewhere through stats
 		System.out.println(message);
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	public View getView()
+	{
+		return view;
 	}
 
 }

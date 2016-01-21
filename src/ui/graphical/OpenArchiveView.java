@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import algorithms.Algorithm;
@@ -17,6 +18,7 @@ import data.TrackingGroup;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -31,6 +33,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
@@ -56,7 +59,7 @@ import product.ProductMode;
  * @update_comment
  */
 @SuppressWarnings({ "rawtypes", "unchecked" }) //oracle recommends using rawtypes
-public class OpenArchiveView extends Application
+public class OpenArchiveView implements View
 {
 	//constants
 	private final String passwordToggleString = "Password";
@@ -76,39 +79,29 @@ public class OpenArchiveView extends Application
 	//controller
 	private OpenArchiveController controller;
 
-
-	/* (non-Javadoc)
-	 * @see javafx.application.Application#start(javafx.stage.Stage)
-	 */
-	@Override
-	public void start(Stage primaryStage) throws Exception
+	public OpenArchiveView(File productFile)
 	{
-		window = primaryStage;
-		window.setTitle(Constants.APPLICATION_NAME_SHORT + " Archive Viewer");
-
-		controller = new OpenArchiveController(this);
-		
-		window.setScene(setupScene());
-		
-		//set the temporary profile as selected by default
-		profileSelect.setValue(controller.getDefaultProfileSelection());
-		
-		
-		
-		window.show();
+		controller = new OpenArchiveController(this, productFile);
 	}
 
 	/**
 	 * @update_comment
 	 * @return
 	 */
-	private Scene setupScene()
+	public void setupScene(Stage window)
 	{
+		this.window = window;
+		
+		window.setTitle(Constants.APPLICATION_NAME_SHORT + " Archive Viewer");
+		
 		BorderPane borderPane = new BorderPane();
 		borderPane.setLeft(setupConfigSelection());
 		borderPane.setCenter(setupContentsSection());
 		
-		return new Scene(borderPane, 1030, 500);
+		window.setScene(new Scene(borderPane, 1040, 500));
+		
+		//set the temporary profile as selected by default
+		profileSelect.setValue(controller.getDefaultProfileSelection());
 	}
 
 	/**
@@ -189,8 +182,8 @@ public class OpenArchiveView extends Application
 		extractionButtons.setSpacing(50);
 		extractionButtons.setPadding(new Insets(10, 0, 0, 0));
 		extractionButtons.getChildren().addAll(extractSelectedButton, extractAllButton);
+		setExtractionButtonsEnabled(false);
 		vbox.getChildren().add(extractionButtons);
-		
 		
 		return vbox;
 	}
@@ -311,6 +304,8 @@ public class OpenArchiveView extends Application
 
 	void setKeySectionEnabled(boolean enabled)
 	{
+		System.out.println("Key section enabled: " + enabled);
+		
 		keyFileToggle.disableProperty().set(!enabled);
 		passwordToggle.disableProperty().set(!enabled);
 		keySelectionLabel.disableProperty().set(!enabled);
@@ -404,6 +399,8 @@ public class OpenArchiveView extends Application
 	 */
 	private void setKeyFileSectionEnabled(boolean enabled)
 	{
+		System.out.println("Key file section enabled: " + enabled);
+		
 		keyFilePath.disableProperty().set(!enabled);
 		keyFileBrowseButton.disableProperty().set(!enabled);
 		keyFileLabel.disableProperty().set(!enabled);
@@ -429,10 +426,11 @@ public class OpenArchiveView extends Application
 	 */
 	private void setPasswordSectionEnabled(boolean enabled)
 	{
+		System.out.println("Password section enabled: " + enabled);
+		
 		passwordField.disableProperty().set(!enabled);
 		passwordLabel.disableProperty().set(!enabled);
 		
-		System.out.println("Password section enabled: " + enabled);
 		if (!enabled)
 		{
 			passwordField.setStyle("-fx-opacity: .75");
@@ -529,6 +527,24 @@ public class OpenArchiveView extends Application
 		}
 	}
 	
+	public void setExtractionButtonsEnabled(boolean enabled)
+	{
+		System.out.println("Extraction buttons enabled: " + enabled);
+		
+		extractSelectedButton.disableProperty().set(!enabled);
+		extractAllButton.disableProperty().set(!enabled);
+
+		if (!enabled)
+		{
+			extractSelectedButton.setStyle("-fx-opacity: .75");
+			extractAllButton.setStyle("-fx-opacity: .75");
+		}
+		else
+		{
+			extractSelectedButton.setStyle("-fx-opacity: 1");
+			extractAllButton.setStyle("-fx-opacity: 1");
+		}
+	}
 	
 	public void setAlgorithmSelection(String presetName)
 	{
@@ -552,6 +568,20 @@ public class OpenArchiveView extends Application
 		else
 		{
 			algorithmSelect.setStyle("-fx-opacity: 1");
+		}
+	}
+	
+	public void setProfileSelectionEnabled(boolean enabled)
+	{
+		profileSelect.disableProperty().set(!enabled);
+		
+		if (!enabled)
+		{
+			profileSelect.setStyle("-fx-opacity: .75");
+		}
+		else
+		{
+			profileSelect.setStyle("-fx-opacity: 1");
 		}
 	}
 	
@@ -580,7 +610,27 @@ public class OpenArchiveView extends Application
 	{
 		keyFilePath.setText(path);
 	}
+	
+	public boolean keyFileEnabled()
+	{
+		return !keyFilePath.disableProperty().get();
+	}
 
+	public boolean passwordEnabled()
+	{
+		return !passwordField.disableProperty().get();
+	}
+	
+	public String getKeyFilePath()
+	{
+		return keyFilePath.getText();
+	}
+	
+	public String getPassword()
+	{
+		return passwordField.getText();
+	}
+	
 	/**
 	 * @update_comment
 	 * @param errors
@@ -594,6 +644,33 @@ public class OpenArchiveView extends Application
 		popup.setHeaderText(header);
 		popup.setScrollText(String.join("\n", errors));
 		popup.showAndWait();
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	public List<Integer> getSelectedRows()
+	{
+		List<Integer> indices = new LinkedList<Integer>();
+		
+		ObservableList selectedRows = table.getSelectionModel().getSelectedCells();
+		for (int x = 0; x < selectedRows.size(); ++x)
+		{
+			TablePosition position = (TablePosition) selectedRows.get(x);
+			indices.add(position.getRow());
+		}
+		
+		return indices;
+	}
+
+	/* (non-Javadoc)
+	 * @see ui.graphical.View#getEnclosingFolder()
+	 */
+	@Override
+	public File getEnclosingFolder()
+	{
+		return chooseFolder();
 	}
 	
 	
