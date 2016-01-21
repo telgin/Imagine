@@ -3,6 +3,7 @@ package ui.graphical;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import algorithms.Algorithm;
@@ -20,6 +21,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -40,6 +42,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import logging.LogLevel;
@@ -55,16 +58,7 @@ import product.ProductMode;
 @SuppressWarnings({ "rawtypes", "unchecked" }) //oracle recommends using rawtypes
 public class OpenArchiveView extends Application
 {
-	//state variables
-	private File file;
-	private List<String> profiles;
-	private List<String> algorithms;
-	private TrackingGroup selectedProfile = null;
-	private Algorithm selectedAlgorithm = null;
-	
 	//constants
-	private final String tempProfileString = "Temporary Profile";
-	private final String noSelectionString = "None Selected";
 	private final String passwordToggleString = "Password";
 	private final String keyFileToggleString = "Key File";
 	
@@ -79,13 +73,9 @@ public class OpenArchiveView extends Application
 	private TableView table;
 	private Label passwordLabel, keyFileLabel, keySelectionLabel, algorithmLabel, profileLabel;
 	
-	
-	public static void main(String[] args)
-	{
-		File f = new File("testing/bank/image_basic_sample/imagine_1453074440957_0.png");
-		args = new String[]{f.getAbsolutePath()};
-		launch(args);
-	}
+	//controller
+	private OpenArchiveController controller;
+
 
 	/* (non-Javadoc)
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
@@ -94,14 +84,14 @@ public class OpenArchiveView extends Application
 	public void start(Stage primaryStage) throws Exception
 	{
 		window = primaryStage;
-		window.setTitle(Constants.APPLICATION_NAME_SHORT + " Archive View");
-		file = new File(getParameters().getUnnamed().get(0));
-		
+		window.setTitle(Constants.APPLICATION_NAME_SHORT + " Archive Viewer");
+
+		controller = new OpenArchiveController(this);
 		
 		window.setScene(setupScene());
 		
 		//set the temporary profile as selected by default
-		profileSelect.setValue(tempProfileString);
+		profileSelect.setValue(controller.getDefaultProfileSelection());
 		
 		
 		
@@ -114,13 +104,11 @@ public class OpenArchiveView extends Application
 	 */
 	private Scene setupScene()
 	{
-		
 		BorderPane borderPane = new BorderPane();
 		borderPane.setLeft(setupConfigSelection());
 		borderPane.setCenter(setupContentsSection());
 		
-		
-		return new Scene(borderPane, 1000, 500);
+		return new Scene(borderPane, 1030, 500);
 	}
 
 	/**
@@ -140,7 +128,7 @@ public class OpenArchiveView extends Application
 		vbox.getChildren().add(archiveContentsLabel);
 		
 		//file name label
-		Label fileNameLabel = new Label("File: " + file.getName());
+		Label fileNameLabel = new Label("File: " + controller.getInputFile().getName());
 		vbox.getChildren().add(fileNameLabel);
 
 		//scroll pane
@@ -163,7 +151,7 @@ public class OpenArchiveView extends Application
 		
 		TableColumn typeColumn = new TableColumn("Type");
 		typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-		typeColumn.setPrefWidth(90);
+		typeColumn.setPrefWidth(150);
 		table.getColumns().add(typeColumn);
 		
 		TableColumn nameColumn = new TableColumn("Name");
@@ -189,12 +177,12 @@ public class OpenArchiveView extends Application
 		//extract selected button
 		extractSelectedButton = new Button();
 		extractSelectedButton.setText("Extract Selected");
-		extractSelectedButton.setOnAction(e -> extractSelected());
+		extractSelectedButton.setOnAction(e -> controller.extractSelected());
 		
 		//extract all button
 		extractAllButton = new Button();
 		extractAllButton.setText("Extract All");
-		extractSelectedButton.setOnAction(e -> extractAll());
+		extractAllButton.setOnAction(e -> controller.extractAll());
 		
 		HBox extractionButtons = new HBox();
 		extractionButtons.setAlignment(Pos.CENTER);
@@ -205,24 +193,6 @@ public class OpenArchiveView extends Application
 		
 		
 		return vbox;
-	}
-
-	/**
-	 * @update_comment
-	 * @return
-	 */
-	private void extractAll()
-	{
-		
-	}
-
-	/**
-	 * @update_comment
-	 * @return
-	 */
-	private void extractSelected()
-	{
-		
 	}
 
 	/**
@@ -246,10 +216,8 @@ public class OpenArchiveView extends Application
 		configSelection.getChildren().add(profileLabel);
 		
 		//profile select
-		profiles = ConfigurationAPI.getTrackingGroupNames();
-		profiles.add(0, tempProfileString);
 		profileSelect = new ChoiceBox();
-		profileSelect.setItems(FXCollections.observableArrayList(profiles));
+		profileSelect.setItems(FXCollections.observableArrayList(controller.getProfiles()));
 		profileSelect.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
@@ -261,10 +229,8 @@ public class OpenArchiveView extends Application
 		configSelection.getChildren().add(algorithmLabel);
 		
 		//algorithm select
-		algorithms = ConfigurationAPI.getAlgorithmPresetNames();
-		algorithms.add(0, noSelectionString);
 		algorithmSelect = new ChoiceBox();
-		algorithmSelect.setItems(FXCollections.observableArrayList(algorithms));
+		algorithmSelect.setItems(FXCollections.observableArrayList(controller.getAlgorithms()));
 		algorithmSelect.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
@@ -314,7 +280,7 @@ public class OpenArchiveView extends Application
 		//key file browse button
 		keyFileBrowseButton = new Button();
 		keyFileBrowseButton.setText("Browse");
-		keyFileBrowseButton.setOnAction(e -> chooseKeyFile());
+		keyFileBrowseButton.setOnAction(e -> controller.chooseKeyFile());
 		HBox keyFilePathRow = indentElement(1, keyFilePath);
 		keyFilePathRow.getChildren().add(keyFileBrowseButton);
 		configSelection.getChildren().add(keyFilePathRow);
@@ -322,7 +288,7 @@ public class OpenArchiveView extends Application
 		//open
 		openButton = new Button();
 		openButton.setText("Open");
-		openButton.setOnAction(e -> openArchive());
+		openButton.setOnAction(e -> controller.openArchive());
 		HBox centered = new HBox();
 		centered.getChildren().add(openButton);
 		centered.setAlignment(Pos.CENTER);
@@ -343,33 +309,7 @@ public class OpenArchiveView extends Application
 		return hbox;
 	}
 
-	/**
-	 * @update_comment
-	 * @param value
-	 * @param oldSelection
-	 * @param newSelection
-	 * @return
-	 */
-	private void keyTypeSelected(ObservableValue<? extends Toggle> value,
-					Toggle oldSelection, Toggle newSelection)
-	{
-		System.out.println("Key type selected: " + newSelection.getUserData());
-		
-		if (newSelection.getUserData().equals(passwordToggleString))
-		{
-			setPasswordSectionEnabled(true);
-			setKeyFileSectionEnabled(false);
-			//clearKeyFileSection();
-		}
-		else //assumed file toggled
-		{
-			setKeyFileSectionEnabled(true);
-			setPasswordSectionEnabled(false);
-			//clearPasswordSection();
-		}
-	}
-
-	private void setKeySectionEnabled(boolean enabled)
+	void setKeySectionEnabled(boolean enabled)
 	{
 		keyFileToggle.disableProperty().set(!enabled);
 		passwordToggle.disableProperty().set(!enabled);
@@ -405,55 +345,62 @@ public class OpenArchiveView extends Application
 		}
 	}
 	
-	private void openArchive()
+	/**
+	 * @update_comment
+	 * @param value
+	 * @param oldSelection
+	 * @param newSelection
+	 * @return
+	 */
+	private void keyTypeSelected(ObservableValue<? extends Toggle> value,
+					Toggle oldSelection, Toggle newSelection)
 	{
-		try
+		System.out.println("Key type selected: " + newSelection.getUserData());
+		
+		if (newSelection.getUserData().equals(passwordToggleString))
 		{
-			openButton.disableProperty().set(true);
-			ProductContents productContents = ConversionAPI.openArchive(selectedProfile, file);
-			List<FileContentsTableRecord> records = new ArrayList<FileContentsTableRecord>();
-			
-			int count = 1;
-			for (FileContents fileContents : productContents.getFileContents())
-			{
-				records.add(new FileContentsTableRecord(count++,
-								fileContents.getMetadata().getType(),
-								fileContents.getFragmentNumber(),
-								fileContents.getMetadata().getFile(),
-								fileContents.getMetadata().getDateCreated(),
-								fileContents.getMetadata().getDateModified()));
-			}
-
-			table.setItems(FXCollections.observableArrayList(records));
+			setPasswordSectionEnabled(true);
+			setKeyFileSectionEnabled(false);
+			//clearKeyFileSection();
 		}
-		catch (IOException e)
+		else //assumed file toggled
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			openButton.disableProperty().set(false);
-			clearTable();
+			setKeyFileSectionEnabled(true);
+			setPasswordSectionEnabled(false);
+			//clearPasswordSection();
 		}
-		catch (UsageException e)
+	}
+	
+	public void setTableData(List<FileContents> data)
+	{
+		List<FileContentsTableRecord> records = new ArrayList<FileContentsTableRecord>();
+		
+		int count = 1;
+		for (FileContents fileContents : data)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			openButton.disableProperty().set(false);
-			clearTable();
+			records.add(new FileContentsTableRecord(count++,
+							fileContents.getMetadata().getType(),
+							fileContents.getFragmentNumber(),
+							fileContents.isFragment(),
+							fileContents.getMetadata().getFile(),
+							fileContents.getMetadata().getDateCreated(),
+							fileContents.getMetadata().getDateModified()));
 		}
+		
+		table.setItems(FXCollections.observableArrayList(records));
 	}
 	
 	/**
 	 * @update_comment
 	 */
-	private void clearTable()
+	void clearTable()
 	{
-		// TODO Auto-generated method stub
-		
+		table.setItems(null);
 	}
 
 	/**
 	 * @update_comment
-	 * @param b
+	 * @param enabled
 	 */
 	private void setKeyFileSectionEnabled(boolean enabled)
 	{
@@ -498,34 +445,39 @@ public class OpenArchiveView extends Application
 		}
 	}
 	
-	private void clearPasswordSection()
+	public void setOpenSectionEnabled(boolean enabled)
+	{
+		openButton.disableProperty().set(!enabled);
+	}
+	
+	public void clearPasswordSection()
 	{
 		passwordField.clear();
 	}
 
-	private void clearKeyFileSection()
+	public void clearKeyFileSection()
 	{
 		keyFilePath.clear();
 	}
 	
-	private void clearKeySection()
+	void clearKeySection()
 	{
 		clearPasswordSection();
 		clearKeyFileSection();
 	}
 	
-	/**
-	 * @update_comment
-	 * @return
-	 */
-	private void chooseKeyFile()
+	
+	
+	public File chooseFile()
 	{
 		FileChooser fileChooser = new FileChooser();
-		File chosen = fileChooser.showOpenDialog(window);
-		if (chosen != null)
-		{
-			keyFilePath.setText(chosen.getAbsolutePath());
-		}
+		return fileChooser.showOpenDialog(window);
+	}
+	
+	public File chooseFolder()
+	{
+		DirectoryChooser dirChooser = new DirectoryChooser();
+		return dirChooser.showDialog(window);
 	}
 
 	/**
@@ -540,36 +492,7 @@ public class OpenArchiveView extends Application
 	{
 		System.out.println("Algorithm selected: " + newIndex);
 		
-		int index = newIndex.intValue();
-		if (index == 0)
-		{
-			//'no selection' selected
-			setKeySectionEnabled(false);
-		}
-		else
-		{
-			try
-			{
-				selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(algorithms.get(index));
-				ProductMode mode = selectedAlgorithm.getProductSecurityLevel();
-				if (mode.equals(ProductMode.k_basic))
-				{
-					setKeySectionEnabled(false);
-				}
-				else
-				{
-					setKeySectionEnabled(true);
-				}
-			}
-			catch (UsageException e)
-			{
-				Logger.log(LogLevel.k_error, e.getMessage());
-				Logger.log(LogLevel.k_debug, e, false);
-				
-				algorithmSelect.setValue(noSelectionString);
-			}
-		}
-		
+		controller.algorithmSelected(newIndex.intValue());
 	}
 
 	/**
@@ -583,83 +506,95 @@ public class OpenArchiveView extends Application
 	{
 		System.out.println("Profile selected: " + newIndex.intValue());
 		
-		clearKeySection();
+		controller.profileSelected(newIndex.intValue());
+	}
+
+	/**
+	 * @update_comment
+	 * @param enabled
+	 */
+	public void setOpenButtonEnabled(boolean enabled)
+	{
+		System.out.println("Open button enabled: " + enabled);
 		
-		if (newIndex.intValue() == 0)
+		openButton.disableProperty().set(!enabled);
+
+		if (!enabled)
 		{
-			//the temporary profile is selected
-			algorithmSelect.setValue(noSelectionString);
-			algorithmSelect.disableProperty().set(false);
-			selectedProfile = null;
-			selectedAlgorithm = null;
+			openButton.setStyle("-fx-opacity: .75");
 		}
 		else
 		{
-			int profileNameIndex = newIndex.intValue();
-			String groupName = profiles.get(profileNameIndex);
-			try
-			{
-				selectedProfile = ConfigurationAPI.getTrackingGroup(groupName);
-				selectedAlgorithm = selectedProfile.getAlgorithm();
-				
-				algorithmSelect.setValue(selectedAlgorithm.getPresetName());
-				//TODO handle case where preset name not found
-				
-				
-				if (selectedAlgorithm.getProductSecurityLevel().isSecured())
-				{
-					setKeySectionEnabled(true);
-					
-					if (selectedProfile.getKey() instanceof FileKey)
-					{
-						keySelectionButtons.selectToggle(keyFileToggle);
-						
-						FileKey key = (FileKey) selectedProfile.getKey();
-						keyFilePath.setText(key.getKeyFile().getAbsolutePath());
-						//TODO handle case where key file not found
-					}
-					else if(selectedProfile.getKey() instanceof PasswordKey)
-					{
-						keySelectionButtons.selectToggle(passwordToggle);
-						passwordField.setPromptText(selectedProfile.getKey().getName());
-					}
-				}
-				else
-				{
-					setKeySectionEnabled(false);
-				}
-			}
-			catch (UsageException e)
-			{
-				Logger.log(LogLevel.k_error, e.getMessage());
-				Logger.log(LogLevel.k_debug, e, false);
-				
-				algorithmSelect.setValue(noSelectionString);
-				clearKeySection();
-				setKeySectionEnabled(false);
-			}
-			
-			//disable algorithm selection b/c it's defined in the profile
-			algorithmSelect.disableProperty().set(true);
-			algorithmSelect.setStyle("-fx-opacity: 1");
+			openButton.setStyle("-fx-opacity: 1");
 		}
-		
-		
 	}
 	
 	
+	public void setAlgorithmSelection(String presetName)
+	{
+		algorithmSelect.setValue(presetName);
+	}
+	
+	public String getAlgorithmSelection()
+	{
+		return (String) algorithmSelect.getValue();
+	}
 	
 	
+	public void setAlgorithmSelectionEnabled(boolean enabled)
+	{
+		algorithmSelect.disableProperty().set(!enabled);
+		
+		if (!enabled)
+		{
+			algorithmSelect.setStyle("-fx-opacity: .75");
+		}
+		else
+		{
+			algorithmSelect.setStyle("-fx-opacity: 1");
+		}
+	}
+	
+	public void setPasswordPrompt(String prompt)
+	{
+		passwordField.setPromptText(prompt);
+	}
 	
 	
+	public void clearPasswordPrompt()
+	{
+		passwordField.setPromptText("");
+	}
 	
+	public void toggleKeySection()
+	{
+		keySelectionButtons.selectToggle(keyFileToggle);
+	}
 	
+	public void togglePasswordSection()
+	{
+		keySelectionButtons.selectToggle(passwordToggle);
+	}
 	
-	
-	
-	
-	
-	
+	public void setKeyFilePath(String path)
+	{
+		keyFilePath.setText(path);
+	}
+
+	/**
+	 * @update_comment
+	 * @param errors
+	 */
+	public void showErrors(List<String> errors, String process)
+	{
+		ScrollAlert popup = new ScrollAlert(Alert.AlertType.ERROR);
+		String header = errors.size() == 1 ? "An error " : "Errors ";
+		header += "occurred during " + process + ":";
+		
+		popup.setHeaderText(header);
+		popup.setScrollText(String.join("\n", errors));
+		popup.showAndWait();
+	}
 	
 	
 	

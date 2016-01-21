@@ -32,4 +32,8 @@ public abstract class UI
 	 * @return
 	 */
 	public abstract String promptParameterValue(Parameter parameter);
+	
+	public abstract void reportMessage(String message);
+	
+	public abstract void reportError(String message);
 }

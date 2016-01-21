@@ -74,7 +74,8 @@ public class ProductExtractor {
 			productContents.addFileContents(fileContents);
 			
 			//skip over the file data
-			skipNextFileData(fileContents);
+			boolean allDataSkipped = skipNextFileData(fileContents);
+			fileContents.setFragment(!allDataSkipped);
 			
 			//try to get the next header
 			fileContents = readNextFileHeader(true);
@@ -818,7 +819,7 @@ public class ProductExtractor {
 			contents.setMetadata(new Metadata());
 		}
 		
-		try
+		try //TODO convert to throwing ProductIOExceptions like the other one
 		{
 			//fragment number
 			if (!readFull(Constants.FRAGMENT_NUMBER_SIZE))
@@ -1005,14 +1006,14 @@ public class ProductExtractor {
 	}
 	
 	
-	private void skipNextFileData(FileContents fileContents)
+	private boolean skipNextFileData(FileContents fileContents)
 	{
 		long fileLengthRemaining = fileContents.getRemainingData();
 		
 		//This might try to over-read because fileLengthRemaining could be more
 		//than what's left in the product if the file continues on in the next
 		//product. If it does, nothing bad should happen.
-		skipFull(fileLengthRemaining);
+		return skipFull(fileLengthRemaining);
 	}
 	
 	private long readNextFileData(FileContents fileContents, BufferedOutputStream output) throws IOException

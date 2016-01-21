@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 
 import config.Configuration;
 import system.SystemManager;
+import ui.UIContext;
 
 public class Logger
 {
@@ -51,11 +52,22 @@ public class Logger
 
 	public static void log(LogLevel level, String message)
 	{
+		//only log if the level is low enough to pass the threshold
 		if (level.toInt() <= messageLevel.toInt())
 		{
 			String line = LogLevel.getLogHeader(level) + message;
-			System.out.println(line);
-
+			
+			//call different functions based on level being more than k_error
+			if (level.toInt() > LogLevel.k_error.toInt())
+			{
+				UIContext.getUI().reportMessage(line);
+			}
+			else //message is an error or a fatal error
+			{
+				UIContext.getUI().reportError(line);
+			}
+			
+			//write everything to the log file also
 			logFileStream.write(line + System.lineSeparator());
 			logFileStream.flush();
 

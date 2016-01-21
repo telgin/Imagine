@@ -8,6 +8,7 @@ import data.Metadata;
 public class FileContents
 {
 	private long fragmentNumber;
+	private boolean isFragment = false;
 	private long remainingData;
 	private Metadata metadata;
 
@@ -35,6 +36,13 @@ public class FileContents
 	public void setFragmentNumber(long fragmentNumber)
 	{
 		this.fragmentNumber = fragmentNumber;
+		
+		//a fragment number of 1 could be a fragment if it's the first fragment
+		//this information may not be known if the data isn't parsed
+		if (!isFragment)
+		{
+			setFragment(this.fragmentNumber > 1);
+		}
 	}
 
 	/**
@@ -69,6 +77,22 @@ public class FileContents
 	public void setMetadata(Metadata metadata)
 	{
 		this.metadata = metadata;
+	}
+
+	/**
+	 * @return the isFragment
+	 */
+	public boolean isFragment()
+	{
+		return isFragment;
+	}
+
+	/**
+	 * @param isFragment the isFragment to set
+	 */
+	public void setFragment(boolean isFragment)
+	{
+		this.isFragment = isFragment;
 	}
 
 }

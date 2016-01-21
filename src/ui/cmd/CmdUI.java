@@ -3,10 +3,8 @@ package ui.cmd;
 import java.io.Console;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import algorithms.Algorithm;
-import algorithms.Option;
 import algorithms.Parameter;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
@@ -516,6 +514,24 @@ public class CmdUI extends UI
 			outputPaused = false;
 			return newEnclosingFolder;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see ui.UI#reportError(java.lang.String)
+	 */
+	@Override
+	public void reportError(String message)
+	{
+		err(message);
+	}
+
+	/* (non-Javadoc)
+	 * @see ui.UI#reportMessage(java.lang.String)
+	 */
+	@Override
+	public void reportMessage(String message)
+	{
+		p(message);
 	}
 
 }

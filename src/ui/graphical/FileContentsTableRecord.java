@@ -29,7 +29,7 @@ public class FileContentsTableRecord
 	 * @param fragmentNumber
 	 */
 	public FileContentsTableRecord(int index, FileType type, long fragmentNumber,
-					File file, long dateCreated, long dateModified)
+					boolean isFragment, File file, long dateCreated, long dateModified)
 	{
 		this.index = new SimpleStringProperty(Integer.toString(index));
 		
@@ -47,7 +47,7 @@ public class FileContentsTableRecord
 			displayType = "Folder";
 		}
 		
-		if (fragmentNumber > 1)
+		if (fragmentNumber > 1 || isFragment)
 			displayType += " (Fragment #" + Long.toString(fragmentNumber) + ")";
 		
 		this.type = new SimpleStringProperty(displayType);

@@ -1,6 +1,7 @@
 package ui.graphical;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 import algorithms.Parameter;
@@ -10,10 +11,12 @@ import ui.UI;
 public class GUI extends UI
 {
 	private List<String> args;
+	private List<String> errors;
 	
 	public GUI(List<String> args)
 	{
 		this.args = args;
+		errors = new LinkedList<String>();
 	}
 
 	@Override
@@ -36,8 +39,7 @@ public class GUI extends UI
 	@Override
 	public void processArgs()
 	{
-		// TODO Auto-generated method stub
-		
+		OpenArchiveView.launch(OpenArchiveView.class, args.toArray(new String[0]));
 	}
 
 	/* (non-Javadoc)
@@ -59,6 +61,41 @@ public class GUI extends UI
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see ui.UI#reportError(java.lang.String)
+	 */
+	@Override
+	public void reportError(String message)
+	{
+		errors.add(message);
+	}
+	
+	public List<String> getErrors()
+	{
+		return errors;
+	}
+	
+	public boolean hasErrors()
+	{
+		return !errors.isEmpty();
+	}
+	
+	public void clearErrors()
+	{
+		errors.clear();
+	}
+
+	/* (non-Javadoc)
+	 * @see ui.UI#reportMessage(java.lang.String)
+	 */
+	@Override
+	public void reportMessage(String message)
+	{
+		//for the moment, there's nothing better to do
+		//some kinds of notifications are handled elsewhere through stats
+		System.out.println(message);
 	}
 
 }
