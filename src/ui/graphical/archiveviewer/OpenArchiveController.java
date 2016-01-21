@@ -1,4 +1,4 @@
-package ui.graphical;
+package ui.graphical.archiveviewer;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +19,7 @@ import logging.Logger;
 import product.ProductContents;
 import product.ProductMode;
 import ui.UIContext;
+import ui.graphical.GUI;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)

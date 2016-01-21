@@ -1,4 +1,4 @@
-package ui.graphical;
+package ui.graphical.archiveviewer;
 
 import java.io.File;
 

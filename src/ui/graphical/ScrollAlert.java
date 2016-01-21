@@ -1,5 +1,7 @@
 package ui.graphical;
 
+import java.util.List;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.text.Text;
@@ -28,6 +30,11 @@ public class ScrollAlert extends Alert
 		scroll.setPrefSize(700, 120);
 		scroll.setStyle("-fx-focus-color: transparent;"); //remove focus highlight
 		getDialogPane().setContent(scroll);
+	}
+	
+	public void setScrollText(List<String> lines)
+	{
+		setScrollText(String.join("\n", lines));
 	}
 
 }

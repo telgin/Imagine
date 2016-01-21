@@ -5,14 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import algorithms.Parameter;
-import config.Constants;
-import data.TrackingGroup;
-import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 import ui.UI;
+import ui.graphical.archiveviewer.OpenArchiveView;
 
 public class GUI extends UI
 {

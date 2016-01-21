@@ -1,21 +1,11 @@
-package ui.graphical;
+package ui.graphical.archiveviewer;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import algorithms.Algorithm;
-import api.ConfigurationAPI;
-import api.ConversionAPI;
-import api.UsageException;
 import config.Constants;
-import data.FileKey;
-import data.PasswordKey;
-import data.TrackingGroup;
-import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,25 +30,20 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import logging.LogLevel;
-import logging.Logger;
 import product.FileContents;
-import product.ProductContents;
-import product.ProductMode;
+import ui.graphical.ScrollAlert;
+import ui.graphical.View;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-@SuppressWarnings({ "rawtypes", "unchecked" }) //oracle recommends using rawtypes
 public class OpenArchiveView implements View
 {
 	//constants
@@ -67,13 +52,13 @@ public class OpenArchiveView implements View
 	
 	//gui elements
 	private Stage window;
-	private ChoiceBox profileSelect, algorithmSelect;
+	private ChoiceBox<String> profileSelect, algorithmSelect;
 	private PasswordField passwordField;
 	private TextField keyFilePath;
 	private Button keyFileBrowseButton, openButton, extractSelectedButton, extractAllButton;
 	private ToggleGroup keySelectionButtons;
 	private RadioButton keyFileToggle, passwordToggle;
-	private TableView table;
+	private TableView<FileContentsTableRecord> table;
 	private Label passwordLabel, keyFileLabel, keySelectionLabel, algorithmLabel, profileLabel;
 	
 	//controller
@@ -132,32 +117,32 @@ public class OpenArchiveView implements View
 		scrollPane.setFitToWidth(true);
 		
 		//table
-		table = new TableView();
+		table = new TableView<FileContentsTableRecord>();
 		table.setEditable(false);
 		table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 		table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		
-		TableColumn indexColumn = new TableColumn("Index");
+		TableColumn<FileContentsTableRecord, String> indexColumn = new TableColumn<>("Index");
 		indexColumn.setCellValueFactory(new PropertyValueFactory<>("index"));
 		indexColumn.setPrefWidth(70);
 		table.getColumns().add(indexColumn);
 		
-		TableColumn typeColumn = new TableColumn("Type");
+		TableColumn<FileContentsTableRecord, String> typeColumn = new TableColumn<>("Type");
 		typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
 		typeColumn.setPrefWidth(150);
 		table.getColumns().add(typeColumn);
 		
-		TableColumn nameColumn = new TableColumn("Name");
+		TableColumn<FileContentsTableRecord, String> nameColumn = new TableColumn<>("Name");
 		nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 		nameColumn.setPrefWidth(250);
 		table.getColumns().add(nameColumn);
 		
-		TableColumn createdColumn = new TableColumn("Date Created");
+		TableColumn<FileContentsTableRecord, String> createdColumn = new TableColumn<>("Date Created");
 		createdColumn.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
 		createdColumn.setPrefWidth(110);
 		table.getColumns().add(createdColumn);
 		
-		TableColumn modifiedColumn = new TableColumn("Date Modified");
+		TableColumn<FileContentsTableRecord, String> modifiedColumn = new TableColumn<>("Date Modified");
 		modifiedColumn.setCellValueFactory(new PropertyValueFactory<>("dateModified"));
 		modifiedColumn.setPrefWidth(110);
 		table.getColumns().add(modifiedColumn);
@@ -209,7 +194,7 @@ public class OpenArchiveView implements View
 		configSelection.getChildren().add(profileLabel);
 		
 		//profile select
-		profileSelect = new ChoiceBox();
+		profileSelect = new ChoiceBox<>();
 		profileSelect.setItems(FXCollections.observableArrayList(controller.getProfiles()));
 		profileSelect.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
@@ -222,7 +207,7 @@ public class OpenArchiveView implements View
 		configSelection.getChildren().add(algorithmLabel);
 		
 		//algorithm select
-		algorithmSelect = new ChoiceBox();
+		algorithmSelect = new ChoiceBox<>();
 		algorithmSelect.setItems(FXCollections.observableArrayList(controller.getAlgorithms()));
 		algorithmSelect.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
@@ -642,7 +627,7 @@ public class OpenArchiveView implements View
 		header += "occurred during " + process + ":";
 		
 		popup.setHeaderText(header);
-		popup.setScrollText(String.join("\n", errors));
+		popup.setScrollText(errors);
 		popup.showAndWait();
 	}
 
@@ -650,11 +635,12 @@ public class OpenArchiveView implements View
 	 * @update_comment
 	 * @return
 	 */
+	@SuppressWarnings("rawtypes")
 	public List<Integer> getSelectedRows()
 	{
 		List<Integer> indices = new LinkedList<Integer>();
 		
-		ObservableList selectedRows = table.getSelectionModel().getSelectedCells();
+		ObservableList<TablePosition> selectedRows = table.getSelectionModel().getSelectedCells();
 		for (int x = 0; x < selectedRows.size(); ++x)
 		{
 			TablePosition position = (TablePosition) selectedRows.get(x);
