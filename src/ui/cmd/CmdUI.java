@@ -23,6 +23,7 @@ import product.ProductContents;
 import product.ProductMode;
 import stats.ProgressMonitor;
 import stats.Stat;
+import ui.ArgParseResult;
 import ui.UI;
 
 public class CmdUI extends UI
@@ -69,21 +70,21 @@ public class CmdUI extends UI
 		else if (args.contains("--open"))
 		{
 			args.remove("--open");
-			CmdParseResult result = cmdParse(CmdAction.k_open, args);
+			ArgParseResult result = cmdParse(CmdAction.k_open, args);
 			if (result != null)
 				openArchive(result);
 		}
 		else if (args.contains("--embed"))
 		{
 			args.remove("--embed");
-			CmdParseResult result = cmdParse(CmdAction.k_embed, args);
+			ArgParseResult result = cmdParse(CmdAction.k_embed, args);
 			if (result != null)
 				embed(result);
 		}
 		else if (args.contains("--extract"))
 		{
 			args.remove("--extract");
-			CmdParseResult result = cmdParse(CmdAction.k_extract, args);
+			ArgParseResult result = cmdParse(CmdAction.k_extract, args);
 			if (result != null)
 				extract(result);
 		}
@@ -129,7 +130,7 @@ public class CmdUI extends UI
 	 * @update_comment
 	 * @param subargs
 	 */
-	private CmdParseResult cmdParse(CmdAction action, List<String> subargs)
+	private ArgParseResult cmdParse(CmdAction action, List<String> subargs)
 	{
 		if (!subargs.contains("-p") && !subargs.contains("-a"))
 		{
@@ -155,7 +156,7 @@ public class CmdUI extends UI
 		{
 			try
 			{
-				CmdParseResult result = new CmdParseResult();
+				ArgParseResult result = new ArgParseResult();
 				
 				if (subargs.contains("-p"))
 					result.profileName = subargs.get(subargs.indexOf("-p")+1);
@@ -184,7 +185,7 @@ public class CmdUI extends UI
 		return null;
 	}
 	
-	private void openArchive(CmdParseResult result)
+	private void openArchive(ArgParseResult result)
 	{
 		try
 		{
@@ -240,7 +241,7 @@ public class CmdUI extends UI
 	/**
 	 * @update_comment
 	 */
-	private void embed(CmdParseResult result)
+	private void embed(ArgParseResult result)
 	{
 		try
 		{
@@ -278,7 +279,7 @@ public class CmdUI extends UI
 	 * @update_comment
 	 * @param subargs
 	 */
-	private void extract(CmdParseResult result)
+	private void extract(ArgParseResult result)
 	{
 		try
 		{
@@ -306,7 +307,7 @@ public class CmdUI extends UI
 		}
 	}
 	
-	private TrackingGroup getTrackingGroup(CmdParseResult result) throws UsageException
+	private TrackingGroup getTrackingGroup(ArgParseResult result) throws UsageException
 	{
 		TrackingGroup group = null;
 		if (result.profileName != null)
@@ -441,15 +442,6 @@ public class CmdUI extends UI
 		
 		outputPaused = false;
 		return password;
-	}
-
-	private class CmdParseResult
-	{
-		public String profileName = null;
-		public String presetName = null;
-		public File inputFile = null;
-		public File outputFolder = null;
-		public File keyFile = null;
 	}
 	
 	private enum CmdAction

@@ -31,6 +31,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
@@ -44,14 +45,13 @@ import ui.graphical.View;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class OpenArchiveView implements View
+public class OpenArchiveView extends View
 {
 	//constants
 	private final String passwordToggleString = "Password";
 	private final String keyFileToggleString = "Key File";
 	
 	//gui elements
-	private Stage window;
 	private ChoiceBox<String> profileSelect, algorithmSelect;
 	private PasswordField passwordField;
 	private TextField keyFilePath;
@@ -64,8 +64,10 @@ public class OpenArchiveView implements View
 	//controller
 	private OpenArchiveController controller;
 
-	public OpenArchiveView(File productFile)
+	public OpenArchiveView(Stage window, File productFile)
 	{
+		super(window);
+		
 		controller = new OpenArchiveController(this, productFile);
 	}
 
@@ -73,20 +75,23 @@ public class OpenArchiveView implements View
 	 * @update_comment
 	 * @return
 	 */
-	public void setupScene(Stage window)
+	@Override
+	public Pane setupPane()
 	{
-		this.window = window;
-		
-		window.setTitle(Constants.APPLICATION_NAME_SHORT + " Archive Viewer");
-		
 		BorderPane borderPane = new BorderPane();
 		borderPane.setLeft(setupConfigSelection());
 		borderPane.setCenter(setupContentsSection());
-		
-		window.setScene(new Scene(borderPane, 1040, 500));
-		
+
 		//set the temporary profile as selected by default
 		profileSelect.setValue(controller.getDefaultProfileSelection());
+		
+		return borderPane;
+	}
+	
+	@Override
+	public String getTabName()
+	{
+		return "Archive Viewer";
 	}
 
 	/**
@@ -448,20 +453,6 @@ public class OpenArchiveView implements View
 		clearPasswordSection();
 		clearKeyFileSection();
 	}
-	
-	
-	
-	public File chooseFile()
-	{
-		FileChooser fileChooser = new FileChooser();
-		return fileChooser.showOpenDialog(window);
-	}
-	
-	public File chooseFolder()
-	{
-		DirectoryChooser dirChooser = new DirectoryChooser();
-		return dirChooser.showDialog(window);
-	}
 
 	/**
 	 * @update_comment
@@ -614,21 +605,6 @@ public class OpenArchiveView implements View
 	public String getPassword()
 	{
 		return passwordField.getText();
-	}
-	
-	/**
-	 * @update_comment
-	 * @param errors
-	 */
-	public void showErrors(List<String> errors, String process)
-	{
-		ScrollAlert popup = new ScrollAlert(Alert.AlertType.ERROR);
-		String header = errors.size() == 1 ? "An error " : "Errors ";
-		header += "occurred during " + process + ":";
-		
-		popup.setHeaderText(header);
-		popup.setScrollText(errors);
-		popup.showAndWait();
 	}
 
 	/**

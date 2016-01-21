@@ -5,14 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import algorithms.Parameter;
+import ui.ArgParseResult;
 import ui.UI;
 import ui.graphical.archiveviewer.OpenArchiveView;
+import ui.graphical.top.TopView;
 
 public class GUI extends UI
 {
 	private List<String> args;
 	private List<String> errors;
-	private View view;
+	private TopView topView;
+	private ArgParseResult result;
 	
 	public GUI(List<String> args)
 	{
@@ -30,7 +33,7 @@ public class GUI extends UI
 	@Override
 	public String promptKey(String keyName, String groupName)
 	{
-		return view.getPassword();
+		return topView.getPassword();
 	}
 
 	/* (non-Javadoc)
@@ -41,8 +44,8 @@ public class GUI extends UI
 	{
 		int fileIndex = args.indexOf("-i") + 1;
 		File inputFile = new File(args.get(fileIndex));
-		
-		view = new OpenArchiveView(inputFile);
+		this.result = new ArgParseResult();
+		this.result.inputFile = inputFile;
 
 		
 		ApplicationWindow.launch(ApplicationWindow.class);
@@ -57,7 +60,7 @@ public class GUI extends UI
 	{
 		//TODO make this better, handle case where folder selected
 		//but file still wasn't found. (right now it just prompts again)
-		return view.getEnclosingFolder();
+		return topView.getEnclosingFolder();
 	}
 
 	/* (non-Javadoc)
@@ -109,9 +112,30 @@ public class GUI extends UI
 	 * @update_comment
 	 * @return
 	 */
-	public View getView()
+	public View getTopView()
 	{
-		return view;
+		return topView;
+	}
+	
+	public void setTopView(TopView topView)
+	{
+		this.topView = topView;
+	}
+
+	/**
+	 * @return the result
+	 */
+	public ArgParseResult getArgParseResult()
+	{
+		return result;
+	}
+
+	/**
+	 * @param result the result to set
+	 */
+	public void setArgParseResult(ArgParseResult result)
+	{
+		this.result = result;
 	}
 
 }
