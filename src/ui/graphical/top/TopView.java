@@ -1,8 +1,9 @@
 package ui.graphical.top;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
@@ -11,6 +12,8 @@ import javafx.stage.Stage;
 import ui.ArgParseResult;
 import ui.graphical.View;
 import ui.graphical.archiveviewer.OpenArchiveView;
+import ui.graphical.configeditor.ConfigEditorView;
+import ui.graphical.embed.EmbedView;
 import ui.graphical.history.HistoryView;
 
 /**
@@ -19,15 +22,19 @@ import ui.graphical.history.HistoryView;
  */
 public class TopView extends View
 {
-	private OpenArchiveView openArchiveView;
-	private HistoryView historyView;
+	private List<View> tabViews;
+	
+	private TabPane tabPane;
 	
 	public TopView(Stage window, ArgParseResult result)
 	{
 		super(window);
 		
-		openArchiveView = new OpenArchiveView(window, result.inputFile);
-		historyView = new HistoryView(window);
+		tabViews = new ArrayList<View>();
+		tabViews.add(new OpenArchiveView(window, result.inputFile));
+		tabViews.add(new EmbedView(window));
+		tabViews.add(new HistoryView(window));
+		tabViews.add(new ConfigEditorView(window));
 	}
 	
 	/* (non-Javadoc)
@@ -36,8 +43,9 @@ public class TopView extends View
 	@Override
 	public String getPassword()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		//pass to correct tab
+		int selectedTabIndex = tabPane.getSelectionModel().getSelectedIndex();
+		return tabViews.get(selectedTabIndex).getPassword();
 	}
 
 	/* (non-Javadoc)
@@ -47,30 +55,17 @@ public class TopView extends View
 	public Pane setupPane()
 	{
 		BorderPane borderPane = new BorderPane();
-		TabPane tabPane = new TabPane();
-		
+		tabPane = new TabPane();
+
+		for (View view : tabViews)
 		{
-			//open archive view
 			Tab tab = new Tab();
 			tab.setClosable(false);
-			tab.setText(openArchiveView.getTabName());
-			Pane pane = openArchiveView.setupPane();
+			tab.setText(view.getTabName());
+			Pane pane = view.setupPane();
 			tab.setContent(pane);
 			tabPane.getTabs().add(tab);
 		}
-		
-		{
-			//history view
-			Tab tab = new Tab();
-			tab.setClosable(false);
-			tab.setText(historyView.getTabName());
-			Pane pane = historyView.setupPane();
-			tab.setContent(pane);
-			tabPane.getTabs().add(tab);
-		}
-		
-		
-		
 		
 		borderPane.setCenter(tabPane);
 		
@@ -83,8 +78,9 @@ public class TopView extends View
 	@Override
 	public File getEnclosingFolder()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		//pass to correct tab
+		int selectedTabIndex = tabPane.getSelectionModel().getSelectedIndex();
+		return tabViews.get(selectedTabIndex).getEnclosingFolder();
 	}
 
 	/* (non-Javadoc)

@@ -91,7 +91,7 @@ public class OpenArchiveView extends View
 	@Override
 	public String getTabName()
 	{
-		return "Archive Viewer";
+		return "Archive Extractor";
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class OpenArchiveView extends View
 											profileSelected(value, oldIndex, newIndex));
 		configSelection.getChildren().add(indentElement(1, profileSelect));
 		
-		//profile label
+		//algorithm label
 		algorithmLabel = new Label("Algorithm:");
 		configSelection.getChildren().add(algorithmLabel);
 		
