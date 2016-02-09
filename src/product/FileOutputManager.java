@@ -2,7 +2,7 @@ package product;
 
 import java.io.File;
 
-import data.TrackingGroup;
+import config.Settings;
 import util.myUtilities;
 
 /**
@@ -11,32 +11,30 @@ import util.myUtilities;
  */
 public class FileOutputManager
 {
-	private TrackingGroup group;
-	private File productStagingFolder;
+	private File outputParentFolder;
 	private int fileCount;
 	private String startTime;
 	private final int maxFilesPerFolder = 1000;
 	
-	public FileOutputManager(TrackingGroup group, File productStagingFolder)
+	public FileOutputManager(File outputParentFolder)
 	{
-		this.group = group;
-		this.productStagingFolder = productStagingFolder;
+		this.outputParentFolder = outputParentFolder;
 		this.startTime = myUtilities.formatDateTimeFileSafe(System.currentTimeMillis());
 	}
 
 	public File getOutputFolder()
 	{
-		if (group.usesStructuredProductOutput())
+		if (Settings.useStructuredOutput())
 		{
 			++fileCount;
-			File groupFolder = new File(productStagingFolder, group.getName() + "_output_" + startTime);
+			File runFolder = new File(outputParentFolder, "output_" + startTime);
 			int indexNumber = (fileCount / maxFilesPerFolder) + 1;
-			File indexFolder = new File(groupFolder, "Index " + indexNumber);
+			File indexFolder = new File(runFolder, "Index " + indexNumber);
 			return indexFolder;
 		}
 		else
 		{
-			return group.getStaticOutputFolder();
+			return outputParentFolder;
 		}
 	}
 	

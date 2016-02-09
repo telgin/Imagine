@@ -52,14 +52,14 @@ public class OpenArchiveView extends View
 	private final String keyFileToggleString = "Key File";
 	
 	//gui elements
-	private ChoiceBox<String> profileSelect, algorithmSelect;
+	private ChoiceBox<String> algorithmSelect;
 	private PasswordField passwordField;
 	private TextField keyFilePath;
 	private Button keyFileBrowseButton, openButton, extractSelectedButton, extractAllButton;
 	private ToggleGroup keySelectionButtons;
 	private RadioButton keyFileToggle, passwordToggle;
 	private TableView<FileContentsTableRecord> table;
-	private Label passwordLabel, keyFileLabel, keySelectionLabel, algorithmLabel, profileLabel;
+	private Label passwordLabel, keyFileLabel, keySelectionLabel, algorithmLabel;
 	
 	//controller
 	private OpenArchiveController controller;
@@ -83,7 +83,7 @@ public class OpenArchiveView extends View
 		borderPane.setCenter(setupContentsSection());
 
 		//set the temporary profile as selected by default
-		profileSelect.setValue(controller.getDefaultProfileSelection());
+		algorithmSelect.setValue(controller.getDefaultAlgorithmSelection());
 		
 		return borderPane;
 	}
@@ -193,19 +193,6 @@ public class OpenArchiveView extends View
 		extractionConfigurationLabel.setFont(new Font("Arial", 20));
 		extractionConfigurationLabel.setPadding(new Insets(0, 0, 10, 0));
 		configSelection.getChildren().add(extractionConfigurationLabel);
-		
-		//profile label
-		profileLabel = new Label("Profile:");
-		configSelection.getChildren().add(profileLabel);
-		
-		//profile select
-		profileSelect = new ChoiceBox<>();
-		profileSelect.setItems(FXCollections.observableArrayList(controller.getProfiles()));
-		profileSelect.getSelectionModel().selectedIndexProperty().addListener(
-						(ObservableValue<? extends Number> value,
-										Number oldIndex, Number newIndex) ->
-											profileSelected(value, oldIndex, newIndex));
-		configSelection.getChildren().add(indentElement(1, profileSelect));
 		
 		//algorithm label
 		algorithmLabel = new Label("Algorithm:");
@@ -471,20 +458,6 @@ public class OpenArchiveView extends View
 
 	/**
 	 * @update_comment
-	 * @param value
-	 * @param oldIndex
-	 * @param newIndex
-	 */
-	private void profileSelected(ObservableValue<? extends Number> value, Number oldIndex,
-					Number newIndex)
-	{
-		System.out.println("Profile selected: " + newIndex.intValue());
-		
-		controller.profileSelected(newIndex.intValue());
-	}
-
-	/**
-	 * @update_comment
 	 * @param enabled
 	 */
 	public void setOpenButtonEnabled(boolean enabled)
@@ -544,20 +517,6 @@ public class OpenArchiveView extends View
 		else
 		{
 			algorithmSelect.setStyle("-fx-opacity: 1");
-		}
-	}
-	
-	public void setProfileSelectionEnabled(boolean enabled)
-	{
-		profileSelect.disableProperty().set(!enabled);
-		
-		if (!enabled)
-		{
-			profileSelect.setStyle("-fx-opacity: .75");
-		}
-		else
-		{
-			profileSelect.setStyle("-fx-opacity: 1");
 		}
 	}
 	

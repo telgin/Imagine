@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
-import data.Key;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductIOException;

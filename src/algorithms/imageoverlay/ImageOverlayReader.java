@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import algorithms.Algorithm;
-import data.Key;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductIOException;

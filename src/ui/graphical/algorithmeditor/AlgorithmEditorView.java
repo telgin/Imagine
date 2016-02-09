@@ -1,4 +1,4 @@
-package ui.graphical.configeditor;
+package ui.graphical.algorithmeditor;
 
 import java.io.File;
 
@@ -23,9 +23,9 @@ import ui.graphical.View;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class ConfigEditorView extends View
+public class AlgorithmEditorView extends View
 {
-	private ConfigEditorController controller;
+	private AlgorithmEditorController controller;
 	
 	private Label profileLabel;
 	private ChoiceBox<String> profileSelect;
@@ -35,11 +35,11 @@ public class ConfigEditorView extends View
 	 * @update_comment
 	 * @param window
 	 */
-	public ConfigEditorView(Stage window)
+	public AlgorithmEditorView(Stage window)
 	{
 		super(window);
 		
-		controller = new ConfigEditorController();
+		controller = new AlgorithmEditorController();
 	}
 
 	/* (non-Javadoc)

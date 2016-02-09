@@ -7,7 +7,7 @@ import java.nio.file.Files;
 
 import algorithms.Algorithm;
 import config.Constants;
-import data.Key;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductIOException;
@@ -72,7 +72,7 @@ public class TextWriter extends Text implements ProductWriter
 							"Saving product file: " + toSave.getAbsolutePath());
 
 			PrintWriter writer = new PrintWriter(toSave);
-			if (algorithm.getParameter("encoding").getValue().equals(Definition.base64Encoding))
+			if (algorithm.getParameter(Definition.encodingParam).getValue().equals(Definition.base64Encoding))
 				writer.print(ByteConversion.bytesToBase64(buffer));
 			else
 				writer.print(ByteConversion.bytesToHex(buffer));

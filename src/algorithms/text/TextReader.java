@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import algorithms.Algorithm;
-import config.Constants;
-import data.Key;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductIOException;
-import product.ProductMode;
 import product.ProductReader;
 import util.ByteConversion;
 
@@ -51,7 +49,7 @@ public class TextReader extends Text implements ProductReader{
 	public void loadFile(File f) throws IOException
 	{
 		String encoded = new String(Files.readAllBytes(f.toPath()));
-		if (algorithm.getParameter("encoding").getValue().equals(Definition.base64Encoding))
+		if (algorithm.getParameter(Definition.encodingParam).getValue().equals(Definition.base64Encoding))
 			buffer = ByteConversion.base64ToBytes(encoded);
 		else
 			buffer = ByteConversion.hexToBytes(encoded);

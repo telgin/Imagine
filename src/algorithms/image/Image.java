@@ -2,13 +2,12 @@ package algorithms.image;
 
 import java.awt.image.BufferedImage;
 import product.Product;
-import product.ProductMode;
 import util.ByteConversion;
 import util.algorithms.HashRandom;
 import util.algorithms.UniqueRandomRange;
-import data.Key;
 import algorithms.Algorithm;
 import config.Constants;
+import key.Key;
 
 public class Image implements Product
 {
@@ -73,11 +72,5 @@ public class Image implements Product
 	public byte[] getUUID()
 	{
 		return this.uuid;
-	}
-
-	@Override
-	public ProductMode getProductMode()
-	{
-		return ProductMode.getMode(algorithm.getParameterValue("productMode"));
 	}
 }

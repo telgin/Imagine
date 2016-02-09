@@ -7,9 +7,9 @@ import system.SystemManager;
 
 public abstract class UI
 {
-	public abstract File promptKeyFileLocation(String keyName, String groupName);
+	public abstract File promptKeyFileLocation();
 
-	public abstract String promptKey(String keyName, String groupName);
+	public abstract String promptKey();
 
 	/**
 	 * Starts the execution of the command line arguments

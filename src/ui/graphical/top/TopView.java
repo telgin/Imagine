@@ -11,8 +11,8 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import ui.ArgParseResult;
 import ui.graphical.View;
+import ui.graphical.algorithmeditor.AlgorithmEditorView;
 import ui.graphical.archiveviewer.OpenArchiveView;
-import ui.graphical.configeditor.ConfigEditorView;
 import ui.graphical.embed.EmbedView;
 import ui.graphical.history.HistoryView;
 
@@ -34,7 +34,7 @@ public class TopView extends View
 		tabViews.add(new OpenArchiveView(window, result.inputFile));
 		tabViews.add(new EmbedView(window));
 		tabViews.add(new HistoryView(window));
-		tabViews.add(new ConfigEditorView(window));
+		//tabViews.add(new AlgorithmEditorView(window));
 	}
 	
 	/* (non-Javadoc)

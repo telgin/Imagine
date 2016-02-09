@@ -1,7 +1,7 @@
 package algorithms.text;
 
 import algorithms.Algorithm;
-import data.Key;
+import key.Key;
 import product.ProductReaderFactory;
 import product.ProductWriterFactory;
 

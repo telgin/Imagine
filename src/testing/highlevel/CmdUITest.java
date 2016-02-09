@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import database.Database;
 import product.ConversionJob;
 import system.Imagine;
 import system.SystemManager;
@@ -88,7 +87,7 @@ public class CmdUITest
 		cmdTempGroup("image_basic", "bigFile");
 	}
 	
-	@Test(timeout = 60000)
+	//@Test(timeout = 60000)
 	public void imageBasicBigTree()
 	{
 		cmdTempGroup("image_basic", "bigTree");
@@ -324,8 +323,8 @@ public class CmdUITest
 	private static File setup(String treeName)
 	{
 		//shutdown from previous run
-		shutdown();
-		Database.reset();
+		if (!SystemManager.isShutdown())
+			shutdown();
 
 		// setup
 		File inputFolder = TestFileTrees.getRoot(homeFolder, treeName);

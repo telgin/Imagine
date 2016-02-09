@@ -6,19 +6,18 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.w3c.dom.Element;
-
+import algorithms.Algorithm;
+import algorithms.AlgorithmRegistry;
+import config.Settings;
 import logging.LogLevel;
 import logging.Logger;
-import treegenerator.TreeGenerator;
 import data.IndexWorker;
 import data.Metadata;
 import data.ProductWorker;
-import data.TrackingGroup;
+import key.Key;
 
 public class ConversionJob implements Runnable
 {
-	private TrackingGroup group;
 	private boolean shuttingDown = false;
 	private boolean active = true;
 	private boolean finished = false;
@@ -28,22 +27,23 @@ public class ConversionJob implements Runnable
 	private List<ProductWorker> productWorkers;
 	private Thread[] workerThreads;
 	private int productWorkerCount;
-	private TreeGenerator generator;
+	private List<File> inputFiles;
 	private FileOutputManager manager;
+	private ProductWriterFactory<? extends ProductWriter> factory;
 
-	public ConversionJob(TrackingGroup group, int productWorkerCount)
+	public ConversionJob(List<File> inputFiles, Algorithm algorithm, Key key, int productWorkerCount)
 	{
-		this.group = group;
+		this.inputFiles = inputFiles;
 		this.productWorkerCount = productWorkerCount;
-
+		factory = AlgorithmRegistry.getProductWriterFactory(algorithm, key);
+		
 		// default for now
 		maxWaitingFiles = 500;
 
 		queue = new LinkedBlockingQueue<Metadata>();
 		productWorkers = new LinkedList<ProductWorker>();
 		workerThreads = new Thread[1 + productWorkerCount]; //+1 for index worker
-		generator = new TreeGenerator(group);
-		manager = new FileOutputManager(group, group.getStaticOutputFolder());
+		manager = new FileOutputManager(Settings.getOutputFolder());
 
 		addProductWorkers();
 	}
@@ -51,19 +51,10 @@ public class ConversionJob implements Runnable
 	private void addProductWorkers()
 	{
 		for (int i = 0; i < productWorkerCount; ++i)
-			productWorkers.add(setupNewProductWorker());
-	}
-
-	private ProductWorker setupNewProductWorker()
-	{
-		Logger.log(LogLevel.k_debug, "Adding new Product Worker");
-
-		return new ProductWorker(queue, group, manager);
-	}
-
-	public void stopBackup()
-	{
-		//TODO
+		{
+			Logger.log(LogLevel.k_debug, "Adding new Product Worker");
+			productWorkers.add(new ProductWorker(queue, factory, manager));
+		}
 	}
 
 	public boolean isFinished()
@@ -75,16 +66,8 @@ public class ConversionJob implements Runnable
 	{
 		Logger.log(LogLevel.k_debug, "Backup job starting...");
 		
-		//create the tree
-		generator.generateTree();
-		Element root = generator.getRoot();
-		Element pcElement = (Element) root.getFirstChild();
-		
-		//initial save: TODO remove this
-		generator.save(new File("testing/highlevel/tree.xml"));
-		
 		//setup index worker
-		indexWorker = new IndexWorker(queue, pcElement, group);
+		indexWorker = new IndexWorker(queue, inputFiles);
 
 		//start product workers first
 		for (int i = 0; i < productWorkers.size(); ++i)
@@ -99,16 +82,6 @@ public class ConversionJob implements Runnable
 		Thread thread = new Thread(indexWorker);
 		workerThreads[productWorkers.size()] = thread;
 		thread.start();
-	}
-
-	public void pauseLoading()
-	{
-		active = false;
-	}
-
-	public void resumeLoading()
-	{
-		active = true;
 	}
 
 	public void shutdown()
@@ -149,11 +122,6 @@ public class ConversionJob implements Runnable
 				e.printStackTrace();
 			}
 		}
-
-		
-		//save tree
-		//TODO change to correct path
-		generator.save(new File("testing/highlevel/tree.xml"));
 		
 		finished = true;
 		

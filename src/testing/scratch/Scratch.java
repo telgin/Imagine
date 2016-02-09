@@ -10,8 +10,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -19,6 +22,8 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 import org.apache.derby.tools.ij;
 
@@ -28,16 +33,14 @@ import util.algorithms.HashRandom;
 import util.algorithms.ImageUtil;
 import util.algorithms.UniqueRandomRange;
 import config.Configuration;
-import data.FileKey;
 import data.IndexWorker;
-import data.Key;
 import data.Metadata;
 import data.ProductWorker;
-import data.TrackingGroup;
+import key.FileKey;
+import key.Key;
 import product.ProductContents;
 import product.ProductLoader;
 import system.Imagine;
-import treegenerator.TreeGenerator;
 import product.ProductExtractor;
 import product.ProductIOException;
 import algorithms.Algorithm;
@@ -54,7 +57,26 @@ public class Scratch {
 	{
 		
 		
+		File top = new File("/media/tom/HDD #2/Internet Images/");
 		
+		for (File indexFolder : top.listFiles())
+		{
+			if (indexFolder.isDirectory() && indexFolder.getName().startsWith("Index"))
+			{
+				for (File imgFile : indexFolder.listFiles())
+				{
+					if (!imgFile.isDirectory() && imgFile.getName().endsWith(".png"))
+					{
+						long pixels = getPixels(imgFile);
+						if (pixels != -1 && pixels < (500 * 1000))
+						{
+							System.out.println("[" + (pixels / 1000) + "] Would delete: " + imgFile.getAbsolutePath());
+						}
+					}
+				}
+				System.exit(0);
+			}
+		}
 		
 		//args = new String[]{"--open", "-a", "image_basic", "-i", "testing/output/imagine_reserved_temp_1452209731750_0.png"};
 		
@@ -63,20 +85,41 @@ public class Scratch {
 		//Imagine.run(args);
 		
 		
-		File file = new File("testing/scratch/testWebImage2.png");
+//		File file = new File("testing/scratch/testWebImage2.png");
+//		
+//		ImageIO.write(ImageUtil.constructTestWebImage2(), "png", file);
+//		
+//		
+//		BufferedImage img = ImageUtil.constructTestWebImage2();
+//		
+//		for (int y=0; y<100; ++y)
+//		{
+//			System.out.println(y + ": " + new Color(img.getRGB(0, y)).getGreen());
+//		}
+//		
 		
-		ImageIO.write(ImageUtil.constructTestWebImage2(), "png", file);
-		
-		
-		BufferedImage img = ImageUtil.constructTestWebImage2();
-		
-		for (int y=0; y<100; ++y)
-		{
-			System.out.println(y + ": " + new Color(img.getRGB(0, y)).getGreen());
-		}
-		
-		
-		
+//		
+//		int[] a = new int[]{3,4,1,0,0};
+//		
+//		System.out.println(Arrays.toString(a));
+//		
+//		Arrays.sort(a);
+//		
+//		System.out.println(Arrays.binarySearch(a, 1));
+//		
+//		System.out.println(Arrays.toString(a));
+//		
+//		LinkedList<Integer> link = new LinkedList<Integer>();
+//		
+//		a.le
+//		
+//		StringBuffer sb = new StringBuffer("abcdefg");
+//		
+//		sb.append("asdf");
+//		sb.append('x');
+//
+//		
+//		System.out.println(sb);
 		
 	}
 	
@@ -84,7 +127,23 @@ public class Scratch {
 	
 	
 	
-	
+	public static long getPixels(File imgFile) throws IOException
+	{
+		try(ImageInputStream in = ImageIO.createImageInputStream(imgFile)){
+		    final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
+		    if (readers.hasNext()) {
+		        ImageReader reader = readers.next();
+		        try {
+		            reader.setInput(in);
+		            return reader.getWidth(0) * reader.getHeight(0);
+		        } finally {
+		            reader.dispose();
+		        }
+		    }
+		}
+		
+		return -1;
+	}
 	
 	
 	

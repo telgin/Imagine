@@ -6,9 +6,8 @@ import java.util.List;
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
-import data.Key;
+import key.Key;
 import product.ProductFactoryCreation;
-import product.ProductMode;
 import product.ProductReader;
 import product.ProductReaderFactory;
 import product.ProductWriter;
@@ -56,19 +55,6 @@ public class Definition implements algorithms.Definition
 	private Algorithm construct(boolean includeOptions)
 	{
 		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER);
-
-		{
-			// product mode
-			Parameter param = new Parameter("ProductMode",
-							Definition.PARAM_STRING_TYPE, ProductMode.k_basic.toString(), false);
-			if (includeOptions)
-			{
-				param.addOption(new Option(ProductMode.k_basic.toString()));
-				param.addOption(new Option(ProductMode.k_trackable.toString()));
-				param.addOption(new Option(ProductMode.k_secure.toString()));
-			}
-			algo.addParameter(param);
-		}
 
 		{
 			// data insertion density (use of 4x4 (25%) or 2x16 (50%))

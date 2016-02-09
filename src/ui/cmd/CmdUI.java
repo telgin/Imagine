@@ -3,6 +3,7 @@ package ui.cmd;
 import java.io.Console;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import algorithms.Algorithm;
 import algorithms.Parameter;
@@ -10,17 +11,17 @@ import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
 import config.Constants;
-import data.FileKey;
+import config.Settings;
 import data.FileType;
-import data.Key;
-import data.PasswordKey;
-import data.TrackingGroup;
+import key.FileKey;
+import key.Key;
+import key.PasswordKey;
+import key.StaticKey;
 import logging.LogLevel;
 import logging.Logger;
 import product.ConversionJob;
 import product.FileContents;
 import product.ProductContents;
-import product.ProductMode;
 import stats.ProgressMonitor;
 import stats.Stat;
 import ui.ArgParseResult;
@@ -45,12 +46,9 @@ public class CmdUI extends UI
 		err("Usage:");
 		err("(See 'imagine --help' for more details.)");
 		err("imagine --gui\n");
-		err("imagine --open -p <profile> -i <file> [-o <folder>]");
-		err("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k <keyfile>]\n");
-		err("imagine --embed -p <profile> [-o <folder>]");
-		err("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k <keyfile>]\n");
-		err("imagine --extract -p <profile> -i <file/folder> [-o <folder>]");
-		err("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k <keyfile>]");
+		err("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k [keyfile]]\n");
+		err("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]\n");
+		err("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]");
 	}
 	
 	/* (non-Javadoc)
@@ -104,12 +102,9 @@ public class CmdUI extends UI
 		p("configuration edits (editing profiles or algorithms) must be done in the GUI.\n");
 		
 		p("Command Syntax:");
-		p("imagine --open -p <profile> -i <file> [-o <folder>]");
-		p("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k <keyfile>]\n");
-		p("imagine --embed -p <profile> [-o <folder>]");
-		p("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k <keyfile>]\n");
-		p("imagine --extract -p <profile> -i <file/folder> [-o <folder>]");
-		p("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k <keyfile>]\n");
+		p("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k [keyfile]]\n");
+		p("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]\n");
+		p("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]\n");
 		
 		p("--open     ");
 		p("    open an archive and selectively extract its contents");
@@ -119,11 +114,10 @@ public class CmdUI extends UI
 		p("    extract all data from an archive file or folder or multiple archives\n");
 		
 		p("-a         algorithm preset name");
-		p("-p         profile name");
 		p("-i         input file or folder");
 		p("-o         output folder");
-		p("-k         key file (optional)");
-		p("-P         specify additional algorithm parameter");
+		p("-k         key file or empty for password (optional)");
+		p("-p         specify additional algorithm parameter");
 	}
 
 	/**
@@ -158,11 +152,8 @@ public class CmdUI extends UI
 			{
 				ArgParseResult result = new ArgParseResult();
 				
-				if (subargs.contains("-p"))
-					result.profileName = subargs.get(subargs.indexOf("-p")+1);
-				
 				if (subargs.contains("-a"))
-					result.presetName = subargs.get(subargs.indexOf("-a")+1);
+					result.algorithmName = subargs.get(subargs.indexOf("-a")+1);
 				
 				if (subargs.contains("-i"))
 					result.inputFile = new File(subargs.get(subargs.indexOf("-i")+1));
@@ -189,9 +180,10 @@ public class CmdUI extends UI
 	{
 		try
 		{
-			TrackingGroup group = getTrackingGroup(result);
+			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.algorithmName);
+			Key key = getKey(result);
 			
-			ProductContents productContents = ConversionAPI.openArchive(group, result.inputFile);
+			ProductContents productContents = ConversionAPI.openArchive(algo, key, result.inputFile);
 			
 			Menu contentsMenu = new Menu("File Contents");
 			contentsMenu.setSubtext("Select a file to extract it.");
@@ -215,15 +207,11 @@ public class CmdUI extends UI
 			
 			int choice = contentsMenu.getChosenIndex();
 			
-			//try static output folder first
-			if (result.outputFolder == null)
-				result.outputFolder = group.getStaticOutputFolder();
-			
-			//otherwise use local dir
+			//use local dir if no output folder set
 			if (result.outputFolder == null)
 				result.outputFolder = new File(".");
 			
-			ConversionAPI.extractFile(group, result.inputFile, result.outputFolder, choice);
+			ConversionAPI.extractFile(algo, key, result.inputFile, result.outputFolder, choice);
 		}
 		catch (IOException | UsageException e)
 		{
@@ -240,26 +228,50 @@ public class CmdUI extends UI
 
 	/**
 	 * @update_comment
+	 * @param result
+	 * @return
+	 */
+	private Key getKey(ArgParseResult result)
+	{
+		Key key = null;
+		
+		if (result.keyFile != null)
+		{
+			key = new FileKey(result.keyFile);
+		}
+		else if (result.usingPassword)
+		{
+			key = new PasswordKey();
+		}
+		else
+		{
+			key = new StaticKey();
+		}
+		
+		return key;
+	}
+
+	/**
+	 * @update_comment
 	 */
 	private void embed(ArgParseResult result)
 	{
 		try
 		{
-			TrackingGroup group = getTrackingGroup(result);
+			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.algorithmName);
+			Key key = getKey(result);
 			
-			group.addTrackedPath(result.inputFile);
+			//TODO handle multiple input files or the file list
+			List<File> inputFiles = new ArrayList<File>();
+			inputFiles.add(result.inputFile);
 			
-			//try static output folder first
-			if (result.outputFolder == null)
-				result.outputFolder = group.getStaticOutputFolder();
-			
-			//otherwise use local dir
+			//use local dir
 			if (result.outputFolder == null)
 				result.outputFolder = new File(".");
 			
-			group.setStaticOutputFolder(result.outputFolder);
+			Settings.setOutputFolder(result.outputFolder);
 			
-			ConversionJob job = ConversionAPI.runConversion(group, Constants.DEFAULT_THREAD_COUNT);
+			ConversionJob job = ConversionAPI.runConversion(inputFiles, algo, key, Constants.DEFAULT_THREAD_COUNT);
 			
 			showStats(job);
 		}
@@ -283,17 +295,14 @@ public class CmdUI extends UI
 	{
 		try
 		{
-			TrackingGroup group = getTrackingGroup(result);
-			
-			//try static output folder first
-			if (result.outputFolder == null)
-				result.outputFolder = group.getStaticOutputFolder();
+			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.algorithmName);
+			Key key = getKey(result);
 			
 			//otherwise use local dir
 			if (result.outputFolder == null)
 				result.outputFolder = new File(".");
 			
-			ConversionAPI.extractAll(group, result.inputFile, result.outputFolder);
+			ConversionAPI.extractAll(algo, key, result.inputFile, result.outputFolder);
 		}
 		catch (UsageException | IOException e)
 		{
@@ -306,42 +315,6 @@ public class CmdUI extends UI
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 	}
-	
-	private TrackingGroup getTrackingGroup(ArgParseResult result) throws UsageException
-	{
-		TrackingGroup group = null;
-		if (result.profileName != null)
-		{
-			group = ConfigurationAPI.getTrackingGroup(result.profileName);
-		}
-		else
-		{
-			Algorithm preset = ConfigurationAPI.getAlgorithmPreset(result.presetName);
-			
-			if (preset.getProductSecurityLevel().equals(ProductMode.k_basic))
-			{
-				group = ConversionAPI.createTemporaryTrackingGroup(result.presetName);
-			}
-			else if (result.keyFile == null)
-			{
-				Key passKey = new PasswordKey(Constants.TEMP_KEY_NAME, Constants.TEMP_RESERVED_GROUP_NAME);
-				group = ConversionAPI.createTemporaryTrackingGroup(result.presetName, passKey);
-			}
-			else
-			{
-				Key fileKey = new FileKey(Constants.TEMP_KEY_NAME,
-								Constants.TEMP_RESERVED_GROUP_NAME, result.keyFile);
-				group = ConversionAPI.createTemporaryTrackingGroup(result.presetName, fileKey);
-			}
-			
-			//temporary groups should not need/want file system tracking
-			group.setUsesAbsolutePaths(false);
-			group.setUsingIndexFiles(false);
-		}
-		
-		return group;
-	}
-
 
 	/* (non-Javadoc)
 	 * @see ui.UI#promptParameterValue(algorithms.Parameter)
@@ -411,22 +384,20 @@ public class CmdUI extends UI
 	}
 
 	@Override
-	public File promptKeyFileLocation(String keyName, String groupName)
+	public File promptKeyFileLocation()
 	{
 		outputPaused = true;
-		File location = new File(promptInput("Enter key (" + keyName
-						+ ") file location for tracking group '" + groupName + "': "));
+		File location = new File(promptInput("Enter key file location: "));
 		outputPaused = false;
 		return location;
 	}
 
 	@Override
-	public String promptKey(String keyName, String groupName)
+	public String promptKey()
 	{
 		outputPaused = true;
 		
-		p("Enter password (" + keyName + ") for tracking group '" + groupName
-						+ "': ");
+		p("Enter password: ");
 		
 		Console console = System.console();
 		String password = null;

@@ -6,10 +6,9 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import algorithms.Algorithm;
 import config.Constants;
-import data.Key;
+import key.Key;
 import product.Product;
 import product.ProductIOException;
-import product.ProductMode;
 import util.ByteConversion;
 import util.algorithms.HashRandom;
 import util.algorithms.ImageUtil;
@@ -121,12 +120,6 @@ public class ImageOverlay implements Product
 	public void setUUID(byte[] uuid)
 	{
 		this.uuid = uuid;
-	}
-
-	@Override
-	public ProductMode getProductMode()
-	{
-		return algorithm.getProductSecurityLevel();
 	}
 
 	@Override

@@ -7,11 +7,10 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import data.Key;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductFactoryCreation;
-import product.ProductMode;
 import product.ProductReader;
 import product.ProductReaderFactory;
 import product.ProductWriter;
@@ -75,15 +74,6 @@ public class Algorithm
 	public List<Parameter> getParameters()
 	{
 		return new ArrayList<Parameter>(parameters.values());
-	}
-
-	/**
-	 * @update_comment
-	 * @return
-	 */
-	public ProductMode getProductSecurityLevel()
-	{
-		return ProductMode.getMode(getParameterValue("ProductMode"));
 	}
 
 	/**

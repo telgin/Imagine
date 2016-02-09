@@ -7,6 +7,8 @@ import logging.LogLevel;
 import logging.Logger;
 import product.FileOutputManager;
 import product.ProductLoader;
+import product.ProductWriter;
+import product.ProductWriterFactory;
 
 /**
  * Dequeues from the given queue and loads files to the ProductLoader Might not
@@ -19,11 +21,12 @@ public class ProductWorker implements Runnable
 	private BlockingQueue<Metadata> queue;
 	private ProductLoader loader;
 
-	public ProductWorker(BlockingQueue<Metadata> queue, TrackingGroup group,
+	public ProductWorker(BlockingQueue<Metadata> queue, 
+					ProductWriterFactory<? extends ProductWriter> factory,
 					FileOutputManager manager)
 	{
 		this.queue = queue;
-		loader = new ProductLoader(group.getProductWriterFactory(), group, manager);
+		loader = new ProductLoader(factory, manager);
 	}
 
 	public boolean isActive()

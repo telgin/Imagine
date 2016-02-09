@@ -1,4 +1,4 @@
-package ui.graphical.configeditor;
+package ui.graphical.algorithmeditor;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;

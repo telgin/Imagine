@@ -1,7 +1,7 @@
 package product;
 
 import algorithms.Algorithm;
-import data.Key;
+import key.Key;
 
 public interface ProductFactoryCreation
 {

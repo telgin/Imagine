@@ -8,16 +8,13 @@ import algorithms.Algorithm;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
-import config.Constants;
-import data.FileKey;
-import data.Key;
-import data.NullKey;
-import data.PasswordKey;
-import data.TrackingGroup;
+import key.FileKey;
+import key.Key;
+import key.PasswordKey;
+import key.StaticKey;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductContents;
-import product.ProductMode;
 import ui.UIContext;
 import ui.graphical.GUI;
 
@@ -32,16 +29,12 @@ public class OpenArchiveController
 	
 	//state variables
 	private File inputFile;
-	private List<String> profiles;
 	private List<String> algorithms;
-	private TrackingGroup selectedProfile = null;
 	private Algorithm selectedAlgorithm = null;
 	
 	//constants
-	private final String tempProfileString = "Temporary Profile";
 	private final String noSelectionString = "None Selected";
-	
-	private String defaultProfileSelection;
+
 	private String defaultAlgorithmSelection;
 		
 	/**
@@ -53,9 +46,6 @@ public class OpenArchiveController
 		this.view = view;
 		this.gui = (GUI) UIContext.getUI();
 		this.inputFile = inputFile;
-		
-		reloadProfiles();
-		setDefaultProfileSelection(tempProfileString);
 		
 		reloadAlgorithmPresets();
 		setDefaultAlgorithmSelection(noSelectionString);
@@ -69,32 +59,6 @@ public class OpenArchiveController
 		algorithms = ConfigurationAPI.getAlgorithmPresetNames();
 		algorithms.add(0, noSelectionString);
 	}
-
-	/**
-	 * @update_comment
-	 */
-	private void reloadProfiles()
-	{
-		profiles = ConfigurationAPI.getTrackingGroupNames();
-		profiles.add(0, tempProfileString);
-	}
-
-	/**
-	 * @return the defaultProfileSelection
-	 */
-	public String getDefaultProfileSelection()
-	{
-		return defaultProfileSelection;
-	}
-
-	/**
-	 * @param defaultProfileSelection the defaultProfileSelection to set
-	 */
-	public void setDefaultProfileSelection(String defaultProfileSelection)
-	{
-		this.defaultProfileSelection = defaultProfileSelection;
-	}
-
 	/**
 	 * @return the defaultAlgorithmSelection
 	 */
@@ -128,22 +92,6 @@ public class OpenArchiveController
 	}
 
 	/**
-	 * @return the selectedProfile
-	 */
-	public TrackingGroup getSelectedProfile()
-	{
-		return selectedProfile;
-	}
-
-	/**
-	 * @param selectedProfile the selectedProfile to set
-	 */
-	public void setSelectedProfile(TrackingGroup selectedProfile)
-	{
-		this.selectedProfile = selectedProfile;
-	}
-
-	/**
 	 * @return the file
 	 */
 	public File getInputFile()
@@ -156,9 +104,10 @@ public class OpenArchiveController
 		try
 		{
 			view.setOpenButtonEnabled(false);
-			view.setProfileSelectionEnabled(false);
 			view.setAlgorithmSelectionEnabled(false);
-			ProductContents productContents = ConversionAPI.openArchive(getTrackingGroup(), inputFile);
+
+			ProductContents productContents = ConversionAPI.openArchive(selectedAlgorithm, getKey(), inputFile);
+			
 			view.setTableData(productContents.getFileContents());
 			view.setExtractionButtonsEnabled(true);
 		}
@@ -168,7 +117,6 @@ public class OpenArchiveController
 			Logger.log(LogLevel.k_error, e.getMessage());
 			
 			view.setOpenButtonEnabled(true);
-			view.setProfileSelectionEnabled(true);
 			view.setAlgorithmSelectionEnabled(false);
 			view.clearTable();
 		}
@@ -204,7 +152,7 @@ public class OpenArchiveController
 		{
 			try
 			{
-				ConversionAPI.extractAll(getTrackingGroup(), inputFile, extractionLocation);
+				ConversionAPI.extractAll(selectedAlgorithm, getKey(), inputFile, extractionLocation);
 			}
 			catch (IOException | UsageException e)
 			{
@@ -224,39 +172,23 @@ public class OpenArchiveController
 	 * @update_comment
 	 * @return
 	 */
-	private TrackingGroup getTrackingGroup()
+	private Key getKey()
 	{
-		if (selectedProfile != null)
+		Key key = null;
+		if (view.keyFileEnabled())
 		{
-			return selectedProfile;
+			key = new FileKey(new File(view.getKeyFilePath()));
 		}
-		else
+		else if (view.passwordEnabled())
 		{
-			Key key = null;
-			if (view.keyFileEnabled())
-			{
-				key = new FileKey(Constants.TEMP_KEY_NAME, 
-								Constants.TEMP_RESERVED_GROUP_NAME,
-								new File(view.getKeyFilePath()));
-			}
-			else if (view.passwordEnabled())
-			{
-				key = new PasswordKey(Constants.TEMP_KEY_NAME, Constants.TEMP_RESERVED_GROUP_NAME);
-			}
-			else //key section not enabled
-			{
-				key = new NullKey();
-			}
-			
-			TrackingGroup tempProfile = ConversionAPI.createTemporaryTrackingGroup(
-							selectedAlgorithm.getPresetName(), key);
-			
-			//temporary groups should not need/want file system tracking
-			tempProfile.setUsesAbsolutePaths(false);
-			tempProfile.setUsingIndexFiles(false);
-			
-			return tempProfile;
+			key = new PasswordKey();
 		}
+		else //key section not enabled
+		{
+			key = new StaticKey();
+		}
+		
+		return key;
 	}
 
 	/**
@@ -274,7 +206,7 @@ public class OpenArchiveController
 			{
 				try
 				{
-					ConversionAPI.extractFile(getTrackingGroup(), inputFile, extractionLocation, index);
+					ConversionAPI.extractFile(selectedAlgorithm, getKey(), inputFile, extractionLocation, index);
 				}
 				catch (IOException | UsageException e)
 				{
@@ -297,26 +229,13 @@ public class OpenArchiveController
 		{
 			//'no selection' selected
 			view.setKeySectionEnabled(false);
-			
-			if (selectedProfile == null)
-			{
-				view.setOpenButtonEnabled(false);
-			}
+			view.setOpenButtonEnabled(false);
 		}
 		else
 		{
 			try
 			{
 				selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(algorithms.get(index));
-				ProductMode mode = selectedAlgorithm.getProductSecurityLevel();
-				if (mode.equals(ProductMode.k_basic))
-				{
-					view.setKeySectionEnabled(false);
-				}
-				else
-				{
-					view.setKeySectionEnabled(true);
-				}
 				
 				view.setOpenButtonEnabled(true);
 			}
@@ -328,85 +247,6 @@ public class OpenArchiveController
 				view.setAlgorithmSelection(noSelectionString);
 			}
 		}
-	}
-	
-	public void profileSelected(int index)
-	{
-		view.clearKeySection();
-		
-		if (index == 0)
-		{
-			//the temporary profile is selected
-			view.setAlgorithmSelection(noSelectionString);
-			view.setAlgorithmSelectionEnabled(true);
-			selectedProfile = null;
-			selectedAlgorithm = null;
-		}
-		else
-		{
-			String groupName = profiles.get(index);
-			try
-			{
-				selectedProfile = ConfigurationAPI.getTrackingGroup(groupName);
-				selectedAlgorithm = selectedProfile.getAlgorithm();
-				
-				view.setAlgorithmSelection(selectedAlgorithm.getPresetName());
-				//TODO handle case where preset name not found
-				
-				
-				if (selectedAlgorithm.getProductSecurityLevel().isSecured())
-				{
-					view.setKeySectionEnabled(true);
-					
-					if (selectedProfile.getKey() instanceof FileKey)
-					{
-						view.toggleKeySection();
-						
-						FileKey key = (FileKey) selectedProfile.getKey();
-						view.setKeyFilePath(key.getKeyFile().getAbsolutePath());
-						//TODO handle case where key file not found
-					}
-					else if(selectedProfile.getKey() instanceof PasswordKey)
-					{
-						view.togglePasswordSection();
-						view.setPasswordPrompt(selectedProfile.getKey().getName());
-					}
-				}
-				else
-				{
-					view.setKeySectionEnabled(false);
-				}
-			}
-			catch (UsageException e)
-			{
-				Logger.log(LogLevel.k_error, e.getMessage());
-				Logger.log(LogLevel.k_debug, e, false);
-				
-				view.setAlgorithmSelection(noSelectionString);
-				view.clearKeySection();
-				view.setKeySectionEnabled(false);
-			}
-			
-			//disable algorithm selection b/c it's defined in the profile
-			view.setAlgorithmSelectionEnabled(false);
-		}
-		
-	}
-
-	/**
-	 * @return the profiles
-	 */
-	public List<String> getProfiles()
-	{
-		return profiles;
-	}
-
-	/**
-	 * @param profiles the profiles to set
-	 */
-	public void setProfiles(List<String> profiles)
-	{
-		this.profiles = profiles;
 	}
 
 	/**

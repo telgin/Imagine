@@ -1,4 +1,4 @@
-package ui.graphical.configeditor;
+package ui.graphical.algorithmeditor;
 
 import java.util.List;
 
@@ -8,17 +8,8 @@ import api.ConfigurationAPI;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class ConfigEditorController
+public class AlgorithmEditorController
 {
-
-	/**
-	 * @update_comment
-	 * @return
-	 */
-	public List<String> getProfiles()
-	{
-		return ConfigurationAPI.getTrackingGroupNames();
-	}
 
 	/**
 	 * @update_comment

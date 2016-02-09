@@ -1,4 +1,4 @@
-package ui.graphical.configeditor;
+package ui.graphical.algorithmeditor;
 
 import java.util.List;
 import java.util.function.Consumer;

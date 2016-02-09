@@ -38,10 +38,6 @@ public class FileContentsTableRecord
 		{
 			displayType = "File";
 		}
-		else if (type.equals(FileType.k_reference))
-		{
-			displayType = "Reference";
-		}
 		else //k_folder
 		{
 			displayType = "Folder";

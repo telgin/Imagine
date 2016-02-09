@@ -10,9 +10,9 @@ public class ArgParseResult
 {
 	public ArgParseResult(){}
 	
-	public String profileName = null;
-	public String presetName = null;
+	public String algorithmName = null;
 	public File inputFile = null;
 	public File outputFolder = null;
 	public File keyFile = null;
+	public boolean usingPassword = false;
 }

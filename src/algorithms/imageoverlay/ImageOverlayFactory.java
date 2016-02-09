@@ -3,7 +3,7 @@ package algorithms.imageoverlay;
 import algorithms.Algorithm;
 import algorithms.imageoverlay.ImageOverlayReader;
 import algorithms.imageoverlay.ImageOverlayWriter;
-import data.Key;
+import key.Key;
 import product.ProductReaderFactory;
 import product.ProductWriterFactory;
 

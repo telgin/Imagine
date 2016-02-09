@@ -14,9 +14,8 @@ import java.util.Set;
 import algorithms.Algorithm;
 import algorithms.Parameter;
 import config.Constants;
-import data.Key;
 import data.Metadata;
-import data.TrackingGroup;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
@@ -82,28 +81,6 @@ public class Comparisons
 				assertEquals(p1.getValue(), p2.getValue());
 			}
 		}
-	}
-	
-	public static void compareTrackingGroups(TrackingGroup g1, TrackingGroup g2)
-	{
-		if (g1 == null || g2 == null)
-		{
-			assertEquals(g1, g2);
-		}
-		else
-		{
-			assertEquals(g1.getName(), g2.getName());
-			assertEquals(g1.getStaticOutputFolder(), g2.getStaticOutputFolder());
-			assertEquals(g1.getHashDBFile(), g2.getHashDBFile());
-			
-			compareFileSets(g1.getTrackedFiles(), g2.getTrackedFiles());
-			compareFileSets(g1.getUntrackedFiles(), g2.getUntrackedFiles());
-			
-			compareAlgorithms(g1.getAlgorithm(), g2.getAlgorithm());
-			
-			compareKeys(g1.getKey(), g2.getKey());
-		}
-		
 	}
 	
 	public static void compareFileSets(Set<File> set1, Set<File> set2)
@@ -240,7 +217,6 @@ public class Comparisons
 		}
 		else
 		{
-			assertEquals(k1.getName(), k2.getName());
 			assertEquals(k1.getType(), k2.getType());
 			assertArrayEquals(k1.getKeyHash(), k2.getKeyHash());
 		}

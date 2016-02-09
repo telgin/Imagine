@@ -6,9 +6,8 @@ import java.util.List;
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
-import data.Key;
+import key.Key;
 import product.ProductFactoryCreation;
-import product.ProductMode;
 import product.ProductReader;
 import product.ProductReaderFactory;
 import product.ProductWriter;
@@ -21,8 +20,12 @@ public class Definition implements algorithms.Definition
 	private static Definition self;
 	private String description;
 	
+	public static final String encodingParam = "encoding";
+	public static final String blockSizeParam = "blockSize";
+	
 	public static final String base64Encoding = "Base64";
 	public static final String hexEncoding = "Hex";
+	
 
 	/**
 	 * @update_comment
@@ -88,21 +91,8 @@ public class Definition implements algorithms.Definition
 		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER);
 
 		{
-			// product mode
-			Parameter param = new Parameter("ProductMode", "string", 
-							ProductMode.k_basic.toString(), false);
-			if (includeOptions)
-			{
-				param.addOption(new Option(ProductMode.k_basic.toString()));
-				param.addOption(new Option(ProductMode.k_trackable.toString()));
-				param.addOption(new Option(ProductMode.k_secure.toString()));
-			}
-			algo.addParameter(param);
-		}
-
-		{
 			// blockSize
-			Parameter param = new Parameter("blockSize", "int", "102400", false);
+			Parameter param = new Parameter(blockSizeParam, "int", "102400", false);
 			if (includeOptions)
 			{
 				param.addOption(new Option("500", Integer.toString(Integer.MAX_VALUE)));
@@ -112,7 +102,7 @@ public class Definition implements algorithms.Definition
 		
 		{
 			// encoding
-			Parameter param = new Parameter("encoding", "string", base64Encoding, false);
+			Parameter param = new Parameter(encodingParam, "string", base64Encoding, false);
 			if (includeOptions)
 			{
 				param.addOption(new Option(base64Encoding));
@@ -166,14 +156,7 @@ public class Definition implements algorithms.Definition
 		//secure
 		Algorithm secure = construct(false);
 		secure.setPresetName("text_secure");
-		secure.setParameter("ProductMode", "secure");
 		presets.add(secure);
-		
-		//test trackable
-		Algorithm trackable = construct(false);
-		trackable.setPresetName("test_text_trackable");
-		trackable.setParameter("ProductMode", "trackable");
-		presets.add(trackable);
 
 		
 		return presets;

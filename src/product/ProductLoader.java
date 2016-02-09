@@ -1,19 +1,17 @@
 package product;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 import config.Constants;
 import logging.LogLevel;
 import logging.Logger;
+import report.Report;
 import stats.ProgressMonitor;
 import stats.Stat;
 import data.FileType;
 import data.Metadata;
-import data.TrackingGroup;
-import database.Database;
 import util.ByteConversion;
 import util.FileSystemUtil;
 
@@ -27,7 +25,6 @@ public class ProductLoader
 
 	private byte[] streamUUID;
 	private int sequenceNumber;
-	private TrackingGroup group;
 	private FileOutputManager fileOutputManager;
 
 	private ProductWriter currentProduct;
@@ -40,12 +37,11 @@ public class ProductLoader
 	private boolean needsReset = true;
 
 	public ProductLoader(ProductWriterFactory<? extends ProductWriter> factory,
-					TrackingGroup group, FileOutputManager manager)
+				FileOutputManager manager)
 	{
 		streamUUID = ByteConversion.longToBytes(Clock.getUniqueTime());
 		sequenceNumber = 0;
 
-		this.group = group;
 		fileOutputManager = manager;
 		currentProduct = factory.createWriter();
 
@@ -109,17 +105,12 @@ public class ProductLoader
 		// set the uuid in case it is used internally by the product
 		currentProduct.setUUID(currentUUID);
 
-		// stealth products will encrypt data beyond this point
-		if (currentProduct.getProductMode().equals(ProductMode.k_secure))
-			currentProduct.secureStream();
+		//secure stream
+		currentProduct.secureStream();
 
 		// write the product header
 		if (!writeProductHeader())
 			throw new ProductIOException("Cannot write product header.");
-
-		// secure products will secure data beyond this point
-		if (currentProduct.getProductMode().equals(ProductMode.k_trackable))
-			currentProduct.secureStream();
 		
 		needsReset = false;
 	}
@@ -130,55 +121,13 @@ public class ProductLoader
 		if (!writeFull(PRODUCT_VERSION_NUMBER))
 			return false;
 
-		// write algorithm name length
-		byte[] algorithmName = currentProduct.getAlgorithmName().getBytes(Constants.CHARSET);
-		if (!writeFull(ByteConversion.shortToBytes((short) algorithmName.length)))
-			return false;
-
-		// write algorithm name
-		if (!writeFull(algorithmName))
-			return false;
-
-		// write algorithm version
-		if (!writeFull(ByteConversion
-						.intToByte(currentProduct.getAlgorithmVersionNumber())))
-			return false;
-
-		// write group name length
-		String groupName = group.getName();
-		if (!writeFull(ByteConversion.shortToBytes((short) groupName.getBytes(Constants.CHARSET).length)))
-			return false;
-
-		// write group name
-		if (!writeFull(groupName.getBytes(Constants.CHARSET)))
-			return false;
-
-		// write group key name / length
-		if (group.getKey().isSecure())
-		{
-			//System.out.println("Writing key name: " + group.getKey().getName()
-			//				+ " of length: "
-			//				+ group.getKey().getName().getBytes(Constants.CHARSET).length);
-			byte[] groupKeyName = group.getKey().getName().getBytes(Constants.CHARSET);
-			if (!writeFull(ByteConversion.shortToBytes((short) groupKeyName.length)))
-				return false;
-			if (!writeFull(groupKeyName))
-				return false;
-		}
-		else
-		{
-			//System.out.println("Not writing key name because the product is not secure.");
-			if (!writeFull(ByteConversion.shortToBytes((short) 0)))
-				return false;
-		}
-
 		return true;
 	}
 
 	private String getSaveName()
 	{
-		return FileSystemUtil.getProductName(group, 
-						ByteConversion.bytesToLong(streamUUID), (sequenceNumber - 1));
+		return FileSystemUtil.getProductName(ByteConversion.bytesToLong(streamUUID),
+						(sequenceNumber - 1));
 
 	}
 
@@ -260,7 +209,7 @@ public class ProductLoader
 
 		// update the database
 		fileMetadata.setFragmentCount(fragmentNumber-1);
-		Database.saveConversionRecord(fileMetadata, group);
+		Report.saveConversionRecord(fileMetadata);
 
 		fileWritten = true;
 
@@ -302,8 +251,7 @@ public class ProductLoader
 		if (!writeFull(ByteConversion.intToByte(fileMetadata.getType().toInt())))
 			return false;
 		
-		if (fileMetadata.getType().equals(FileType.k_file) ||
-						fileMetadata.getType().equals(FileType.k_reference))
+		if (fileMetadata.getType().equals(FileType.k_file))
 		{
 			// file hash
 			if (!writeFull(fileMetadata.getFileHash()))
@@ -333,18 +281,6 @@ public class ProductLoader
 			// length of data that still needs to be written
 			if (!writeFull(ByteConversion.longToBytes(fileLengthRemaining)))
 				return false;
-			
-			if (fileMetadata.getType().equals(FileType.k_reference))
-			{
-				//pf1uuid
-				if (!writeFull(Database.getCachedF1UUID(fileMetadata.getFileHash(), group)))
-					return false;
-				
-				//fragment count
-				if (!writeFull(ByteConversion.longToBytes(
-								Database.getCachedFragmentCount(fileMetadata.getFileHash(), group))))
-					return false;
-			}
 		}
 		else
 		{

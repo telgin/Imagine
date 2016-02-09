@@ -1,7 +1,7 @@
 package algorithms.image;
 
 import algorithms.Algorithm;
-import data.Key;
+import key.Key;
 import product.ProductReaderFactory;
 import product.ProductWriterFactory;
 

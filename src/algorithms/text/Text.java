@@ -1,22 +1,14 @@
 package algorithms.text;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-
 import algorithms.Algorithm;
 import logging.LogLevel;
 import logging.Logger;
 import product.Product;
-import product.ProductMode;
-import stats.ProgressMonitor;
-import stats.Stat;
 import util.ByteConversion;
 import util.algorithms.HashRandom;
 import util.algorithms.UniqueRandomRange;
-import config.Configuration;
 import config.Constants;
-import data.Key;
+import key.Key;
 
 public abstract class Text implements Product
 {
@@ -32,8 +24,8 @@ public abstract class Text implements Product
 	{
 		algorithm = algo;
 		this.key = key;
-		blockSize = Integer.parseInt(algorithm.getParameterValue("blockSize"));
-		Logger.log(LogLevel.k_debug, "TextBlock Created");
+		blockSize = Integer.parseInt(algorithm.getParameterValue(Definition.blockSizeParam));
+		Logger.log(LogLevel.k_debug, "Text Product Created");
 	}
 
 	protected void reset()
@@ -59,12 +51,6 @@ public abstract class Text implements Product
 	public void setUUID(byte[] uuid)
 	{
 		this.uuid = uuid;
-	}
-
-	@Override
-	public ProductMode getProductMode()
-	{
-		return algorithm.getProductSecurityLevel();
 	}
 
 	@Override

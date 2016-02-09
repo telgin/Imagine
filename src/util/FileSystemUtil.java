@@ -27,8 +27,8 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import data.FileType;
 import data.Metadata;
-import data.TrackingGroup;
 
 public class FileSystemUtil
 {
@@ -50,6 +50,9 @@ public class FileSystemUtil
 
 		if (metadata.getPermissions() == -1)
 			metadata.setPermissions(getNumericFilePermissions(file));
+		
+		if (metadata.getType() == null)
+			metadata.setType(file.isDirectory() ? FileType.k_folder : FileType.k_file);
 	}
 
 	public static short getNumericFilePermissions(File file)
@@ -416,14 +419,14 @@ public class FileSystemUtil
 		}
 	}
 	
-	public static String getProductName(TrackingGroup group, long streamUUID, long sequenceNumber)
+	public static String getProductName(long streamUUID, long sequenceNumber)
 	{
-		return group.getName() + "_" + streamUUID + "_" + sequenceNumber;
+		return streamUUID + "_" + sequenceNumber;
 	}
 	
-	public static String getProductName(TrackingGroup group, byte[] productUUID)
+	public static String getProductName(byte[] productUUID)
 	{
-		return getProductName(group, ByteConversion.getStreamUUID(productUUID),
+		return getProductName(ByteConversion.getStreamUUID(productUUID),
 						ByteConversion.getProductSequenceNumber(productUUID));
 	}
 	
@@ -444,33 +447,4 @@ public class FileSystemUtil
 	      System.out.println("writer " + names[i]);
 	    }
 	}
-
-//	/**
-//	 * @update_comment
-//	 * @param included
-//	 * @return
-//	 */
-//	public static String getDriveUUID(File included)
-//	{
-//		//get the drive file
-//		File parent = included.getParentFile();
-//		while (parent.getParentFile() != null)
-//			parent = parent.getParentFile();
-//		
-//		//look for the pre-existing drive uuid file
-//		File uuidFile = new File(parent, ".imagine_drive_uuid");
-//		if (uuidFile.exists())
-//		{
-//			String uuid = myUtilities.readStringFromFile(included).trim();
-//			return uuid;
-//		}
-//		else
-//		{
-//			//create a new drive uuid if one wasn't found
-//			byte[] newUUID = Hashing.hash(ByteConversion.longToBytes(Clock.getUniqueTime()));
-//			String truncated = ByteConversion.bytesToHex(newUUID).substring(16);
-//			myUtilities.writeStringToFile(uuidFile, truncated);
-//			return truncated;
-//		}
-//	}
 }

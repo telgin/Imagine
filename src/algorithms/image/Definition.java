@@ -6,9 +6,8 @@ import java.util.List;
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
-import data.Key;
+import key.Key;
 import product.ProductFactoryCreation;
-import product.ProductMode;
 import product.ProductReader;
 import product.ProductReaderFactory;
 import product.ProductWriter;
@@ -55,24 +54,6 @@ public class Definition implements algorithms.Definition
 	private Algorithm construct(boolean includeOptions)
 	{
 		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER);
-
-		{
-			// product mode
-			Parameter param = new Parameter("ProductMode", "string", 
-							ProductMode.k_basic.toString(), false);
-			param.setDescription("Created product files can optionally show "
-							+ "product metadata in the clear before using the key "
-							+ "to secure file data. Information like the group name "
-							+ "or key name may help you remember the correct key to "
-							+ "use to extract data from the product file.");
-			if (includeOptions)
-			{
-				param.addOption(new Option(ProductMode.k_basic.toString()));
-				param.addOption(new Option(ProductMode.k_trackable.toString()));
-				param.addOption(new Option(ProductMode.k_secure.toString()));
-			}
-			algo.addParameter(param);
-		}
 
 		{
 			// colors

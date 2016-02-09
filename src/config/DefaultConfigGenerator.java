@@ -8,9 +8,6 @@ import org.w3c.dom.Node;
 
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
-import data.FileKey;
-import data.Key;
-import data.TrackingGroup;
 import util.ConfigUtil;
 
 public abstract class DefaultConfigGenerator
@@ -40,32 +37,8 @@ public abstract class DefaultConfigGenerator
 			}
 		}
 		
-		//add test tracking group
-		addTestTrackingGroup();
-		
 		//save configuration
 		Configuration.saveConfig();
-	}
-	
-	private static void addTestTrackingGroup()
-	{
-		//initialize
-		String name = "Test Image Basic";
-		String presetName = "image_basic";
-		Algorithm algo = Configuration.getAlgorithmPreset(presetName);
-		boolean usesDatabase = true;
-		Key key = new FileKey("potatoes", name, new File("keys/key1.txt"));
-		TrackingGroup testGroup = new TrackingGroup(name, usesDatabase, algo, key);
-		
-		//add paths
-		testGroup.addTrackedPath("testing/scratch");
-		testGroup.addUntrackedPath("testing/scratch/tree2.xml");
-		
-		//add locations
-		testGroup.setHashDBFile(new File("testing/scratch/hashdb.db"));
-		//testGroup.setStaticOutputFolder(new File("output"));
-		
-		Configuration.addTrackingGroup(testGroup);
 	}
 
 	private static Document makeBasicConfig()

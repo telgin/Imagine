@@ -10,8 +10,7 @@ import java.util.Map;
 public enum FileType
 {
 	k_file(1),
-	k_folder(2),
-	k_reference(3);
+	k_folder(2);
 	
 	private int num;
 	private static Map<Integer, FileType> map;
@@ -21,7 +20,6 @@ public enum FileType
 		map = new HashMap<Integer, FileType>();
 		map.put(1, FileType.k_file);
 		map.put(2, FileType.k_folder);
-		map.put(3, FileType.k_reference);
 	}
 	
 	FileType(int num)

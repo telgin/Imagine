@@ -11,8 +11,8 @@ import product.ProductIOException;
 import product.ProductReader;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
-import data.Key;
 import algorithms.Algorithm;
+import key.Key;
 
 public class ImageReader extends Image implements ProductReader
 {

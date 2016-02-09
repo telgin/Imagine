@@ -1,12 +1,8 @@
-package data;
+package key;
 
 public interface Key
 {
-	public boolean isSecure();
-
 	public byte[] getKeyHash();
-
-	public String getName();
 
 	/**
 	 * @update_comment

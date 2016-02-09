@@ -13,8 +13,8 @@ import stats.ProgressMonitor;
 import stats.Stat;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
-import data.Key;
 import algorithms.Algorithm;
+import key.Key;
 
 public class ImageWriter extends Image implements ProductWriter
 {

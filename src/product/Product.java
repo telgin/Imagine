@@ -12,8 +12,6 @@ public interface Product
 
 	public byte[] getUUID();
 
-	public ProductMode getProductMode();
-
 	// secure methods
 	public void secureStream();
 }

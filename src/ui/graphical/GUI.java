@@ -24,14 +24,14 @@ public class GUI extends UI
 	}
 
 	@Override
-	public File promptKeyFileLocation(String keyName, String groupName)
+	public File promptKeyFileLocation()
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String promptKey(String keyName, String groupName)
+	public String promptKey()
 	{
 		return topView.getPassword();
 	}

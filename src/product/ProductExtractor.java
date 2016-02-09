@@ -2,25 +2,23 @@ package product;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import algorithms.Algorithm;
+import algorithms.AlgorithmRegistry;
 import config.Constants;
 import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
 import util.FileSystemUtil;
-import util.Hashing;
 import data.FileType;
 import data.Metadata;
-import data.TrackingGroup;
+import key.Key;
 
 public class ProductExtractor {
 	
@@ -28,33 +26,35 @@ public class ProductExtractor {
 	private byte[] curFileHash;
 	private long curFragmentNumber;
 	private byte[] buffer;
-	private TrackingGroup group;
 	private File enclosingFolder;
 	private File curProductFile;
 	private ExtractionManager manager;
+	private Algorithm algo;
+	private Key key;
 	
 	
-	public ProductExtractor(TrackingGroup group, File enclosingFolder)
+	public ProductExtractor(Algorithm algo, Key key, File enclosingFolder)
 	{
-		this(group, enclosingFolder, new ExtractionManager());
+		this(algo, key, enclosingFolder, new ExtractionManager());
 		
 		mapHeaders(enclosingFolder);
 	}
 	
-	private ProductExtractor(TrackingGroup group, File enclosingFolder, ExtractionManager manager)
+	private ProductExtractor(Algorithm algo, Key key, File enclosingFolder, ExtractionManager manager)
 	{
-		this.group = group;
 		setEnclosingFolder(enclosingFolder);
-		product = group.getProductReaderFactory().createReader();
+		product = AlgorithmRegistry.getProductReaderFactory(algo, key).createReader();
 		
 		buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
+		this.algo = algo;
+		this.key = key;
 		this.manager = manager;
 	}
 	
 	@Override
 	public ProductExtractor clone()
 	{
-		return new ProductExtractor(group, enclosingFolder, manager);
+		return new ProductExtractor(algo, key, enclosingFolder, manager);
 	}
 	
 	public void setEnclosingFolder(File folder)
@@ -137,7 +137,7 @@ public class ProductExtractor {
 				
 				//there are other fragments that need to be added,
 				//find the next product file
-				String searchName = FileSystemUtil.getProductName(group, curProductContents.getStreamUUID(),
+				String searchName = FileSystemUtil.getProductName(curProductContents.getStreamUUID(),
 												curProductContents.getProductSequenceNumber() + increment);
 				File nextProductFile = manager.findProductFile(searchName,
 								curExtractor.curProductFile.getAbsoluteFile().getParentFile());
@@ -282,8 +282,7 @@ public class ProductExtractor {
 	private void mapHeader(File productFile) throws IOException
 	{
 		ProductContents productContents = parseProductContents(productFile);
-		String fileName = FileSystemUtil.getProductName(
-						group, productContents.getStreamUUID(),
+		String fileName = FileSystemUtil.getProductName(productContents.getStreamUUID(),
 						productContents.getProductSequenceNumber());
 		manager.cacheHeaderLocation(fileName, productFile);
 	}
@@ -327,49 +326,9 @@ public class ProductExtractor {
 				}
 					
 			}
-			else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
+			else
 			{
 				manager.moveFolderToExtractionFolder(fileContents, extractionFolder);
-			}
-			else //k_reference
-			{
-				byte[] refHash = fileContents.getMetadata().getFileHash();
-				byte[] refUUID = fileContents.getMetadata().getRefProductUUID();
-				long refStreamUUID = ByteConversion.getStreamUUID(refUUID);
-				int refSequenceNum = ByteConversion.getProductSequenceNumber(refUUID);
-				
-				//a copy of the file may have already been extracted
-				//if so, copy it instead of searching for it in a product file
-				File existing = manager.getPreviouslyExtractedFile(refHash);
-				if (existing != null)
-				{
-					manager.copyFileToExtractionFolder(existing, fileContents, extractionFolder);
-				}
-				else
-				{
-					manager.setEnclosingFolder(enclosingFolder);
-					
-					String searchName = FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum);
-					File refProductFile = manager.findProductFile(searchName,
-									productFile.getAbsoluteFile().getParentFile());
-					
-					if (refProductFile == null)
-					{
-						Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
-										searchName);
-						
-						//read next header
-						fileContents = readNextFileHeader(true);
-						
-						continue;
-					}
-					else
-					{
-						ProductExtractor subExtractor = this.clone();
-						subExtractor.extractAndCopyFirstHashMatch(refProductFile, extractionFolder, refHash, fileContents);
-					}
-				}
-					
 			}
 			
 			//read next header
@@ -496,44 +455,9 @@ public class ProductExtractor {
 						return false;
 					}	
 				}
-				else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
+				else
 				{
 					manager.moveFolderToExtractionFolder(fileContents, extractionFolder);
-				}
-				else //k_reference
-				{
-					byte[] refHash = fileContents.getMetadata().getFileHash();
-					byte[] refUUID = fileContents.getMetadata().getRefProductUUID();
-					long refStreamUUID = ByteConversion.getStreamUUID(refUUID);
-					int refSequenceNum = ByteConversion.getProductSequenceNumber(refUUID);
-					
-					//a copy of the file may have already been extracted
-					//if so, copy it instead of searching for it in a product file
-					File existing = manager.getPreviouslyExtractedFile(refHash);
-					if (existing != null)
-					{
-						manager.copyFileToExtractionFolder(existing, fileContents, extractionFolder);
-					}
-					else
-					{
-						manager.setEnclosingFolder(enclosingFolder);
-						
-						String searchName = FileSystemUtil.getProductName(group, refStreamUUID, refSequenceNum);
-						File refProductFile = manager.findProductFile(searchName,
-										productFile.getAbsoluteFile().getParentFile());
-						
-						if (refProductFile == null)
-						{
-							Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
-											searchName);
-							return false;
-						}
-						else
-						{
-							ProductExtractor subExtractor = this.clone();
-							subExtractor.extractAndCopyFirstHashMatch(refProductFile, extractionFolder, refHash, fileContents);
-						}
-					}
 				}
 				
 				return true;
@@ -551,7 +475,6 @@ public class ProductExtractor {
 
 		return false;
 	}
-	
 	
 	private ProductContents parseProductContents(File productFile) throws IOException
 	{
@@ -688,11 +611,7 @@ public class ProductExtractor {
 			//System.out.println("Read stream uuid " + ByteConversion.getStreamUUID(product.getUUID()));
 			//System.out.println("Read product sequence number " + ByteConversion.getProductSequenceNumber(product.getUUID()));
 				
-			//stealth secure stream now
-			if (product.getProductMode().equals(ProductMode.k_secure))
-			{
-				product.secureStream();
-			}
+			product.secureStream();
 
 			//product version
 			if (parseData)
@@ -706,89 +625,6 @@ public class ProductExtractor {
 			{
 				if (!skipFull(Constants.PRODUCT_VERSION_NUMBER_SIZE))
 					throw new ProductIOException("Could not skip product version number.");
-			}
-				
-			//algorithm name length
-			if (!readFull(Constants.ALGORITHM_NAME_LENGTH_SIZE))
-				throw new ProductIOException("Could not read algorithm length.");
-			
-			short algorithmNameLength = ByteConversion.bytesToShort(buffer, 0);
-				
-			//algorithm name
-			if (parseData)
-			{
-				if (!readFull(algorithmNameLength))
-					throw new ProductIOException("Could not read algorithm name.");
-				
-				contents.setAlgorithmName(new String(buffer, 0, algorithmNameLength, Constants.CHARSET));
-			}
-			else
-			{
-				if (!skipFull(algorithmNameLength))
-					throw new ProductIOException("Could not skip algorithm name.");
-			}
-				
-			//algorithm version
-			if (parseData)
-			{
-				if (!readFull(Constants.ALGORITHM_VERSION_NUMBER_SIZE))
-					throw new ProductIOException("Could not read algorithm version number.");
-				
-				contents.setAlgorithmVersionNumber(ByteConversion.byteToInt(buffer[0]));
-			}
-			else
-			{
-				if (!skipFull(Constants.ALGORITHM_VERSION_NUMBER_SIZE))
-					throw new ProductIOException("Could not skip algorithm version number.");
-			}
-				
-			//group name length
-			if (!readFull(Constants.GROUP_NAME_LENGTH_SIZE))
-				throw new ProductIOException("Could not read group name length.");
-			
-			short groupNameLength = ByteConversion.bytesToShort(buffer, 0);
-			//System.out.println("groupNameLength: " + groupNameLength);
-				
-			//group name
-			if (parseData)
-			{
-				if (!readFull(groupNameLength))
-					throw new ProductIOException("Could not read group name.");
-				
-				contents.setGroupName(new String(buffer, 0, groupNameLength, Constants.CHARSET));
-			}
-			else
-			{
-				if (!skipFull(groupNameLength))
-					throw new ProductIOException("Could not skip group name.");
-			}
-			
-			//group key name length
-			if (!readFull(Constants.GROUP_KEY_NAME_LENGTH_SIZE))
-				throw new ProductIOException("Could not read group key name length.");
-			
-			short groupKeyNameLength = ByteConversion.bytesToShort(buffer, 0);
-			//System.out.println("Read group key name length of: " + groupKeyNameLength);
-				
-			//group key name
-			if (parseData)
-			{
-				if (!readFull(groupKeyNameLength))
-					throw new ProductIOException("Could not read group key name.");
-				
-				contents.setGroupKeyName(new String(buffer, 0, groupKeyNameLength, Constants.CHARSET));
-				//System.out.println("Read group key name of: " + new String(buffer, 0, groupKeyNameLength, Constants.CHARSET));
-			}
-			else
-			{
-				if (!skipFull(groupKeyNameLength))
-					throw new ProductIOException("Could not skip group key name.");
-			}
-				
-			//secure products secure the stream now
-			if (product.getProductMode().equals(ProductMode.k_trackable))
-			{
-				product.secureStream();
 			}
 
 			return contents;
@@ -848,8 +684,8 @@ public class ProductExtractor {
 			FileType fileType = FileType.toFileType(fileTypeNum);
 			contents.getMetadata().setType(fileType);
 			
-			//file or reference type:
-			if (fileType.equals(FileType.k_file) || fileType.equals(FileType.k_reference))
+			//file type:
+			if (fileType.equals(FileType.k_file))
 			{
 				//file hash
 				if (parseData)
@@ -929,38 +765,6 @@ public class ProductExtractor {
 				if (!readFull(Constants.FILE_LENGTH_REMAINING_SIZE))
 					return null;
 				contents.setRemainingData(ByteConversion.bytesToLong(buffer, 0));
-				
-				if (fileType.equals(FileType.k_reference))
-				{
-					//pf1uuid
-					if (parseData)
-					{
-						if (!readFull(Constants.PRODUCT_UUID_SIZE))
-							return null;
-						
-						contents.getMetadata().setRefProductUUID(
-										ByteConversion.subArray(buffer, 0, Constants.PRODUCT_UUID_SIZE));
-					}
-					else
-					{
-						if (!skipFull(Constants.PRODUCT_UUID_SIZE))
-							return null;
-					}
-					
-					//fragment count
-					if (parseData)
-					{
-						if (!readFull(Constants.FRAGMENT_NUMBER_SIZE))
-							return null;
-						
-						contents.getMetadata().setFragmentCount(ByteConversion.bytesToLong(buffer, 0));
-					}
-					else
-					{
-						if (!skipFull(Constants.FRAGMENT_NUMBER_SIZE))
-							return null;
-					}
-				}
 			}
 			else
 			{
