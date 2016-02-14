@@ -25,6 +25,7 @@ public class Algorithm
 {
 	private String name;
 	private int versionNum;
+	private String description;
 	private HashMap<String, Parameter> parameters;
 	private ProductFactoryCreation productFactoryCreation;
 	private String presetName;
@@ -34,10 +35,11 @@ public class Algorithm
 	 * @param name
 	 * @param versionNum
 	 */
-	public Algorithm(String name, int versionNum)
+	public Algorithm(String name, int versionNum, String description)
 	{
 		this.name = name;
 		this.versionNum = versionNum;
+		this.description = description;
 		parameters = new HashMap<String, Parameter>();
 	}
 
@@ -47,9 +49,10 @@ public class Algorithm
 	 */
 	public Algorithm(Element algoNode)
 	{
-		this.name = algoNode.getAttribute("name");
-		this.versionNum = Integer.parseInt(algoNode.getAttribute("version"));
-		this.presetName = algoNode.getAttribute("presetName");
+		name = algoNode.getAttribute("name");
+		versionNum = Integer.parseInt(algoNode.getAttribute("version"));
+		description = AlgorithmRegistry.getDefaultAlgorithm(name).getDescription();
+		presetName = algoNode.getAttribute("presetName");
 
 		parameters = new HashMap<String, Parameter>();
 		for (Element paramNode : ConfigUtil.children(algoNode, "Parameter"))
@@ -58,6 +61,19 @@ public class Algorithm
 		}
 	}
 
+	@Override
+	public Algorithm clone()
+	{
+		Algorithm clone = new Algorithm(name, versionNum, description);
+		clone.setPresetName(presetName);
+		for (Parameter param : parameters.values())
+			clone.addParameter(param.clone());
+		
+		clone.setProductFactoryCreation(productFactoryCreation);
+		
+		return clone;
+	}
+	
 	/**
 	 * @update_comment
 	 * @param creation
@@ -182,61 +198,6 @@ public class Algorithm
 	}
 
 	/**
-	 * Does the other algorithm have the same parameters, and are those
-	 * parameter values within the bounds of my options? (this = spec, other =
-	 * input algo)
-	 * 
-	 * Logs fatal errors against the other algorithm
-	 * 
-	 * @param other
-	 */
-	/**
-	 * @update_comment
-	 * @param other
-	 */
-	public void validate(Algorithm other)
-	{
-		String header = "Algorithm " + name + "v" + versionNum + " validation: ";
-		String otherId = other.getName() + "v" + other.getVersion();
-		Logger.log(LogLevel.k_info, header);
-
-		// are the names and versions the same?
-		if (!name.equals(other.getName()) || versionNum != other.getVersion())
-			Logger.log(LogLevel.k_error,
-							header + "validating against different algorithm " + otherId);
-
-		// check parameters
-		for (Parameter pOther : other.getParameters())
-		{
-			Parameter pSpec = parameters.get(pOther.getName());
-
-			// the spec must contain this parameter
-			if (pSpec == null)
-			{
-				Logger.log(LogLevel.k_fatal,
-								header + "unknown parameter '" + pOther.getName() + "'");
-			}
-
-			if (pOther.isEnabled())
-			{
-				pSpec.validate(pOther);
-			}
-		}
-
-		// see if there are any non-optional parameters not covered
-		for (Parameter pSpec : getParameters())
-		{
-			Parameter pOther = other.getParameter(pSpec.getName());
-			if (pOther == null && !pSpec.isOptional())
-			{
-				Logger.log(LogLevel.k_fatal, header + "Parameter " + pSpec.getName()
-								+ " does not exist, but it's not optional.");
-			}
-		}
-
-	}
-
-	/**
 	 * @update_comment
 	 * @param key
 	 * @return
@@ -270,5 +231,21 @@ public class Algorithm
 	public void setPresetName(String presetName)
 	{
 		this.presetName = presetName;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
 	}
 }

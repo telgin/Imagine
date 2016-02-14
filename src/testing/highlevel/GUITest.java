@@ -20,6 +20,5 @@ public class GUITest
 		};
 		
 		Imagine.run(args);
-		
 	}
 }

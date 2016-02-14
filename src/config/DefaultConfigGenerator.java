@@ -8,6 +8,7 @@ import org.w3c.dom.Node;
 
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
+import system.Imagine;
 import util.ConfigUtil;
 
 public abstract class DefaultConfigGenerator
@@ -16,8 +17,8 @@ public abstract class DefaultConfigGenerator
 
 	public static void main(String[] args)
 	{
-		//creates a config file at current location
-		create(Constants.CONFIG_FILE);
+		//regenerate default config
+		Imagine.run(new String[]{"--install"});
 	}
 	
 	public static void create(File configFile)
@@ -50,7 +51,6 @@ public abstract class DefaultConfigGenerator
 		Element root = mkElement("Configuration");
 
 		root.appendChild(mkElement("AlgorithmPresets"));
-		root.appendChild(mkElement("TrackingGroups"));
 		root.appendChild(mkSystemNode());
 
 		doc.appendChild(root);
@@ -69,7 +69,6 @@ public abstract class DefaultConfigGenerator
 		
 		//folders
 		system.appendChild(mkPathNode("LogFolder", "logs"));
-		system.appendChild(mkPathNode("DatabaseFolder", "databases"));
 		
 		//installation uuid
 		Element installationUUID = mkElement("InstallationUUID");

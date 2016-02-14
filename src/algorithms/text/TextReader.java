@@ -49,7 +49,7 @@ public class TextReader extends Text implements ProductReader{
 	public void loadFile(File f) throws IOException
 	{
 		String encoded = new String(Files.readAllBytes(f.toPath()));
-		if (algorithm.getParameter(Definition.encodingParam).getValue().equals(Definition.base64Encoding))
+		if (algorithm.getParameter(Definition.ENCODING_PARAM).getValue().equals(Definition.BASE64_ENCODING))
 			buffer = ByteConversion.base64ToBytes(encoded);
 		else
 			buffer = ByteConversion.hexToBytes(encoded);

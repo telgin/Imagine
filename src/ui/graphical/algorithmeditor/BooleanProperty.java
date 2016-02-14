@@ -83,4 +83,13 @@ public class BooleanProperty extends ConfigurationProperty
 		}
 	}
 
+	/**
+	 * @update_comment
+	 * @param enabled
+	 */
+	public void setChecked(boolean checked)
+	{
+		checkBox.setSelected(checked);
+	}
+
 }

@@ -1,6 +1,7 @@
 package algorithms;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -12,7 +13,14 @@ import util.ConfigUtil;
 
 public class Parameter
 {
-	private ArrayList<Option> options;
+	public static final String STRING_TYPE = "string";
+	public static final String INT_TYPE = "int";
+	public static final String LONG_TYPE = "long";
+	public static final String BOOLEAN_TYPE = "boolean";
+	public static final String DECIMAL_TYPE = "decimal";
+	public static final String FILE_TYPE = "file";
+	
+	private List<Option> options;
 	private String name;
 	private String type;
 	private String value;
@@ -20,22 +28,28 @@ public class Parameter
 	private boolean optional;
 	private boolean enabled;
 
-	public Parameter(String name, String type, String value, boolean optional,
-					boolean enabled)
+	public Parameter(String name, String type, boolean optional, boolean enabled)
 	{
 		options = new ArrayList<Option>();
 
 		setName(name);
 		setType(type);
-		setValue(value);
 		setOptional(optional);
 		setEnabled(enabled);
 		setDescription("");
 	}
-
-	public Parameter(String name, String type, String value, boolean optional)
+	
+	@Override
+	public Parameter clone()
 	{
-		this(name, type, value, optional, !optional);
+		Parameter clone = new Parameter(name, type, optional, enabled);
+		clone.setDescription(description);
+		for (Option opt : options)
+			clone.addOption(opt.clone());
+		
+		clone.setValue(value);
+		
+		return clone;
 	}
 
 	public Parameter(Element paramElement)
@@ -45,22 +59,37 @@ public class Parameter
 		setName(paramElement.getAttribute("name"));
 		setDescription(paramElement.getAttribute("description"));
 		setType(paramElement.getAttribute("type"));
-		setValue(paramElement.getAttribute("value"));
 		setOptional(Boolean.parseBoolean(paramElement.getAttribute("optional")));
-		if (paramElement.hasAttribute("enabled"))
-		{
-			setEnabled(Boolean.parseBoolean(paramElement.getAttribute("enabled")));
-		}
+		setEnabled(Boolean.parseBoolean(paramElement.getAttribute("enabled")));
 
 		for (Element optionNode : ConfigUtil.children(paramElement, "Option"))
 		{
 			options.add(new Option(optionNode));
 		}
+		
+		setValue(paramElement.getAttribute("value"));
 	}
 
 	public void addOption(Option opt)
 	{
 		options.add(opt);
+	}
+	
+	public List<Option> getOptions()
+	{
+		return options;
+	}
+	
+	public List<String> getOptionDisplayValues()
+	{
+		List<String> displays = new ArrayList<String>();
+		
+		for (Option opt : options)
+			displays.add(opt.toString());
+		
+		displays.sort(null);
+		
+		return displays;
 	}
 
 	public String getName()
@@ -85,7 +114,8 @@ public class Parameter
 
 	public void setValue(String value)
 	{
-		this.value = value;
+		if (validate(value))
+			this.value = value;
 	}
 
 	public boolean isOptional()
@@ -106,8 +136,15 @@ public class Parameter
 	public void setEnabled(boolean enabled)
 	{
 		if (!enabled && !optional)
+		{
 			Logger.log(LogLevel.k_error,
 							"Cannot disable the required parameter: " + name);
+			this.enabled = true;
+		}
+		else
+		{
+			this.enabled = enabled;
+		}
 	}
 
 	/**
@@ -135,9 +172,7 @@ public class Parameter
 		element.setAttribute("type", type);
 		element.setAttribute("value", value);
 		element.setAttribute("optional", Boolean.toString(optional));
-
-		if (optional)
-			element.setAttribute("enabled", Boolean.toString(enabled));
+		element.setAttribute("enabled", Boolean.toString(enabled));
 
 		for (Option opt : options)
 			element.appendChild(opt.toElement(doc));
@@ -145,25 +180,8 @@ public class Parameter
 		return element;
 	}
 
-	public void validate(Parameter other)
+	public boolean validate(String value)
 	{
-		// for sanity, the optional states should always be the same
-		if (optional != other.isOptional())
-		{
-			Logger.log(LogLevel.k_fatal, "Parameter " + other.getName()
-							+ " does not have the same optional designation as the spec.");
-		}
-
-		// (mismatching optional/enabled states are handled upon parameter
-		// creation)
-
-		// make sure the data types are the same
-		if (!type.toLowerCase().equals(other.getType().toLowerCase()))
-		{
-			Logger.log(LogLevel.k_fatal, "Parameter " + other.getName()
-							+ " should be of type " + type);
-		}
-
 		// make sure the input value conforms to the constraints of the options:
 
 		// for sanity, make sure the spec has at least one option
@@ -176,7 +194,7 @@ public class Parameter
 		boolean found = false;
 		for (Option opt : options)
 		{
-			if (opt.validate(other.getValue(), other.getType()))
+			if (opt.validate(value, type))
 			{
 				found = true;
 				break;
@@ -185,9 +203,10 @@ public class Parameter
 
 		if (!found)
 		{
-			Logger.log(LogLevel.k_fatal, "Parameter " + other.getName()
-							+ " has invalid value: " + other.getValue());
+			Logger.log(LogLevel.k_error, "Parameter " + name + " cannot be set to: " + value);
 		}
+		
+		return found;
 	}
 
 	/**

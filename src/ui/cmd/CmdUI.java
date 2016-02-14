@@ -86,6 +86,11 @@ public class CmdUI extends UI
 			if (result != null)
 				extract(result);
 		}
+		else if (args.contains("--install"))
+		{
+			//just install
+			ConfigurationAPI.install();
+		}
 		else
 		{
 			usage("tmp else");

@@ -9,6 +9,7 @@ import logging.Logger;
 public class SystemManager
 {
 	private static List<ActiveComponent> components;
+	private static boolean shutdownCalled = false;
 
 	static
 	{
@@ -28,24 +29,56 @@ public class SystemManager
 
 	public static void shutdown()
 	{
-		Logger.log(LogLevel.k_debug, "System Manager shutting down.");
-		
-		for (ActiveComponent component : components)
+		if (!shutdownCalled)
 		{
-			component.shutdown();
+			shutdownCalled = true;
+			
+			Logger.log(LogLevel.k_debug, "System Manager shutting down.");
+			
+			for (ActiveComponent component : components)
+			{
+				component.shutdown();
+			}
+	
+			// shutdown the log last
+			Logger.shutdown();
 		}
-
-		// shutdown the log last
-		Logger.shutdown();
 	}
 
 	public static boolean isShutdown()
 	{
+		if (components.isEmpty())
+			return true;
+		
 		for (ActiveComponent component : components)
 		{
 			if (!component.isShutdown())
+			{
 				return false;
+			}
 		}
+		
 		return true;
+	}
+	
+	private static class Exiter implements Runnable
+	{
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run()
+		{
+			while (!SystemManager.isShutdown())
+			{
+				try
+				{
+					Thread.sleep(100);
+				}
+				catch (InterruptedException e){}
+			}
+			
+			System.exit(0);
+		}
 	}
 }

@@ -17,12 +17,18 @@ public class Definition implements algorithms.Definition
 {
 	private static final String NAME = "Image";
 	private static final int VERSION_NUMBER = 1;
+	private static final String DESCRIPTION = "Data is encoded in the pixels of an image file. "
+					+ "(Very large or small images may result in excessivly long conversion times. If the "
+					+ "image is not large enough to contain the file header, the conversion "
+					+ "will fail. If the image file is too large, a lot of space may be wasted depending "
+					+ "on how fully the embedded data fills the last output image.)";
 	private static Definition self;
-	private String description;
+	
+	
+	public static final String IMAGE_TYPE_PROPERTY = "ImageType";
 
 	private Definition()
 	{
-		description = "Data is encoded in the pixels of an image file.";
 	}
 
 	public static Definition getInstance()
@@ -40,59 +46,55 @@ public class Definition implements algorithms.Definition
 	}
 
 	@Override
-	public Algorithm getDefaultAlgorithm()
+	public Algorithm constructDefaultAlgorithm()
 	{
-		return construct(false);
-	}
-
-	@Override
-	public Algorithm getAlgorithmSpec()
-	{
-		return construct(true);
-	}
-
-	private Algorithm construct(boolean includeOptions)
-	{
-		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER);
+		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER, DESCRIPTION);
 
 		{
 			// colors
-			Parameter param = new Parameter("Colors", "string", "rgb", false);
-			if (includeOptions)
-			{
-				param.addOption(new Option("rgb"));
-				param.addOption(new Option("rgba"));
-			}
+			Parameter param = new Parameter("Colors", Parameter.STRING_TYPE, false, true);
+			param.setDescription("The way to represent colors in the output image.");
+			
+			param.addOption(new Option("rgb", "Use one byte each for red, green, and blue to represent each pixel color."));
+
+			param.setValue("rgb");
+			
 			algo.addParameter(param);
 		}
 
 		{
 			// width
-			Parameter param = new Parameter("Width", "int", "1820", false);
-			if (includeOptions)
-			{
-				param.addOption(new Option("0", "10000"));
-			}
+			Parameter param = new Parameter("Width", Parameter.INT_TYPE, false, true);
+			param.setDescription("The width of the output image.");
+
+			param.addOption(new Option("0", "10000", "The width in pixels."));
+			
+			param.setValue("1820");
+
 			algo.addParameter(param);
 		}
 
 		{
 			// height
-			Parameter param = new Parameter("Height", "int", "980", false);
-			if (includeOptions)
-			{
-				param.addOption(new Option("0", "10000"));
-			}
+			Parameter param = new Parameter("Height", Parameter.INT_TYPE, false, true);
+			param.setDescription("The height of the output image.");
+
+			param.addOption(new Option("0", "10000", "The height in pixels."));
+			
+			param.setValue("980");
+
 			algo.addParameter(param);
 		}
 		
 		{
 			// image type
-			Parameter param = new Parameter("ImageType", "string", "png", false);
-			if (includeOptions)
-			{
-				param.addOption(new Option("png"));
-			}
+			Parameter param = new Parameter(IMAGE_TYPE_PROPERTY, Parameter.STRING_TYPE, false, true);
+			param.setDescription("The file format to output images in.");
+
+			param.addOption(new Option("png", "Output png images."));
+			
+			param.setValue("png");
+
 			algo.addParameter(param);
 		}
 
@@ -129,32 +131,15 @@ public class Definition implements algorithms.Definition
 		List<Algorithm> presets = new LinkedList<Algorithm>();
 		
 		//basic
-		Algorithm basic = construct(false);
+		Algorithm basic = constructDefaultAlgorithm();
 		basic.setPresetName("image_basic");
 		presets.add(basic);
 		
 		//secure
-		Algorithm secure = construct(false);
+		Algorithm secure = constructDefaultAlgorithm();
 		secure.setPresetName("image_secure");
-		secure.setParameter("ProductMode", "secure");
 		presets.add(secure);
-		
-		//test trackable
-		Algorithm trackable = construct(false);
-		trackable.setPresetName("test_image_trackable");
-		trackable.setParameter("ProductMode", "trackable");
-		presets.add(trackable);
 		
 		return presets;
 	}
-
-	/* (non-Javadoc)
-	 * @see algorithms.Definition#getDescription()
-	 */
-	@Override
-	public String getDescription()
-	{
-		return description;
-	}
-
 }

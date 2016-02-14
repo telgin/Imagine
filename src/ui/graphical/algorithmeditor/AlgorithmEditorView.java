@@ -1,7 +1,10 @@
 package ui.graphical.algorithmeditor;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import algorithms.Parameter;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -9,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -27,9 +31,15 @@ public class AlgorithmEditorView extends View
 {
 	private AlgorithmEditorController controller;
 	
-	private Label profileLabel;
-	private ChoiceBox<String> profileSelect;
-	private Button saveProfileButton;
+	private Label presetLabel;
+	private ChoiceBox<String> algorithmSelect;
+	private ListView<String> presetList, parameterList;
+	private Button createNewButton, saveButton;
+	private StringProperty presetName;
+	private ChoiceProperty algorithmType;
+	private DescriptionProperty algorithmDescription, parameterDescription;
+	private BooleanProperty parameterEnabled;
+	private VBox optionSection;
 
 	/**
 	 * @update_comment
@@ -39,7 +49,7 @@ public class AlgorithmEditorView extends View
 	{
 		super(window);
 		
-		controller = new AlgorithmEditorController();
+		controller = new AlgorithmEditorController(this);
 	}
 
 	/* (non-Javadoc)
@@ -60,134 +70,162 @@ public class AlgorithmEditorView extends View
 	{
 		BorderPane base = new BorderPane();
 		
-		base.setLeft(setupEditProfileSection());
-		base.setRight(setupEditAlgorithmSection());
+		base.setCenter(setupAlgorithmSection());
 		
 		return base;
+	}
+	
+	private Node setupAlgorithmSection()
+	{
+		HBox hbox = new HBox();
+		hbox.setSpacing(3);
+		hbox.setPadding(new Insets(20,20,20,20));
+		
+		hbox.getChildren().add(setupPresetSelectionSection());
+		hbox.getChildren().add(setupEditAttributesSection());
+		hbox.getChildren().add(setupParameterSelectionSection());
+		hbox.getChildren().add(setupEditParameterSection());
+		
+		return hbox;
+	}
+	
+
+
+	private Node setupButtonSection()
+	{
+		HBox hbox = new HBox();
+		hbox.setSpacing(40);
+		hbox.setPadding(new Insets(20,20,20,20));
+		
+		//create new preset button
+		createNewButton = new Button();
+		createNewButton.setText("Create New");
+		createNewButton.setOnAction(e -> controller.createNewPressed());
+		hbox.getChildren().add(createNewButton);
+		
+		//save button
+		saveButton = new Button();
+		saveButton.setText("Save");
+		saveButton.setOnAction(e -> controller.savePressed());
+		hbox.getChildren().add(saveButton);
+		
+		return hbox;
+	}
+	
+	private Node setupPresetSelectionSection()
+	{
+		VBox vbox = new VBox();
+		vbox.setSpacing(3);
+		vbox.setPadding(new Insets(10,10,10,10));
+
+		//presets label
+		Label sectionLabel = new Label("Existing Presets");
+		sectionLabel.setFont(new Font("Arial", 20));
+		sectionLabel.setPadding(new Insets(0, 0, 10, 0));
+		vbox.getChildren().add(sectionLabel);
+		
+		//preset list
+		presetList = new ListView<String>();
+		presetList.setItems(FXCollections.observableArrayList(controller.getPresetNames()));
+		presetList.getSelectionModel().selectedIndexProperty().addListener(
+						(ObservableValue<? extends Number> value,
+										Number oldIndex, Number newIndex) ->
+											presetSelected(value, oldIndex, newIndex));
+		
+		vbox.getChildren().add(presetList);
+		
+		//buttons
+		vbox.getChildren().add(setupButtonSection());
+		
+		return vbox;
+	}
+	
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	private Node setupEditAttributesSection()
+	{
+		VBox vbox = new VBox();
+		vbox.setSpacing(3);
+		vbox.setPadding(new Insets(10,10,10,10));
+		
+		//preset name
+		presetName = new StringProperty("Preset Name");
+		presetName.setup(vbox);
+		
+		//algorithm type
+		algorithmType = new ChoiceProperty("Algorithm", 
+						controller.getAlgorithmNames(),
+						e -> controller.algorithmSelected(e));
+		algorithmType.setup(vbox);
+		
+		//algorithm description
+		algorithmDescription = new DescriptionProperty("Algorithm Description");
+		algorithmDescription.setup(vbox);
+		algorithmDescription.getArea().setPrefSize(175, 180);
+		algorithmDescription.getArea().setWrapText(true);
+		
+		return vbox;
+	}
+	
+	public void setSelectedAlgorithm(String choice)
+	{
+		algorithmType.setSelectedChoice(choice);
+	}
+
+	
+	public String getPresetName()
+	{
+		return presetName.getText();
+	}
+	
+	public void setPresetName(String name)
+	{
+		presetName.setText(name);
+	}
+	
+	public void setAlgorithmDescription(String text)
+	{
+		algorithmDescription.setText(text);
+	}
+	
+	public void setParameterDescription(String text)
+	{
+		parameterDescription.setText(text);
+	}
+	
+	public void setParameterNames(List<String> parameterNames)
+	{
+		parameterList.setItems(FXCollections.observableArrayList(parameterNames));
 	}
 
 	/**
 	 * @update_comment
 	 * @return
 	 */
-	private Node setupEditProfileSection()
-	{	
+	private Node setupParameterSelectionSection()
+	{
 		VBox vbox = new VBox();
 		vbox.setSpacing(3);
-		vbox.setPadding(new Insets(14,10,20,20));
-
-		//section label
-		Label sectionLabel = new Label("Edit Profiles");
+		vbox.setPadding(new Insets(10,10,10,10));
+		
+		//presets label
+		Label sectionLabel = new Label("Algorithm Parameters");
 		sectionLabel.setFont(new Font("Arial", 20));
 		sectionLabel.setPadding(new Insets(0, 0, 10, 0));
 		vbox.getChildren().add(sectionLabel);
 		
-		//profile selection row
-		HBox profileSelectionRow = new HBox();
-		profileSelectionRow.setPadding(new Insets(2, 2, 2, 2));
-		profileSelectionRow.setSpacing(10);
-		
-		//profile label
-		profileLabel = new Label("Profile:");
-		profileLabel.setPadding(new Insets(5, 0, 0, 0));
-		profileSelectionRow.getChildren().add(profileLabel);
-		
-		//profile select
-		profileSelect = new ChoiceBox<>();
-		profileSelect.setItems(FXCollections.observableArrayList(controller.getProfiles()));
-		profileSelect.getSelectionModel().selectedIndexProperty().addListener(
+		//parameter list
+		parameterList = new ListView<String>();
+		parameterList.setItems(FXCollections.observableArrayList(controller.getParameterNames()));
+		parameterList.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
-											profileSelected(value, oldIndex, newIndex));
-		profileSelectionRow.getChildren().add(profileSelect);
+											parameterSelected(value, oldIndex, newIndex));
 		
-		//save profile button
-		saveProfileButton = new Button();
-		saveProfileButton.setText("Save Profile");
-		saveProfileButton.setOnAction(e -> controller.saveProfilePressed());
-		profileSelectionRow.getChildren().add(saveProfileButton);
-		
-		vbox.getChildren().add(profileSelectionRow);
-		
-		//profile scroll pane
-		ScrollPane profileScroll = new ScrollPane();
-		VBox profileProperties = new VBox();
-		profileProperties.setPadding(new Insets(2, 2, 2, 5));
-		profileProperties.setSpacing(5);
-		
-		//profile name
-		StringProperty profileName = new StringProperty("Profile Name:");
-		profileName.setup(profileProperties);
-		
-		//profile algorithm preset
-		ChoiceProperty algoPresetSelect = new ChoiceProperty("Algorithm Preset:",
-						controller.getProfiles(), i -> controller.algorithmSelected(i));
-		algoPresetSelect.setup(profileProperties);
-		
-		//use key file
-		BooleanProperty useKeyFile = new BooleanProperty("Use key file?",
-						b -> controller.keyFileChecked(b));
-		useKeyFile.setup(profileProperties);
-		
-		//key file
-		FileProperty keyFilePath = new FileProperty("Key File:", e -> controller.browseKeyFile());
-		keyFilePath.setup(profileProperties);
-		
-		//static tracked files
-		FileListProperty trackedFiles = new FileListProperty("Tracked Files/Folders: (Optional)",
-						e -> controller.addTrackedFilePressed(),
-						e -> controller.addTrackedFolderPressed(),
-						e -> controller.removeTrackedFilePressed());
-		trackedFiles.setup(profileProperties);
-		
-		//static untracked files
-		FileListProperty untrackedFiles = new FileListProperty("Untracked Files/Folders: (Optional)",
-						e -> controller.addUntrackedFilePressed(),
-						e -> controller.addUntrackedFolderPressed(),
-						e -> controller.removeUntrackedFilePressed());
-		untrackedFiles.setup(profileProperties);
-		
-		//use static output folder
-		BooleanProperty useStaticOutputFolder = new BooleanProperty("Use static output folder?",
-						b -> controller.staticOutputFolderChecked(b));
-		useStaticOutputFolder.setup(profileProperties);
-		
-		//static output folder
-		FileProperty staticOutputFolderPath = new FileProperty("Static Output Folder:",
-						e -> controller.browseStaticOutputFolder());
-		staticOutputFolderPath.setup(profileProperties);
-		
-		//use custom database file
-		BooleanProperty useCustomHashDB = new BooleanProperty("Use custom database file?",
-						b -> controller.customDBChecked(b));
-		useCustomHashDB.setup(profileProperties);
-		
-		//hashdb file
-		FileProperty hashDBPath = new FileProperty("Database File:",
-						e -> controller.browseHashDBFile());
-		hashDBPath.setup(profileProperties);
-		
-		//using index files
-		BooleanProperty useIndexFiles = new BooleanProperty("Index file system?",
-						b -> controller.useIndexFilesChecked(b));
-		useIndexFiles.setup(profileProperties);
-		
-		//using absolute paths
-		BooleanProperty useAbsolutePaths = new BooleanProperty("Use absolute paths?",
-						b -> controller.useAbsolutePathsChecked(b));
-		useAbsolutePaths.setup(profileProperties);
-		
-		//using structured output folders
-		BooleanProperty useStructuredOutput = new BooleanProperty("Structure file output?",
-						b -> controller.useStructuredOutputChecked(b));
-		useStructuredOutput.setup(profileProperties);
-		
-		
-		profileProperties.setPrefWidth(350);
-		profileScroll.setContent(profileProperties);
-		vbox.getChildren().add(profileScroll);
-		
-		
+		vbox.getChildren().add(parameterList);
+				
 		return vbox;
 	}
 
@@ -195,10 +233,37 @@ public class AlgorithmEditorView extends View
 	 * @update_comment
 	 * @return
 	 */
-	private void browseKeyFile()
+	private Node setupEditParameterSection()
 	{
+		VBox vbox = new VBox();
+		vbox.setSpacing(3);
+		vbox.setPadding(new Insets(10,10,10,10));
 		
+		//enabled check box
+		parameterEnabled = new BooleanProperty("Enabled", b -> controller.parameterEnabledChecked(b));
+		parameterEnabled.setup(vbox);
+		
+		//algorithm description
+		parameterDescription = new DescriptionProperty("Parameter Description");
+		parameterDescription.setup(vbox);
+		parameterDescription.getArea().setPrefSize(175, 180);
+		parameterDescription.getArea().setWrapText(true);
+		
+		//option section
+		optionSection = new VBox();
+		optionSection.setSpacing(3);
+		optionSection.setPadding(new Insets(10,10,10,10));
+		optionSection.setPrefHeight(200);
+		vbox.getChildren().add(optionSection);
+		
+		return vbox;
 	}
+	
+	public void allowParameterEnabledChange(boolean allow)
+	{
+		parameterEnabled.setEnabled(allow);
+	}
+
 
 	/**
 	 * @update_comment
@@ -207,19 +272,23 @@ public class AlgorithmEditorView extends View
 	 * @param newIndex
 	 * @return
 	 */
-	private void profileSelected(ObservableValue<? extends Number> value,
+	private void presetSelected(ObservableValue<? extends Number> value,
 					Number oldIndex, Number newIndex)
 	{
-		
+		controller.presetSelected(newIndex.intValue());
 	}
-
+	
 	/**
 	 * @update_comment
+	 * @param value
+	 * @param oldIndex
+	 * @param newIndex
 	 * @return
 	 */
-	private Node setupEditAlgorithmSection()
+	private void parameterSelected(ObservableValue<? extends Number> value,
+					Number oldIndex, Number newIndex)
 	{
-		return new BorderPane();
+		controller.parameterSelected(newIndex.intValue());
 	}
 
 	/* (non-Javadoc)
@@ -238,7 +307,56 @@ public class AlgorithmEditorView extends View
 	@Override
 	public String getTabName()
 	{
-		return "Configuration Editor";
+		return "Algorithm Editor";
+	}
+
+	/**
+	 * @update_comment
+	 * @param enabled
+	 */
+	public void setParameterEnabled(boolean enabled)
+	{
+		parameterEnabled.setChecked(enabled);
+	}
+
+	/**
+	 * @update_comment
+	 * @param object
+	 */
+	public void setSelectedParameter(int index)
+	{
+		parameterList.getSelectionModel().select(index);
+	}
+
+	/**
+	 * @update_comment
+	 */
+	public void removeParameterOptions()
+	{
+		optionSection.getChildren().clear();
+	}
+
+	/**
+	 * @update_comment
+	 * @param selectedParameter
+	 */
+	public void displayParameterOptions(Parameter parameter)
+	{
+		if (parameter.getType().equals(Parameter.STRING_TYPE))
+		{
+			if (parameter.getOptions().size() == 1 && parameter.getOptions().get(0).getValue().equals("*"))
+			{
+				StringProperty prop = new StringProperty("Value");
+				prop.setup(optionSection);
+			}
+			else
+			{
+				ChoiceProperty prop = new ChoiceProperty("Value",
+								parameter.getOptionDisplayValues(), e -> controller.optionSelected(e));
+				prop.setup(optionSection);
+				prop.setSelectedChoice(parameter.getValue());
+			}
+		}
 	}
 
 }

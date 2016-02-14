@@ -24,7 +24,7 @@ public abstract class Text implements Product
 	{
 		algorithm = algo;
 		this.key = key;
-		blockSize = Integer.parseInt(algorithm.getParameterValue(Definition.blockSizeParam));
+		blockSize = Integer.parseInt(algorithm.getParameterValue(Definition.BLOCK_SIZE_PARAM));
 		Logger.log(LogLevel.k_debug, "Text Product Created");
 	}
 

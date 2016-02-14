@@ -37,17 +37,15 @@ public class AlgorithmRegistry
 	
 	public static List<String> getAlgorithmNames()
 	{
-		return new ArrayList<String>(definitions.keySet());
+		List<String> names = new ArrayList<String>(definitions.keySet());
+		names.sort(null);
+		
+		return names;
 	}
 	
 	public static Algorithm getDefaultAlgorithm(String name)
 	{
-		return definitions.get(name).getDefaultAlgorithm();
-	}
-	
-	public static Algorithm getAlgorithmSpec(String name)
-	{
-		return definitions.get(name).getAlgorithmSpec();
+		return definitions.get(name).constructDefaultAlgorithm();
 	}
 	
 	/**
@@ -77,16 +75,4 @@ public class AlgorithmRegistry
 		return definitions.get(algo.getName()).getProductFactoryCreation()
 				.createWriter(algo, key);
 	}
-
-	/**
-	 * @update_comment
-	 * @param algoDefName
-	 * @return
-	 */
-	public static String getAlgorithmDefinitionDescription(String algoName)
-	{
-		return definitions.get(algoName).getDescription();
-	}
-
-	
 }

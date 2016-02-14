@@ -18,11 +18,6 @@ public abstract class ConfigurationAPI
 	{
 		//create a config file
 		DefaultConfigGenerator.create(Constants.CONFIG_FILE);
-		
-		//create these folders now, because it's better to show
-		//they exist and are empty as opposed to creating them
-		//when they're needed
-		Configuration.getLogFolder().mkdir();
 	}
 	
 	//Algorithm Preset Operations------------------------
@@ -75,7 +70,7 @@ public abstract class ConfigurationAPI
 		return AlgorithmRegistry.getAlgorithmNames();
 	}
 	
-	public static String getAlgorithmDefinitionDescription(String algoDefName) throws UsageException
+	public static Algorithm getDefaultAlgorithm(String algoDefName) throws UsageException
 	{
 		if (algoDefName == null || algoDefName.length() == 0)
 			throw new UsageException("The algorithm definition name must be defined.");
@@ -83,17 +78,6 @@ public abstract class ConfigurationAPI
 		if (!AlgorithmRegistry.getAlgorithmNames().contains(algoDefName))
 			throw new UsageException("An algorithm definition by the name of '" + algoDefName + "' does not exist.");
 		
-		return AlgorithmRegistry.getAlgorithmDefinitionDescription(algoDefName);
-	}
-	
-	public static Algorithm getAlgorithmDefinition(String algoDefName) throws UsageException
-	{
-		if (algoDefName == null || algoDefName.length() == 0)
-			throw new UsageException("The algorithm definition name must be defined.");
-		
-		if (!AlgorithmRegistry.getAlgorithmNames().contains(algoDefName))
-			throw new UsageException("An algorithm definition by the name of '" + algoDefName + "' does not exist.");
-		
-		return AlgorithmRegistry.getAlgorithmSpec(algoDefName);
+		return AlgorithmRegistry.getDefaultAlgorithm(algoDefName);
 	}
 }

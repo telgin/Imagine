@@ -14,7 +14,6 @@ import ui.graphical.View;
 import ui.graphical.algorithmeditor.AlgorithmEditorView;
 import ui.graphical.archiveviewer.OpenArchiveView;
 import ui.graphical.embed.EmbedView;
-import ui.graphical.history.HistoryView;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -33,8 +32,7 @@ public class TopView extends View
 		tabViews = new ArrayList<View>();
 		tabViews.add(new OpenArchiveView(window, result.inputFile));
 		tabViews.add(new EmbedView(window));
-		tabViews.add(new HistoryView(window));
-		//tabViews.add(new AlgorithmEditorView(window));
+		tabViews.add(new AlgorithmEditorView(window));
 	}
 	
 	/* (non-Javadoc)

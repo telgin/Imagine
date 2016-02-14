@@ -11,25 +11,56 @@ public class Option
 	private String value;
 	private String startRange;
 	private String endRange;
+	private String description;
 	
-	public static final Option PROMPT_OPTION = new Option("Prompt For Value");
+	public static final Option PROMPT_OPTION = new Option("Prompt For Value", "Prompt for this value at run time.");
 
-	public Option(String value)
+	public Option(String value, String description)
 	{
 		this.value = value;
+		this.description = description;
+	}
+	
+	public Option(String startRange, String endRange, String description)
+	{
+		this.startRange = startRange;
+		this.endRange = endRange;
+		this.description = description;
 	}
 
 	public Option(Element optionNode)
 	{
-		this.value = optionNode.getAttribute("value");
+		if (optionNode.hasAttribute("value"))
+			this.value = optionNode.getAttribute("value");
+		
+		if (optionNode.hasAttribute("startRange"))
+			this.startRange = optionNode.getAttribute("startRange");
+		
+		if (optionNode.hasAttribute("endRange"))
+			this.endRange = optionNode.getAttribute("endRange");
 	}
 
-	public Option(String startRange, String endRange)
+	@Override
+	public Option clone()
 	{
-		this.startRange = startRange;
-		this.endRange = endRange;
-	}
+		Option clone = new Option(value, description);
+		clone.startRange = startRange;
+		clone.endRange = endRange;
 
+		return clone;
+	}
+	
+	public String toString()
+	{
+		if (value != null)
+			return value;
+		
+		if (startRange != null && endRange != null)
+			return "[" + startRange + ", " + endRange + "]";
+		
+		return "null";
+	}
+	
 	/**
 	 * @return the startRange
 	 */
@@ -64,29 +95,29 @@ public class Option
 		}
 		else
 		{
-			element.setAttribute("valueStartRange", startRange);
-			element.setAttribute("valueEndRange", endRange);
+			element.setAttribute("startRange", startRange);
+			element.setAttribute("endRange", endRange);
 		}
 
 		return element;
 	}
 
-	public boolean validate(String vOther, String type)
+	public boolean validate(String value, String type)
 	{
-		if (type.equals("string"))
+		if (type.equals(Parameter.STRING_TYPE))
 		{
 			if (value != null)
 			{
-				return value.equals("*") || value.equals(vOther);
+				return value.equals("*") || value.equals(value);
 			}
 
 			return false; // no ranges for strings
 		}
-		else if (type.equals("int"))
+		else if (type.equals(Parameter.INT_TYPE))
 		{
 			if (value != null)
 			{
-				return value.equals("*") || value.equals(vOther);
+				return value.equals("*") || value.equals(value);
 			}
 			else
 			{
@@ -94,25 +125,25 @@ public class Option
 								: Integer.parseInt(startRange);
 				int myEndRange = startRange.equals("*") ? Integer.MAX_VALUE
 								: Integer.parseInt(endRange);
-				int vOtherInt = Integer.parseInt(vOther);
+				int vOtherInt = Integer.parseInt(value);
 
 				return vOtherInt >= myStartRange && vOtherInt <= myEndRange;
 			}
 		}
-		else if (type.equals("boolean"))
+		else if (type.equals(Parameter.BOOLEAN_TYPE))
 		{
 			if (value != null)
 			{
-				return value.equals("*") || value.equals(vOther);
+				return value.equals("*") || value.equals(value);
 			}
 
 			return false; // no ranges for booleans
 		}
-		else if (type.equals("long"))
+		else if (type.equals(Parameter.LONG_TYPE))
 		{
 			if (value != null)
 			{
-				return value.equals("*") || value.equals(vOther);
+				return value.equals("*") || value.equals(value);
 			}
 			else
 			{
@@ -120,10 +151,15 @@ public class Option
 								: Long.parseLong(startRange);
 				long myEndRange = startRange.equals("*") ? Long.MAX_VALUE
 								: Long.parseLong(endRange);
-				long vOtherLong = Long.parseLong(vOther);
+				long vOtherLong = Long.parseLong(value);
 
 				return vOtherLong >= myStartRange && vOtherLong <= myEndRange;
 			}
+		}
+		else if (type.equals(Parameter.FILE_TYPE))
+		{
+			//for now, any non-empty string could be valid
+			return value != null && !value.isEmpty();
 		}
 		else
 		{

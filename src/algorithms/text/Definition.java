@@ -17,14 +17,15 @@ public class Definition implements algorithms.Definition
 {
 	private static final String NAME = "Text";
 	private static final int VERSION_NUMBER = 1;
+	private static final String DESCRIPTION = "Data is encoded into text files such "
+						+ "that all characters are ascii.";
 	private static Definition self;
-	private String description;
 	
-	public static final String encodingParam = "encoding";
-	public static final String blockSizeParam = "blockSize";
+	public static final String ENCODING_PARAM = "encoding";
+	public static final String BLOCK_SIZE_PARAM = "blockSize";
 	
-	public static final String base64Encoding = "Base64";
-	public static final String hexEncoding = "Hex";
+	public static final String BASE64_ENCODING = "Base64";
+	public static final String HEX_ENCODING = "Hex";
 	
 
 	/**
@@ -32,8 +33,6 @@ public class Definition implements algorithms.Definition
 	 */
 	private Definition()
 	{
-		description = "Data is encoded into text files such "
-						+ "that all characters are ascii.";
 	}
 
 	/**
@@ -65,49 +64,32 @@ public class Definition implements algorithms.Definition
 	 * @see algorithms.Definition#getDefaultAlgorithm()
 	 */
 	@Override
-	public Algorithm getDefaultAlgorithm()
+	public Algorithm constructDefaultAlgorithm()
 	{
-		return construct(false);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see algorithms.Definition#getAlgorithmSpec()
-	 */
-	@Override
-	public Algorithm getAlgorithmSpec()
-	{
-		return construct(true);
-	}
-
-	/**
-	 * @update_comment
-	 * @param includeOptions
-	 * @return
-	 */
-	private Algorithm construct(boolean includeOptions)
-	{
-		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER);
+		Algorithm algo = new Algorithm(NAME, VERSION_NUMBER, DESCRIPTION);
 
 		{
 			// blockSize
-			Parameter param = new Parameter(blockSizeParam, "int", "102400", false);
-			if (includeOptions)
-			{
-				param.addOption(new Option("500", Integer.toString(Integer.MAX_VALUE)));
-			}
+			Parameter param = new Parameter(BLOCK_SIZE_PARAM, Parameter.INT_TYPE, false, true);
+			param.setDescription("The number of bytes of input data to put in each output file.");
+
+			param.addOption(new Option("500", Integer.toString(Integer.MAX_VALUE), ""));
+			
+			param.setValue("102400");
+
 			algo.addParameter(param);
 		}
 		
 		{
 			// encoding
-			Parameter param = new Parameter(encodingParam, "string", base64Encoding, false);
-			if (includeOptions)
-			{
-				param.addOption(new Option(base64Encoding));
-				param.addOption(new Option(hexEncoding));
-			}
+			Parameter param = new Parameter(ENCODING_PARAM, Parameter.STRING_TYPE, false, true);
+			param.setDescription("The encoding of bytes to output text as.");
+			
+			param.addOption(new Option(BASE64_ENCODING, ""));
+			param.addOption(new Option(HEX_ENCODING, ""));
+			
+			param.setValue(BASE64_ENCODING);
+			
 			algo.addParameter(param);
 		}
 
@@ -149,26 +131,16 @@ public class Definition implements algorithms.Definition
 		List<Algorithm> presets = new LinkedList<Algorithm>();
 		
 		//basic
-		Algorithm basic = construct(false);
+		Algorithm basic = constructDefaultAlgorithm();
 		basic.setPresetName("text_basic");
 		presets.add(basic);
 		
 		//secure
-		Algorithm secure = construct(false);
+		Algorithm secure = constructDefaultAlgorithm();
 		secure.setPresetName("text_secure");
 		presets.add(secure);
 
 		
 		return presets;
 	}
-
-	/* (non-Javadoc)
-	 * @see algorithms.Definition#getDescription()
-	 */
-	@Override
-	public String getDescription()
-	{
-		return description;
-	}
-
 }

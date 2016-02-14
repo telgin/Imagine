@@ -72,7 +72,7 @@ public class TextWriter extends Text implements ProductWriter
 							"Saving product file: " + toSave.getAbsolutePath());
 
 			PrintWriter writer = new PrintWriter(toSave);
-			if (algorithm.getParameter(Definition.encodingParam).getValue().equals(Definition.base64Encoding))
+			if (algorithm.getParameter(Definition.ENCODING_PARAM).getValue().equals(Definition.BASE64_ENCODING))
 				writer.print(ByteConversion.bytesToBase64(buffer));
 			else
 				writer.print(ByteConversion.bytesToHex(buffer));
