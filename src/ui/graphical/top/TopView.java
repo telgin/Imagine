@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import algorithms.Parameter;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
@@ -88,6 +89,16 @@ public class TopView extends View
 	public String getTabName()
 	{
 		return "Top View";
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	public String promptParameterValue(Parameter parameter)
+	{
+		int selectedTabIndex = tabPane.getSelectionModel().getSelectedIndex();
+		return tabViews.get(selectedTabIndex).promptParameterValue(parameter);
 	}
 
 }

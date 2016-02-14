@@ -116,4 +116,16 @@ public class FileListProperty extends ConfigurationProperty
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see ui.graphical.algorithmeditor.ConfigurationProperty#setErrorState(boolean)
+	 */
+	@Override
+	public void setErrorState(boolean error)
+	{
+		if (error)
+			table.setStyle("-fx-text-inner-color: red;");
+		else
+			table.setStyle("-fx-text-inner-color: black;");
+	}
+
 }

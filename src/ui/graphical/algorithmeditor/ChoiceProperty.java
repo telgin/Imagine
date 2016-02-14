@@ -98,4 +98,16 @@ public class ChoiceProperty extends ConfigurationProperty
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see ui.graphical.algorithmeditor.ConfigurationProperty#setErrorState(boolean)
+	 */
+	@Override
+	public void setErrorState(boolean error)
+	{
+		if (error)
+			choiceBox.setStyle("-fx-highlight-fill: red");
+		else
+			choiceBox.setStyle("-fx-highlight-fill: white");
+	}
+
 }

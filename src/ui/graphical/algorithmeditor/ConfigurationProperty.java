@@ -14,11 +14,11 @@ public abstract class ConfigurationProperty
 {
 	private Label label;
 	
-	
-	
 	public abstract void setup(VBox container);
 	
 	public abstract void setEnabled(boolean enabled);
+	
+	public abstract void setErrorState(boolean error);
 	
 	protected HBox indentElement(int indent, Node element)
 	{

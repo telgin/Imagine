@@ -1,9 +1,9 @@
 package ui.graphical.algorithmeditor;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
+import algorithms.Option;
 import algorithms.Parameter;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -13,8 +13,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -30,9 +28,7 @@ import ui.graphical.View;
 public class AlgorithmEditorView extends View
 {
 	private AlgorithmEditorController controller;
-	
-	private Label presetLabel;
-	private ChoiceBox<String> algorithmSelect;
+
 	private ListView<String> presetList, parameterList;
 	private Button createNewButton, saveButton;
 	private StringProperty presetName;
@@ -40,6 +36,7 @@ public class AlgorithmEditorView extends View
 	private DescriptionProperty algorithmDescription, parameterDescription;
 	private BooleanProperty parameterEnabled;
 	private VBox optionSection;
+	private ConfigurationProperty optionSelection;
 
 	/**
 	 * @update_comment
@@ -71,6 +68,8 @@ public class AlgorithmEditorView extends View
 		BorderPane base = new BorderPane();
 		
 		base.setCenter(setupAlgorithmSection());
+		
+		reset();
 		
 		return base;
 	}
@@ -127,6 +126,7 @@ public class AlgorithmEditorView extends View
 		//preset list
 		presetList = new ListView<String>();
 		presetList.setItems(FXCollections.observableArrayList(controller.getPresetNames()));
+		presetList.setPrefWidth(presetList.getPrefWidth() - 75);
 		presetList.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
@@ -211,7 +211,7 @@ public class AlgorithmEditorView extends View
 		vbox.setPadding(new Insets(10,10,10,10));
 		
 		//presets label
-		Label sectionLabel = new Label("Algorithm Parameters");
+		Label sectionLabel = new Label("Parameters");
 		sectionLabel.setFont(new Font("Arial", 20));
 		sectionLabel.setPadding(new Insets(0, 0, 10, 0));
 		vbox.getChildren().add(sectionLabel);
@@ -219,12 +219,21 @@ public class AlgorithmEditorView extends View
 		//parameter list
 		parameterList = new ListView<String>();
 		parameterList.setItems(FXCollections.observableArrayList(controller.getParameterNames()));
+		parameterList.setPrefWidth(150);
+		parameterList.setPrefHeight(250);
 		parameterList.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
 											parameterSelected(value, oldIndex, newIndex));
 		
 		vbox.getChildren().add(parameterList);
+		
+		//parameter description
+		parameterDescription = new DescriptionProperty("Parameter Description");
+		parameterDescription.setup(vbox);
+		parameterDescription.getArea().setPrefSize(175, 180);
+		parameterDescription.getArea().setWrapText(true);
+		parameterDescription.setPadding(new Insets(20, 0, 0, 0));
 				
 		return vbox;
 	}
@@ -239,21 +248,12 @@ public class AlgorithmEditorView extends View
 		vbox.setSpacing(3);
 		vbox.setPadding(new Insets(10,10,10,10));
 		
-		//enabled check box
-		parameterEnabled = new BooleanProperty("Enabled", b -> controller.parameterEnabledChecked(b));
-		parameterEnabled.setup(vbox);
-		
-		//algorithm description
-		parameterDescription = new DescriptionProperty("Parameter Description");
-		parameterDescription.setup(vbox);
-		parameterDescription.getArea().setPrefSize(175, 180);
-		parameterDescription.getArea().setWrapText(true);
-		
 		//option section
 		optionSection = new VBox();
 		optionSection.setSpacing(3);
 		optionSection.setPadding(new Insets(10,10,10,10));
 		optionSection.setPrefHeight(200);
+		optionSection.setPrefWidth(300);
 		vbox.getChildren().add(optionSection);
 		
 		return vbox;
@@ -312,15 +312,6 @@ public class AlgorithmEditorView extends View
 
 	/**
 	 * @update_comment
-	 * @param enabled
-	 */
-	public void setParameterEnabled(boolean enabled)
-	{
-		parameterEnabled.setChecked(enabled);
-	}
-
-	/**
-	 * @update_comment
 	 * @param object
 	 */
 	public void setSelectedParameter(int index)
@@ -334,6 +325,7 @@ public class AlgorithmEditorView extends View
 	public void removeParameterOptions()
 	{
 		optionSection.getChildren().clear();
+		optionSelection = null;
 	}
 
 	/**
@@ -342,21 +334,143 @@ public class AlgorithmEditorView extends View
 	 */
 	public void displayParameterOptions(Parameter parameter)
 	{
+		//enabled check box
+		parameterEnabled = new BooleanProperty("Enabled", b -> controller.parameterEnabledChecked(b));
+		parameterEnabled.setup(optionSection);
+		parameterEnabled.setPadding(new Insets(0, 0, 20, 0));
+		parameterEnabled.setChecked(parameter.isEnabled());
+		parameterEnabled.setEnabled(parameter.isOptional());
+		
+		//define at runtime check box
+		if (parameter.getOptions().contains(Option.PROMPT_OPTION))
+		{
+			BooleanProperty prop = new BooleanProperty("Define at run time?", b -> controller.promptOptionSelected(b));
+			prop.setup(optionSection);
+			
+			System.out.println("The value: " + parameter.getValue());
+			if (parameter.getValue() != null)
+				prop.setChecked(parameter.getValue().equals(Option.PROMPT_OPTION.getValue()));
+		}
+		
 		if (parameter.getType().equals(Parameter.STRING_TYPE))
 		{
 			if (parameter.getOptions().size() == 1 && parameter.getOptions().get(0).getValue().equals("*"))
 			{
 				StringProperty prop = new StringProperty("Value");
 				prop.setup(optionSection);
+				optionSelection = prop;
 			}
 			else
 			{
 				ChoiceProperty prop = new ChoiceProperty("Value",
 								parameter.getOptionDisplayValues(), e -> controller.optionSelected(e));
 				prop.setup(optionSection);
+				optionSelection = prop;
 				prop.setSelectedChoice(parameter.getValue());
 			}
 		}
+		else if (parameter.getType().equals(Parameter.INT_TYPE) || parameter.getType().equals(Parameter.LONG_TYPE))
+		{
+			Option opt = parameter.getOptions().get(0);
+
+			//add value input
+			StringProperty prop = new StringProperty("Value: " + opt.toString());
+			prop.setup(optionSection);
+			prop.setEditedCallback(e -> controller.optionSelected(e));
+			optionSelection = prop;
+			prop.setText(parameter.getValue());
+		}
+		else if (parameter.getType().equals(Parameter.FILE_TYPE))
+		{
+			FileProperty prop = new FileProperty("Value", e -> selectOptionFolder());
+			prop.setup(optionSection);
+			optionSelection = prop;
+			
+			if (parameter.getValue() != null && !parameter.getValue().equals(Option.PROMPT_OPTION.getValue()))
+				prop.setPath(parameter.getValue());
+		}
 	}
 
+	/**
+	 * @update_comment
+	 * @param b
+	 */
+	public void setOptionSelectionErrorState(boolean error)
+	{
+		if (optionSelection != null)
+		{
+			optionSelection.setErrorState(error);
+		}
+	}
+	
+	public void setOptionSelectionEnabled(boolean enabled)
+	{
+		if (optionSelection != null)
+		{
+			optionSelection.setEnabled(enabled);
+		}
+	}
+	
+	public void selectOptionFolder()
+	{
+		File folder = chooseFolder();
+		controller.optionSelected(folder == null ? null : folder.getAbsolutePath());
+		((FileProperty) optionSelection).setPath(folder == null ? "[none selected]" : folder.getAbsolutePath());
+	}
+
+	/**
+	 * @update_comment
+	 */
+	public void reset()
+	{
+		//clear all content
+		presetList.setItems(null);
+		presetName.setText(null);
+		algorithmType.setSelectedChoice(null);
+		algorithmType.setChoices(null);
+		algorithmType.setEnabled(false);
+		algorithmDescription.setText(null);
+		parameterList.setItems(null);
+		parameterDescription.setText(null);
+		removeParameterOptions();
+		
+		//re-add the list of presets
+		presetList.setItems(FXCollections.observableArrayList(controller.getPresetNames()));
+	}
+
+	/**
+	 * @update_comment
+	 * @param enabled
+	 */
+	public void setParameterEnabled(boolean checked)
+	{
+		parameterEnabled.setChecked(checked);
+	}
+
+	/**
+	 * @update_comment
+	 * @param algorithmDefinitionNames
+	 */
+	public void setAlgorithmNames(List<String> algorithmDefinitionNames)
+	{
+		algorithmType.setChoices(algorithmDefinitionNames);
+	}
+
+	/**
+	 * @update_comment
+	 * @param b
+	 */
+	public void setAlgorithmSelectionEnabled(boolean enabled)
+	{
+		algorithmType.setEnabled(enabled);
+	}
+	
+	@Override
+	public String promptParameterValue(Parameter parameter)
+	{
+		//within the context of the configuration editor, we don't
+		//want to prompt the user for the value of a parameter, only
+		//show that we would prompt for the value during execution.
+		return Option.PROMPT_OPTION.getValue();
+	}
 }

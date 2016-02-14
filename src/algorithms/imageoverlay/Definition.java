@@ -63,6 +63,7 @@ public class Definition implements algorithms.Definition
 			param.setDescription("A folder of images to apply the overlay to.");
 
 			param.addOption(new Option("*", "Path to a folder."));
+			param.addOption(Option.PROMPT_OPTION);
 			
 			param.setValue(Option.PROMPT_OPTION.getValue());
 

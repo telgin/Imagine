@@ -3,6 +3,7 @@ package ui.graphical.algorithmeditor;
 import java.util.function.Consumer;
 
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -18,6 +19,7 @@ public class BooleanProperty extends ConfigurationProperty
 	private String name;
 	private CheckBox checkBox;
 	private Consumer<Boolean> callback;
+	private HBox propertyRow;
 	
 	public BooleanProperty(String name, Consumer<Boolean> callback)
 	{
@@ -32,7 +34,7 @@ public class BooleanProperty extends ConfigurationProperty
 	@Override
 	public void setup(VBox container)
 	{
-		HBox propertyRow = new HBox();
+		propertyRow = new HBox();
 		propertyRow.setSpacing(10);
 		propertyRow.getChildren().add(getLabel());
 		
@@ -90,6 +92,27 @@ public class BooleanProperty extends ConfigurationProperty
 	public void setChecked(boolean checked)
 	{
 		checkBox.setSelected(checked);
+	}
+
+	/* (non-Javadoc)
+	 * @see ui.graphical.algorithmeditor.ConfigurationProperty#setErrorState(boolean)
+	 */
+	@Override
+	public void setErrorState(boolean error)
+	{
+		if (error)
+			checkBox.setStyle("-fx-highlight-fill: red");
+		else
+			checkBox.setStyle("-fx-highlight-fill: white");
+	}
+
+	/**
+	 * @update_comment
+	 * @param insets
+	 */
+	public void setPadding(Insets insets)
+	{
+		propertyRow.setPadding(insets);
 	}
 
 }

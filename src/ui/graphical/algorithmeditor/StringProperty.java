@@ -1,5 +1,7 @@
 package ui.graphical.algorithmeditor;
 
+import java.util.function.Consumer;
+
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -12,6 +14,7 @@ public class StringProperty extends ConfigurationProperty
 {
 	private String name;
 	private TextField field;
+	private Consumer<String> callback;
 	
 	public StringProperty(String name)
 	{
@@ -52,6 +55,11 @@ public class StringProperty extends ConfigurationProperty
 	{
 		this.field = field;
 	}
+	
+	public void setEditedCallback(Consumer<String> callback)
+	{
+		field.textProperty().addListener((obsv, oldValue, newValue) -> callback.accept(newValue)) ;
+	}
 
 	/* (non-Javadoc)
 	 * @see ui.graphical.configeditor.ConfigurationProperty#setEnabled(boolean)
@@ -74,6 +82,25 @@ public class StringProperty extends ConfigurationProperty
 		{
 			getLabel().setStyle("-fx-opacity: 1");
 			field.setStyle("-fx-opacity: 1");
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see ui.graphical.algorithmeditor.ConfigurationProperty#setErrorState(boolean)
+	 */
+	@Override
+	public void setErrorState(boolean error)
+	{
+		if (error)
+		{
+			field.setStyle("-fx-text-inner-color: red; "
+							+ "-fx-text-box-border: red; "
+							+ "-fx-focus-color: red; "
+							+ "-fx-border-width: 2px;");
+		}
+		else
+		{
+			field.setStyle("");
 		}
 	}
 }

@@ -73,7 +73,7 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter(BLOCK_SIZE_PARAM, Parameter.INT_TYPE, false, true);
 			param.setDescription("The number of bytes of input data to put in each output file.");
 
-			param.addOption(new Option("500", Integer.toString(Integer.MAX_VALUE), ""));
+			param.addOption(new Option("500", Integer.toString(Integer.MAX_VALUE), null));
 			
 			param.setValue("102400");
 
@@ -85,8 +85,8 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter(ENCODING_PARAM, Parameter.STRING_TYPE, false, true);
 			param.setDescription("The encoding of bytes to output text as.");
 			
-			param.addOption(new Option(BASE64_ENCODING, ""));
-			param.addOption(new Option(HEX_ENCODING, ""));
+			param.addOption(new Option(BASE64_ENCODING, null));
+			param.addOption(new Option(HEX_ENCODING, null));
 			
 			param.setValue(BASE64_ENCODING);
 			

@@ -69,8 +69,7 @@ public class GUI extends UI
 	@Override
 	public String promptParameterValue(Parameter parameter)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return topView.promptParameterValue(parameter);
 	}
 
 	/* (non-Javadoc)

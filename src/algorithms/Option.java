@@ -12,7 +12,7 @@ public class Option
 	private String startRange;
 	private String endRange;
 	private String description;
-	
+
 	public static final Option PROMPT_OPTION = new Option("Prompt For Value", "Prompt for this value at run time.");
 
 	public Option(String value, String description)
@@ -38,6 +38,9 @@ public class Option
 		
 		if (optionNode.hasAttribute("endRange"))
 			this.endRange = optionNode.getAttribute("endRange");
+		
+		if (optionNode.hasAttribute("description"))
+			this.description = optionNode.getAttribute("description");
 	}
 
 	@Override
@@ -76,6 +79,22 @@ public class Option
 	{
 		return endRange;
 	}
+	
+	/**
+	 * @return the description
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
 
 	/**
 	 * @return the value
@@ -98,6 +117,9 @@ public class Option
 			element.setAttribute("startRange", startRange);
 			element.setAttribute("endRange", endRange);
 		}
+		
+		if (description != null)
+			element.setAttribute("description", description);
 
 		return element;
 	}
@@ -106,54 +128,68 @@ public class Option
 	{
 		if (type.equals(Parameter.STRING_TYPE))
 		{
-			if (value != null)
+			if (this.value != null)
 			{
-				return value.equals("*") || value.equals(value);
+				return this.value.equals("*") || this.value.equals(value);
 			}
 
 			return false; // no ranges for strings
 		}
 		else if (type.equals(Parameter.INT_TYPE))
 		{
-			if (value != null)
+			if (this.value != null)
 			{
-				return value.equals("*") || value.equals(value);
+				return this.value.equals("*") || this.value.equals(value);
 			}
 			else
 			{
-				int myStartRange = startRange.equals("*") ? Integer.MIN_VALUE
-								: Integer.parseInt(startRange);
-				int myEndRange = startRange.equals("*") ? Integer.MAX_VALUE
-								: Integer.parseInt(endRange);
-				int vOtherInt = Integer.parseInt(value);
-
-				return vOtherInt >= myStartRange && vOtherInt <= myEndRange;
+				try
+				{
+					int myStartRange = startRange.equals("*") ? Integer.MIN_VALUE
+									: Integer.parseInt(startRange);
+					int myEndRange = startRange.equals("*") ? Integer.MAX_VALUE
+									: Integer.parseInt(endRange);
+					int vOtherInt = Integer.parseInt(value);
+	
+					return vOtherInt >= myStartRange && vOtherInt <= myEndRange;
+				}
+				catch (NumberFormatException e)
+				{
+					return false;
+				}
 			}
 		}
 		else if (type.equals(Parameter.BOOLEAN_TYPE))
 		{
-			if (value != null)
+			if (this.value != null)
 			{
-				return value.equals("*") || value.equals(value);
+				return this.value.equals("*") || this.value.equals(value);
 			}
 
 			return false; // no ranges for booleans
 		}
 		else if (type.equals(Parameter.LONG_TYPE))
 		{
-			if (value != null)
+			if (this.value != null)
 			{
-				return value.equals("*") || value.equals(value);
+				return this.value.equals("*") || this.value.equals(value);
 			}
 			else
 			{
-				long myStartRange = startRange.equals("*") ? Long.MIN_VALUE
-								: Long.parseLong(startRange);
-				long myEndRange = startRange.equals("*") ? Long.MAX_VALUE
-								: Long.parseLong(endRange);
-				long vOtherLong = Long.parseLong(value);
-
-				return vOtherLong >= myStartRange && vOtherLong <= myEndRange;
+				try
+				{
+					long myStartRange = startRange.equals("*") ? Long.MIN_VALUE
+									: Long.parseLong(startRange);
+					long myEndRange = startRange.equals("*") ? Long.MAX_VALUE
+									: Long.parseLong(endRange);
+					long vOtherLong = Long.parseLong(value);
+	
+					return vOtherLong >= myStartRange && vOtherLong <= myEndRange;
+				}
+				catch (NumberFormatException e)
+				{
+					return false;
+				}
 			}
 		}
 		else if (type.equals(Parameter.FILE_TYPE))
@@ -166,5 +202,64 @@ public class Option
 			Logger.log(LogLevel.k_fatal, "Unrecognized data type: " + type);
 			return false;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((endRange == null) ? 0 : endRange.hashCode());
+		result = prime * result + ((startRange == null) ? 0 : startRange.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Option other = (Option) obj;
+		if (description == null)
+		{
+			if (other.description != null)
+				return false;
+		}
+		else if (!description.equals(other.description))
+			return false;
+		if (endRange == null)
+		{
+			if (other.endRange != null)
+				return false;
+		}
+		else if (!endRange.equals(other.endRange))
+			return false;
+		if (startRange == null)
+		{
+			if (other.startRange != null)
+				return false;
+		}
+		else if (!startRange.equals(other.startRange))
+			return false;
+		if (value == null)
+		{
+			if (other.value != null)
+				return false;
+		}
+		else if (!value.equals(other.value))
+			return false;
+		return true;
 	}
 }

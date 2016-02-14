@@ -83,4 +83,23 @@ public class FileProperty extends ConfigurationProperty
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see ui.graphical.algorithmeditor.ConfigurationProperty#setErrorState(boolean)
+	 */
+	@Override
+	public void setErrorState(boolean error)
+	{
+		if (error)
+		{
+			path.setStyle("-fx-text-inner-color: red; "
+							+ "-fx-text-box-border: red; "
+							+ "-fx-focus-color: red; "
+							+ "-fx-border-width: 2px;");
+		}
+		else
+		{
+			path.setStyle("");
+		}
+	}
+
 }

@@ -3,6 +3,7 @@ package ui.graphical;
 import java.io.File;
 import java.util.List;
 
+import algorithms.Parameter;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
@@ -29,6 +30,11 @@ public abstract class View
 	public abstract File getEnclosingFolder();
 	
 	public abstract String getTabName();
+	
+	public String promptParameterValue(Parameter parameter)
+	{
+		return null;
+	}
 
 	/**
 	 * @update_comment

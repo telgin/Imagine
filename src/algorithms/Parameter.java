@@ -112,10 +112,17 @@ public class Parameter
 		return value;
 	}
 
-	public void setValue(String value)
+	public boolean setValue(String value)
 	{
-		if (validate(value))
+		System.out.println("----"  + value);
+		boolean success = validate(value);
+		System.out.println("----"  + value);
+		if (success)
 			this.value = value;
+		
+		System.out.println(success + "----"  + this.value + "----" + value);
+		
+		return success;
 	}
 
 	public boolean isOptional()
@@ -180,7 +187,7 @@ public class Parameter
 		return element;
 	}
 
-	public boolean validate(String value)
+	private boolean validate(String value)
 	{
 		// make sure the input value conforms to the constraints of the options:
 
@@ -189,24 +196,22 @@ public class Parameter
 		{
 			Logger.log(LogLevel.k_fatal, "The specification for parameter " + name
 							+ " has no options");
+			return false;
 		}
-
-		boolean found = false;
-		for (Option opt : options)
+		else
 		{
-			if (opt.validate(value, type))
+			boolean found = false;
+			for (Option opt : options)
 			{
-				found = true;
-				break;
+				if (opt.validate(value, type))
+				{
+					found = true;
+					break;
+				}
 			}
+			
+			return found;
 		}
-
-		if (!found)
-		{
-			Logger.log(LogLevel.k_error, "Parameter " + name + " cannot be set to: " + value);
-		}
-		
-		return found;
 	}
 
 	/**

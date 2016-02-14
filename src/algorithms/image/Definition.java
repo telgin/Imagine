@@ -67,7 +67,7 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter("Width", Parameter.INT_TYPE, false, true);
 			param.setDescription("The width of the output image.");
 
-			param.addOption(new Option("0", "10000", "The width in pixels."));
+			param.addOption(new Option("1", "10000", "The width in pixels."));
 			
 			param.setValue("1820");
 
@@ -79,7 +79,7 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter("Height", Parameter.INT_TYPE, false, true);
 			param.setDescription("The height of the output image.");
 
-			param.addOption(new Option("0", "10000", "The height in pixels."));
+			param.addOption(new Option("1", "10000", "The height in pixels."));
 			
 			param.setValue("980");
 

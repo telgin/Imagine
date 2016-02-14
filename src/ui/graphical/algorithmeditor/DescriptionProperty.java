@@ -1,5 +1,6 @@
 package ui.graphical.algorithmeditor;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextArea;
@@ -78,5 +79,21 @@ public class DescriptionProperty extends ConfigurationProperty
 			getLabel().setStyle("-fx-opacity: 1");
 			area.setStyle("-fx-opacity: 1");
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see ui.graphical.algorithmeditor.ConfigurationProperty#setErrorState(boolean)
+	 */
+	@Override
+	public void setErrorState(boolean error)
+	{
+		//description not editable
+	}
+	
+	
+	public void setPadding(Insets insets)
+	{
+		getLabel().setPadding(new Insets(insets.getTop(), insets.getRight(), 0, insets.getLeft()));
+		area.setPadding(new Insets(0, insets.getRight(), insets.getBottom(), insets.getLeft()));
 	}
 }
