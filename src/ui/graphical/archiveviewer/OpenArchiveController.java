@@ -8,6 +8,7 @@ import algorithms.Algorithm;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
+import javafx.beans.Observable;
 import key.FileKey;
 import key.Key;
 import key.PasswordKey;
@@ -117,7 +118,7 @@ public class OpenArchiveController
 			Logger.log(LogLevel.k_error, e.getMessage());
 			
 			view.setOpenButtonEnabled(true);
-			view.setAlgorithmSelectionEnabled(false);
+			view.setAlgorithmSelectionEnabled(true);
 			view.clearTable();
 		}
 		
@@ -225,7 +226,12 @@ public class OpenArchiveController
 	
 	public void algorithmSelected(int index)
 	{
-		if (index == 0)
+		if (index == -1)
+		{
+			//nothing selected, select "No Selection"
+			view.setAlgorithmSelection(defaultAlgorithmSelection);
+		}
+		else if (index == 0)
 		{
 			//'no selection' selected
 			view.setKeySectionEnabled(false);
@@ -236,7 +242,7 @@ public class OpenArchiveController
 			try
 			{
 				selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(algorithms.get(index));
-				
+				view.setKeySectionEnabled(true);
 				view.setOpenButtonEnabled(true);
 			}
 			catch (UsageException e)
@@ -246,6 +252,12 @@ public class OpenArchiveController
 				
 				view.setAlgorithmSelection(noSelectionString);
 			}
+		}
+		
+		if (gui.hasErrors())
+		{
+			view.showErrors(gui.getErrors(), "algorithm lookup");
+			gui.clearErrors();
 		}
 	}
 
@@ -263,6 +275,28 @@ public class OpenArchiveController
 	public void setAlgorithms(List<String> algorithms)
 	{
 		this.algorithms = algorithms;
+	}
+
+	/**
+	 * @update_comment
+	 * @param b
+	 * @return
+	 */
+	public void algorithmSelectFocus(boolean focused)
+	{
+		//update the list if focused on
+		if (focused)
+		{
+			String previousSelection = view.getAlgorithmSelection();
+			
+			reloadAlgorithmPresets();
+			view.setAlgorithmPresets(algorithms);
+			
+			if (algorithms.contains(previousSelection))
+			{
+				view.setAlgorithmSelection(previousSelection);
+			}
+		}
 	}
 	
 }

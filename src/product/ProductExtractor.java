@@ -66,31 +66,39 @@ public class ProductExtractor {
 	{
 		ProductContents productContents = parseProductContents(productFile);
 		
-		//keep trying to read files until one can't be read
-		FileContents fileContents = readNextFileHeader(true);
-		while (fileContents != null)
+		try
 		{
-			//add header information to product contents
-			productContents.addFileContents(fileContents);
-			
-			//skip over the file data
-			boolean allDataSkipped = skipNextFileData(fileContents);
-			fileContents.setFragment(!allDataSkipped);
-			
-			//try to get the next header
-			fileContents = readNextFileHeader(true);
+			//keep trying to read files until one can't be read
+			FileContents fileContents = readNextFileHeader(true);
+			while (fileContents != null) //TODO change to true
+			{
+				//add header information to product contents
+				productContents.addFileContents(fileContents);
+				
+				//skip over the file data
+				boolean allDataSkipped = skipNextFileData(fileContents);
+				fileContents.setFragment(!allDataSkipped);
+				
+				//try to get the next header
+				fileContents = readNextFileHeader(true);
+			}
+		}
+		catch (ProductIOException e)
+		{
+			//this will happen whenever the next file cannot be read
+			//this is normal if we've reached the end of the product
+			Logger.log(LogLevel.k_debug, "The next file header could not be read "
+							+ "(possibly because we're at the end of a product): " + e.getMessage());
 		}
 			
 		if (productContents.getFileContents().isEmpty())
 		{
 			//There were no files beyond the product header. This shouldn't happen, so it's probably
-			//a corrupted header.
-			Logger.log(LogLevel.k_error, "There were no files recovered from " + productFile.getPath());
+			//a corrupted header. Even though the product header got parsed into something, it's
+			//probably not useful.
 			Logger.log(LogLevel.k_debug, "Failed to extract from " + productFile.getName());
 			
-			//return null even though the product header got parsed into something... it's
-			//probably not useful.
-			return null;
+			throw new ProductIOException("There were no files recovered from " + productFile.getPath());
 		}
 		
 		return productContents;
@@ -643,7 +651,7 @@ public class ProductExtractor {
 		}
 	}
 	
-	private FileContents readNextFileHeader(boolean parseData)
+	private FileContents readNextFileHeader(boolean parseData) throws ProductIOException
 	{
 		Logger.log(LogLevel.k_debug, "Reading file header");
 
@@ -682,6 +690,9 @@ public class ProductExtractor {
 			int fileTypeNum = ByteConversion.byteToInt(buffer[0]);
 			//System.out.println("File type number: " + fileTypeNum);
 			FileType fileType = FileType.toFileType(fileTypeNum);
+			if (fileType == null)
+				throw new ProductIOException("Failed to read file type.");
+			
 			contents.getMetadata().setType(fileType);
 			
 			//file type:
@@ -801,11 +812,14 @@ public class ProductExtractor {
 			return contents;
 
 		}
+		catch (ProductIOException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
-			Logger.log(LogLevel.k_error, "Failed to read file header.");
-			Logger.log(LogLevel.k_error, e, false);
-			return null;
+			Logger.log(LogLevel.k_debug, e, false);
+			throw new ProductIOException("Failed to read file header: " + e.getMessage());
 		}
 	}
 	

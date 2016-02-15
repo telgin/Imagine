@@ -11,21 +11,18 @@ public class Option
 	private String value;
 	private String startRange;
 	private String endRange;
-	private String description;
 
-	public static final Option PROMPT_OPTION = new Option("Prompt For Value", "Prompt for this value at run time.");
+	public static final Option PROMPT_OPTION = new Option("Prompt For Value");
 
-	public Option(String value, String description)
+	public Option(String value)
 	{
 		this.value = value;
-		this.description = description;
 	}
 	
-	public Option(String startRange, String endRange, String description)
+	public Option(String startRange, String endRange)
 	{
 		this.startRange = startRange;
 		this.endRange = endRange;
-		this.description = description;
 	}
 
 	public Option(Element optionNode)
@@ -38,15 +35,12 @@ public class Option
 		
 		if (optionNode.hasAttribute("endRange"))
 			this.endRange = optionNode.getAttribute("endRange");
-		
-		if (optionNode.hasAttribute("description"))
-			this.description = optionNode.getAttribute("description");
 	}
 
 	@Override
 	public Option clone()
 	{
-		Option clone = new Option(value, description);
+		Option clone = new Option(value);
 		clone.startRange = startRange;
 		clone.endRange = endRange;
 
@@ -79,22 +73,6 @@ public class Option
 	{
 		return endRange;
 	}
-	
-	/**
-	 * @return the description
-	 */
-	public String getDescription()
-	{
-		return description;
-	}
-
-	/**
-	 * @param description the description to set
-	 */
-	public void setDescription(String description)
-	{
-		this.description = description;
-	}
 
 	/**
 	 * @return the value
@@ -117,9 +95,6 @@ public class Option
 			element.setAttribute("startRange", startRange);
 			element.setAttribute("endRange", endRange);
 		}
-		
-		if (description != null)
-			element.setAttribute("description", description);
 
 		return element;
 	}
@@ -212,7 +187,6 @@ public class Option
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		result = prime * result + ((endRange == null) ? 0 : endRange.hashCode());
 		result = prime * result + ((startRange == null) ? 0 : startRange.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
@@ -232,13 +206,6 @@ public class Option
 		if (getClass() != obj.getClass())
 			return false;
 		Option other = (Option) obj;
-		if (description == null)
-		{
-			if (other.description != null)
-				return false;
-		}
-		else if (!description.equals(other.description))
-			return false;
 		if (endRange == null)
 		{
 			if (other.endRange != null)

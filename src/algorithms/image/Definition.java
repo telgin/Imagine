@@ -67,7 +67,7 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter("Width", Parameter.INT_TYPE, false, true);
 			param.setDescription("The width of the output image.");
 
-			param.addOption(new Option("1", "10000", "The width in pixels."));
+			param.addOption(new Option("1", "10000"));
 			
 			param.setValue("1820");
 
@@ -79,7 +79,7 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter("Height", Parameter.INT_TYPE, false, true);
 			param.setDescription("The height of the output image.");
 
-			param.addOption(new Option("1", "10000", "The height in pixels."));
+			param.addOption(new Option("1", "10000"));
 			
 			param.setValue("980");
 
@@ -91,7 +91,7 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter(IMAGE_TYPE_PROPERTY, Parameter.STRING_TYPE, false, true);
 			param.setDescription("The file format to output images in.");
 
-			param.addOption(new Option("png", "Output png images."));
+			param.addOption(new Option("png"));
 			
 			param.setValue("png");
 
@@ -130,15 +130,10 @@ public class Definition implements algorithms.Definition
 	{
 		List<Algorithm> presets = new LinkedList<Algorithm>();
 		
-		//basic
-		Algorithm basic = constructDefaultAlgorithm();
-		basic.setPresetName("image_basic");
-		presets.add(basic);
-		
-		//secure
-		Algorithm secure = constructDefaultAlgorithm();
-		secure.setPresetName("image_secure");
-		presets.add(secure);
+		//plain default
+		Algorithm defaultAlgo = constructDefaultAlgorithm();
+		defaultAlgo.setPresetName("image_default");
+		presets.add(defaultAlgo);
 		
 		return presets;
 	}

@@ -68,7 +68,7 @@ public class AlgorithmEditorController
 				workingAlgorithm = storedAlgorithm.clone();
 				view.setPresetName(workingAlgorithm.getPresetName());
 				view.setAlgorithmNames(ConfigurationAPI.getAlgorithmDefinitionNames());
-				view.setAlgorithmSelectionEnabled(true);
+				view.setEditsEnabled(true);
 				view.setSelectedAlgorithm(workingAlgorithm.getName());
 			}
 			catch (UsageException e)
@@ -128,7 +128,7 @@ public class AlgorithmEditorController
 			storedAlgorithm = null;
 			workingAlgorithm = ConfigurationAPI.getDefaultAlgorithm(algoName);
 			view.setAlgorithmNames(ConfigurationAPI.getAlgorithmDefinitionNames());
-			view.setAlgorithmSelectionEnabled(true);
+			view.setEditsEnabled(true);
 			view.setSelectedAlgorithm(algoName);
 			view.setPresetName("New Algorithm Preset");
 		}

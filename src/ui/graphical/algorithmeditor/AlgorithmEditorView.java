@@ -8,6 +8,7 @@ import algorithms.Parameter;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -37,6 +38,7 @@ public class AlgorithmEditorView extends View
 	private BooleanProperty parameterEnabled;
 	private VBox optionSection;
 	private ConfigurationProperty optionSelection;
+	private Label parameterLabel;
 
 	/**
 	 * @update_comment
@@ -67,34 +69,72 @@ public class AlgorithmEditorView extends View
 	{
 		BorderPane base = new BorderPane();
 		
-		base.setCenter(setupAlgorithmSection());
+		base.setTop(setupTitleSection());
+		base.setLeft(setupAlgorithmSection());
+		base.setRight(setupParameterSection());
+		base.setBottom(setupButtonSection());
 		
 		reset();
 		
 		return base;
 	}
 	
-	private Node setupAlgorithmSection()
+	private Node setupTitleSection()
 	{
 		HBox hbox = new HBox();
 		hbox.setSpacing(3);
-		hbox.setPadding(new Insets(20,20,20,20));
+		hbox.setPadding(new Insets(10,10,0,10));
+		hbox.setAlignment(Pos.CENTER);
 		
-		hbox.getChildren().add(setupPresetSelectionSection());
-		hbox.getChildren().add(setupEditAttributesSection());
-		hbox.getChildren().add(setupParameterSelectionSection());
-		hbox.getChildren().add(setupEditParameterSection());
+		Label sectionLabel = new Label("Add or Edit Algorithm Presets");
+		sectionLabel.setFont(new Font("Arial", 20));
+		hbox.getChildren().add(sectionLabel);
 		
 		return hbox;
 	}
 	
-
+	private Node setupAlgorithmSection()
+	{
+		VBox vbox = new VBox();
+		vbox.setSpacing(3);
+		vbox.setPadding(new Insets(10,0,10,10));
+		
+		HBox hbox = new HBox();
+		hbox.setSpacing(3);
+		hbox.setPadding(new Insets(10,10,10,10));
+		
+		hbox.getChildren().add(setupPresetSelectionSection());
+		hbox.getChildren().add(setupEditAttributesSection());
+		
+		vbox.getChildren().add(hbox);
+		
+		return vbox;
+	}
+	
+	private Node setupParameterSection()
+	{
+		VBox vbox = new VBox();
+		vbox.setSpacing(3);
+		vbox.setPadding(new Insets(10,10,10,0));	
+		
+		HBox hbox = new HBox();
+		hbox.setSpacing(20);
+		hbox.setPadding(new Insets(10,10,10,10));
+		
+		hbox.getChildren().add(setupParameterSelectionSection());
+		hbox.getChildren().add(setupEditParameterSection());
+		
+		vbox.getChildren().add(hbox);
+		
+		return vbox;
+	}
 
 	private Node setupButtonSection()
 	{
 		HBox hbox = new HBox();
 		hbox.setSpacing(40);
-		hbox.setPadding(new Insets(20,20,20,20));
+		hbox.setPadding(new Insets(10,10,20,10));
+		hbox.setAlignment(Pos.CENTER);
 		
 		//create new preset button
 		createNewButton = new Button();
@@ -116,26 +156,21 @@ public class AlgorithmEditorView extends View
 		VBox vbox = new VBox();
 		vbox.setSpacing(3);
 		vbox.setPadding(new Insets(10,10,10,10));
-
-		//presets label
-		Label sectionLabel = new Label("Existing Presets");
-		sectionLabel.setFont(new Font("Arial", 20));
-		sectionLabel.setPadding(new Insets(0, 0, 10, 0));
-		vbox.getChildren().add(sectionLabel);
+		
+		//preset label
+		Label presetsLabel = new Label("Presets");
+		vbox.getChildren().add(presetsLabel);
 		
 		//preset list
 		presetList = new ListView<String>();
 		presetList.setItems(FXCollections.observableArrayList(controller.getPresetNames()));
-		presetList.setPrefWidth(presetList.getPrefWidth() - 75);
+		presetList.setPrefWidth(200);
 		presetList.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
 											presetSelected(value, oldIndex, newIndex));
 		
 		vbox.getChildren().add(presetList);
-		
-		//buttons
-		vbox.getChildren().add(setupButtonSection());
 		
 		return vbox;
 	}
@@ -163,7 +198,7 @@ public class AlgorithmEditorView extends View
 		//algorithm description
 		algorithmDescription = new DescriptionProperty("Algorithm Description");
 		algorithmDescription.setup(vbox);
-		algorithmDescription.getArea().setPrefSize(175, 180);
+		algorithmDescription.getArea().setPrefWidth(200);
 		algorithmDescription.getArea().setWrapText(true);
 		
 		return vbox;
@@ -208,32 +243,23 @@ public class AlgorithmEditorView extends View
 	{
 		VBox vbox = new VBox();
 		vbox.setSpacing(3);
-		vbox.setPadding(new Insets(10,10,10,10));
+		vbox.setPadding(new Insets(10,0,10,10));
 		
-		//presets label
-		Label sectionLabel = new Label("Parameters");
-		sectionLabel.setFont(new Font("Arial", 20));
-		sectionLabel.setPadding(new Insets(0, 0, 10, 0));
-		vbox.getChildren().add(sectionLabel);
+		//parameter label
+		parameterLabel = new Label("Parameters");
+		vbox.getChildren().add(parameterLabel);
 		
 		//parameter list
 		parameterList = new ListView<String>();
 		parameterList.setItems(FXCollections.observableArrayList(controller.getParameterNames()));
-		parameterList.setPrefWidth(150);
-		parameterList.setPrefHeight(250);
+		parameterList.setPrefWidth(200);
+		//parameterList.setPrefHeight(250);
 		parameterList.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
 											parameterSelected(value, oldIndex, newIndex));
 		
 		vbox.getChildren().add(parameterList);
-		
-		//parameter description
-		parameterDescription = new DescriptionProperty("Parameter Description");
-		parameterDescription.setup(vbox);
-		parameterDescription.getArea().setPrefSize(175, 180);
-		parameterDescription.getArea().setWrapText(true);
-		parameterDescription.setPadding(new Insets(20, 0, 0, 0));
 				
 		return vbox;
 	}
@@ -246,12 +272,19 @@ public class AlgorithmEditorView extends View
 	{
 		VBox vbox = new VBox();
 		vbox.setSpacing(3);
-		vbox.setPadding(new Insets(10,10,10,10));
+		vbox.setPadding(new Insets(10,10,10,0));
+		
+		//parameter description
+		parameterDescription = new DescriptionProperty("Parameter Description");
+		parameterDescription.setup(vbox);
+		parameterDescription.getArea().setPrefSize(300, 150);
+		parameterDescription.getArea().setWrapText(true);
+		//parameterDescription.setPadding(new Insets(20, 0, 0, 0));
 		
 		//option section
 		optionSection = new VBox();
 		optionSection.setSpacing(3);
-		optionSection.setPadding(new Insets(10,10,10,10));
+		//optionSection.setPadding(new Insets(10,10,10,10));
 		optionSection.setPrefHeight(200);
 		optionSection.setPrefWidth(300);
 		vbox.getChildren().add(optionSection);
@@ -337,21 +370,10 @@ public class AlgorithmEditorView extends View
 		//enabled check box
 		parameterEnabled = new BooleanProperty("Enabled", b -> controller.parameterEnabledChecked(b));
 		parameterEnabled.setup(optionSection);
-		parameterEnabled.setPadding(new Insets(0, 0, 20, 0));
+		parameterEnabled.setPadding(new Insets(10, 0, 5, 0));
 		parameterEnabled.setChecked(parameter.isEnabled());
 		parameterEnabled.setEnabled(parameter.isOptional());
-		
-		//define at runtime check box
-		if (parameter.getOptions().contains(Option.PROMPT_OPTION))
-		{
-			BooleanProperty prop = new BooleanProperty("Define at run time?", b -> controller.promptOptionSelected(b));
-			prop.setup(optionSection);
-			
-			System.out.println("The value: " + parameter.getValue());
-			if (parameter.getValue() != null)
-				prop.setChecked(parameter.getValue().equals(Option.PROMPT_OPTION.getValue()));
-		}
-		
+
 		if (parameter.getType().equals(Parameter.STRING_TYPE))
 		{
 			if (parameter.getOptions().size() == 1 && parameter.getOptions().get(0).getValue().equals("*"))
@@ -388,6 +410,17 @@ public class AlgorithmEditorView extends View
 			
 			if (parameter.getValue() != null && !parameter.getValue().equals(Option.PROMPT_OPTION.getValue()))
 				prop.setPath(parameter.getValue());
+		}
+		
+		//define at runtime check box
+		if (parameter.getOptions().contains(Option.PROMPT_OPTION))
+		{
+			BooleanProperty prop = new BooleanProperty("Define at run time?", b -> controller.promptOptionSelected(b));
+			prop.setup(optionSection);
+			
+			System.out.println("The value: " + parameter.getValue());
+			if (parameter.getValue() != null)
+				prop.setChecked(parameter.getValue().equals(Option.PROMPT_OPTION.getValue()));
 		}
 	}
 
@@ -426,12 +459,16 @@ public class AlgorithmEditorView extends View
 		//clear all content
 		presetList.setItems(null);
 		presetName.setText(null);
+		presetName.setEnabled(false);
 		algorithmType.setSelectedChoice(null);
 		algorithmType.setChoices(null);
 		algorithmType.setEnabled(false);
 		algorithmDescription.setText(null);
+		algorithmDescription.setEnabled(false);
 		parameterList.setItems(null);
+		setParameterListEnabled(false);
 		parameterDescription.setText(null);
+		parameterDescription.setEnabled(false);
 		removeParameterOptions();
 		
 		//re-add the list of presets
@@ -460,9 +497,30 @@ public class AlgorithmEditorView extends View
 	 * @update_comment
 	 * @param b
 	 */
-	public void setAlgorithmSelectionEnabled(boolean enabled)
+	public void setEditsEnabled(boolean enabled)
 	{
+		presetName.setEnabled(enabled);
 		algorithmType.setEnabled(enabled);
+		algorithmDescription.setEnabled(enabled);
+		parameterDescription.setEnabled(enabled);
+		setParameterListEnabled(enabled);
+	}
+	
+	public void setParameterListEnabled(boolean enabled)
+	{
+		parameterLabel.disableProperty().set(!enabled);
+		parameterList.disableProperty().set(!enabled);
+		
+		if (!enabled)
+		{
+			parameterLabel.setStyle("-fx-opacity: .5");
+			parameterList.setStyle("-fx-opacity: .75");
+		}
+		else
+		{
+			parameterLabel.setStyle("-fx-opacity: 1");
+			parameterList.setStyle("-fx-opacity: 1");
+		}
 	}
 	
 	@Override

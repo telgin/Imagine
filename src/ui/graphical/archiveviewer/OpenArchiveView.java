@@ -48,6 +48,7 @@ import ui.graphical.View;
 public class OpenArchiveView extends View
 {
 	//constants
+	private final String noKeyToggleString = "No Key";
 	private final String passwordToggleString = "Password";
 	private final String keyFileToggleString = "Key File";
 	
@@ -57,7 +58,7 @@ public class OpenArchiveView extends View
 	private TextField keyFilePath;
 	private Button keyFileBrowseButton, openButton, extractSelectedButton, extractAllButton;
 	private ToggleGroup keySelectionButtons;
-	private RadioButton keyFileToggle, passwordToggle;
+	private RadioButton noKeyToggle, keyFileToggle, passwordToggle;
 	private TableView<FileContentsTableRecord> table;
 	private Label passwordLabel, keyFileLabel, keySelectionLabel, algorithmLabel;
 	
@@ -200,11 +201,15 @@ public class OpenArchiveView extends View
 		
 		//algorithm select
 		algorithmSelect = new ChoiceBox<>();
-		algorithmSelect.setItems(FXCollections.observableArrayList(controller.getAlgorithms()));
+		setAlgorithmPresets(controller.getAlgorithms());
 		algorithmSelect.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
 											algorithmSelected(value, oldIndex, newIndex));
+		algorithmSelect.focusedProperty().addListener(
+						(ObservableValue<? extends Boolean> value,
+										Boolean oldValue, Boolean newValue) ->
+											controller.algorithmSelectFocus(newValue.booleanValue()));
 		configSelection.getChildren().add(indentElement(1, algorithmSelect));
 		
 		//key selection label
@@ -214,13 +219,16 @@ public class OpenArchiveView extends View
 		//key selection buttons
 		keySelectionButtons = new ToggleGroup();
 		
+		noKeyToggle = new RadioButton(noKeyToggleString);
+		noKeyToggle.setToggleGroup(keySelectionButtons);
+		noKeyToggle.setUserData(noKeyToggleString);
 		keyFileToggle = new RadioButton(keyFileToggleString);
 		keyFileToggle.setToggleGroup(keySelectionButtons);
 		keyFileToggle.setUserData(keyFileToggleString);
 		passwordToggle = new RadioButton(passwordToggleString);
 		passwordToggle.setUserData(passwordToggleString);
 		passwordToggle.setToggleGroup(keySelectionButtons);
-		keySelectionButtons.selectToggle(passwordToggle);
+		keySelectionButtons.selectToggle(noKeyToggle);
 		keySelectionButtons.selectedToggleProperty().addListener(
 						(ObservableValue<? extends Toggle> value,
 										Toggle oldSelection, Toggle newSelection) ->
@@ -228,7 +236,7 @@ public class OpenArchiveView extends View
 		
 		HBox radioBox = new HBox();
 		radioBox.setSpacing(10);
-		radioBox.getChildren().addAll(passwordToggle, keyFileToggle);
+		radioBox.getChildren().addAll(noKeyToggle, passwordToggle, keyFileToggle);
 		configSelection.getChildren().add(indentElement(1, radioBox));
 		
 		//password label
@@ -283,12 +291,14 @@ public class OpenArchiveView extends View
 	{
 		System.out.println("Key section enabled: " + enabled);
 		
+		noKeyToggle.disableProperty().set(!enabled);
 		keyFileToggle.disableProperty().set(!enabled);
 		passwordToggle.disableProperty().set(!enabled);
 		keySelectionLabel.disableProperty().set(!enabled);
 		
 		if (!enabled)
 		{
+			noKeyToggle.setStyle("-fx-opacity: .75");
 			keyFileToggle.setStyle("-fx-opacity: .75");
 			passwordToggle.setStyle("-fx-opacity: .75");
 			keySelectionLabel.setStyle("-fx-opacity: .5");
@@ -299,6 +309,7 @@ public class OpenArchiveView extends View
 		}
 		else
 		{
+			noKeyToggle.setStyle("-fx-opacity: 1");
 			keyFileToggle.setStyle("-fx-opacity: 1");
 			passwordToggle.setStyle("-fx-opacity: 1");
 			keySelectionLabel.setStyle("-fx-opacity: 1");
@@ -309,10 +320,16 @@ public class OpenArchiveView extends View
 				setKeyFileSectionEnabled(true);
 				setPasswordSectionEnabled(false);
 			}
-			else
+			else if (keySelectionButtons.getSelectedToggle().getUserData().equals(passwordToggleString))
 			{
 				setKeyFileSectionEnabled(false);
 				setPasswordSectionEnabled(true);
+			}
+			else //assuming no key selected
+			{
+				//disable everything
+				setKeyFileSectionEnabled(false);
+				setPasswordSectionEnabled(false);
 			}
 		}
 	}
@@ -328,8 +345,12 @@ public class OpenArchiveView extends View
 					Toggle oldSelection, Toggle newSelection)
 	{
 		System.out.println("Key type selected: " + newSelection.getUserData());
-		
-		if (newSelection.getUserData().equals(passwordToggleString))
+		if (newSelection.getUserData().equals(noKeyToggleString))
+		{
+			setPasswordSectionEnabled(false);
+			setKeyFileSectionEnabled(false);
+		}
+		else if (newSelection.getUserData().equals(passwordToggleString))
 		{
 			setPasswordSectionEnabled(true);
 			setKeyFileSectionEnabled(false);
@@ -337,8 +358,8 @@ public class OpenArchiveView extends View
 		}
 		else //assumed file toggled
 		{
-			setKeyFileSectionEnabled(true);
 			setPasswordSectionEnabled(false);
+			setKeyFileSectionEnabled(true);
 			//clearPasswordSection();
 		}
 	}
@@ -498,6 +519,11 @@ public class OpenArchiveView extends View
 	public void setAlgorithmSelection(String presetName)
 	{
 		algorithmSelect.setValue(presetName);
+	}
+	
+	public void setAlgorithmPresets(List<String> presetNames)
+	{
+		algorithmSelect.setItems(FXCollections.observableArrayList(presetNames));
 	}
 	
 	public String getAlgorithmSelection()

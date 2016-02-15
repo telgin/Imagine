@@ -18,7 +18,8 @@ public class Definition implements algorithms.Definition
 	private static final String NAME = "ImageOverlay";
 	private static final int VERSION_NUMBER = 1;
 	private static final String DESCRIPTION = "Data is encoded in the slightly "
-						+ "modified pixels of another image file.";
+						+ "modified pixels of an existing image file such that it is hard "
+						+ "or impossible to perceive the difference with human eyes.";
 	private static Definition self;
 
 	private Definition()
@@ -47,10 +48,12 @@ public class Definition implements algorithms.Definition
 		{
 			// data insertion density (use of 4x4 (25%) or 2x16 (50%))
 			Parameter param = new Parameter("InsertionDensity", Parameter.STRING_TYPE, false, true);
-			param.setDescription("The precentage of data in the input image to be overwritten with embedded data.");
+			param.setDescription("The percentage of data in the input image to be overwritten with embedded data. At "
+							+ "25%, the visual difference with be unnoticeable for most images. At 50%, some artifacts "
+							+ "will be noticeable in smaller images or when looking at an image zoomed in.");
 
-			param.addOption(new Option("25%", "Use 25% of the information about each color value to store the embedded data."));
-			param.addOption(new Option("50%", "Use 50% of the information about each color value to store the embedded data."));
+			param.addOption(new Option("25%"));
+			param.addOption(new Option("50%"));
 			
 			param.setValue("25%");
 
@@ -62,7 +65,7 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter("ImageFolder", Parameter.FILE_TYPE, false, true);
 			param.setDescription("A folder of images to apply the overlay to.");
 
-			param.addOption(new Option("*", "Path to a folder."));
+			param.addOption(new Option("*"));
 			param.addOption(Option.PROMPT_OPTION);
 			
 			param.setValue(Option.PROMPT_OPTION.getValue());
@@ -73,11 +76,15 @@ public class Definition implements algorithms.Definition
 		{
 			// input image consumption mode
 			Parameter param = new Parameter("ImageConsumptionMode", Parameter.STRING_TYPE, false, true);
-			param.setDescription("How to deal with used input images once an overlay is applied.");
+			param.setDescription("How to deal with used input images once an overlay is applied.\n\nCycle:  "
+							+ "Cycle through input images in the input folder. Start from the beginning once "
+							+ "the last one is used.\n\nMove:  Move used images to a subfolder within the image "
+							+ "input folder.\n\nDelete:  Delete images from the input folder once an overlay is "
+							+ "applied.");
 
-			param.addOption(new Option("cycle", "Cycle through input images in the input folder. Start from the beginning once the last one is used."));
-			param.addOption(new Option("move", "Move used images to a subfolder within the image input folder."));
-			param.addOption(new Option("delete", "Delete images from the input folder once an overlay is applied."));
+			param.addOption(new Option("cycle"));
+			param.addOption(new Option("move"));
+			param.addOption(new Option("delete"));
 			
 			param.setValue("cycle");
 
@@ -89,7 +96,7 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter("ImageType", Parameter.STRING_TYPE, false, true);
 			param.setDescription("The file format to output images in.");
 
-			param.addOption(new Option("png", "Output png images."));
+			param.addOption(new Option("png"));
 			
 			param.setValue("png");
 
@@ -128,17 +135,17 @@ public class Definition implements algorithms.Definition
 	{
 		List<Algorithm> presets = new LinkedList<Algorithm>();
 		
-		//basic
-		Algorithm basic = constructDefaultAlgorithm();
-		basic.setPresetName("image_overlay_basic");
-		basic.setParameter("ImageFolder", "testing/input_images");//TODO remove this
-		presets.add(basic);
+		//light
+		Algorithm light = constructDefaultAlgorithm();
+		light.setPresetName("image_overlay_light");
+		light.setParameter("ImageFolder", "testing/input_images");//TODO remove this
+		presets.add(light);
 		
-		//secure
-		Algorithm secure = constructDefaultAlgorithm();
-		secure.setPresetName("image_overlay_secure");
-		secure.setParameter("ImageFolder", "testing/input_images");//TODO remove this
-		presets.add(secure);
+		//heavy
+		Algorithm heavy = constructDefaultAlgorithm();
+		heavy.setPresetName("image_overlay_heavy");
+		heavy.setParameter("ImageFolder", "testing/input_images");//TODO remove this
+		presets.add(heavy);
 		
 		return presets;
 	}
