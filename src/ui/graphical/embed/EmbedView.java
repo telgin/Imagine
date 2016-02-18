@@ -2,8 +2,10 @@ package ui.graphical.embed;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 
@@ -26,6 +28,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.control.cell.ProgressBarTreeTableCell;
@@ -35,6 +38,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import logging.LogLevel;
+import logging.Logger;
 import product.FileContents;
 import ui.graphical.BooleanProperty;
 import ui.graphical.FileProperty;
@@ -53,7 +58,7 @@ public class EmbedView extends View
 	private final String keyFileToggleString = "Key File";
 	private final String filesCreatedString = "Total output files created: ";
 	private final String estimatedOutputSizeString = "Estimated total output file size: ";
-	private final ProgressBarCheckBoxTreeItem<String> tempExpandableChildItem = new ProgressBarCheckBoxTreeItem<String>("Loading...");
+	private final InputFileTreeItem tempExpandableChildItem = new InputFileTreeItem("Loading...");
 	
 	//gui elements
 	private ChoiceBox<String> algorithmSelect;
@@ -70,16 +75,22 @@ public class EmbedView extends View
 	private BooleanProperty structuredOutput;
 	private TreeView<String> inputFiles, targetFiles;
 	private ProgressBar conversionProgress;
-	private ProgressBarCheckBoxTreeItem<String> inputFileRoot, targetFileRoot;
+	private InputFileTreeItem inputFileRoot;
+	private TargetFileTreeItem targetFileRoot;
 	
 	//controller
 	private EmbedController controller;
+	
+	private Map<TreeCell<String>, InputFileTreeItem> activeInputCells;
+	private Map<TreeCell<String>, TargetFileTreeItem> activeTargetCells;
 
 	public EmbedView(Stage window)
 	{
 		super(window);
 		
 		controller = new EmbedController(this);
+		activeInputCells = new HashMap<TreeCell<String>, InputFileTreeItem>();
+		activeTargetCells = new HashMap<TreeCell<String>, TargetFileTreeItem>();
 	}
 
 	/**
@@ -160,29 +171,21 @@ public class EmbedView extends View
 		inputFiles.setEditable(true);
 		inputFiles.setShowRoot(false);
 		
-		inputFileRoot = new ProgressBarCheckBoxTreeItem<String>("Input files temp");
+		inputFileRoot = new InputFileTreeItem("");
 		inputFiles.setRoot(inputFileRoot);
 		inputFiles.setCellFactory(e -> {
 			TreeCell<String> cell = CheckBoxTreeCell.<String>forTreeView().call(e);
-			System.out.println("Cell created: " + cell.getText() + ", " + cell.getItem());
-			//System.out.println();
-			//if (cell.get)
-			//cell.setStyle("-fx-background-color: rgba(0, 100, 100, 0.5)");
+
+			//update active cell map when a cell changes its item
 			cell.treeItemProperty().addListener((obs, oldItem, newItem) -> {
-				if (newItem == null)
-					cell.setStyle(null);
-				else
-				{
-					ProgressBarCheckBoxTreeItem<String> item = (ProgressBarCheckBoxTreeItem<String>) newItem;
-					int width = (int) cell.getWidth();
-					int rightInset = width - (int) (width * item.getProgress());
-					cell.setStyle("-fx-background-color: rgba(0, 100, "+ (item.getProgress()*255) + ", 0.5); -fx-background-insets: 0 " + rightInset + " 0 0");
-				}
+				activeInputCells.put(cell, (InputFileTreeItem) newItem);
+				
+				//update this specific cell now
+				updateInputCellStyle(cell);
 			});
-				//cell.setStyle("-fx-background-color: rgba(0, 100, 100, 0.5); -fx-background-radius: 10;");
+
 			return cell;
 		});
-		//inputFiles.setCellFactory(CheckBoxTreeCell.<String>forTreeView());
 		vbox.getChildren().add(inputFiles);
 		
 		HBox buttonRow1 = new HBox();
@@ -210,6 +213,59 @@ public class EmbedView extends View
 		
 		return vbox;
 	}
+	
+	public void updateInputCellStyle(TreeCell<String> cell)
+	{
+		InputFileTreeItem item = activeInputCells.get(cell);
+		if (item == null)
+		{
+			//cell is blank, remove progress bar
+			cell.setStyle(null);
+		}
+		else
+		{
+			//set the cell style according to the item's status and progress
+			item.setCellStyle(cell);
+		}
+	}
+	
+	public void updateTargetCellStyle(TreeCell<String> cell)
+	{
+		TargetFileTreeItem item = activeTargetCells.get(cell);
+		if (item == null)
+		{
+			//cell is blank, remove progress bar
+			cell.setStyle(null);
+		}
+		else
+		{
+			//set the cell style according to the item's status and progress
+			item.setCellStyle(cell);
+		}
+	}
+	
+	public void updateAllActiveCells()
+	{
+		//input cells
+		for (TreeCell<String> cell : activeInputCells.keySet())
+			updateInputCellStyle(cell);
+		
+		//target cells
+		for (TreeCell<String> cell : activeTargetCells.keySet())
+			updateTargetCellStyle(cell);
+	}
+	
+	//TODO remove
+	public void setAll(double set)
+	{
+		for (InputFileTreeItem item : activeInputCells.values())
+		{
+			if (item != null)
+			{
+				item.setProgress(set);
+			}
+		}
+	}
 
 	/**
 	 * @update_comment
@@ -221,13 +277,39 @@ public class EmbedView extends View
 		vbox.setSpacing(3);
 		vbox.setPadding(new Insets(10,10,10,10));
 		
-		//target file tree
+		//input file tree
 		targetFiles = new TreeView<String>();
 		targetFiles.setEditable(true);
-		targetFiles.setShowRoot(true);
+		targetFiles.setShowRoot(false);
 		
-		ProgressBarCheckBoxTreeItem<String> root = new ProgressBarCheckBoxTreeItem<String>("Target files temp");
-		targetFiles.setRoot(root);
+		targetFileRoot = new TargetFileTreeItem("");
+		targetFiles.setRoot(targetFileRoot);
+		targetFiles.setCellFactory(e -> 
+		{
+			TreeCell<String> cell = new TreeCell<String>()
+			{
+				@Override
+				public void updateItem(String item, boolean empty)
+				{
+					super.updateItem(item, empty);
+					
+					if (empty)
+						setText(null);
+					else
+						setText(item);
+				}
+			};
+			
+			//update active cell map when a cell changes its item
+			cell.treeItemProperty().addListener((obs, oldItem, newItem) -> {
+				activeTargetCells.put(cell, (TargetFileTreeItem) newItem);
+				
+				//update this specific cell now
+				updateTargetCellStyle(cell);
+			});
+
+			return cell;
+		});
 		vbox.getChildren().add(targetFiles);
 		
 		HBox buttonRow1 = new HBox();
@@ -237,7 +319,7 @@ public class EmbedView extends View
 		
 		//select folder button
 		targetSelectFolderButton = new Button("Select Folder");
-		targetSelectFolderButton.setOnAction(e -> controller.inputAddFolderPressed());
+		targetSelectFolderButton.setOnAction(e -> controller.targetSelectFolderPressed());
 		buttonRow1.getChildren().add(targetSelectFolderButton);
 		vbox.getChildren().add(buttonRow1);
 		
@@ -555,62 +637,22 @@ public class EmbedView extends View
 	
 	public void addInput(File inputFile)
 	{
-		ProgressBarCheckBoxTreeItem<String> item = getInputTreeItem(inputFile);
+		final InputFileTreeItem item = new InputFileTreeItem(inputFile);
+		item.setStatus(new Random().nextInt(5));//TODO remove
 		item.setSelected(true);
+		
 		inputFileRoot.getChildren().add(item);
 	}
 	
-	private ProgressBarCheckBoxTreeItem<String> getInputTreeItem(File inputFile)
+	public void setTarget(File targetFolder)
 	{
-		final ProgressBarCheckBoxTreeItem<String> item = new ProgressBarCheckBoxTreeItem<String>(inputFile.getName());
-		item.setProgress(new Random().nextDouble());
+		final TargetFileTreeItem item = new TargetFileTreeItem(targetFolder);
+		item.setStatus(new Random().nextInt(5));//TODO remove
 		
-		if (inputFile.isDirectory() && inputFile.listFiles().length > 0)
-		{
-			//load actual children once expanded
-			item.expandedProperty().addListener(
-				(ObservableValue<? extends Boolean> value,
-					Boolean oldValue, Boolean newValue) ->
-						folderEntryExpanded(newValue.booleanValue(), item, inputFile));
-			
-			//add a temporary entry so the input file entry will show up as expandable
-			//this will be replaced when it is expanded
-			item.getChildren().add(tempExpandableChildItem);
-		}
-		
-		return item;
+		targetFileRoot.getChildren().clear();
+		targetFileRoot.getChildren().add(item);
 	}
 	
-	/**
-	 * @param item 
-	 * @update_comment
-	 * @param booleanValue
-	 * @param inputFile
-	 * @return
-	 */
-	private void folderEntryExpanded(boolean expanded, ProgressBarCheckBoxTreeItem<String> parent, File entryFile)
-	{
-		//only load children if they haven't been loaded yet
-		if (expanded && parent.getChildren().get(0).equals(tempExpandableChildItem))
-		{
-			List<ProgressBarCheckBoxTreeItem<String>> loadedItems = new ArrayList<ProgressBarCheckBoxTreeItem<String>>();
-			
-			//load entries
-			for (File child : entryFile.listFiles())
-			{
-				ProgressBarCheckBoxTreeItem<String> item = getInputTreeItem(child);
-				item.setSelected(parent.isSelected());
-				loadedItems.add(item);
-			}
-			
-			//clear now that all are loaded
-			parent.getChildren().clear();
-			
-			//add loaded items
-			parent.getChildren().addAll(loadedItems);
-		}
-	}
-
 	public void clearPasswordPrompt()
 	{
 		passwordField.setPromptText("");
@@ -689,4 +731,43 @@ public class EmbedView extends View
 		return chooseFolder();
 	}
 
+	/**
+	 * @update_comment
+	 * @param folder
+	 */
+	public void setOutputFolder(File folder)
+	{
+		outputFolder.setPath(folder.getAbsolutePath());
+	}
+
+	public File getOutputFolder()
+	{
+		String path = outputFolder.getPath();
+		
+		if (path == null || path.isEmpty())
+			return null;
+		else
+			return new File(path);
+	}
+
+	/**
+	 * @update_comment
+	 */
+	public void removeSelectedInput()
+	{
+		TreeItem<String> selected = inputFiles.getSelectionModel().getSelectedItem();
+		if (selected != null)
+		{
+			if (inputFileRoot.getChildren().contains(selected))
+			{
+				inputFileRoot.getChildren().remove(selected);
+			}
+			else
+			{
+				Logger.log(LogLevel.k_error, "You may only remove top level entries. "
+								+ "This is equivalent to unchecking them.");
+			}
+		}
+	}
+	
 }
