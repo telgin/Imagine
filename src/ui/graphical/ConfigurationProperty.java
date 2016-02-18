@@ -1,4 +1,4 @@
-package ui.graphical.algorithmeditor;
+package ui.graphical;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;

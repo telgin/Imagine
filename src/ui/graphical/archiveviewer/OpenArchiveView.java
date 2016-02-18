@@ -82,9 +82,6 @@ public class OpenArchiveView extends View
 		BorderPane borderPane = new BorderPane();
 		borderPane.setLeft(setupConfigSelection());
 		borderPane.setCenter(setupContentsSection());
-
-		//set the temporary profile as selected by default
-		algorithmSelect.setValue(controller.getDefaultAlgorithmSelection());
 		
 		return borderPane;
 	}
@@ -201,11 +198,11 @@ public class OpenArchiveView extends View
 		
 		//algorithm select
 		algorithmSelect = new ChoiceBox<>();
-		setAlgorithmPresets(controller.getAlgorithms());
+		setAlgorithmPresets(controller.getPresetNames());
 		algorithmSelect.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
-											algorithmSelected(value, oldIndex, newIndex));
+											controller.algorithmSelected(newIndex.intValue()));
 		algorithmSelect.focusedProperty().addListener(
 						(ObservableValue<? extends Boolean> value,
 										Boolean oldValue, Boolean newValue) ->
@@ -464,21 +461,6 @@ public class OpenArchiveView extends View
 
 	/**
 	 * @update_comment
-	 * @param value
-	 * @param oldIndex
-	 * @param newIndex
-	 * @return
-	 */
-	private void algorithmSelected(ObservableValue<? extends Number> value,
-					Number oldIndex, Number newIndex)
-	{
-		System.out.println("Algorithm selected: " + newIndex);
-		
-		controller.algorithmSelected(newIndex.intValue());
-	}
-
-	/**
-	 * @update_comment
 	 * @param enabled
 	 */
 	public void setOpenButtonEnabled(boolean enabled)
@@ -619,10 +601,5 @@ public class OpenArchiveView extends View
 	{
 		return chooseFolder();
 	}
-	
-	
-	
-	
-	
-	
+
 }

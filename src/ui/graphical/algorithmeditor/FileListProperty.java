@@ -12,6 +12,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import ui.graphical.ConfigurationProperty;
 import ui.graphical.archiveviewer.FileContentsTableRecord;
 
 /**

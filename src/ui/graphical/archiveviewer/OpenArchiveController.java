@@ -30,13 +30,8 @@ public class OpenArchiveController
 	
 	//state variables
 	private File inputFile;
-	private List<String> algorithms;
+	private List<String> presetNames;
 	private Algorithm selectedAlgorithm = null;
-	
-	//constants
-	private final String noSelectionString = "None Selected";
-
-	private String defaultAlgorithmSelection;
 		
 	/**
 	 * @update_comment
@@ -48,32 +43,7 @@ public class OpenArchiveController
 		this.gui = (GUI) UIContext.getUI();
 		this.inputFile = inputFile;
 		
-		reloadAlgorithmPresets();
-		setDefaultAlgorithmSelection(noSelectionString);
-	}
-
-	/**
-	 * @update_comment
-	 */
-	private void reloadAlgorithmPresets()
-	{
-		algorithms = ConfigurationAPI.getAlgorithmPresetNames();
-		algorithms.add(0, noSelectionString);
-	}
-	/**
-	 * @return the defaultAlgorithmSelection
-	 */
-	public String getDefaultAlgorithmSelection()
-	{
-		return defaultAlgorithmSelection;
-	}
-
-	/**
-	 * @param defaultAlgorithmSelection the defaultAlgorithmSelection to set
-	 */
-	public void setDefaultAlgorithmSelection(String defaultAlgorithmSelection)
-	{
-		this.defaultAlgorithmSelection = defaultAlgorithmSelection;
+		presetNames = ConfigurationAPI.getAlgorithmPresetNames();
 	}
 
 	/**
@@ -228,12 +198,7 @@ public class OpenArchiveController
 	{
 		if (index == -1)
 		{
-			//nothing selected, select "No Selection"
-			view.setAlgorithmSelection(defaultAlgorithmSelection);
-		}
-		else if (index == 0)
-		{
-			//'no selection' selected
+			//nothing selected
 			view.setKeySectionEnabled(false);
 			view.setOpenButtonEnabled(false);
 		}
@@ -241,7 +206,7 @@ public class OpenArchiveController
 		{
 			try
 			{
-				selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(algorithms.get(index));
+				selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(presetNames.get(index));
 				view.setKeySectionEnabled(true);
 				view.setOpenButtonEnabled(true);
 			}
@@ -250,7 +215,7 @@ public class OpenArchiveController
 				Logger.log(LogLevel.k_error, e.getMessage());
 				Logger.log(LogLevel.k_debug, e, false);
 				
-				view.setAlgorithmSelection(noSelectionString);
+				view.setAlgorithmSelection(null);
 			}
 		}
 		
@@ -264,17 +229,9 @@ public class OpenArchiveController
 	/**
 	 * @return the algorithms
 	 */
-	public List<String> getAlgorithms()
+	public List<String> getPresetNames()
 	{
-		return algorithms;
-	}
-
-	/**
-	 * @param algorithms the algorithms to set
-	 */
-	public void setAlgorithms(List<String> algorithms)
-	{
-		this.algorithms = algorithms;
+		return presetNames;
 	}
 
 	/**
@@ -289,12 +246,16 @@ public class OpenArchiveController
 		{
 			String previousSelection = view.getAlgorithmSelection();
 			
-			reloadAlgorithmPresets();
-			view.setAlgorithmPresets(algorithms);
+			presetNames = ConfigurationAPI.getAlgorithmPresetNames();
+			view.setAlgorithmPresets(presetNames);
 			
-			if (algorithms.contains(previousSelection))
+			if (presetNames.contains(previousSelection))
 			{
 				view.setAlgorithmSelection(previousSelection);
+			}
+			else
+			{
+				view.setAlgorithmSelection(null);
 			}
 		}
 	}

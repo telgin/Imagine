@@ -20,6 +20,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import ui.graphical.BooleanProperty;
+import ui.graphical.ChoiceProperty;
+import ui.graphical.ConfigurationProperty;
+import ui.graphical.DescriptionProperty;
+import ui.graphical.FileProperty;
+import ui.graphical.StringProperty;
 import ui.graphical.View;
 
 /**
