@@ -1,11 +1,14 @@
 package ui.graphical.embed;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import algorithms.Algorithm;
 import api.ConfigurationAPI;
+import api.ConversionAPI;
 import api.UsageException;
+import config.Settings;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import key.FileKey;
@@ -14,15 +17,19 @@ import key.PasswordKey;
 import key.StaticKey;
 import logging.LogLevel;
 import logging.Logger;
+import product.ConversionJob;
+import product.JobStatus;
+import system.ActiveComponent;
 import ui.UIContext;
 import ui.graphical.FileProperty;
 import ui.graphical.GUI;
+import util.FileSystemUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class EmbedController
+public class EmbedController implements ActiveComponent
 {
 	private EmbedView view;
 	private GUI gui;
@@ -31,6 +38,10 @@ public class EmbedController
 	private List<String> presetNames;
 	private Algorithm selectedAlgorithm = null;
 	private boolean structuredOutput = false;
+	
+	private boolean cssDaemonRunning = false;
+	private boolean shuttingDown = false;
+	private int totalFilesThisRun = 0;
 		
 	/**
 	 * @update_comment
@@ -233,22 +244,67 @@ public class EmbedController
 	 */
 	public void runConversionPressed()
 	{
-		runProgressTest();
+		File outputFolder = view.getOutputFolder();
+		
+		if (outputFolder == null)
+		{
+			Logger.log(LogLevel.k_error, "An output folder must be chosen.");
+		}
+		else
+		{
+			List<File> inputFiles = view.getInputFileList();
+			totalFilesThisRun = 0;
+			try
+			{
+				for (File input : inputFiles)
+					totalFilesThisRun += FileSystemUtil.countEligableFiles(input);
+			}
+			catch (IOException e1)
+			{
+				Logger.log(LogLevel.k_debug, "Could not count files for an entry.");
+				totalFilesThisRun = 0;
+			}
+		
+			Settings.setOutputFolder(view.getOutputFolder());
+			Settings.setUsingStructuredOutput(structuredOutput);
+					
+			ConversionJob job = ConversionAPI.runConversion(inputFiles, selectedAlgorithm, getKey(), 1);
+			
+			//if (!cssDaemonRunning)
+			//	startCSSDaemon();
+			
+//			while (!job.isFinished())
+//			{
+//				try
+//				{
+//					Thread.sleep(50);
+//				}
+//				catch (InterruptedException e){}
+//			}
+		}
+		
+		if (gui.hasErrors())
+		{
+			view.showErrors(gui.getErrors(), "conversion");
+			gui.clearErrors();
+		}
 	}
 	
-	private void runProgressTest()
+	private void startCSSDaemon()
 	{
 		Task<Void> task = new Task<Void>()
 		{ 
 			@Override
 			public Void call()
 			{
-				double x = 0;
-				for (; x <= 1.000001; x += .005)
+				while (JobStatus.getInputFilesProcessed() < totalFilesThisRun && !shuttingDown)
 				{
-					view.setAll(x);
-					System.out.println(x);
-					view.updateAllActiveCells();
+					//Platform.runLater(() -> view.setFilesCreated(JobStatus.getProductsCreated()));
+					//Platform.runLater(() -> view.setConversionProgress((double) JobStatus.getInputFilesProcessed() / totalFilesThisRun));
+					//view.updateAllActiveCells();
+					
+					updateProgress(JobStatus.getInputFilesProcessed(), totalFilesThisRun);
+					
 					try
 					{
 						Thread.sleep(50);
@@ -263,9 +319,12 @@ public class EmbedController
 			}
 		};
 		
+		
+		
 		Thread thread = new Thread(task);
 		thread.setDaemon(true);
 		thread.start();
+		cssDaemonRunning = true;
 	}
 
 	/**
@@ -280,5 +339,28 @@ public class EmbedController
 		{
 			view.setTarget(folder);
 		}
+	}
+	
+	public int getTotalFilesThisRun()
+	{
+		return totalFilesThisRun;
+	}
+
+	/* (non-Javadoc)
+	 * @see system.ActiveComponent#shutdown()
+	 */
+	@Override
+	public void shutdown()
+	{
+		shuttingDown = true;
+	}
+
+	/* (non-Javadoc)
+	 * @see system.ActiveComponent#isShutdown()
+	 */
+	@Override
+	public boolean isShutdown()
+	{
+		return true;
 	}
 }

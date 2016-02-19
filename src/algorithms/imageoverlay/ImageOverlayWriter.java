@@ -12,10 +12,9 @@ import algorithms.Parameter;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
+import product.JobStatus;
 import product.ProductIOException;
 import product.ProductWriter;
-import stats.ProgressMonitor;
-import stats.Stat;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
 
@@ -229,9 +228,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 			ImageIO.write(img, "png", imgFile);
 
 			// update progress
-			Stat stat = ProgressMonitor.getStat("productsCreated");
-			if (stat != null)
-				stat.incrementNumericProgress(1);
+			JobStatus.incrementProductsCreated(1);
 		}
 		catch (IOException e)
 		{

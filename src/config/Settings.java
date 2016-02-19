@@ -19,6 +19,11 @@ public class Settings
 	{
 		return usesStructuredOutput;
 	}
+	
+	public static void setUsingStructuredOutput(boolean structured)
+	{
+		usesStructuredOutput = structured;
+	}
 
 	/**
 	 * @update_comment

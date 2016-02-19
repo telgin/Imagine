@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Timer;
 
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -41,6 +44,7 @@ import javafx.stage.Stage;
 import logging.LogLevel;
 import logging.Logger;
 import product.FileContents;
+import product.JobStatus;
 import ui.graphical.BooleanProperty;
 import ui.graphical.FileProperty;
 import ui.graphical.View;
@@ -123,6 +127,24 @@ public class EmbedView extends View
 		//progress bar
 		conversionProgress = new ProgressBar(.75);
 		conversionProgress.setPrefWidth(230);
+		Task<Void> task = new Task<Void>()
+		{
+			@Override
+			protected Void call() throws Exception
+			{
+				while (true)
+				{
+					updateProgress(JobStatus.getInputFilesProcessed(), controller.getTotalFilesThisRun());
+					
+					Thread.sleep(50);
+				}
+			}
+
+		};
+		
+		conversionProgress.progressProperty().bind(task.progressProperty());
+		new Thread(task).start();
+		
 		hbox.getChildren().add(conversionProgress);
 
 		//files created label
@@ -702,6 +724,11 @@ public class EmbedView extends View
 	{
 		estimatedOutputSizeLabel.setText(estimatedOutputSizeString + kb + " KB");
 	}
+	
+	public void setConversionProgress(double progress)
+	{
+		conversionProgress.setProgress(progress);
+	}
 
 	/**
 	 * @update_comment
@@ -768,6 +795,50 @@ public class EmbedView extends View
 								+ "This is equivalent to unchecking them.");
 			}
 		}
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	public List<File> getInputFileList()
+	{
+		List<File> files = new ArrayList<File>();
+		
+		for (TreeItem<String> child : inputFileRoot.getChildren())
+		{
+			collectInputFiles(files, (InputFileTreeItem) child);
+		}
+		
+		return files;
+	}
+
+	/**
+	 * @update_comment
+	 * @param files
+	 * @param parent
+	 */
+	private void collectInputFiles(List<File> files, InputFileTreeItem parent)
+	{
+		System.out.println("On: " + parent.getFile().getAbsolutePath());
+		System.out.println("ind: " + parent.isIndeterminate() + ", selected: " + parent.isSelected());
+		if (parent.isIndeterminate())
+		{
+			//parent is not selected, but some children are selected or indeterminate
+			//(must be a folder and must have been expanded)
+			for (TreeItem<String> child : parent.getChildren())
+			{
+				collectInputFiles(files, (InputFileTreeItem) child);
+			}
+		}
+		else if (parent.isSelected())
+		{
+			//parent is selected
+			//(file or folder, just add it)
+			files.add(parent.getFile());
+		}
+		
+		//else: unselected, don't add
 	}
 	
 }

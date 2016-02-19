@@ -8,8 +8,6 @@ import config.Constants;
 import logging.LogLevel;
 import logging.Logger;
 import report.Report;
-import stats.ProgressMonitor;
-import stats.Stat;
 import data.FileType;
 import data.Metadata;
 import util.ByteConversion;
@@ -17,10 +15,6 @@ import util.FileSystemUtil;
 
 public class ProductLoader
 {
-	// delete factory member? can the factory ever become null?
-	// do we ever need another product?
-	// private final ProductFactory<? extends Product> factory;
-
 	private final byte PRODUCT_VERSION_NUMBER = ByteConversion.intToByte(0);
 
 	private byte[] streamUUID;
@@ -214,9 +208,7 @@ public class ProductLoader
 		fileWritten = true;
 
 		// update progress
-		Stat stat = ProgressMonitor.getStat("filesProcessed");
-		if (stat != null)
-			stat.incrementNumericProgress(1);
+		JobStatus.incrementInputFilesProcessed(1);
 	}
 
 	//TODO maybe use this function to increase reader speed

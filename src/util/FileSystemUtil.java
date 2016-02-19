@@ -447,4 +447,37 @@ public class FileSystemUtil
 	      System.out.println("writer " + names[i]);
 	    }
 	}
+	
+	
+	/**
+	 * Counts the number of files which could be added to an archive. Specifically,
+	 * this would be any files and empty folders. If the input file a leaf, this function
+	 * will return 1.
+	 * @param file
+	 * @return
+	 * @throws IOException 
+	 */
+	public static int countEligableFiles(File file) throws IOException
+	{
+		if (file.isDirectory())
+		{
+			File[] children = file.listFiles();
+			if (children.length == 0)
+			{
+				return 1;
+			}
+			else
+			{
+				int count = 0;
+				for (File child : children)
+					count += countEligableFiles(child);
+				
+				return count;
+			}
+		}
+		else
+		{
+			return 1;
+		}
+	}
 }

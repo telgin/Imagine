@@ -10,10 +10,9 @@ import config.Constants;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
+import product.JobStatus;
 import product.ProductIOException;
 import product.ProductWriter;
-import stats.ProgressMonitor;
-import stats.Stat;
 import util.ByteConversion;
 
 public class TextWriter extends Text implements ProductWriter
@@ -80,9 +79,7 @@ public class TextWriter extends Text implements ProductWriter
 			writer.close();
 
 			// update progress
-			Stat stat = ProgressMonitor.getStat("productsCreated");
-			if (stat != null)
-				stat.incrementNumericProgress(1);
+			JobStatus.incrementProductsCreated(1);
 		}
 		catch (IOException e)
 		{

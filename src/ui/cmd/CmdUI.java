@@ -21,9 +21,8 @@ import logging.LogLevel;
 import logging.Logger;
 import product.ConversionJob;
 import product.FileContents;
+import product.JobStatus;
 import product.ProductContents;
-import stats.ProgressMonitor;
-import stats.Stat;
 import ui.ArgParseResult;
 import ui.UI;
 
@@ -338,25 +337,8 @@ public class CmdUI extends UI
 		{
 			while (!outputPaused && !job.isFinished())
 			{
-				String statOutput = "";
-				Stat stat = ProgressMonitor.getStat("filesProcessed");
-				if (stat != null)
-				{
-					int filesProcessed = (int) stat.getNumericProgress().doubleValue();
-					statOutput += "Files Processed: " + filesProcessed;
-				}
-				
-				stat = ProgressMonitor.getStat("productsCreated");
-				if (stat != null)
-				{
-					int productsCreated = (int) stat.getNumericProgress().doubleValue();
-					if (!statOutput.isEmpty())
-						statOutput += ", ";
-					statOutput += ", Products Created: " + productsCreated;
-				}
-				
-				if (!statOutput.isEmpty())
-					Logger.log(LogLevel.k_info, statOutput);
+				Logger.log(LogLevel.k_info, "Files Processed: " + JobStatus.getInputFilesProcessed() + 
+					", Products Created: " + JobStatus.getProductsCreated());
 				
 				Thread.sleep(1000);
 			}
