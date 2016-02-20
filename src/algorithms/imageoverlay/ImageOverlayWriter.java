@@ -12,7 +12,7 @@ import algorithms.Parameter;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.ConversionJobFileStatus;
+import product.ConversionJobFileState;
 import product.JobStatus;
 import product.ProductIOException;
 import product.ProductWriter;
@@ -27,13 +27,13 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	public ImageOverlayWriter(Algorithm algo, Key key)
 	{
 		super(algo, key);
-		File imageFolder = new File(algo.getParameterValue("ImageFolder"));
+		File imageFolder = new File(algo.getParameterValue(Definition.IMAGE_FOLDER_PARAM));
 		
 		//prompt for the image folder if the one listed doesn't exist
 		if (!imageFolder.exists())
 		{
 			algo.setParameter(Definition.IMAGE_FOLDER_PARAM, Option.PROMPT_OPTION.getValue());
-			imageFolder = new File(algo.getParameterValue("ImageFolder"));
+			imageFolder = new File(algo.getParameterValue(Definition.IMAGE_FOLDER_PARAM));
 		}
 		
 		ConsumptionMode mode = ConsumptionMode.parseMode(
@@ -58,7 +58,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 				manager.setFileUsed(imgFile);
 				
 				//update status to show previous image file was used
-				JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileStatus.FINISHED);
+				JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileState.FINISHED);
 			}
 			catch (IOException e)
 			{
@@ -81,7 +81,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		else
 		{
 			//update status to show this new image file is about to be used
-			JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileStatus.WRITING);
+			JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileState.WRITING);
 		}
 		
 		boolean foundFile = false;

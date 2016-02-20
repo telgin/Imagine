@@ -10,7 +10,8 @@ import java.util.Random;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
-import product.ConversionJobFileStatus;
+import product.ConversionJobFileState;
+import util.FileSystemUtil;
 import javafx.beans.value.ObservableValue;
 
 /**
@@ -21,22 +22,23 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 {
 	private double progress;
 	private File file;
-	private ConversionJobFileStatus status;
+	private ConversionJobFileState status;
+	private boolean focused;
 	
 	private static final InputFileTreeItem tempExpandableChildItem = new InputFileTreeItem("Loading...");
 	
-	private static final Map<ConversionJobFileStatus, String> fxStatusColors = 
-					new HashMap<ConversionJobFileStatus, String>();
+	private static final Map<ConversionJobFileState, String> fxStatusColors = 
+					new HashMap<ConversionJobFileState, String>();
 	
 	private static final String textFillColor = "-fx-text-fill: black; ";
 	
-	static
+	static//-fx-accent: #0093ff; 
 	{
-		fxStatusColors.put(ConversionJobFileStatus.NOT_STARTED, "-fx-accent: #0093ff; ");
-		fxStatusColors.put(ConversionJobFileStatus.WRITING, "-fx-background-color: rgba(11, 156, 0, .7); ");
-		fxStatusColors.put(ConversionJobFileStatus.PAUSED, "-fx-background-color: rgba(156, 146, 0, .7); ");
-		fxStatusColors.put(ConversionJobFileStatus.FINISHED, "-fx-background-color: rgba(11, 156, 0, .9); ");
-		fxStatusColors.put(ConversionJobFileStatus.ERRORED, "-fx-background-color: rgba(244, 20, 0, .75); ");
+		fxStatusColors.put(ConversionJobFileState.NOT_STARTED, "-fx-accent: rgba(200, 200, 200, 1); ");
+		fxStatusColors.put(ConversionJobFileState.WRITING, "-fx-background-color: rgba(11, 156, 0, .5); ");
+		fxStatusColors.put(ConversionJobFileState.PAUSED, "-fx-background-color: rgba(156, 146, 0, .5); ");
+		fxStatusColors.put(ConversionJobFileState.FINISHED, "-fx-background-color: rgba(11, 156, 0, .7); ");
+		fxStatusColors.put(ConversionJobFileState.ERRORED, "-fx-background-color: rgba(244, 20, 0, .75); ");
 	}
 	
 
@@ -48,7 +50,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	{
 		super(file.getName());
 		this.file = file;
-		status = ConversionJobFileStatus.NOT_STARTED;
+		status = ConversionJobFileState.NOT_STARTED;
 		
 		if (file.isDirectory() && file.listFiles().length > 0)
 		{
@@ -105,7 +107,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	/**
 	 * @return the status
 	 */
-	public ConversionJobFileStatus getStatus()
+	public ConversionJobFileState getStatus()
 	{
 		return status;
 	}
@@ -113,7 +115,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	/**
 	 * @param status the status to set
 	 */
-	public void setStatus(ConversionJobFileStatus status)
+	public void setStatus(ConversionJobFileState status)
 	{
 		this.status = status;
 	}
@@ -156,17 +158,35 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 		
 		//directories with contents are not added directly and should not show progress
 		//bars, just states
-		boolean directlyAdded = !file.isDirectory() || file.list().length == 0;
+		//boolean directlyAdded = !file.isDirectory() || FileSystemUtil.directoryEmpty(file);
 		
 		//create a progress bar out of the background color by setting the insets
 		//according to the progress of the item
 		String bar = "";
-		if (directlyAdded && (status.equals(ConversionJobFileStatus.WRITING) || 
-						status.equals(ConversionJobFileStatus.PAUSED)))
+		if ((status.equals(ConversionJobFileState.WRITING) || 
+						status.equals(ConversionJobFileState.PAUSED)))
 		{
 			bar = " -fx-background-insets: 0 " + rightInset + " 0 0";
 		}
 		
-		cell.setStyle(textFillColor + fxStatusColors.get(status) + bar);
+		String focusedOpacity = focused ? "-fx-opacity: 1; " : "-fx-opacity: .9; ";
+		
+		cell.setStyle(focusedOpacity + textFillColor + fxStatusColors.get(status) + bar);
+	}
+
+	/**
+	 * @return the focused
+	 */
+	public boolean isFocused()
+	{
+		return focused;
+	}
+
+	/**
+	 * @param focused the focused to set
+	 */
+	public void setFocused(boolean focused)
+	{
+		this.focused = focused;
 	}
 }

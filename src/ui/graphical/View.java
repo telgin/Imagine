@@ -3,6 +3,7 @@ package ui.graphical;
 import java.io.File;
 import java.util.List;
 
+import algorithms.Option;
 import algorithms.Parameter;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;

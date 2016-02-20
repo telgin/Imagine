@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.CopyOption;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
@@ -478,6 +479,29 @@ public class FileSystemUtil
 		else
 		{
 			return 1;
+		}
+	}
+	
+	/**
+	 * @credit http://stackoverflow.com/questions/5930087/how-to-check-if-a-directory-is-empty-in-java
+	 * @update_comment
+	 * @param folder
+	 * @return
+	 */
+	public static boolean directoryEmpty(File folder)
+	{
+		try
+		{
+			DirectoryStream<Path> dirStream = Files.newDirectoryStream(folder.toPath());
+			boolean empty = !dirStream.iterator().hasNext();
+			dirStream.close();
+			return empty;
+		}
+		catch (IOException e)
+		{
+			//this is kind of bad, but logically, with the way this will be used, 
+			//a directory which doesn't exist doesn't have files in it.
+			return true;
 		}
 	}
 }

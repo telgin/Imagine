@@ -19,6 +19,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.css.CssMetaData;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -186,12 +187,26 @@ public class EmbedView extends View
 		inputFiles.setRoot(inputFileRoot);
 		inputFiles.setCellFactory(e -> {
 			TreeCell<String> cell = CheckBoxTreeCell.<String>forTreeView().call(e);
+			
+			//make sure items know focused state so they can change color slightly
+			cell.focusedProperty().addListener(
+							(ObservableValue<? extends Boolean> value,
+								Boolean oldValue, Boolean newValue) -> {
+										InputFileTreeItem item = activeInputItems.get(cell);
+										if (item != null)
+											item.setFocused(newValue.booleanValue());
+										
+										//change the focus state without looking up perfectly current
+										//state/progress information
+										updateInputCellStyle(cell);
+									});
 
 			//update active cell map when a cell changes its item
 			cell.treeItemProperty().addListener((obs, oldItem, newItem) -> {
 				activeInputItems.put(cell, (InputFileTreeItem) newItem);
 				
 				//update this specific cell now
+				controller.updateInputItem((InputFileTreeItem) newItem);
 				updateInputCellStyle(cell);
 			});
 
@@ -324,11 +339,25 @@ public class EmbedView extends View
 				}
 			};
 			
+			//make sure items know focused state so they can change color slightly
+			cell.focusedProperty().addListener(
+				(ObservableValue<? extends Boolean> value,
+					Boolean oldValue, Boolean newValue) -> {
+							TargetFileTreeItem item = activeTargetItems.get(cell);
+							if (item != null)
+								item.setFocused(newValue.booleanValue());
+							
+							//change the focus state without looking up perfectly current
+							//state/progress information
+							updateTargetCellStyle(cell);
+						});
+			
 			//update active cell map when a cell changes its item
 			cell.treeItemProperty().addListener((obs, oldItem, newItem) -> {
 				activeTargetItems.put(cell, (TargetFileTreeItem) newItem);
 				
 				//update this specific cell now
+				controller.updateTargetItem((TargetFileTreeItem) newItem);
 				updateTargetCellStyle(cell);
 			});
 

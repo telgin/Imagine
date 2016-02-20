@@ -128,7 +128,7 @@ public class ProductLoader
 	public void writeFile(Metadata fileMetadata) throws IOException
 	{
 		//update file status to indicate we're going to write the file
-		JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileStatus.WRITING);
+		JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileState.WRITING);
 		
 		//resetting causes the product header to be written
 		//don't reset unless this loader actually writes a file
@@ -214,7 +214,7 @@ public class ProductLoader
 		fileWritten = true;
 		
 		//update file status as finished
-		JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileStatus.FINISHED);
+		JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileState.FINISHED);
 
 		// update progress
 		JobStatus.incrementInputFilesProcessed(1);

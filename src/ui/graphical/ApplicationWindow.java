@@ -20,7 +20,7 @@ public class ApplicationWindow extends Application
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception
-	{
+	{	
 		ArgParseResult result = ((GUI) UIContext.getUI()).getArgParseResult();
 		
 		TopView topView = new TopView(primaryStage, result);

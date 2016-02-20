@@ -21,7 +21,7 @@ import key.StaticKey;
 import logging.LogLevel;
 import logging.Logger;
 import product.ConversionJob;
-import product.ConversionJobFileStatus;
+import product.ConversionJobFileState;
 import product.FileStatus;
 import product.JobStatus;
 import system.ActiveComponent;
@@ -42,6 +42,7 @@ public class EmbedController implements ActiveComponent
 	//state variables
 	private List<String> presetNames;
 	private Algorithm selectedAlgorithm = null;
+	private File selectedTargetFolder = null;
 	private boolean structuredOutput = false;
 	
 	private boolean shuttingDown = false;
@@ -143,7 +144,7 @@ public class EmbedController implements ActiveComponent
 					view.setTargetSectionEnabled(true);
 					
 					//reflect the set target folder if it exists
-					if (!imageFolder.getValue().equals(Option.PROMPT_OPTION.getValue()))
+					if (imageFolder.getValue() != null && !imageFolder.getValue().equals(Option.PROMPT_OPTION.getValue()))
 					{
 						view.setTarget(new File(imageFolder.getValue()));
 					}
@@ -200,7 +201,8 @@ public class EmbedController implements ActiveComponent
 				presetNames = currentPresetNames;
 				view.setAlgorithmPresets(presetNames);
 			
-				if (presetNames.contains(previousSelection.getPresetName()))
+				//try to restore the changes that were made
+				if (previousSelection != null && presetNames.contains(previousSelection.getPresetName()))
 				{
 					view.setAlgorithmSelection(previousSelection.getPresetName());
 					selectedAlgorithm = previousSelection;
@@ -297,39 +299,51 @@ public class EmbedController implements ActiveComponent
 	 */
 	public void runConversionPressed()
 	{
-		File outputFolder = view.getOutputFolder();
-		
-		if (outputFolder == null)
+		try
 		{
-			Logger.log(LogLevel.k_error, "An output folder must be chosen.");
-		}
-		else
-		{
-			List<File> inputFiles = view.getInputFileList();
-			totalFilesThisRun = 0;
-			try
-			{
-				for (File input : inputFiles)
-					totalFilesThisRun += FileSystemUtil.countEligableFiles(input);
-			}
-			catch (IOException e1)
-			{
-				Logger.log(LogLevel.k_debug, "Could not count files for an entry.");
-				totalFilesThisRun = 0;
-			}
-		
-			Settings.setOutputFolder(view.getOutputFolder());
-			Settings.setUsingStructuredOutput(structuredOutput);
+			File outputFolder = view.getOutputFolder();
 			
-			JobStatus.reset();
-			ConversionAPI.runConversion(inputFiles, selectedAlgorithm, getKey(), 1);
-
-			if (guiUpdateDaemon == null || !guiUpdateDaemon.isAlive())
+			if (outputFolder == null)
 			{
-				guiUpdateDaemon = new Thread(() -> cssUpdateLoop());
-				guiUpdateDaemon.setDaemon(true);
-				guiUpdateDaemon.start();
+				Logger.log(LogLevel.k_error, "An output folder must be chosen.");
 			}
+			else if (selectedTargetFolder == null || !selectedTargetFolder.exists())
+			{
+				Logger.log(LogLevel.k_error, "A valid target folder must be chosen.");
+			}
+			else
+			{
+				List<File> inputFiles = view.getInputFileList();
+				totalFilesThisRun = 0;
+				try
+				{
+					for (File input : inputFiles)
+						totalFilesThisRun += FileSystemUtil.countEligableFiles(input);
+				}
+				catch (IOException e1)
+				{
+					Logger.log(LogLevel.k_debug, "Could not count files for an entry.");
+					totalFilesThisRun = 0;
+				}
+			
+				Settings.setOutputFolder(view.getOutputFolder());
+				Settings.setUsingStructuredOutput(structuredOutput);
+				
+				JobStatus.reset();
+				ConversionJob job = ConversionAPI.runConversion(inputFiles, selectedAlgorithm, getKey(), 1);
+	
+				if (guiUpdateDaemon == null || !guiUpdateDaemon.isAlive())
+				{
+					guiUpdateDaemon = new Thread(() -> updateCSS(job));
+					guiUpdateDaemon.setDaemon(true);
+					guiUpdateDaemon.start();
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			Logger.log(LogLevel.k_error, "The conversion job failed to run.");
+			Logger.log(LogLevel.k_debug, e, false);
 		}
 		
 		if (gui.hasErrors())
@@ -339,121 +353,97 @@ public class EmbedController implements ActiveComponent
 		}
 	}
 	
-	public void cssUpdateLoop()
+	public void updateCSS(ConversionJob job)
 	{
-		while (!shuttingDown)
+		int run = 0;
+		while (!shuttingDown && !job.isFinished())
 		{
-			//System.out.println("Looping..." + filesCreated);
-			
-			//update things if they're different
-			
-			//files created
-			int currentFilesCreated = JobStatus.getProductsCreated();
-			if (currentFilesCreated != filesCreated)
+			cssUpdateLoop(run++);
+		}
+		
+		//finalize any progress that was made one last time
+		if (!shuttingDown && job.isFinished())
+		{
+			cssUpdateLoop(run++);
+		}
+		
+		if (gui.hasErrors())
+		{
+			Platform.runLater(() -> 
 			{
-				filesCreated = JobStatus.getProductsCreated();
-				view.setFilesCreated(filesCreated);
-			}
-			
-			//conversion progress
-			double currentConversionProgress = (double) JobStatus.getInputFilesProcessed() / totalFilesThisRun;
-			if (conversionProgress != currentConversionProgress)
-			{
-				conversionProgress = currentConversionProgress;
-				view.setConversionProgress(conversionProgress);
-			}
-			
-			//update input file item status/progress for visible/loaded cells
-			for (InputFileTreeItem item : view.getActiveInputItems().values())
-			{
-				if (item != null)
-				{
-					if (item.getFile().isDirectory() && item.getFile().list().length > 0)
-					{
-						//directory item with children, not directly added to archive
-						FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
-						
-						ConversionJobFileStatus parentStatus = null;
-						boolean allFinished = true;
-						boolean allNotStarted = true;
-						for (File child : item.getFile().listFiles())
-						{
-							//if (!child.isDirectory() || child.list().length == 0)
-							//{
-								FileStatus childFileStatus = JobStatus.getFileStatus(child);
-								if (childFileStatus.getStatus().equals(ConversionJobFileStatus.ERRORED))
-								{
-									parentStatus = ConversionJobFileStatus.ERRORED;
-									break;
-								}
-								else if (childFileStatus.getStatus().equals(ConversionJobFileStatus.WRITING))
-								{
-									parentStatus = ConversionJobFileStatus.WRITING;
-									break;
-								}
-								else if (childFileStatus.getStatus().equals(ConversionJobFileStatus.PAUSED))
-								{
-									parentStatus = ConversionJobFileStatus.PAUSED;
-									break;
-								}
-								else if (!childFileStatus.getStatus().equals(ConversionJobFileStatus.NOT_STARTED))
-								{
-									allNotStarted = false;
-								}
-								else if (!childFileStatus.getStatus().equals(ConversionJobFileStatus.FINISHED))
-								{
-									allFinished = false;
-								}
-							//}
-						}
-						
-						if (parentStatus == null)
-						{
-							if (allFinished && !allNotStarted)
-								parentStatus = ConversionJobFileStatus.FINISHED;
-							else if (allNotStarted && !allFinished)
-								parentStatus = ConversionJobFileStatus.NOT_STARTED;
-							else
-								parentStatus = ConversionJobFileStatus.WRITING;
-						}
-						
-						//System.err.println(parentStatus + "\t" + item.getFile().getName());
-						fileStatus.setStatus(parentStatus);
-						item.setStatus(fileStatus.getStatus());
-					}
-					else
-					{
-						//file or empty folder, directly added to archive and has progress bar
-						FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
-						//System.err.println(fileStatus.getStatus() + "\t" + item.getFile().getName());
-						item.setStatus(fileStatus.getStatus());
-						item.setProgress(fileStatus.getProgress());
-					}
-					
-				}
-			}
-			
-			//update target file item status for visible/loaded cells
-			for (TargetFileTreeItem item : view.getActiveTargetItems().values())
-			{
-				if (item != null)
-				{
-					FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
-					item.setStatus(fileStatus.getStatus());
-				}
-			}
-			
-			//update the cell css
-			view.updateAllActiveCells();
-			
-			try
-			{
-				Thread.sleep(50);
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
+				view.showErrors(gui.getErrors(), "conversion");
+				gui.clearErrors();
+			});
+		}
+	}
+	
+	public void cssUpdateLoop(int run)
+	{
+		//System.out.println("Looping..." + filesCreated);
+		
+		//update things if they're different
+		
+		//files created
+		int currentFilesCreated = JobStatus.getProductsCreated();
+		if (currentFilesCreated != filesCreated)
+		{
+			filesCreated = JobStatus.getProductsCreated();
+			view.setFilesCreated(filesCreated);
+		}
+		
+		//conversion progress
+		double currentConversionProgress = (double) JobStatus.getInputFilesProcessed() / totalFilesThisRun;
+		if (conversionProgress != currentConversionProgress)
+		{
+			conversionProgress = currentConversionProgress;
+			view.setConversionProgress(conversionProgress);
+		}
+		
+		//update input file item status/progress for visible/loaded cells
+		for (InputFileTreeItem item : view.getActiveInputItems().values())
+		{
+			updateInputItem(item);
+		}
+		
+		//update target file item status for visible/loaded cells
+		for (TargetFileTreeItem item : view.getActiveTargetItems().values())
+		{
+			updateTargetItem(item);
+		}
+		
+		//update the cell css
+		view.updateAllActiveCells();
+		
+		try
+		{
+			Thread.sleep(50);
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public synchronized void updateInputItem(InputFileTreeItem item)
+	{
+		if (item != null)
+		{
+			FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
+			//System.err.println(fileStatus.getStatus() + "\t" + item.getFile().getName());
+
+			item.setStatus(fileStatus.getState());
+			item.setProgress(fileStatus.getProgress());
+		}
+	}
+	
+	public synchronized void updateTargetItem(TargetFileTreeItem item)
+	{
+		if (item != null)
+		{
+			FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
+			//System.err.println(fileStatus.getStatus() + "\t" + item.getFile().getName());
+
+			item.setStatus(fileStatus.getState());
 		}
 	}
 
@@ -468,6 +458,7 @@ public class EmbedController implements ActiveComponent
 		if (folder != null)
 		{
 			view.setTarget(folder);
+			selectedTargetFolder = folder;
 			
 			Parameter imageFolder = selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
 			if (imageFolder != null)

@@ -4,7 +4,7 @@ package product;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public enum ConversionJobFileStatus
+public enum ConversionJobFileState
 {
 	NOT_STARTED,
 	WRITING,

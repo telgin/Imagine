@@ -15,7 +15,10 @@ public abstract class JobStatus
 	
 	private static Map<File, FileStatus> fileStati;
 	
-	
+	static
+	{
+		reset();
+	}
 	
 
 	public static void reset()
@@ -34,7 +37,7 @@ public abstract class JobStatus
 		if (fileStatus == null)
 		{
 			fileStatus = new FileStatus(file);
-			fileStatus.setStatus(ConversionJobFileStatus.NOT_STARTED);
+			fileStatus.setState(ConversionJobFileState.NOT_STARTED);
 			fileStati.put(file, fileStatus);
 		}
 		
@@ -87,16 +90,16 @@ public abstract class JobStatus
 		}
 	}
 	
-	public static void setConversionJobFileStatus(File file, ConversionJobFileStatus status)
+	public static void setConversionJobFileStatus(File file, ConversionJobFileState status)
 	{
 		if (fileStati.containsKey(file))
 		{
-			fileStati.get(file).setStatus(status);
+			fileStati.get(file).setState(status);
 		}
 		else
 		{
 			FileStatus fileStatus = new FileStatus(file);
-			fileStatus.setStatus(status);
+			fileStatus.setState(status);
 			fileStati.put(file, fileStatus);
 		}
 	}
