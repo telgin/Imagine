@@ -83,6 +83,8 @@ public class OpenArchiveView extends View
 		borderPane.setLeft(setupConfigSelection());
 		borderPane.setCenter(setupContentsSection());
 		
+		keySelectionButtons.selectToggle(noKeyToggle);
+		
 		return borderPane;
 	}
 	
@@ -225,7 +227,6 @@ public class OpenArchiveView extends View
 		passwordToggle = new RadioButton(passwordToggleString);
 		passwordToggle.setUserData(passwordToggleString);
 		passwordToggle.setToggleGroup(keySelectionButtons);
-		keySelectionButtons.selectToggle(noKeyToggle);
 		keySelectionButtons.selectedToggleProperty().addListener(
 						(ObservableValue<? extends Toggle> value,
 										Toggle oldSelection, Toggle newSelection) ->

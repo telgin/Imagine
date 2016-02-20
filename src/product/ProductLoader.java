@@ -127,6 +127,9 @@ public class ProductLoader
 
 	public void writeFile(Metadata fileMetadata) throws IOException
 	{
+		//update file status to indicate we're going to write the file
+		JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileStatus.WRITING);
+		
 		//resetting causes the product header to be written
 		//don't reset unless this loader actually writes a file
 		//needs reset should only be true after initialization
@@ -148,7 +151,7 @@ public class ProductLoader
 			fileLengthRemaining = fileMetadata.getFile().length();
 			reader = new DataInputStream(new FileInputStream(fileMetadata.getFile()));
 		}
-		else //k_folder or k_reference
+		else //k_folder
 		{
 			fileLengthRemaining = 0;
 			reader = null;
@@ -194,6 +197,9 @@ public class ProductLoader
 
 			// update fragment number
 			++fragmentNumber;
+			
+			//update file length remaining
+			JobStatus.setBytesLeft(fileMetadata.getFile(), fileLengthRemaining);
 
 		}
 		while (fileLengthRemaining > 0);
@@ -206,6 +212,9 @@ public class ProductLoader
 		Report.saveConversionRecord(fileMetadata);
 
 		fileWritten = true;
+		
+		//update file status as finished
+		JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileStatus.FINISHED);
 
 		// update progress
 		JobStatus.incrementInputFilesProcessed(1);
@@ -300,8 +309,8 @@ public class ProductLoader
 			int bytesWritten = currentProduct.write(buffer, dataOffset, dataLength);
 			//System.out.println("Buffer length: " + buffer.length);
 			//System.out.println("bytes written: " + bytesWritten);
-			Logger.log(LogLevel.k_debug, "Writing " + dataLength + " bytes was requested and " + 
-							bytesWritten + " were written.");
+			//Logger.log(LogLevel.k_debug, "Writing " + dataLength + " bytes was requested and " + 
+			//				bytesWritten + " were written.");
 			
 			dataOffset += bytesWritten;
 			dataLength -= bytesWritten;

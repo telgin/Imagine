@@ -5,7 +5,9 @@ import java.util.concurrent.BlockingQueue;
 
 import logging.LogLevel;
 import logging.Logger;
+import product.ConversionJobFileStatus;
 import product.FileOutputManager;
+import product.JobStatus;
 import product.ProductLoader;
 import product.ProductWriter;
 import product.ProductWriterFactory;
@@ -46,11 +48,27 @@ public class ProductWorker implements Runnable
 
 			while (!queue.isEmpty() && !stopping)
 			{
+				Metadata taken;
 				try
 				{
-					loader.writeFile(queue.take());
+					taken = queue.take();
+					
+					try
+					{
+						loader.writeFile(taken);
+					}
+					catch (IOException e)
+					{
+						//update status to show failure
+						JobStatus.setConversionJobFileStatus(taken.getFile(), ConversionJobFileStatus.ERRORED);
+						
+						Logger.log(LogLevel.k_error,
+										"A file could not be written: " + taken.getFile().getName());
+						Logger.log(LogLevel.k_error, e.getMessage());
+						Logger.log(LogLevel.k_debug, e, false);
+					}
 				}
-				catch (IOException | InterruptedException e)
+				catch (InterruptedException e)
 				{
 					Logger.log(LogLevel.k_error,
 									"Product worker failed to load a file from the queue.");

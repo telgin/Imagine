@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.List;
 
 import algorithms.Algorithm;
+import algorithms.Option;
+import algorithms.Parameter;
+import algorithms.imageoverlay.Definition;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
@@ -244,18 +247,28 @@ public class OpenArchiveController
 		//update the list if focused on
 		if (focused)
 		{
-			String previousSelection = view.getAlgorithmSelection();
+			List<String> currentPresetNames = ConfigurationAPI.getAlgorithmPresetNames();
 			
-			presetNames = ConfigurationAPI.getAlgorithmPresetNames();
-			view.setAlgorithmPresets(presetNames);
+			//update the list only if it changed
+			if (presetNames.size() != currentPresetNames.size() || 
+							!presetNames.containsAll(currentPresetNames))
+			{
+				//save algorithm modifications
+				Algorithm previousSelection = selectedAlgorithm;
+				
+				//refresh the preset names to the new list
+				presetNames = currentPresetNames;
+				view.setAlgorithmPresets(presetNames);
 			
-			if (presetNames.contains(previousSelection))
-			{
-				view.setAlgorithmSelection(previousSelection);
-			}
-			else
-			{
-				view.setAlgorithmSelection(null);
+				if (presetNames.contains(previousSelection.getPresetName()))
+				{
+					view.setAlgorithmSelection(previousSelection.getPresetName());
+					selectedAlgorithm = previousSelection;
+				}
+				else
+				{
+					view.setAlgorithmSelection(null);
+				}
 			}
 		}
 	}

@@ -29,7 +29,16 @@ public abstract class JobStatus
 	
 	public static FileStatus getFileStatus(File file)
 	{
-		return fileStati.get(file);
+		FileStatus fileStatus = fileStati.get(file);
+		
+		if (fileStatus == null)
+		{
+			fileStatus = new FileStatus(file);
+			fileStatus.setStatus(ConversionJobFileStatus.NOT_STARTED);
+			fileStati.put(file, fileStatus);
+		}
+		
+		return fileStatus;
 	}
 
 	/**
@@ -62,5 +71,33 @@ public abstract class JobStatus
 	public static void incrementInputFilesProcessed(int increment)
 	{
 		inputFilesProcessed += increment;
+	}
+	
+	public static void setBytesLeft(File file, long bytesLeft)
+	{
+		if (fileStati.containsKey(file))
+		{
+			fileStati.get(file).setBytesLeft(bytesLeft);
+		}
+		else
+		{
+			FileStatus fileStatus = new FileStatus(file);
+			fileStatus.setBytesLeft(bytesLeft);
+			fileStati.put(file, fileStatus);
+		}
+	}
+	
+	public static void setConversionJobFileStatus(File file, ConversionJobFileStatus status)
+	{
+		if (fileStati.containsKey(file))
+		{
+			fileStati.get(file).setStatus(status);
+		}
+		else
+		{
+			FileStatus fileStatus = new FileStatus(file);
+			fileStatus.setStatus(status);
+			fileStati.put(file, fileStatus);
+		}
 	}
 }

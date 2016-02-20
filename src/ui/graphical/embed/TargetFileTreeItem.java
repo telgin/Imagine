@@ -10,6 +10,7 @@ import java.util.Random;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
+import product.ConversionJobFileStatus;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -18,26 +19,22 @@ import javafx.scene.control.TreeItem;
 public class TargetFileTreeItem extends TreeItem<String>
 {
 	private File file;
-	private int status;
+	private ConversionJobFileStatus status;
 	
 	private static final TargetFileTreeItem tempExpandableChildItem = new TargetFileTreeItem("Loading...");
 	
-	public static final int NOT_STARTED = 0;
-	public static final int OK = 1;
-	public static final int PAUSED = 2;
-	public static final int FINISHED = 3;
-	public static final int ERRORED = 4;
+	private static final Map<ConversionJobFileStatus, String> fxStatusColors = 
+					new HashMap<ConversionJobFileStatus, String>();
 	
-	private static final Map<Integer, String> fxStatusColors = 
-					new HashMap<Integer, String>();
+	private static final String textFillColor = "-fx-text-fill: black; ";
 	
 	static
 	{
-		fxStatusColors.put(NOT_STARTED, "");
-		fxStatusColors.put(OK, "-fx-background-color: rgba(11, 156, 0, .7); ");
-		fxStatusColors.put(PAUSED, "-fx-background-color: rgba(156, 146, 0, .7); ");
-		fxStatusColors.put(FINISHED, "-fx-background-color: rgba(11, 156, 0, .9); ");
-		fxStatusColors.put(ERRORED, "-fx-background-color: rgba(244, 20, 0, .75); ");
+		fxStatusColors.put(ConversionJobFileStatus.NOT_STARTED, "-fx-accent: #0093ff; ");
+		fxStatusColors.put(ConversionJobFileStatus.WRITING, "-fx-background-color: rgba(11, 156, 0, .7); ");
+		fxStatusColors.put(ConversionJobFileStatus.PAUSED, "-fx-background-color: rgba(156, 146, 0, .7); ");
+		fxStatusColors.put(ConversionJobFileStatus.FINISHED, "-fx-background-color: rgba(11, 156, 0, .9); ");
+		fxStatusColors.put(ConversionJobFileStatus.ERRORED, "-fx-background-color: rgba(244, 20, 0, .75); ");
 	}
 	
 	
@@ -50,7 +47,7 @@ public class TargetFileTreeItem extends TreeItem<String>
 	{
 		super(file.getName());
 		this.file = file;
-		status = NOT_STARTED;
+		status = ConversionJobFileStatus.NOT_STARTED;
 		
 		if (file.isDirectory() && file.listFiles().length > 0)
 		{
@@ -91,7 +88,7 @@ public class TargetFileTreeItem extends TreeItem<String>
 	/**
 	 * @return the status
 	 */
-	public int getStatus()
+	public ConversionJobFileStatus getStatus()
 	{
 		return status;
 	}
@@ -99,7 +96,7 @@ public class TargetFileTreeItem extends TreeItem<String>
 	/**
 	 * @param status the status to set
 	 */
-	public void setStatus(int status)
+	public void setStatus(ConversionJobFileStatus status)
 	{
 		this.status = status;
 	}
@@ -122,7 +119,6 @@ public class TargetFileTreeItem extends TreeItem<String>
 			for (File child : getFile().listFiles())
 			{
 				TargetFileTreeItem item = new TargetFileTreeItem(child);
-				item.setStatus(new Random().nextInt(5));//TODO remove
 				loadedItems.add(item);
 			}
 			
@@ -136,6 +132,6 @@ public class TargetFileTreeItem extends TreeItem<String>
 	
 	public void setCellStyle(TreeCell<?> cell)
 	{
-		cell.setStyle(fxStatusColors.get(status));
+		cell.setStyle(textFillColor + fxStatusColors.get(status));
 	}
 }

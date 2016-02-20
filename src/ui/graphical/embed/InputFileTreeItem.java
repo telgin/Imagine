@@ -10,6 +10,7 @@ import java.util.Random;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
+import product.ConversionJobFileStatus;
 import javafx.beans.value.ObservableValue;
 
 /**
@@ -20,26 +21,22 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 {
 	private double progress;
 	private File file;
-	private int status;
+	private ConversionJobFileStatus status;
 	
 	private static final InputFileTreeItem tempExpandableChildItem = new InputFileTreeItem("Loading...");
 	
-	public static final int NOT_STARTED = 0;
-	public static final int OK = 1;
-	public static final int PAUSED = 2;
-	public static final int FINISHED = 3;
-	public static final int ERRORED = 4;
+	private static final Map<ConversionJobFileStatus, String> fxStatusColors = 
+					new HashMap<ConversionJobFileStatus, String>();
 	
-	private static final Map<Integer, String> fxStatusColors = 
-					new HashMap<Integer, String>();
+	private static final String textFillColor = "-fx-text-fill: black; ";
 	
 	static
 	{
-		fxStatusColors.put(NOT_STARTED, "");
-		fxStatusColors.put(OK, "-fx-background-color: rgba(11, 156, 0, .7); ");
-		fxStatusColors.put(PAUSED, "-fx-background-color: rgba(156, 146, 0, .7); ");
-		fxStatusColors.put(FINISHED, "-fx-background-color: rgba(11, 156, 0, .9); ");
-		fxStatusColors.put(ERRORED, "-fx-background-color: rgba(244, 20, 0, .75); ");
+		fxStatusColors.put(ConversionJobFileStatus.NOT_STARTED, "-fx-accent: #0093ff; ");
+		fxStatusColors.put(ConversionJobFileStatus.WRITING, "-fx-background-color: rgba(11, 156, 0, .7); ");
+		fxStatusColors.put(ConversionJobFileStatus.PAUSED, "-fx-background-color: rgba(156, 146, 0, .7); ");
+		fxStatusColors.put(ConversionJobFileStatus.FINISHED, "-fx-background-color: rgba(11, 156, 0, .9); ");
+		fxStatusColors.put(ConversionJobFileStatus.ERRORED, "-fx-background-color: rgba(244, 20, 0, .75); ");
 	}
 	
 
@@ -51,7 +48,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	{
 		super(file.getName());
 		this.file = file;
-		status = NOT_STARTED;
+		status = ConversionJobFileStatus.NOT_STARTED;
 		
 		if (file.isDirectory() && file.listFiles().length > 0)
 		{
@@ -108,7 +105,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	/**
 	 * @return the status
 	 */
-	public int getStatus()
+	public ConversionJobFileStatus getStatus()
 	{
 		return status;
 	}
@@ -116,7 +113,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	/**
 	 * @param status the status to set
 	 */
-	public void setStatus(int status)
+	public void setStatus(ConversionJobFileStatus status)
 	{
 		this.status = status;
 	}
@@ -139,7 +136,6 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 			for (File child : getFile().listFiles())
 			{
 				InputFileTreeItem item = new InputFileTreeItem(child);
-				item.setStatus(new Random().nextInt(5));//TODO remove
 				item.setSelected(isSelected());
 				loadedItems.add(item);
 			}
@@ -156,8 +152,21 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	{
 		int width = (int) cell.getWidth();
 		int rightInset = width - (int) (width * this.progress);
-		System.out.println("Progress: " + getProgress() + ", Right inset: " + rightInset + ", Status: " + status);
-		String bar = status == ERRORED ? "" : " -fx-background-insets: 0 " + rightInset + " 0 0";
-		cell.setStyle(fxStatusColors.get(status) + bar);
+		//System.out.println("Progress: " + getProgress() + ", Right inset: " + rightInset + ", Status: " + status);
+		
+		//directories with contents are not added directly and should not show progress
+		//bars, just states
+		boolean directlyAdded = !file.isDirectory() || file.list().length == 0;
+		
+		//create a progress bar out of the background color by setting the insets
+		//according to the progress of the item
+		String bar = "";
+		if (directlyAdded && (status.equals(ConversionJobFileStatus.WRITING) || 
+						status.equals(ConversionJobFileStatus.PAUSED)))
+		{
+			bar = " -fx-background-insets: 0 " + rightInset + " 0 0";
+		}
+		
+		cell.setStyle(textFillColor + fxStatusColors.get(status) + bar);
 	}
 }

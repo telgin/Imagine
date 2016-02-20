@@ -12,6 +12,7 @@ import algorithms.Parameter;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
+import product.ConversionJobFileStatus;
 import product.JobStatus;
 import product.ProductIOException;
 import product.ProductWriter;
@@ -31,12 +32,12 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		//prompt for the image folder if the one listed doesn't exist
 		if (!imageFolder.exists())
 		{
-			algo.setParameter("ImageFolder", Option.PROMPT_OPTION.getValue());
+			algo.setParameter(Definition.IMAGE_FOLDER_PARAM, Option.PROMPT_OPTION.getValue());
 			imageFolder = new File(algo.getParameterValue("ImageFolder"));
 		}
 		
 		ConsumptionMode mode = ConsumptionMode.parseMode(
-						algo.getParameterValue("ImageConsumptionMode"));
+						algo.getParameterValue(Definition.IMAGE_CONSUMPTION_MODE_PARAM));
 		manager = InputImageManager.getInstance(imageFolder, mode);
 	}
 
@@ -55,12 +56,17 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 			try
 			{
 				manager.setFileUsed(imgFile);
+				
+				//update status to show previous image file was used
+				JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileStatus.FINISHED);
 			}
 			catch (IOException e)
 			{
 				//probably the file doesn't exist anymore, that's ok
 				//otherwise it's a permissions problem
-				e.printStackTrace();
+				Logger.log(LogLevel.k_debug, "The target image file could not be 'set used'. "
+								+ "This may be ok. " + imgFile.getAbsolutePath());
+				Logger.log(LogLevel.k_debug, e, false);
 			}
 		}
 		
@@ -71,6 +77,11 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		if (imgFile == null)
 		{
 			throw new ProductIOException("No input images remain.");
+		}
+		else
+		{
+			//update status to show this new image file is about to be used
+			JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileStatus.WRITING);
 		}
 		
 		boolean foundFile = false;

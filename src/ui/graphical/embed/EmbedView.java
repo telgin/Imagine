@@ -3,14 +3,18 @@ package ui.graphical.embed;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -61,8 +65,6 @@ public class EmbedView extends View
 	private final String passwordToggleString = "Password";
 	private final String keyFileToggleString = "Key File";
 	private final String filesCreatedString = "Total output files created: ";
-	private final String estimatedOutputSizeString = "Estimated total output file size: ";
-	private final InputFileTreeItem tempExpandableChildItem = new InputFileTreeItem("Loading...");
 	
 	//gui elements
 	private ChoiceBox<String> algorithmSelect;
@@ -74,7 +76,7 @@ public class EmbedView extends View
 	private RadioButton noKeyToggle, keyFileToggle, passwordToggle;
 	private TableView<FileContentsTableRecord> table;
 	private Label passwordLabel, keyFileLabel, keySelectionLabel, algorithmLabel,
-		estimatedOutputSizeLabel, filesCreatedLabel;
+		inputFilesLabel, targetFilesLabel, filesCreatedLabel;
 	private FileProperty outputFolder;
 	private BooleanProperty structuredOutput;
 	private TreeView<String> inputFiles, targetFiles;
@@ -85,16 +87,17 @@ public class EmbedView extends View
 	//controller
 	private EmbedController controller;
 	
-	private Map<TreeCell<String>, InputFileTreeItem> activeInputCells;
-	private Map<TreeCell<String>, TargetFileTreeItem> activeTargetCells;
+	private Map<TreeCell<String>, InputFileTreeItem> activeInputItems;
+	private Map<TreeCell<String>, TargetFileTreeItem> activeTargetItems;
+	boolean updatingCells = false;
 
 	public EmbedView(Stage window)
 	{
 		super(window);
 		
 		controller = new EmbedController(this);
-		activeInputCells = new HashMap<TreeCell<String>, InputFileTreeItem>();
-		activeTargetCells = new HashMap<TreeCell<String>, TargetFileTreeItem>();
+		activeInputItems = new HashMap<TreeCell<String>, InputFileTreeItem>();
+		activeTargetItems = new HashMap<TreeCell<String>, TargetFileTreeItem>();
 	}
 
 	/**
@@ -109,6 +112,11 @@ public class EmbedView extends View
 		borderPane.setRight(setupTargetFileSection());
 		borderPane.setCenter(setupInputFileSection());
 		//borderPane.setBottom(setupProgressSection());
+		
+		keySelectionButtons.selectToggle(noKeyToggle);
+		setInputSectionEnabled(false);
+		setTargetSectionEnabled(false);
+		setRunConversionEnabled(false);
 		
 		return borderPane;
 	}
@@ -125,26 +133,8 @@ public class EmbedView extends View
 		hbox.setAlignment(Pos.CENTER);
 		
 		//progress bar
-		conversionProgress = new ProgressBar(.75);
+		conversionProgress = new ProgressBar(0);
 		conversionProgress.setPrefWidth(230);
-		Task<Void> task = new Task<Void>()
-		{
-			@Override
-			protected Void call() throws Exception
-			{
-				while (true)
-				{
-					updateProgress(JobStatus.getInputFilesProcessed(), controller.getTotalFilesThisRun());
-					
-					Thread.sleep(50);
-				}
-			}
-
-		};
-		
-		conversionProgress.progressProperty().bind(task.progressProperty());
-		new Thread(task).start();
-		
 		hbox.getChildren().add(conversionProgress);
 
 		//files created label
@@ -183,10 +173,9 @@ public class EmbedView extends View
 		vbox.setSpacing(3);
 		vbox.setPadding(new Insets(10,10,10,10));
 		
-		//output size label
-		estimatedOutputSizeLabel = new Label("");
-		setEstimatedOutputSize(0);
-		vbox.getChildren().add(estimatedOutputSizeLabel);
+		//input files label
+		inputFilesLabel = new Label("Input Files:");
+		vbox.getChildren().add(inputFilesLabel);
 		
 		//input file tree
 		inputFiles = new TreeView<String>();
@@ -200,7 +189,7 @@ public class EmbedView extends View
 
 			//update active cell map when a cell changes its item
 			cell.treeItemProperty().addListener((obs, oldItem, newItem) -> {
-				activeInputCells.put(cell, (InputFileTreeItem) newItem);
+				activeInputItems.put(cell, (InputFileTreeItem) newItem);
 				
 				//update this specific cell now
 				updateInputCellStyle(cell);
@@ -238,7 +227,7 @@ public class EmbedView extends View
 	
 	public void updateInputCellStyle(TreeCell<String> cell)
 	{
-		InputFileTreeItem item = activeInputCells.get(cell);
+		InputFileTreeItem item = activeInputItems.get(cell);
 		if (item == null)
 		{
 			//cell is blank, remove progress bar
@@ -253,7 +242,7 @@ public class EmbedView extends View
 	
 	public void updateTargetCellStyle(TreeCell<String> cell)
 	{
-		TargetFileTreeItem item = activeTargetCells.get(cell);
+		TargetFileTreeItem item = activeTargetItems.get(cell);
 		if (item == null)
 		{
 			//cell is blank, remove progress bar
@@ -268,19 +257,28 @@ public class EmbedView extends View
 	
 	public void updateAllActiveCells()
 	{
-		//input cells
-		for (TreeCell<String> cell : activeInputCells.keySet())
-			updateInputCellStyle(cell);
-		
-		//target cells
-		for (TreeCell<String> cell : activeTargetCells.keySet())
-			updateTargetCellStyle(cell);
+		if (!updatingCells)
+		{
+			updatingCells = true;
+			
+			Platform.runLater(() -> {
+				//input cells
+				for (TreeCell<String> cell : activeInputItems.keySet())
+					updateInputCellStyle(cell);
+				
+				//target cells
+				for (TreeCell<String> cell : activeTargetItems.keySet())
+					updateTargetCellStyle(cell);
+
+				updatingCells = false;
+			});
+		}
 	}
 	
 	//TODO remove
 	public void setAll(double set)
 	{
-		for (InputFileTreeItem item : activeInputCells.values())
+		for (InputFileTreeItem item : activeInputItems.values())
 		{
 			if (item != null)
 			{
@@ -299,6 +297,10 @@ public class EmbedView extends View
 		vbox.setSpacing(3);
 		vbox.setPadding(new Insets(10,10,10,10));
 		
+		//target files label
+		targetFilesLabel = new Label("Target Files:");
+		vbox.getChildren().add(targetFilesLabel);
+				
 		//input file tree
 		targetFiles = new TreeView<String>();
 		targetFiles.setEditable(true);
@@ -324,7 +326,7 @@ public class EmbedView extends View
 			
 			//update active cell map when a cell changes its item
 			cell.treeItemProperty().addListener((obs, oldItem, newItem) -> {
-				activeTargetCells.put(cell, (TargetFileTreeItem) newItem);
+				activeTargetItems.put(cell, (TargetFileTreeItem) newItem);
 				
 				//update this specific cell now
 				updateTargetCellStyle(cell);
@@ -413,7 +415,6 @@ public class EmbedView extends View
 		passwordToggle = new RadioButton(passwordToggleString);
 		passwordToggle.setUserData(passwordToggleString);
 		passwordToggle.setToggleGroup(keySelectionButtons);
-		keySelectionButtons.selectToggle(noKeyToggle);
 		keySelectionButtons.selectedToggleProperty().addListener(
 						(ObservableValue<? extends Toggle> value,
 										Toggle oldSelection, Toggle newSelection) ->
@@ -660,7 +661,6 @@ public class EmbedView extends View
 	public void addInput(File inputFile)
 	{
 		final InputFileTreeItem item = new InputFileTreeItem(inputFile);
-		item.setStatus(new Random().nextInt(5));//TODO remove
 		item.setSelected(true);
 		
 		inputFileRoot.getChildren().add(item);
@@ -669,10 +669,46 @@ public class EmbedView extends View
 	public void setTarget(File targetFolder)
 	{
 		final TargetFileTreeItem item = new TargetFileTreeItem(targetFolder);
-		item.setStatus(new Random().nextInt(5));//TODO remove
 		
 		targetFileRoot.getChildren().clear();
 		targetFileRoot.getChildren().add(item);
+	}
+	
+	public void setTargetSectionEnabled(boolean enabled)
+	{
+		targetFiles.disableProperty().set(!enabled);
+		targetSelectFolderButton.disableProperty().set(!enabled);
+		
+		if (!enabled)
+		{
+			targetFilesLabel.setStyle("-fx-opacity: .5");
+		}
+		else
+		{
+			targetFilesLabel.setStyle("-fx-opacity: 1");
+		}
+	}
+	
+	public void setInputSectionEnabled(boolean enabled)
+	{
+		inputFiles.disableProperty().set(!enabled);
+		inputAddFileButton.disableProperty().set(!enabled);
+		inputAddFolderButton.disableProperty().set(!enabled);
+		inputRemoveButton.disableProperty().set(!enabled);
+		
+		if (!enabled)
+		{
+			inputFilesLabel.setStyle("-fx-opacity: .5");
+		}
+		else
+		{
+			inputFilesLabel.setStyle("-fx-opacity: 1");
+		}
+	}
+	
+	public void setRunConversionEnabled(boolean enabled)
+	{
+		runConversionButton.disableProperty().set(!enabled);
 	}
 	
 	public void clearPasswordPrompt()
@@ -715,19 +751,25 @@ public class EmbedView extends View
 		return passwordField.getText();
 	}
 	
-	public void setFilesCreated(int number)
+	public Map<TreeCell<String>, InputFileTreeItem> getActiveInputItems()
 	{
-		filesCreatedLabel.setText(filesCreatedString + number);
+		return activeInputItems;
 	}
 	
-	public void setEstimatedOutputSize(long kb)
+	public Map<TreeCell<String>, TargetFileTreeItem> getActiveTargetItems()
 	{
-		estimatedOutputSizeLabel.setText(estimatedOutputSizeString + kb + " KB");
+		return activeTargetItems;
+	}
+	
+	public void setFilesCreated(int number)
+	{
+		//Platform.runLater(() -> filesCreatedStringProperty.set(filesCreatedString + number));
+		Platform.runLater(() -> filesCreatedLabel.setText(filesCreatedString + number));
 	}
 	
 	public void setConversionProgress(double progress)
 	{
-		conversionProgress.setProgress(progress);
+		Platform.runLater(() -> conversionProgress.setProgress(progress));
 	}
 
 	/**
@@ -755,7 +797,8 @@ public class EmbedView extends View
 	@Override
 	public File getEnclosingFolder()
 	{
-		return chooseFolder();
+		//this shouldn't happen in embed
+		return null;
 	}
 
 	/**
@@ -803,14 +846,14 @@ public class EmbedView extends View
 	 */
 	public List<File> getInputFileList()
 	{
-		List<File> files = new ArrayList<File>();
+		Set<File> files = new HashSet<File>();
 		
 		for (TreeItem<String> child : inputFileRoot.getChildren())
 		{
 			collectInputFiles(files, (InputFileTreeItem) child);
 		}
 		
-		return files;
+		return new ArrayList<File>(files);
 	}
 
 	/**
@@ -818,10 +861,8 @@ public class EmbedView extends View
 	 * @param files
 	 * @param parent
 	 */
-	private void collectInputFiles(List<File> files, InputFileTreeItem parent)
+	private void collectInputFiles(Set<File> files, InputFileTreeItem parent)
 	{
-		System.out.println("On: " + parent.getFile().getAbsolutePath());
-		System.out.println("ind: " + parent.isIndeterminate() + ", selected: " + parent.isSelected());
 		if (parent.isIndeterminate())
 		{
 			//parent is not selected, but some children are selected or indeterminate

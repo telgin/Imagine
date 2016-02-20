@@ -21,6 +21,11 @@ public class Definition implements algorithms.Definition
 						+ "modified pixels of an existing image file such that it is hard "
 						+ "or impossible to perceive the difference with human eyes.";
 	private static Definition self;
+	
+	public static final String INSERTION_DENSITY_PARAM = "InsertionDensity";
+	public static final String IMAGE_FOLDER_PARAM = "ImageFolder";
+	public static final String IMAGE_CONSUMPTION_MODE_PARAM = "ImageConsumptionMode";
+	public static final String IMAGE_TYPE_PARAM = "ImageType";
 
 	private Definition()
 	{
@@ -47,7 +52,7 @@ public class Definition implements algorithms.Definition
 
 		{
 			// data insertion density (use of 4x4 (25%) or 2x16 (50%))
-			Parameter param = new Parameter("InsertionDensity", Parameter.STRING_TYPE, false, true);
+			Parameter param = new Parameter(INSERTION_DENSITY_PARAM, Parameter.STRING_TYPE, false, true);
 			param.setDescription("The percentage of data in the input image to be overwritten with embedded data. At "
 							+ "25%, the visual difference with be unnoticeable for most images. At 50%, some artifacts "
 							+ "will be noticeable in smaller images or when looking at an image zoomed in.");
@@ -62,7 +67,7 @@ public class Definition implements algorithms.Definition
 
 		{
 			// input image folder
-			Parameter param = new Parameter("ImageFolder", Parameter.FILE_TYPE, false, true);
+			Parameter param = new Parameter(IMAGE_FOLDER_PARAM, Parameter.FILE_TYPE, false, true);
 			param.setDescription("A folder of images to apply the overlay to.");
 
 			param.addOption(new Option("*"));
@@ -75,7 +80,7 @@ public class Definition implements algorithms.Definition
 		
 		{
 			// input image consumption mode
-			Parameter param = new Parameter("ImageConsumptionMode", Parameter.STRING_TYPE, false, true);
+			Parameter param = new Parameter(IMAGE_CONSUMPTION_MODE_PARAM, Parameter.STRING_TYPE, false, true);
 			param.setDescription("How to deal with used input images once an overlay is applied.\n\nCycle:  "
 							+ "Cycle through input images in the input folder. Start from the beginning once "
 							+ "the last one is used.\n\nMove:  Move used images to a subfolder within the image "
@@ -93,7 +98,7 @@ public class Definition implements algorithms.Definition
 		
 		{
 			// image type
-			Parameter param = new Parameter("ImageType", Parameter.STRING_TYPE, false, true);
+			Parameter param = new Parameter(IMAGE_TYPE_PARAM, Parameter.STRING_TYPE, false, true);
 			param.setDescription("The file format to output images in.");
 
 			param.addOption(new Option("png"));
@@ -138,13 +143,14 @@ public class Definition implements algorithms.Definition
 		//light
 		Algorithm light = constructDefaultAlgorithm();
 		light.setPresetName("image_overlay_light");
-		light.setParameter("ImageFolder", "testing/input_images");//TODO remove this
+		light.setParameter(IMAGE_FOLDER_PARAM, "testing/input_images");//TODO remove this
 		presets.add(light);
 		
 		//heavy
 		Algorithm heavy = constructDefaultAlgorithm();
 		heavy.setPresetName("image_overlay_heavy");
-		heavy.setParameter("ImageFolder", "testing/input_images");//TODO remove this
+		heavy.setParameter(INSERTION_DENSITY_PARAM, "50%");
+		heavy.setParameter(IMAGE_FOLDER_PARAM, "testing/input_images");//TODO remove this
 		presets.add(heavy);
 		
 		return presets;

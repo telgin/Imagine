@@ -28,7 +28,6 @@ public class IndexWorker implements Runnable
 		active = true;
 	}
 
-
 	public void shutdown()
 	{
 		shuttingDown = true;

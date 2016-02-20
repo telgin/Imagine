@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.List;
 
 import algorithms.Algorithm;
+import algorithms.Option;
+import algorithms.Parameter;
+import algorithms.imageoverlay.Definition;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
@@ -18,6 +21,8 @@ import key.StaticKey;
 import logging.LogLevel;
 import logging.Logger;
 import product.ConversionJob;
+import product.ConversionJobFileStatus;
+import product.FileStatus;
 import product.JobStatus;
 import system.ActiveComponent;
 import ui.UIContext;
@@ -39,9 +44,11 @@ public class EmbedController implements ActiveComponent
 	private Algorithm selectedAlgorithm = null;
 	private boolean structuredOutput = false;
 	
-	private boolean cssDaemonRunning = false;
 	private boolean shuttingDown = false;
 	private int totalFilesThisRun = 0;
+	private int filesCreated = 0;
+	private double conversionProgress = 0;
+	private Thread guiUpdateDaemon;
 		
 	/**
 	 * @update_comment
@@ -113,13 +120,38 @@ public class EmbedController implements ActiveComponent
 		{
 			//nothing selected
 			view.setKeySectionEnabled(false);
+			view.setInputSectionEnabled(false);
+			view.setTargetSectionEnabled(false);
+			view.setRunConversionEnabled(false);
+			selectedAlgorithm = null;
 		}
-		else
+		//else if the selected algorithm is a new selection...
+		else if (selectedAlgorithm == null || !selectedAlgorithm.getPresetName().equals(presetNames.get(index)))
 		{
 			try
 			{
 				selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(presetNames.get(index));
 				view.setKeySectionEnabled(true);
+				view.setInputSectionEnabled(true);
+				view.setRunConversionEnabled(true);
+				
+				//Enable the target section if the algorithm uses it
+				//TODO create a better way to handle this (or update it once more algos exist)
+				Parameter imageFolder = selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
+				if (imageFolder != null)
+				{
+					view.setTargetSectionEnabled(true);
+					
+					//reflect the set target folder if it exists
+					if (!imageFolder.getValue().equals(Option.PROMPT_OPTION.getValue()))
+					{
+						view.setTarget(new File(imageFolder.getValue()));
+					}
+				}
+				else
+				{
+					view.setTargetSectionEnabled(false);
+				}
 			}
 			catch (UsageException e)
 			{
@@ -155,18 +187,39 @@ public class EmbedController implements ActiveComponent
 		//update the list if focused on
 		if (focused)
 		{
-			String previousSelection = view.getAlgorithmSelection();
+			List<String> currentPresetNames = ConfigurationAPI.getAlgorithmPresetNames();
 			
-			presetNames = ConfigurationAPI.getAlgorithmPresetNames();
-			view.setAlgorithmPresets(presetNames);
+			//update the list only if it changed
+			if (presetNames.size() != currentPresetNames.size() || 
+							!presetNames.containsAll(currentPresetNames))
+			{
+				//save algorithm modifications
+				Algorithm previousSelection = selectedAlgorithm;
+				
+				//refresh the preset names to the new list
+				presetNames = currentPresetNames;
+				view.setAlgorithmPresets(presetNames);
 			
-			if (presetNames.contains(previousSelection))
-			{
-				view.setAlgorithmSelection(previousSelection);
-			}
-			else
-			{
-				view.setAlgorithmSelection(null);
+				if (presetNames.contains(previousSelection.getPresetName()))
+				{
+					view.setAlgorithmSelection(previousSelection.getPresetName());
+					selectedAlgorithm = previousSelection;
+					
+					//reset the target section
+					Parameter imageFolder = selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
+					if (imageFolder != null)
+					{
+						//reflect the set target folder if it exists
+						if (!imageFolder.getValue().equals(Option.PROMPT_OPTION.getValue()))
+						{
+							view.setTarget(new File(imageFolder.getValue()));
+						}
+					}
+				}
+				else
+				{
+					view.setAlgorithmSelection(null);
+				}
 			}
 		}
 	}
@@ -267,20 +320,16 @@ public class EmbedController implements ActiveComponent
 		
 			Settings.setOutputFolder(view.getOutputFolder());
 			Settings.setUsingStructuredOutput(structuredOutput);
-					
-			ConversionJob job = ConversionAPI.runConversion(inputFiles, selectedAlgorithm, getKey(), 1);
 			
-			//if (!cssDaemonRunning)
-			//	startCSSDaemon();
-			
-//			while (!job.isFinished())
-//			{
-//				try
-//				{
-//					Thread.sleep(50);
-//				}
-//				catch (InterruptedException e){}
-//			}
+			JobStatus.reset();
+			ConversionAPI.runConversion(inputFiles, selectedAlgorithm, getKey(), 1);
+
+			if (guiUpdateDaemon == null || !guiUpdateDaemon.isAlive())
+			{
+				guiUpdateDaemon = new Thread(() -> cssUpdateLoop());
+				guiUpdateDaemon.setDaemon(true);
+				guiUpdateDaemon.start();
+			}
 		}
 		
 		if (gui.hasErrors())
@@ -290,41 +339,122 @@ public class EmbedController implements ActiveComponent
 		}
 	}
 	
-	private void startCSSDaemon()
+	public void cssUpdateLoop()
 	{
-		Task<Void> task = new Task<Void>()
-		{ 
-			@Override
-			public Void call()
+		while (!shuttingDown)
+		{
+			//System.out.println("Looping..." + filesCreated);
+			
+			//update things if they're different
+			
+			//files created
+			int currentFilesCreated = JobStatus.getProductsCreated();
+			if (currentFilesCreated != filesCreated)
 			{
-				while (JobStatus.getInputFilesProcessed() < totalFilesThisRun && !shuttingDown)
-				{
-					//Platform.runLater(() -> view.setFilesCreated(JobStatus.getProductsCreated()));
-					//Platform.runLater(() -> view.setConversionProgress((double) JobStatus.getInputFilesProcessed() / totalFilesThisRun));
-					//view.updateAllActiveCells();
-					
-					updateProgress(JobStatus.getInputFilesProcessed(), totalFilesThisRun);
-					
-					try
-					{
-						Thread.sleep(50);
-					}
-					catch (InterruptedException e)
-					{
-						e.printStackTrace();
-					}
-				}
-				
-				return null;
+				filesCreated = JobStatus.getProductsCreated();
+				view.setFilesCreated(filesCreated);
 			}
-		};
-		
-		
-		
-		Thread thread = new Thread(task);
-		thread.setDaemon(true);
-		thread.start();
-		cssDaemonRunning = true;
+			
+			//conversion progress
+			double currentConversionProgress = (double) JobStatus.getInputFilesProcessed() / totalFilesThisRun;
+			if (conversionProgress != currentConversionProgress)
+			{
+				conversionProgress = currentConversionProgress;
+				view.setConversionProgress(conversionProgress);
+			}
+			
+			//update input file item status/progress for visible/loaded cells
+			for (InputFileTreeItem item : view.getActiveInputItems().values())
+			{
+				if (item != null)
+				{
+					if (item.getFile().isDirectory() && item.getFile().list().length > 0)
+					{
+						//directory item with children, not directly added to archive
+						FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
+						
+						ConversionJobFileStatus parentStatus = null;
+						boolean allFinished = true;
+						boolean allNotStarted = true;
+						for (File child : item.getFile().listFiles())
+						{
+							//if (!child.isDirectory() || child.list().length == 0)
+							//{
+								FileStatus childFileStatus = JobStatus.getFileStatus(child);
+								if (childFileStatus.getStatus().equals(ConversionJobFileStatus.ERRORED))
+								{
+									parentStatus = ConversionJobFileStatus.ERRORED;
+									break;
+								}
+								else if (childFileStatus.getStatus().equals(ConversionJobFileStatus.WRITING))
+								{
+									parentStatus = ConversionJobFileStatus.WRITING;
+									break;
+								}
+								else if (childFileStatus.getStatus().equals(ConversionJobFileStatus.PAUSED))
+								{
+									parentStatus = ConversionJobFileStatus.PAUSED;
+									break;
+								}
+								else if (!childFileStatus.getStatus().equals(ConversionJobFileStatus.NOT_STARTED))
+								{
+									allNotStarted = false;
+								}
+								else if (!childFileStatus.getStatus().equals(ConversionJobFileStatus.FINISHED))
+								{
+									allFinished = false;
+								}
+							//}
+						}
+						
+						if (parentStatus == null)
+						{
+							if (allFinished && !allNotStarted)
+								parentStatus = ConversionJobFileStatus.FINISHED;
+							else if (allNotStarted && !allFinished)
+								parentStatus = ConversionJobFileStatus.NOT_STARTED;
+							else
+								parentStatus = ConversionJobFileStatus.WRITING;
+						}
+						
+						//System.err.println(parentStatus + "\t" + item.getFile().getName());
+						fileStatus.setStatus(parentStatus);
+						item.setStatus(fileStatus.getStatus());
+					}
+					else
+					{
+						//file or empty folder, directly added to archive and has progress bar
+						FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
+						//System.err.println(fileStatus.getStatus() + "\t" + item.getFile().getName());
+						item.setStatus(fileStatus.getStatus());
+						item.setProgress(fileStatus.getProgress());
+					}
+					
+				}
+			}
+			
+			//update target file item status for visible/loaded cells
+			for (TargetFileTreeItem item : view.getActiveTargetItems().values())
+			{
+				if (item != null)
+				{
+					FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
+					item.setStatus(fileStatus.getStatus());
+				}
+			}
+			
+			//update the cell css
+			view.updateAllActiveCells();
+			
+			try
+			{
+				Thread.sleep(50);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -338,6 +468,14 @@ public class EmbedController implements ActiveComponent
 		if (folder != null)
 		{
 			view.setTarget(folder);
+			
+			Parameter imageFolder = selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
+			if (imageFolder != null)
+			{
+				//set the current algorithm's image folder to the selected one
+				//this change should not be saved
+				imageFolder.setValue(folder.getAbsolutePath());
+			}
 		}
 	}
 	
