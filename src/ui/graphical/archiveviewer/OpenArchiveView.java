@@ -654,7 +654,7 @@ public class OpenArchiveView extends View
 		ObservableList<TablePosition> selectedRows = table.getSelectionModel().getSelectedCells();
 		for (int x = 0; x < selectedRows.size(); ++x)
 		{
-			TablePosition position = (TablePosition) selectedRows.get(x);
+			TablePosition position = selectedRows.get(x);
 			indices.add(position.getRow());
 		}
 		

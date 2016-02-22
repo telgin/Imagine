@@ -34,6 +34,7 @@ public class OpenArchiveController
 	//state variables
 	private List<String> presetNames;
 	private Algorithm selectedAlgorithm = null;
+	private boolean nonInitialFragment;
 		
 	/**
 	 * @update_comment
@@ -71,6 +72,11 @@ public class OpenArchiveController
 			view.setAlgorithmSelectionEnabled(false);
 			
 			ProductContents productContents = ConversionAPI.openArchive(selectedAlgorithm, getKey(), getInputFile());
+			
+			if (!productContents.getFileContents().isEmpty())
+				nonInitialFragment = productContents.getFileContents().get(0).getFragmentNumber() > 1;
+			else
+				nonInitialFragment = false;
 			
 			view.setTableData(productContents.getFileContents());
 			view.setExtractionButtonsEnabled(true);
@@ -138,6 +144,11 @@ public class OpenArchiveController
 	{
 		try
 		{
+			if (nonInitialFragment)
+				Logger.log(LogLevel.k_error, "The first file has a fragment number greater than 1. "
+								+ "Only initial fragments may start an extraction chain, "
+								+ "so this file will not be complete.");
+				
 			ConversionAPI.extractAll(selectedAlgorithm, getKey(), getInputFile(), getOutputFolder());
 		}
 		catch (Exception e)
@@ -191,6 +202,13 @@ public class OpenArchiveController
 			
 			for (int index : indices)
 			{
+				if (index == 0 && nonInitialFragment)
+				{
+					Logger.log(LogLevel.k_error, "The first file has a fragment number greater than 1. "
+									+ "Only initial fragments may start an extraction chain, "
+									+ "so this file will not be complete.");
+				}
+
 				try
 				{
 					ConversionAPI.extractFile(selectedAlgorithm, getKey(), inputFile, outputFolder, index);
@@ -200,6 +218,7 @@ public class OpenArchiveController
 					Logger.log(LogLevel.k_debug, e, false);
 					Logger.log(LogLevel.k_error, e.getMessage());
 				}
+
 			}
 		}
 		catch (Exception e)
@@ -324,5 +343,4 @@ public class OpenArchiveController
 			view.setOutputFolderPath(folder.getAbsolutePath());
 		}
 	}
-	
 }

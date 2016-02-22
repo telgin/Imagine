@@ -19,6 +19,8 @@ public class FileContentsTableRecord
 	private final SimpleStringProperty dateCreated;
 	private final SimpleStringProperty dateModified;
 	
+	private long fragmentNumber;
+	
 	/**
 	 * @update_comment
 	 * @param i
@@ -46,6 +48,7 @@ public class FileContentsTableRecord
 		if (fragmentNumber > 1 || isFragment)
 			displayType += " (Fragment #" + Long.toString(fragmentNumber) + ")";
 		
+		this.fragmentNumber = fragmentNumber;
 		this.type = new SimpleStringProperty(displayType);
 		this.name = new SimpleStringProperty(file.getName());
 		this.dateCreated = new SimpleStringProperty(myUtilities.formatDate(dateCreated));
@@ -90,6 +93,14 @@ public class FileContentsTableRecord
 	public String getDateModified()
 	{
 		return dateModified.get();
+	}
+
+	/**
+	 * @return the fragmentNumber
+	 */
+	public long getFragmentNumber()
+	{
+		return fragmentNumber;
 	}
 
 }

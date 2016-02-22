@@ -103,7 +103,7 @@ public class Imagine
 		ArgParseResult result = new ArgParseResult();
 		
 		//gui mode
-		result.guiMode = args.contains("--gui");
+		result.guiMode = args.contains("--gui") || args.isEmpty();
 
 		//actions
 		if (args.contains("--help"))

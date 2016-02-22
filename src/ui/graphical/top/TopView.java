@@ -35,8 +35,8 @@ public class TopView extends View
 		this.args = args;
 		
 		tabViews = new ArrayList<View>();
-		tabViews.add(new OpenArchiveView(window, args));
 		tabViews.add(new EmbedView(window, args));
+		tabViews.add(new OpenArchiveView(window, args));
 		tabViews.add(new AlgorithmEditorView(window, args));
 	}
 	
@@ -80,7 +80,7 @@ public class TopView extends View
 				break;
 				
 			case k_embed:
-				tabPane.getSelectionModel().select(1);
+				tabPane.getSelectionModel().select(0);
 				break;
 				
 			case k_open:
@@ -88,7 +88,7 @@ public class TopView extends View
 			case k_install:
 			case k_help:
 			default:
-				tabPane.getSelectionModel().select(0);
+				tabPane.getSelectionModel().select(1);
 		}
 		
 		return borderPane;
