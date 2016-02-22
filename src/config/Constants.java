@@ -53,7 +53,6 @@ public abstract class Constants
 	public static final int GROUP_NAME_LENGTH_SIZE = 2;
 	public static final int GROUP_KEY_NAME_LENGTH_SIZE = 2;
 	public static final int FRAGMENT_NUMBER_SIZE = 8;
-	public static final int FILE_HASH_SIZE = 32;
 	public static final int FILE_NAME_LENGTH_SIZE = 2;
 	public static final int DATE_CREATED_SIZE = 8;
 	public static final int DATE_MODIFIED_SIZE = 8;

@@ -38,7 +38,6 @@ public class Comparisons
 		else
 		{
 			assertEquals(m1.getFile().getAbsolutePath(), m2.getFile().getAbsolutePath());
-			assertArrayEquals(m1.getFileHash(), m2.getFileHash());
 			assertEquals(m1.getFile().getPath(), m2.getFile().getPath());
 			assertEquals(m1.getPermissions(), m2.getPermissions());
 			assertEquals(m1.getDateCreated(), m2.getDateCreated());
@@ -51,7 +50,6 @@ public class Comparisons
 	public static void compareMetadataFile(File f, Metadata m)
 	{
 		assertEquals(f.getAbsolutePath(), m.getFile().getAbsolutePath());
-		assertTrue(ByteConversion.bytesEqual(Hashing.hash(f), m.getFileHash()));
 		assertEquals(f.getPath(), m.getFile().getPath());
 		assertEquals(FileSystemUtil.getNumericFilePermissions(f), m.getPermissions());
 		assertEquals(FileSystemUtil.getDateCreated(f), m.getDateCreated());

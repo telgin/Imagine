@@ -259,10 +259,6 @@ public class ProductLoader
 		
 		if (fileMetadata.getType().equals(FileType.k_file))
 		{
-			// file hash
-			if (!writeFull(fileMetadata.getFileHash()))
-				return false;
-	
 			// file name length
 			if (!writeFull(ByteConversion
 							.shortToBytes((short) fileMetadata.getFile().getPath().length())))

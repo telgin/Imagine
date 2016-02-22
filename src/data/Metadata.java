@@ -8,7 +8,6 @@ public class Metadata
 {
 	private long dateCreated;
 	private long dateModified;
-	private byte[] fileHash;
 	private File file;
 	private byte[] productUUID;
 	private byte[] refProductUUID;
@@ -39,7 +38,6 @@ public class Metadata
 		totalLength += file.getAbsolutePath().getBytes().length;
 		totalLength += Constants.DATE_CREATED_SIZE;
 		totalLength += Constants.DATE_MODIFIED_SIZE;
-		totalLength += fileHash.length;
 		totalLength += Constants.PERMISSIONS_SIZE;
 
 		return totalLength;
@@ -97,16 +95,6 @@ public class Metadata
 	public void setFile(File file)
 	{
 		this.file = file;
-	}
-
-	public byte[] getFileHash()
-	{
-		return fileHash;
-	}
-
-	public void setFileHash(byte[] fileHash)
-	{
-		this.fileHash = fileHash;
 	}
 
 	public boolean isNewerThan(Metadata other)

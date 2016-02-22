@@ -23,7 +23,6 @@ import key.Key;
 public class ProductExtractor {
 	
 	private ProductReader product;
-	//private byte[] curFileHash;
 	private long curFragmentNumber;
 	private byte[] buffer;
 	private File enclosingFolder;
@@ -508,62 +507,6 @@ public class ProductExtractor {
 		return productContents;
 	}
 	
-	/**
-	 * @update_comment
-	 * @param refProductFile
-	 * @param fileHash
-	 * @throws IOException 
-	 */
-	private boolean extractAndCopyFirstHashMatch(File productFile, 
-					File extractionFolder, byte[] fileHash, FileContents destContents) throws IOException
-	{
-		ProductContents productContents = parseProductContents(productFile);
-		
-		//keep trying to read files until one can't be read
-		FileContents fileContents = readNextFileHeader(true);
-		while (fileContents != null)
-		{
-			if (fileContents.getMetadata().getType().equals(FileType.k_file))
-			{
-				byte[] curHash = fileContents.getMetadata().getFileHash();
-				if (ByteConversion.bytesEqual(curHash, fileHash))
-				{
-					//assemble this file, if it has other fragments, follow the trail of products
-					File assembled = assembleCurrentFileData(productContents, fileContents, extractionFolder);
-					
-					if (assembled != null)
-					{
-						manager.moveFileToExtractionFolder(assembled, destContents, extractionFolder);
-						return true;
-					}
-					else
-					{
-						Logger.log(LogLevel.k_error, "Failed to extract file: " +
-										fileContents.getMetadata().getFile().getPath());
-						return false;
-					}
-				}
-				else
-				{
-					//skip on to the next file if this one didn't match
-					skipNextFileData(fileContents);
-				}	
-			}
-			
-			//file types which aren't k_file don't have file data,
-			//so, nothing to skip
-			
-			//read next header
-			fileContents = readNextFileHeader(true);
-		}
-
-		//couldn't find the file
-		Logger.log(LogLevel.k_error, "Failed to find file with hash: " +
-						ByteConversion.bytesToHex(fileHash) + " in product file: " +
-						productFile.getName());
-		return false;
-	}
-	
 	private void loadProduct(File productFile) throws IOException
 	{
 		curProductFile = productFile;
@@ -698,22 +641,6 @@ public class ProductExtractor {
 			//file type:
 			if (fileType.equals(FileType.k_file))
 			{
-				//file hash
-				if (parseData)
-				{
-					if (!readFull(Constants.FILE_HASH_SIZE))
-						return null;
-
-					//System.out.println(ByteConversion.bytesToHex((curFileHash)));
-					contents.getMetadata().setFileHash(
-									ByteConversion.subArray(buffer, 0, Constants.FILE_HASH_SIZE));
-				}
-				else
-				{
-					if (!skipFull(Constants.FILE_HASH_SIZE))
-						return null;
-				}
-				
 				//file name length
 				if (!readFull(Constants.FILE_NAME_LENGTH_SIZE))
 					return null;

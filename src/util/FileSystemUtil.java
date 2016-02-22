@@ -43,9 +43,6 @@ public class FileSystemUtil
 		if (metadata.getDateModified() == -1)
 			metadata.setDateModified(getDateModified(file));
 
-		if (metadata.getFileHash() == null)
-			metadata.setFileHash(Hashing.hash(file));
-
 		if (metadata.getFile() == null)
 			metadata.setFile(file);
 
