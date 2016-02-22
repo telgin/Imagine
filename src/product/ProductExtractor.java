@@ -265,9 +265,10 @@ public class ProductExtractor {
 						{
 							mapHeader(sub);
 						}
-						catch (IOException e)
+						catch (Exception e) //anything could happen!
 						{
-							Logger.log(LogLevel.k_warning, "Could not read product file: " + sub.getName());
+							//the file could be any file, so it might not even be a product file
+							Logger.log(LogLevel.k_warning, "Could not map file: " + sub.getName());
 						}
 					}
 				}

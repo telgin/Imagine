@@ -233,10 +233,10 @@ public class EmbedController implements ActiveComponent
 	public void inputAddFilePressed()
 	{
 		File file = view.chooseFile();
-		
+
 		if (file != null)
 		{
-			view.addInput(file);
+			view.addInput(FileSystemUtil.relativizeByCurrentLocation(file));
 		}
 	}
 
@@ -247,10 +247,10 @@ public class EmbedController implements ActiveComponent
 	public void inputAddFolderPressed()
 	{
 		File folder = view.chooseFolder();
-		
+
 		if (folder != null)
 		{
-			view.addInput(folder);
+			view.addInput(FileSystemUtil.relativizeByCurrentLocation(folder));
 		}
 	}
 
@@ -307,7 +307,8 @@ public class EmbedController implements ActiveComponent
 			{
 				Logger.log(LogLevel.k_error, "An output folder must be chosen.");
 			}
-			else if (selectedTargetFolder == null || !selectedTargetFolder.exists())
+			else if (selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM) != null && 
+							(selectedTargetFolder == null || !selectedTargetFolder.exists()))
 			{
 				Logger.log(LogLevel.k_error, "A valid target folder must be chosen.");
 			}

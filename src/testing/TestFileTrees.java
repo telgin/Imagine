@@ -2,9 +2,8 @@ package testing;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
-
-import com.google.common.io.Files;
 
 import util.FileSystemUtil;
 
@@ -251,7 +250,7 @@ public class TestFileTrees
 			if (target.isDirectory())
 				FileSystemUtil.copyDir2(target, copyTo);
 			else
-				Files.copy(target, copyTo);
+				Files.copy(target.toPath(), copyTo.toPath());
 		}
 		catch (IOException e)
 		{

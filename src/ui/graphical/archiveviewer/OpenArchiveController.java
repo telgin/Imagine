@@ -75,7 +75,7 @@ public class OpenArchiveController
 			view.setTableData(productContents.getFileContents());
 			view.setExtractionButtonsEnabled(true);
 		}
-		catch (IOException | UsageException e)
+		catch (Exception e)
 		{
 			Logger.log(LogLevel.k_debug, e, false);
 			Logger.log(LogLevel.k_error, e.getMessage());
@@ -140,7 +140,7 @@ public class OpenArchiveController
 		{
 			ConversionAPI.extractAll(selectedAlgorithm, getKey(), getInputFile(), getOutputFolder());
 		}
-		catch (IOException | UsageException e)
+		catch (Exception e)
 		{
 			Logger.log(LogLevel.k_debug, e, false);
 			Logger.log(LogLevel.k_error, e.getMessage());
@@ -202,7 +202,7 @@ public class OpenArchiveController
 				}
 			}
 		}
-		catch (UsageException e)
+		catch (Exception e)
 		{
 			Logger.log(LogLevel.k_debug, e, false);
 			Logger.log(LogLevel.k_error, e.getMessage());
@@ -302,6 +302,12 @@ public class OpenArchiveController
 		if (file != null)
 		{
 			view.setInputFilePath(file.getAbsolutePath());
+			
+			//reset
+			view.setOpenButtonEnabled(true);
+			view.setAlgorithmSelectionEnabled(true);
+			view.clearTable();
+			view.setExtractionButtonsEnabled(false);
 		}
 	}
 

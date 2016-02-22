@@ -43,7 +43,7 @@ public class ProductWorker implements Runnable
 		int count = 0;
 		while (!stopping)
 		{
-			if (count % 4 == 0)
+			if (count % 20 == 0)
 				Logger.log(LogLevel.k_debug,
 								"Product worker waiting for queued metadata...");
 
@@ -80,7 +80,7 @@ public class ProductWorker implements Runnable
 			}
 			try
 			{
-				Thread.sleep(500);
+				Thread.sleep(100);
 			}
 			catch (InterruptedException e){}
 			
