@@ -50,6 +50,8 @@ import logging.LogLevel;
 import logging.Logger;
 import product.FileContents;
 import product.JobStatus;
+import system.CmdAction;
+import ui.ArgParseResult;
 import ui.graphical.BooleanProperty;
 import ui.graphical.FileProperty;
 import ui.graphical.View;
@@ -88,14 +90,17 @@ public class EmbedView extends View
 	//controller
 	private EmbedController controller;
 	
+	private ArgParseResult args;
+	
 	private Map<TreeCell<String>, InputFileTreeItem> activeInputItems;
 	private Map<TreeCell<String>, TargetFileTreeItem> activeTargetItems;
 	boolean updatingCells = false;
 
-	public EmbedView(Stage window)
+	public EmbedView(Stage window, ArgParseResult args)
 	{
 		super(window);
 		
+		this.args = args;
 		controller = new EmbedController(this);
 		activeInputItems = new HashMap<TreeCell<String>, InputFileTreeItem>();
 		activeTargetItems = new HashMap<TreeCell<String>, TargetFileTreeItem>();
@@ -112,12 +117,46 @@ public class EmbedView extends View
 		borderPane.setLeft(setupConfigSelection());
 		borderPane.setRight(setupTargetFileSection());
 		borderPane.setCenter(setupInputFileSection());
-		//borderPane.setBottom(setupProgressSection());
+		borderPane.setBottom(setupProgressSection());
 		
 		keySelectionButtons.selectToggle(noKeyToggle);
 		setInputSectionEnabled(false);
 		setTargetSectionEnabled(false);
 		setRunConversionEnabled(false);
+		
+		//setup stuff specified in args
+		if (args.action == CmdAction.k_embed)
+		{
+			for (File input : args.inputFiles)
+				if (input.exists())
+					addInput(input);
+			
+			if (args.presetName != null && controller.getPresetNames().contains(args.presetName))
+			{
+				setAlgorithmSelection(args.presetName);
+			}
+			else
+			{
+				//set to the first one if not specified (so everything's not grayed out)
+				setAlgorithmSelection(controller.getPresetNames().get(0));
+			}
+			
+			if (args.outputFolder != null && args.outputFolder.exists())
+			{
+				setOutputFolder(args.outputFolder);
+			}
+			
+			if (args.keyFile != null && args.keyFile.exists())
+			{
+				setKeyFilePath(args.keyFile.getAbsolutePath());
+				toggleKeySection();
+			}
+			
+			if (args.usePassword)
+			{
+				togglePasswordSection();
+			}
+		}
 		
 		return borderPane;
 	}
@@ -235,7 +274,7 @@ public class EmbedView extends View
 		buttonRow1.getChildren().add(inputRemoveButton);
 		vbox.getChildren().add(buttonRow1);
 		
-		vbox.getChildren().add(setupProgressSection());
+		//vbox.getChildren().add(setupProgressSection());
 		
 		return vbox;
 	}

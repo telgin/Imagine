@@ -23,76 +23,58 @@ import product.ConversionJob;
 import product.FileContents;
 import product.JobStatus;
 import product.ProductContents;
+import report.Report;
+import system.CmdAction;
+import system.Imagine;
 import ui.ArgParseResult;
 import ui.UI;
+import util.myUtilities;
 
 public class CmdUI extends UI
 {
-	private List<String> args;
 	private boolean outputPaused;
+	private ArgParseResult args;
 
-	public CmdUI(List<String> args)
+	public CmdUI(ArgParseResult args)
 	{
 		this.args = args;
 		outputPaused = false;
-	}
-	
-	private void usage(String message)
-	{
-		if (message != null)
-			err(message);
-		
-		err("Usage:");
-		err("(See 'imagine --help' for more details.)");
-		err("imagine --gui\n");
-		err("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k [keyfile]]\n");
-		err("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]\n");
-		err("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]");
 	}
 	
 	/* (non-Javadoc)
 	 * @see ui.UI#processArgs()
 	 */
 	@Override
-	public void processArgs()
+	public void init()
 	{
-		if (args.isEmpty())
+		switch (args.action)
 		{
-			usage("tmp empty");
-		}
-		else if (args.contains("--help"))
-		{
-			helpSection();
-		}
-		else if (args.contains("--open"))
-		{
-			args.remove("--open");
-			ArgParseResult result = cmdParse(CmdAction.k_open, args);
-			if (result != null)
-				openArchive(result);
-		}
-		else if (args.contains("--embed"))
-		{
-			args.remove("--embed");
-			ArgParseResult result = cmdParse(CmdAction.k_embed, args);
-			if (result != null)
-				embed(result);
-		}
-		else if (args.contains("--extract"))
-		{
-			args.remove("--extract");
-			ArgParseResult result = cmdParse(CmdAction.k_extract, args);
-			if (result != null)
-				extract(result);
-		}
-		else if (args.contains("--install"))
-		{
-			//just install
-			ConfigurationAPI.install();
-		}
-		else
-		{
-			usage("tmp else");
+			case k_open:
+				openArchive(args);
+				break;
+				
+			case k_embed:
+				embed(args);
+				break;
+				
+			case k_extract:
+				extract(args);
+				break;
+				
+			case k_install:
+				ConfigurationAPI.install();
+				break;
+				
+			case k_help:
+				helpSection();
+				break;
+		
+			case k_editor:
+				Imagine.usage("Algorithm editor is not supported in command line mode.");
+				break;
+				
+			default:
+				Imagine.usage("A valid action must be specified.");
 		}
 	}
 
@@ -121,73 +103,40 @@ public class CmdUI extends UI
 		p("-i         input file or folder");
 		p("-o         output folder");
 		p("-k         key file or empty for password (optional)");
-		p("-p         specify additional algorithm parameter");
+		p("-p         use a password");
+		p("-P         specify additional algorithm parameter");
 	}
 
-	/**
-	 * @update_comment
-	 * @param subargs
-	 */
-	private ArgParseResult cmdParse(CmdAction action, List<String> subargs)
-	{
-		if (!subargs.contains("-p") && !subargs.contains("-a"))
-		{
-			usage("Either a profile name (-p) or an algorithm preset name (-a) must be specified.");
-		}
-		else if (action.equals(CmdAction.k_embed) && subargs.contains("-p") && subargs.contains("-i"))
-		{
-			usage("Profiles have a locked set of data input locations. Seperate input cannot be specified.");
-		}
-		else if (!subargs.contains("-i"))
-		{
-			usage("The input file (-i) must be specified.");
-		}
-		else if (subargs.contains("-p") && subargs.contains("-a"))
-		{
-			usage("Either specify an algorithm preset name or a profile name, not both.");
-		}
-		else if (subargs.contains("-p") && subargs.contains("-k"))
-		{
-			usage("You cannot specify both a profile and a key. Keys are contained within profiles.");
-		}
-		else
-		{
-			try
-			{
-				ArgParseResult result = new ArgParseResult();
-				
-				if (subargs.contains("-a"))
-					result.algorithmName = subargs.get(subargs.indexOf("-a")+1);
-				
-				if (subargs.contains("-i"))
-					result.inputFile = new File(subargs.get(subargs.indexOf("-i")+1));
-				
-				if (subargs.contains("-o"))
-					result.outputFolder = new File(subargs.get(subargs.indexOf("-o")+1));
-					
-				if (subargs.contains("-k"))
-					result.keyFile = new File(subargs.get(subargs.indexOf("-k")+1));
-				
-				return result;
-			}
-			catch (Exception e)
-			{
-				Logger.log(LogLevel.k_debug, e, false);
-				usage(null);
-			}
-		}
-		
-		return null;
-	}
+//		if (!subargs.contains("-p") && !subargs.contains("-a"))
+//		{
+//			Imagine.usage("Either a profile name (-p) or an algorithm preset name (-a) must be specified.");
+//		}
+//		else if (action.equals(CmdAction.k_embed) && subargs.contains("-p") && subargs.contains("-i"))
+//		{
+//			Imagine.usage("Profiles have a locked set of data input locations. Seperate input cannot be specified.");
+//		}
+//		else if (!subargs.contains("-i") || (action.equals(CmdAction.k_embed) && !subargs.contains("-i") && !subargs.contains("-I")))
+//		{
+//			Imagine.usage("Input files must be specified.");
+//		}
+//		else if (subargs.contains("-p") && subargs.contains("-a"))
+//		{
+//			Imagine.usage("Either specify an algorithm preset name or a profile name, not both.");
+//		}
+//		else if (subargs.contains("-p") && subargs.contains("-k"))
+//		{
+//			Imagine.usage("You cannot specify both a profile and a key. Keys are contained within profiles.");
+//		}
+
 	
 	private void openArchive(ArgParseResult result)
 	{
 		try
 		{
-			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.algorithmName);
+			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.presetName);
 			Key key = getKey(result);
 			
-			ProductContents productContents = ConversionAPI.openArchive(algo, key, result.inputFile);
+			ProductContents productContents = ConversionAPI.openArchive(algo, key, result.inputFiles.get(0));
 			
 			Menu contentsMenu = new Menu("File Contents");
 			contentsMenu.setSubtext("Select a file to extract it.");
@@ -215,16 +164,16 @@ public class CmdUI extends UI
 			if (result.outputFolder == null)
 				result.outputFolder = new File(".");
 			
-			ConversionAPI.extractFile(algo, key, result.inputFile, result.outputFolder, choice);
+			ConversionAPI.extractFile(algo, key, result.inputFiles.get(0), result.outputFolder, choice);
 		}
 		catch (IOException | UsageException e)
 		{
-			usage(e.getMessage());
+			Imagine.usage(e.getMessage());
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 		catch (Exception e)
 		{
-			usage(null);
+			Imagine.usage(null);
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 		
@@ -262,12 +211,12 @@ public class CmdUI extends UI
 	{
 		try
 		{
-			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.algorithmName);
+			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.presetName);
 			Key key = getKey(result);
 			
-			//TODO handle multiple input files or the file list
-			List<File> inputFiles = new ArrayList<File>();
-			inputFiles.add(result.inputFile);
+			//must have input files
+			if (result.inputFiles.size() == 0)
+				throw new UsageException("No input files could be found.");
 			
 			//use local dir
 			if (result.outputFolder == null)
@@ -275,18 +224,40 @@ public class CmdUI extends UI
 			
 			Settings.setOutputFolder(result.outputFolder);
 			
-			ConversionJob job = ConversionAPI.runConversion(inputFiles, algo, key, Constants.DEFAULT_THREAD_COUNT);
+			//make report if requested
+			if (result.resultFile != null)
+			{
+				Settings.setGenerateReport(true);
+				Report.reset();
+			}
 			
-			showStats(job);
+			//do not track file status in cmd
+			Settings.setTrackFileStatus(false);
+
+			//run the job thread
+			ConversionJob job = ConversionAPI.runConversion(result.inputFiles, algo, key, Constants.DEFAULT_THREAD_COUNT);
+			
+			while (!job.isFinished())
+			{
+				if (!outputPaused)
+					showStats();
+				
+				Thread.sleep(1000);
+			}
+			
+			//write report
+			if (Settings.generateReport())
+				Report.writeReport(result.resultFile);
+			
 		}
 		catch (UsageException e)
 		{
-			usage(e.getMessage());
+			Imagine.usage(e.getMessage());
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 		catch (Exception e)
 		{
-			usage("A failure occurred during conversion.");
+			Imagine.usage("A failure occurred during conversion.");
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 	}
@@ -299,23 +270,23 @@ public class CmdUI extends UI
 	{
 		try
 		{
-			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.algorithmName);
+			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.presetName);
 			Key key = getKey(result);
 			
 			//otherwise use local dir
 			if (result.outputFolder == null)
 				result.outputFolder = new File(".");
 			
-			ConversionAPI.extractAll(algo, key, result.inputFile, result.outputFolder);
+			ConversionAPI.extractAll(algo, key, result.inputFiles.get(0), result.outputFolder);
 		}
 		catch (UsageException | IOException e)
 		{
-			usage(e.getMessage());
+			Imagine.usage(e.getMessage());
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 		catch (Exception e)
 		{
-			usage(null);
+			Imagine.usage(null);
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 	}
@@ -331,19 +302,10 @@ public class CmdUI extends UI
 		return promptInput("Please enter the parameter value: ");
 	}
 
-	private void showStats(ConversionJob job) throws InterruptedException
+	private void showStats()
 	{
-		while (!job.isFinished())
-		{
-			while (!outputPaused && !job.isFinished())
-			{
-				Logger.log(LogLevel.k_info, "Files Processed: " + JobStatus.getInputFilesProcessed() + 
-					", Products Created: " + JobStatus.getProductsCreated());
-				
-				Thread.sleep(1000);
-			}
-			Thread.sleep(1000);
-		}
+		Logger.log(LogLevel.k_info, "Files Processed: " + JobStatus.getInputFilesProcessed() + 
+			", Products Created: " + JobStatus.getProductsCreated());
 	}
 
 	private static String promptInput(String prompt)
@@ -400,13 +362,6 @@ public class CmdUI extends UI
 		
 		outputPaused = false;
 		return password;
-	}
-	
-	private enum CmdAction
-	{
-		k_open,
-		k_embed,
-		k_extract;
 	}
 
 	/* (non-Javadoc)

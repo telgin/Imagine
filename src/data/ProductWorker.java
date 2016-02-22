@@ -3,6 +3,7 @@ package data;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
+import config.Settings;
 import logging.LogLevel;
 import logging.Logger;
 import product.ConversionJobFileState;
@@ -60,7 +61,8 @@ public class ProductWorker implements Runnable
 					catch (IOException e)
 					{
 						//update status to show failure
-						JobStatus.setConversionJobFileStatus(taken.getFile(), ConversionJobFileState.ERRORED);
+						if (Settings.trackFileStatus())
+							JobStatus.setConversionJobFileStatus(taken.getFile(), ConversionJobFileState.ERRORED);
 						
 						Logger.log(LogLevel.k_error,
 										"A file could not be written: " + taken.getFile().getName());

@@ -32,7 +32,6 @@ public class OpenArchiveController
 	private GUI gui;
 	
 	//state variables
-	private File inputFile;
 	private List<String> presetNames;
 	private Algorithm selectedAlgorithm = null;
 		
@@ -40,11 +39,10 @@ public class OpenArchiveController
 	 * @update_comment
 	 * @param file
 	 */
-	public OpenArchiveController(OpenArchiveView view, File inputFile)
+	public OpenArchiveController(OpenArchiveView view)
 	{
 		this.view = view;
 		this.gui = (GUI) UIContext.getUI();
-		this.inputFile = inputFile;
 		
 		presetNames = ConfigurationAPI.getAlgorithmPresetNames();
 	}
@@ -64,14 +62,6 @@ public class OpenArchiveController
 	{
 		this.selectedAlgorithm = selectedAlgorithm;
 	}
-
-	/**
-	 * @return the file
-	 */
-	public File getInputFile()
-	{
-		return inputFile;
-	}
 	
 	void openArchive()
 	{
@@ -79,8 +69,8 @@ public class OpenArchiveController
 		{
 			view.setOpenButtonEnabled(false);
 			view.setAlgorithmSelectionEnabled(false);
-
-			ProductContents productContents = ConversionAPI.openArchive(selectedAlgorithm, getKey(), inputFile);
+			
+			ProductContents productContents = ConversionAPI.openArchive(selectedAlgorithm, getKey(), getInputFile());
 			
 			view.setTableData(productContents.getFileContents());
 			view.setExtractionButtonsEnabled(true);
@@ -102,6 +92,31 @@ public class OpenArchiveController
 		}
 	}
 	
+	
+	private File getInputFile() throws UsageException
+	{
+		File inputFile = null;
+		if (view.getInputFilePath() != null && !view.getInputFilePath().isEmpty())
+			inputFile = new File(view.getInputFilePath());
+
+		if (inputFile == null)
+			throw new UsageException("The input file must exist.");
+		
+		return inputFile;
+	}
+	
+	private File getOutputFolder() throws UsageException
+	{
+		File outputFolder = null;
+		if (view.getOutputFolderPath() != null && !view.getOutputFolderPath().isEmpty())
+			outputFolder = new File(view.getOutputFolderPath());
+
+		if (outputFolder == null)
+			throw new UsageException("The output folder must exist.");
+		
+		return outputFolder;
+	}
+	
 	/**
 	 * @update_comment
 	 * @return
@@ -121,18 +136,14 @@ public class OpenArchiveController
 	 */
 	public void extractAll()
 	{
-		File extractionLocation = view.chooseFolder();
-		if (extractionLocation != null)
+		try
 		{
-			try
-			{
-				ConversionAPI.extractAll(selectedAlgorithm, getKey(), inputFile, extractionLocation);
-			}
-			catch (IOException | UsageException e)
-			{
-				Logger.log(LogLevel.k_debug, e, false);
-				Logger.log(LogLevel.k_error, e.getMessage());
-			}
+			ConversionAPI.extractAll(selectedAlgorithm, getKey(), getInputFile(), getOutputFolder());
+		}
+		catch (IOException | UsageException e)
+		{
+			Logger.log(LogLevel.k_debug, e, false);
+			Logger.log(LogLevel.k_error, e.getMessage());
 		}
 		
 		if (gui.hasErrors())
@@ -173,14 +184,16 @@ public class OpenArchiveController
 	{
 		List<Integer> indices = view.getSelectedRows();
 		
-		File extractionLocation = view.chooseFolder();
-		if (extractionLocation != null)
+		try
 		{
+			File outputFolder = getOutputFolder();
+			File inputFile = getInputFile();
+			
 			for (int index : indices)
 			{
 				try
 				{
-					ConversionAPI.extractFile(selectedAlgorithm, getKey(), inputFile, extractionLocation, index);
+					ConversionAPI.extractFile(selectedAlgorithm, getKey(), inputFile, outputFolder, index);
 				}
 				catch (IOException | UsageException e)
 				{
@@ -188,6 +201,11 @@ public class OpenArchiveController
 					Logger.log(LogLevel.k_error, e.getMessage());
 				}
 			}
+		}
+		catch (UsageException e)
+		{
+			Logger.log(LogLevel.k_debug, e, false);
+			Logger.log(LogLevel.k_error, e.getMessage());
 		}
 		
 		if (gui.hasErrors())
@@ -270,6 +288,34 @@ public class OpenArchiveController
 					view.setAlgorithmSelection(null);
 				}
 			}
+		}
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	public void browseInputFile()
+	{
+		File file = view.chooseFile();
+		
+		if (file != null)
+		{
+			view.setInputFilePath(file.getAbsolutePath());
+		}
+	}
+
+	/**
+	 * @update_comment
+	 * @return
+	 */
+	public void browseOutputFolder()
+	{
+		File folder = view.chooseFolder();
+		
+		if (folder != null)
+		{
+			view.setOutputFolderPath(folder.getAbsolutePath());
 		}
 	}
 	

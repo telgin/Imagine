@@ -27,7 +27,7 @@ public class ApplicationWindow extends Application
 		((GUI) UIContext.getUI()).setTopView(topView);
 		
 		Pane topViewPane = topView.setupPane();
-		Scene scene = new Scene(topViewPane, 1040, 500);
+		Scene scene = new Scene(topViewPane, 1040, 550);
 		
 		topViewPane.prefHeightProperty().bind(scene.heightProperty());
 		topViewPane.prefWidthProperty().bind(scene.widthProperty());

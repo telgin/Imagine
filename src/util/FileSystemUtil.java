@@ -330,7 +330,7 @@ public class FileSystemUtil
 		}
 		else
 		{
-			com.google.common.io.Files.copy(src, dest);
+			Files.copy(src.toPath(), dest.toPath());
 		}
 	}
 

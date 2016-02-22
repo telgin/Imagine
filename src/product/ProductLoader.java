@@ -5,12 +5,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import config.Constants;
+import config.Settings;
 import logging.LogLevel;
 import logging.Logger;
 import report.Report;
 import data.FileType;
 import data.Metadata;
 import util.ByteConversion;
+import util.Clock;
 import util.FileSystemUtil;
 
 public class ProductLoader
@@ -128,7 +130,8 @@ public class ProductLoader
 	public void writeFile(Metadata fileMetadata) throws IOException
 	{
 		//update file status to indicate we're going to write the file
-		JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileState.WRITING);
+		if (Settings.trackFileStatus())
+			JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileState.WRITING);
 		
 		//resetting causes the product header to be written
 		//don't reset unless this loader actually writes a file
@@ -209,12 +212,14 @@ public class ProductLoader
 
 		// update the database
 		fileMetadata.setFragmentCount(fragmentNumber-1);
-		Report.saveConversionRecord(fileMetadata);
+		if (Settings.generateReport())
+			Report.saveConversionRecord(fileMetadata);
 
 		fileWritten = true;
 		
 		//update file status as finished
-		JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileState.FINISHED);
+		if (Settings.trackFileStatus())
+			JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileState.FINISHED);
 
 		// update progress
 		JobStatus.incrementInputFilesProcessed(1);

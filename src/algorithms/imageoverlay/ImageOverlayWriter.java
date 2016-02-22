@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
+import config.Settings;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
@@ -58,7 +59,8 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 				manager.setFileUsed(imgFile);
 				
 				//update status to show previous image file was used
-				JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileState.FINISHED);
+				if (Settings.trackFileStatus())
+					JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileState.FINISHED);
 			}
 			catch (IOException e)
 			{
@@ -81,7 +83,8 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		else
 		{
 			//update status to show this new image file is about to be used
-			JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileState.WRITING);
+			if (Settings.trackFileStatus())
+				JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileState.WRITING);
 		}
 		
 		boolean foundFile = false;

@@ -70,6 +70,7 @@ public class AlgorithmEditorController
 				view.setAlgorithmNames(ConfigurationAPI.getAlgorithmDefinitionNames());
 				view.setEditsEnabled(true);
 				view.setSelectedAlgorithm(workingAlgorithm.getName());
+				view.setSelectedParameter(-1);
 			}
 			catch (UsageException e)
 			{

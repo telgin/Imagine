@@ -14,7 +14,7 @@ public abstract class UI
 	/**
 	 * Starts the execution of the command line arguments
 	 */
-	public abstract void processArgs();
+	public abstract void init();
 
 	/**
 	 * @update_comment

@@ -1,4 +1,4 @@
-package product;
+package util;
 
 import logging.LogLevel;
 import logging.Logger;

@@ -38,6 +38,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import product.FileContents;
+import system.CmdAction;
+import ui.ArgParseResult;
+import ui.graphical.FileProperty;
 import ui.graphical.ScrollAlert;
 import ui.graphical.View;
 
@@ -61,15 +64,19 @@ public class OpenArchiveView extends View
 	private RadioButton noKeyToggle, keyFileToggle, passwordToggle;
 	private TableView<FileContentsTableRecord> table;
 	private Label passwordLabel, keyFileLabel, keySelectionLabel, algorithmLabel;
+	private FileProperty inputFile, outputFolder;
 	
 	//controller
 	private OpenArchiveController controller;
+	
+	private ArgParseResult args;
 
-	public OpenArchiveView(Stage window, File productFile)
+	public OpenArchiveView(Stage window, ArgParseResult args)
 	{
 		super(window);
 		
-		controller = new OpenArchiveController(this, productFile);
+		this.args = args;
+		controller = new OpenArchiveController(this);
 	}
 
 	/**
@@ -84,6 +91,31 @@ public class OpenArchiveView extends View
 		borderPane.setCenter(setupContentsSection());
 		
 		keySelectionButtons.selectToggle(noKeyToggle);
+		
+		//setup stuff specified in args
+		if (args.action == CmdAction.k_open)
+		{
+			if (args.inputFiles.size() > 0 && args.inputFiles.get(0).exists())
+			{
+				setInputFilePath(args.inputFiles.get(0).getAbsolutePath());
+			}
+			
+			if (args.presetName != null && controller.getPresetNames().contains(args.presetName))
+			{
+				setAlgorithmSelection(args.presetName);
+			}
+			
+			if (args.keyFile != null && args.keyFile.exists())
+			{
+				setKeyFilePath(args.keyFile.getAbsolutePath());
+				toggleKeySection();
+			}
+			
+			if (args.usePassword)
+			{
+				togglePasswordSection();
+			}
+		}
 		
 		return borderPane;
 	}
@@ -109,10 +141,6 @@ public class OpenArchiveView extends View
 		Label archiveContentsLabel = new Label("Archive Contents");
 		archiveContentsLabel.setFont(new Font("Arial", 20));
 		vbox.getChildren().add(archiveContentsLabel);
-		
-		//file name label
-		Label fileNameLabel = new Label("File: " + controller.getInputFile().getName());
-		vbox.getChildren().add(fileNameLabel);
 
 		//scroll pane
 		ScrollPane scrollPane = new ScrollPane();
@@ -194,6 +222,10 @@ public class OpenArchiveView extends View
 		extractionConfigurationLabel.setPadding(new Insets(0, 0, 10, 0));
 		configSelection.getChildren().add(extractionConfigurationLabel);
 		
+		//input file
+		inputFile = new FileProperty("Input File", e -> controller.browseInputFile());
+		inputFile.setup(configSelection);
+		
 		//algorithm label
 		algorithmLabel = new Label("Algorithm:");
 		configSelection.getChildren().add(algorithmLabel);
@@ -210,6 +242,10 @@ public class OpenArchiveView extends View
 										Boolean oldValue, Boolean newValue) ->
 											controller.algorithmSelectFocus(newValue.booleanValue()));
 		configSelection.getChildren().add(indentElement(1, algorithmSelect));
+		
+		//output file
+		outputFolder = new FileProperty("Output Folder", e -> controller.browseOutputFolder());
+		outputFolder.setup(configSelection);
 		
 		//key selection label
 		keySelectionLabel = new Label("Key Selection:");
@@ -548,6 +584,26 @@ public class OpenArchiveView extends View
 	public void togglePasswordSection()
 	{
 		keySelectionButtons.selectToggle(passwordToggle);
+	}
+	
+	public void setInputFilePath(String path)
+	{
+		inputFile.setPath(path);
+	}
+	
+	public void setOutputFolderPath(String path)
+	{
+		outputFolder.setPath(path);
+	}
+	
+	public String getInputFilePath()
+	{
+		return inputFile.getPath();
+	}
+	
+	public String getOutputFolderPath()
+	{
+		return outputFolder.getPath();
 	}
 	
 	public void setKeyFilePath(String path)

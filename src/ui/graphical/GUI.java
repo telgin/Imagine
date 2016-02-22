@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import algorithms.Parameter;
+import api.ConfigurationAPI;
+import system.Imagine;
 import ui.ArgParseResult;
 import ui.UI;
 import ui.graphical.archiveviewer.OpenArchiveView;
@@ -12,12 +14,11 @@ import ui.graphical.top.TopView;
 
 public class GUI extends UI
 {
-	private List<String> args;
 	private List<String> errors;
 	private TopView topView;
-	private ArgParseResult result;
+	private ArgParseResult args;
 	
-	public GUI(List<String> args)
+	public GUI(ArgParseResult args)
 	{
 		this.args = args;
 		errors = new LinkedList<String>();
@@ -40,14 +41,8 @@ public class GUI extends UI
 	 * @see ui.UI#processArgs()
 	 */
 	@Override
-	public void processArgs()
+	public void init()
 	{
-		int fileIndex = args.indexOf("-i") + 1;
-		File inputFile = new File(args.get(fileIndex));
-		this.result = new ArgParseResult();
-		this.result.inputFile = inputFile;
-
-		
 		ApplicationWindow.launch(ApplicationWindow.class);
 	}
 
@@ -126,7 +121,7 @@ public class GUI extends UI
 	 */
 	public ArgParseResult getArgParseResult()
 	{
-		return result;
+		return args;
 	}
 
 	/**
@@ -134,7 +129,7 @@ public class GUI extends UI
 	 */
 	public void setArgParseResult(ArgParseResult result)
 	{
-		this.result = result;
+		this.args = result;
 	}
 
 }

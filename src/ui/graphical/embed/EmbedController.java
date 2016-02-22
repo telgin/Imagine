@@ -328,6 +328,8 @@ public class EmbedController implements ActiveComponent
 			
 				Settings.setOutputFolder(view.getOutputFolder());
 				Settings.setUsingStructuredOutput(structuredOutput);
+				Settings.setGenerateReport(false);
+				Settings.setTrackFileStatus(true);
 				
 				JobStatus.reset();
 				ConversionJob job = ConversionAPI.runConversion(inputFiles, selectedAlgorithm, getKey(), 1);

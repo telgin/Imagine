@@ -20,6 +20,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import system.CmdAction;
+import ui.ArgParseResult;
 import ui.graphical.BooleanProperty;
 import ui.graphical.ChoiceProperty;
 import ui.graphical.ConfigurationProperty;
@@ -45,15 +47,18 @@ public class AlgorithmEditorView extends View
 	private VBox optionSection;
 	private ConfigurationProperty optionSelection;
 	private Label parameterLabel;
+	
+	private ArgParseResult args;
 
 	/**
 	 * @update_comment
 	 * @param window
 	 */
-	public AlgorithmEditorView(Stage window)
+	public AlgorithmEditorView(Stage window, ArgParseResult args)
 	{
 		super(window);
 		
+		this.args = args;
 		controller = new AlgorithmEditorController(this);
 	}
 
@@ -81,6 +86,20 @@ public class AlgorithmEditorView extends View
 		base.setBottom(setupButtonSection());
 		
 		reset();
+		
+		//setup stuff specified in args
+		if (args.action == CmdAction.k_editor)
+		{
+			if (args.presetName != null && controller.getPresetNames().contains(args.presetName))
+			{
+				presetList.getSelectionModel().select(args.presetName);
+			}
+			else
+			{
+				//set to the first one if not specified (so everything's not grayed out)
+				presetList.getSelectionModel().select(0);
+			}
+		}
 		
 		return base;
 	}
@@ -205,6 +224,7 @@ public class AlgorithmEditorView extends View
 		algorithmDescription = new DescriptionProperty("Algorithm Description");
 		algorithmDescription.setup(vbox);
 		algorithmDescription.getArea().setPrefWidth(200);
+		algorithmDescription.getArea().setPrefHeight(300);
 		algorithmDescription.getArea().setWrapText(true);
 		
 		return vbox;

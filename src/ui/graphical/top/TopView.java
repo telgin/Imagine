@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import algorithms.Parameter;
+import api.ConfigurationAPI;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import system.Imagine;
 import ui.ArgParseResult;
 import ui.graphical.View;
 import ui.graphical.algorithmeditor.AlgorithmEditorView;
@@ -23,17 +25,19 @@ import ui.graphical.embed.EmbedView;
 public class TopView extends View
 {
 	private List<View> tabViews;
-	
+	private ArgParseResult args;
 	private TabPane tabPane;
 	
-	public TopView(Stage window, ArgParseResult result)
+	public TopView(Stage window, ArgParseResult args)
 	{
 		super(window);
 		
+		this.args = args;
+		
 		tabViews = new ArrayList<View>();
-		tabViews.add(new OpenArchiveView(window, result.inputFile));
-		tabViews.add(new EmbedView(window));
-		tabViews.add(new AlgorithmEditorView(window));
+		tabViews.add(new OpenArchiveView(window, args));
+		tabViews.add(new EmbedView(window, args));
+		tabViews.add(new AlgorithmEditorView(window, args));
 	}
 	
 	/* (non-Javadoc)
@@ -67,6 +71,25 @@ public class TopView extends View
 		}
 		
 		borderPane.setCenter(tabPane);
+		
+		//set active tab
+		switch (args.action)
+		{
+			case k_editor:
+				tabPane.getSelectionModel().select(2);
+				break;
+				
+			case k_embed:
+				tabPane.getSelectionModel().select(1);
+				break;
+				
+			case k_open:
+			case k_extract:		
+			case k_install:
+			case k_help:
+			default:
+				tabPane.getSelectionModel().select(0);
+		}
 		
 		return borderPane;
 	}
