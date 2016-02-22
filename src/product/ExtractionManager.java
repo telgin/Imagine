@@ -40,15 +40,16 @@ public class ExtractionManager
 		enclosingFolder = folder;
 	}
 	
-	public void addExtractedFile(byte[] hash, File finalLocation)
-	{
-		extractedFiles.put(ByteConversion.bytesToHex(hash), finalLocation);
-	}
+	//TODO remove extractedFiles if it's never needed
+//	public void addExtractedFile(byte[] hash, File finalLocation)
+//	{
+//		extractedFiles.put(ByteConversion.bytesToHex(hash), finalLocation);
+//	}
 	
-	public File getPreviouslyExtractedFile(byte[] hash)
-	{
-		return extractedFiles.get(ByteConversion.bytesToHex(hash));
-	}
+//	public File getPreviouslyExtractedFile(byte[] hash)
+//	{
+//		return extractedFiles.get(ByteConversion.bytesToHex(hash));
+//	}
 	
 	public void setExplored(File productFile)
 	{
@@ -168,7 +169,7 @@ public class ExtractionManager
 			Files.move(assembled.toPath(), created.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			Logger.log(LogLevel.k_info, "Assembled file moved to: "
 							+ created.getAbsolutePath());
-			addExtractedFile(fileContents.getMetadata().getFileHash(), created);
+			//addExtractedFile(fileContents.getMetadata().getFileHash(), created);
 		}
 		catch (IOException e)
 		{
@@ -200,7 +201,7 @@ public class ExtractionManager
 							+ created.getAbsolutePath());
 			
 			//update cache that this file was already extracted
-			addExtractedFile(fileContents.getMetadata().getFileHash(), created);
+			//addExtractedFile(fileContents.getMetadata().getFileHash(), created);
 			
 			//set permissions of file
 			FileSystemUtil.setNumericFilePermissions(created, fileContents.getMetadata().getPermissions());

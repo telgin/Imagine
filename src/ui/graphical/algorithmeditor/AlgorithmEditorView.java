@@ -94,11 +94,12 @@ public class AlgorithmEditorView extends View
 			{
 				presetList.getSelectionModel().select(args.presetName);
 			}
-			else
-			{
-				//set to the first one if not specified (so everything's not grayed out)
-				presetList.getSelectionModel().select(0);
-			}
+		}
+		
+		//set to the first one if not specified (so everything's not grayed out)
+		if (presetList.getSelectionModel().isEmpty())
+		{
+			presetList.getSelectionModel().select(0);
 		}
 		
 		return base;

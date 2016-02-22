@@ -135,11 +135,6 @@ public class EmbedView extends View
 			{
 				setAlgorithmSelection(args.presetName);
 			}
-			else
-			{
-				//set to the first one if not specified (so everything's not grayed out)
-				setAlgorithmSelection(controller.getPresetNames().get(0));
-			}
 			
 			if (args.outputFolder != null && args.outputFolder.exists())
 			{
@@ -156,6 +151,12 @@ public class EmbedView extends View
 			{
 				togglePasswordSection();
 			}
+		}
+		
+		//set to the first one if not specified (so everything's not grayed out)
+		if (algorithmSelect.getSelectionModel().isEmpty())
+		{
+			setAlgorithmSelection(controller.getPresetNames().get(0));
 		}
 		
 		return borderPane;

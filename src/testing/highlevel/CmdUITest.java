@@ -66,13 +66,13 @@ public class CmdUITest
 	//@Test(timeout = 60000)
 	public void imageBasicEmptyFolder()
 	{
-		cmdTempGroup("image_basic", "emptyFolder");
+		cmdTempGroup("image_default", "emptyFolder");
 	}
 
 	//@Test(timeout = 60000)
 	public void imageBasicSmallFile()
 	{
-		cmdTempGroup("image_basic", "smallFile");
+		cmdTempGroup("image_default", "smallFile");
 	}
 	
 	//@Test(timeout = 60000)
@@ -90,7 +90,7 @@ public class CmdUITest
 	//@Test(timeout = 60000)
 	public void imageBasicBigTree()
 	{
-		cmdTempGroup("image_basic", "bigTree");
+		cmdTempGroup("image_default", "bigTree");
 	}
 
 	//Image Overlay
@@ -224,10 +224,10 @@ public class CmdUITest
 	
 	//ImageOverlay
 	
-	//@Test//(timeout = 60000)
+	@Test//(timeout = 60000)
 	public void imageOverlaySecureBigTree()
 	{
-		cmdTempGroup("image_overlay_secure", "bigTree", keyFile.getPath());
+		cmdTempGroup("image_overlay_heavy", "bigTree", keyFile.getPath());
 	}
 		
 	//Text
@@ -259,7 +259,7 @@ public class CmdUITest
 	//@Test
 	public void textSecureBigTree()
 	{
-		cmdTempGroup("text_secure", "bigTree", keyFile.getPath());
+		cmdTempGroup("text_default", "bigTree", keyFile.getPath());
 	}
 	
 	
@@ -274,6 +274,7 @@ public class CmdUITest
 	}
 	
 		
+	
 	
 	
 	
@@ -335,7 +336,6 @@ public class CmdUITest
 	
 	private static void setupInputImages()
 	{
-
 		File root = TestFileTrees.getRoot(homeFolder, "inputImages");
 		reset("inputImages");
 		

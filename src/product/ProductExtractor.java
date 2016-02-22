@@ -23,7 +23,7 @@ import key.Key;
 public class ProductExtractor {
 	
 	private ProductReader product;
-	private byte[] curFileHash;
+	//private byte[] curFileHash;
 	private long curFragmentNumber;
 	private byte[] buffer;
 	private File enclosingFolder;
@@ -703,9 +703,10 @@ public class ProductExtractor {
 				{
 					if (!readFull(Constants.FILE_HASH_SIZE))
 						return null;
-					curFileHash = ByteConversion.subArray(buffer, 0, Constants.FILE_HASH_SIZE);
+
 					//System.out.println(ByteConversion.bytesToHex((curFileHash)));
-					contents.getMetadata().setFileHash(curFileHash);
+					contents.getMetadata().setFileHash(
+									ByteConversion.subArray(buffer, 0, Constants.FILE_HASH_SIZE));
 				}
 				else
 				{
