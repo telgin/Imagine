@@ -23,8 +23,8 @@ public class ImageReader extends Image implements ProductReader
 
 	private byte read() throws ProductIOException
 	{
-		byte secured = getImageByte(randOrder.next());
-		return ByteConversion.intToByte(secured ^ random.nextByte());
+		byte secured = getImageByte(f_randOrder.next());
+		return ByteConversion.intToByte(secured ^ f_random.nextByte());
 	}
 
 	@Override
@@ -49,27 +49,27 @@ public class ImageReader extends Image implements ProductReader
 	{
 		int color = index % 3;
 		int pixel = index / 3;
-		int y = pixel / img.getWidth();
-		int x = pixel % img.getWidth();
+		int y = pixel / f_img.getWidth();
+		int x = pixel % f_img.getWidth();
 
 		if (color == 0)
 		{
-			return ImageUtil.getRed(img.getRGB(x, y));
+			return ImageUtil.getRed(f_img.getRGB(x, y));
 		}
 		else if (color == 1)
 		{
-			return ImageUtil.getGreen(img.getRGB(x, y));
+			return ImageUtil.getGreen(f_img.getRGB(x, y));
 		}
 		else
 		{
-			return ImageUtil.getBlue(img.getRGB(x, y));
+			return ImageUtil.getBlue(f_img.getRGB(x, y));
 		}
 	}
 
 	@Override
 	public void loadFile(File f) throws IOException
 	{
-		img = ImageIO.read(f);
+		f_img = ImageIO.read(f);
 		reset();
 	}
 
@@ -81,8 +81,8 @@ public class ImageReader extends Image implements ProductReader
 		{
 			for (long l = 0; l < bytes; ++l)
 			{
-				randOrder.next();
-				random.nextByte();
+				f_randOrder.next();
+				f_random.nextByte();
 				++skipped;
 			}
 		}

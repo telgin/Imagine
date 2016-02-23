@@ -11,6 +11,10 @@ import logging.Logger;
 import ui.UIContext;
 import util.ConfigUtil;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class Parameter
 {
 	public static final String STRING_TYPE = "string";
@@ -20,71 +24,97 @@ public class Parameter
 	public static final String DECIMAL_TYPE = "decimal";
 	public static final String FILE_TYPE = "file";
 	
-	private List<Option> options;
-	private String name;
-	private String type;
-	private String value;
-	private String description;
-	private boolean optional;
-	private boolean enabled;
+	private List<Option> f_options;
+	private String f_name;
+	private String f_type;
+	private String f_value;
+	private String f_description;
+	private boolean f_optional;
+	private boolean f_enabled;
 
-	public Parameter(String name, String type, boolean optional, boolean enabled)
+	/**
+	 * @update_comment
+	 * @param p_name
+	 * @param p_type
+	 * @param p_optional
+	 * @param p_enabled
+	 */
+	public Parameter(String p_name, String p_type, boolean p_optional, boolean p_enabled)
 	{
-		options = new ArrayList<Option>();
+		f_options = new ArrayList<Option>();
 
-		setName(name);
-		setType(type);
-		setOptional(optional);
-		setEnabled(enabled);
+		setName(p_name);
+		setType(p_type);
+		setOptional(p_optional);
+		setEnabled(p_enabled);
 		setDescription("");
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
 	@Override
 	public Parameter clone()
 	{
-		Parameter clone = new Parameter(name, type, optional, enabled);
-		clone.setDescription(description);
-		for (Option opt : options)
+		Parameter clone = new Parameter(f_name, f_type, f_optional, f_enabled);
+		clone.setDescription(f_description);
+		for (Option opt : f_options)
 			clone.addOption(opt.clone());
 		
-		clone.setValue(value);
+		clone.setValue(f_value);
 		
 		return clone;
 	}
 
-	public Parameter(Element paramElement)
+	/**
+	 * @update_comment
+	 * @param p_paramElement
+	 */
+	public Parameter(Element p_paramElement)
 	{
-		options = new ArrayList<Option>();
+		f_options = new ArrayList<Option>();
 
-		setName(paramElement.getAttribute("name"));
-		setDescription(paramElement.getAttribute("description"));
-		setType(paramElement.getAttribute("type"));
-		setOptional(Boolean.parseBoolean(paramElement.getAttribute("optional")));
-		setEnabled(Boolean.parseBoolean(paramElement.getAttribute("enabled")));
+		setName(p_paramElement.getAttribute("name"));
+		setDescription(p_paramElement.getAttribute("description"));
+		setType(p_paramElement.getAttribute("type"));
+		setOptional(Boolean.parseBoolean(p_paramElement.getAttribute("optional")));
+		setEnabled(Boolean.parseBoolean(p_paramElement.getAttribute("enabled")));
 
-		for (Element optionNode : ConfigUtil.children(paramElement, "Option"))
+		for (Element optionNode : ConfigUtil.children(p_paramElement, "Option"))
 		{
-			options.add(new Option(optionNode));
+			f_options.add(new Option(optionNode));
 		}
 		
-		setValue(paramElement.getAttribute("value"));
+		setValue(p_paramElement.getAttribute("value"));
 	}
 
-	public void addOption(Option opt)
+	/**
+	 * @update_comment
+	 * @param p_opt
+	 */
+	public void addOption(Option p_opt)
 	{
-		options.add(opt);
+		f_options.add(p_opt);
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public List<Option> getOptions()
 	{
-		return options;
+		return f_options;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public List<String> getOptionDisplayValues()
 	{
 		List<String> displays = new ArrayList<String>();
 		
-		for (Option opt : options)
+		for (Option opt : f_options)
 			displays.add(opt.toString());
 		
 		displays.sort(null);
@@ -92,62 +122,95 @@ public class Parameter
 		return displays;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public String getName()
 	{
-		return name;
+		return f_name;
 	}
 
-	public void setName(String name)
+	/**
+	 * @update_comment
+	 * @param p_name
+	 */
+	public void setName(String p_name)
 	{
-		this.name = name;
+		this.f_name = p_name;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public String getValue()
 	{
-		if (value != null && value.equals(Option.PROMPT_OPTION.getValue()))
+		if (f_value != null && f_value.equals(Option.PROMPT_OPTION.getValue()))
 		{
-			value = UIContext.getUI().promptParameterValue(this);
+			f_value = UIContext.getUI().promptParameterValue(this);
 		}
 		
-		return value;
+		return f_value;
 	}
 
-	public boolean setValue(String value)
+	/**
+	 * @update_comment
+	 * @param p_value
+	 * @return
+	 */
+	public boolean setValue(String p_value)
 	{
-		boolean success = validate(value);
+		boolean success = validate(p_value);
 		
 		if (success)
-			this.value = value;
+			this.f_value = p_value;
 		
 		return success;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public boolean isOptional()
 	{
-		return optional;
+		return f_optional;
 	}
 
-	public void setOptional(boolean optional)
+	/**
+	 * @update_comment
+	 * @param p_optional
+	 */
+	public void setOptional(boolean p_optional)
 	{
-		this.optional = optional;
+		this.f_optional = p_optional;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public boolean isEnabled()
 	{
-		return enabled;
+		return f_enabled;
 	}
 
-	public void setEnabled(boolean enabled)
+	/**
+	 * @update_comment
+	 * @param p_enabled
+	 */
+	public void setEnabled(boolean p_enabled)
 	{
-		if (!enabled && !optional)
+		if (!p_enabled && !f_optional)
 		{
 			Logger.log(LogLevel.k_error,
-							"Cannot disable the required parameter: " + name);
-			this.enabled = true;
+							"Cannot disable the required parameter: " + f_name);
+			this.f_enabled = true;
 		}
 		else
 		{
-			this.enabled = enabled;
+			this.f_enabled = p_enabled;
 		}
 	}
 
@@ -156,51 +219,60 @@ public class Parameter
 	 */
 	public String getType()
 	{
-		return type;
+		return f_type;
 	}
 
 	/**
-	 * @param type
-	 *            the type to set
+	 * @param p_type the type to set
 	 */
-	public void setType(String type)
+	public void setType(String p_type)
 	{
-		this.type = type.toLowerCase();
+		this.f_type = p_type.toLowerCase();
 	}
 
-	public Element toElement(Document doc)
+	/**
+	 * @update_comment
+	 * @param p_doc
+	 * @return
+	 */
+	public Element toElement(Document p_doc)
 	{
-		Element element = doc.createElement("Parameter");
-		element.setAttribute("name", name);
-		element.setAttribute("description", description);
-		element.setAttribute("type", type);
-		element.setAttribute("value", value);
-		element.setAttribute("optional", Boolean.toString(optional));
-		element.setAttribute("enabled", Boolean.toString(enabled));
+		Element element = p_doc.createElement("Parameter");
+		element.setAttribute("name", f_name);
+		element.setAttribute("description", f_description);
+		element.setAttribute("type", f_type);
+		element.setAttribute("value", f_value);
+		element.setAttribute("optional", Boolean.toString(f_optional));
+		element.setAttribute("enabled", Boolean.toString(f_enabled));
 
-		for (Option opt : options)
-			element.appendChild(opt.toElement(doc));
+		for (Option opt : f_options)
+			element.appendChild(opt.toElement(p_doc));
 
 		return element;
 	}
 
-	private boolean validate(String value)
+	/**
+	 * @update_comment
+	 * @param p_value
+	 * @return
+	 */
+	private boolean validate(String p_value)
 	{
 		// make sure the input value conforms to the constraints of the options:
 
 		// for sanity, make sure the spec has at least one option
-		if (options.size() == 0)
+		if (f_options.size() == 0)
 		{
-			Logger.log(LogLevel.k_fatal, "The specification for parameter " + name
+			Logger.log(LogLevel.k_fatal, "The specification for parameter " + f_name
 							+ " has no options");
 			return false;
 		}
 		else
 		{
 			boolean found = false;
-			for (Option opt : options)
+			for (Option opt : f_options)
 			{
-				if (opt.validate(value, type))
+				if (opt.validate(p_value, f_type))
 				{
 					found = true;
 					break;
@@ -216,7 +288,7 @@ public class Parameter
 	 */
 	public String getDescription()
 	{
-		return description;
+		return f_description;
 	}
 
 	/**
@@ -224,6 +296,6 @@ public class Parameter
 	 */
 	public void setDescription(String description)
 	{
-		this.description = description;
+		this.f_description = description;
 	}
 }

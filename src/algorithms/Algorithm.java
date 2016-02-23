@@ -3,6 +3,7 @@ package algorithms;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -24,64 +25,69 @@ import util.ConfigUtil;
  */
 public class Algorithm
 {
-	private String name;
-	private int versionNum;
-	private String description;
-	private HashMap<String, Parameter> parameters;
-	private ProductFactoryCreation productFactoryCreation;
-	private String presetName;
+	private String f_name;
+	private int f_versionNum;
+	private String f_description;
+	private Map<String, Parameter> f_parameters;
+	private ProductFactoryCreation f_productFactoryCreation;
+	private String f_presetName;
+
 
 	/**
 	 * @update_comment
-	 * @param name
-	 * @param versionNum
+	 * @param p_name
+	 * @param p_versionNum
+	 * @param p_description
 	 */
-	public Algorithm(String name, int versionNum, String description)
+	public Algorithm(String p_name, int p_versionNum, String p_description)
 	{
-		this.name = name;
-		this.versionNum = versionNum;
-		this.description = description;
-		parameters = new HashMap<String, Parameter>();
+		f_name = p_name;
+		f_versionNum = p_versionNum;
+		f_description = p_description;
+		f_parameters = new HashMap<String, Parameter>();
 	}
 
 	/**
 	 * @update_comment
-	 * @param algoNode
+	 * @param p_algoNode
 	 */
-	public Algorithm(Element algoNode)
+	public Algorithm(Element p_algoNode)
 	{
-		name = algoNode.getAttribute("name");
-		versionNum = Integer.parseInt(algoNode.getAttribute("version"));
-		description = AlgorithmRegistry.getDefaultAlgorithm(name).getDescription();
-		presetName = algoNode.getAttribute("presetName");
+		f_name = p_algoNode.getAttribute("name");
+		f_versionNum = Integer.parseInt(p_algoNode.getAttribute("version"));
+		f_description = AlgorithmRegistry.getDefaultAlgorithm(f_name).getDescription();
+		f_presetName = p_algoNode.getAttribute("presetName");
 
-		parameters = new HashMap<String, Parameter>();
-		for (Element paramNode : ConfigUtil.children(algoNode, "Parameter"))
+		f_parameters = new HashMap<String, Parameter>();
+		for (Element paramNode : ConfigUtil.children(p_algoNode, "Parameter"))
 		{
 			addParameter(new Parameter(paramNode));
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
 	@Override
 	public Algorithm clone()
 	{
-		Algorithm clone = new Algorithm(name, versionNum, description);
-		clone.setPresetName(presetName);
-		for (Parameter param : parameters.values())
+		Algorithm clone = new Algorithm(f_name, f_versionNum, f_description);
+		clone.setPresetName(f_presetName);
+		for (Parameter param : f_parameters.values())
 			clone.addParameter(param.clone());
 		
-		clone.setProductFactoryCreation(productFactoryCreation);
+		clone.setProductFactoryCreation(f_productFactoryCreation);
 		
 		return clone;
 	}
 	
 	/**
 	 * @update_comment
-	 * @param creation
+	 * @param p_creation
 	 */
-	public void setProductFactoryCreation(ProductFactoryCreation creation)
+	public void setProductFactoryCreation(ProductFactoryCreation p_creation)
 	{
-		productFactoryCreation = creation;
+		f_productFactoryCreation = p_creation;
 	}
 
 	/**
@@ -90,57 +96,57 @@ public class Algorithm
 	 */
 	public List<Parameter> getParameters()
 	{
-		return new ArrayList<Parameter>(parameters.values());
+		return new ArrayList<Parameter>(f_parameters.values());
 	}
 
 	/**
 	 * @update_comment
-	 * @param name
-	 * @param value
+	 * @param p_name
+	 * @param p_value
 	 * @throws UsageException 
 	 */
-	public void setParameter(String name, String value) throws UsageException
+	public void setParameter(String p_name, String p_value) throws UsageException
 	{
-		Parameter param = parameters.get(name.toLowerCase());
+		Parameter param = f_parameters.get(p_name.toLowerCase());
 		if (param == null)
-			throw new UsageException("No such parameter '" + name + "' in algorithm '"
-				+ this.name + "'");
-		else if (!param.setValue(value))
-			throw new UsageException("Could not set parameter'" + name + "' to value '" + value + "'");
+			throw new UsageException("No such parameter '" + p_name + "' in algorithm '"
+				+ this.f_name + "'");
+		else if (!param.setValue(p_value))
+			throw new UsageException("Could not set parameter'" + p_name + "' to value '" + p_value + "'");
 	}
 
 	/**
 	 * @update_comment
-	 * @param name
-	 * @param enabled
+	 * @param p_name
+	 * @param p_enabled
 	 */
-	public void setParameterEnabled(String name, boolean enabled)
+	public void setParameterEnabled(String p_name, boolean p_enabled)
 	{
-		Parameter param = parameters.get(name.toLowerCase());
+		Parameter param = f_parameters.get(p_name.toLowerCase());
 		if (param == null)
-			Logger.log(LogLevel.k_error, "No such parameter '" + name + "' in algorithm '"
-				+ this.name + "'");
+			Logger.log(LogLevel.k_error, "No such parameter '" + p_name + "' in algorithm '"
+				+ this.f_name + "'");
 		else
-			param.setEnabled(enabled);
+			param.setEnabled(p_enabled);
 	}
 
 	/**
 	 * @update_comment
-	 * @param param
+	 * @param p_param
 	 */
-	public void addParameter(Parameter param)
+	public void addParameter(Parameter p_param)
 	{
-		parameters.put(param.getName().toLowerCase(), param);
+		f_parameters.put(p_param.getName().toLowerCase(), p_param);
 	}
 
 	/**
 	 * @update_comment
-	 * @param name
+	 * @param p_name
 	 * @return
 	 */
-	public Parameter getParameter(String name)
+	public Parameter getParameter(String p_name)
 	{
-		return parameters.get(name.toLowerCase());
+		return f_parameters.get(p_name.toLowerCase());
 	}
 
 	/**
@@ -149,7 +155,7 @@ public class Algorithm
 	 */
 	public String getName()
 	{
-		return name;
+		return f_name;
 	}
 
 	/**
@@ -158,21 +164,21 @@ public class Algorithm
 	 */
 	public int getVersion()
 	{
-		return versionNum;
+		return f_versionNum;
 	}
 
 	/**
 	 * @update_comment
-	 * @param name
+	 * @param p_name
 	 * @return
 	 */
-	public String getParameterValue(String name)
+	public String getParameterValue(String p_name)
 	{
-		Parameter param = parameters.get(name.toLowerCase());
+		Parameter param = f_parameters.get(p_name.toLowerCase());
 		if (param == null)
 		{
-			Logger.log(LogLevel.k_error, "No such parameter '" + name + "' in algorithm '" 
-				+ this.name + "'");
+			Logger.log(LogLevel.k_error, "No such parameter '" + p_name + "' in algorithm '" 
+				+ this.f_name + "'");
 			return null;
 		}
 
@@ -181,19 +187,19 @@ public class Algorithm
 
 	/**
 	 * @update_comment
-	 * @param doc
+	 * @param p_doc
 	 * @return
 	 */
-	public Element toElement(Document doc)
+	public Element toElement(Document p_doc)
 	{
-		Element element = doc.createElement("Algorithm");
-		element.setAttribute("name", name);
-		element.setAttribute("version", Integer.toString(versionNum));
-		element.setAttribute("presetName", presetName);
+		Element element = p_doc.createElement("Algorithm");
+		element.setAttribute("name", f_name);
+		element.setAttribute("version", Integer.toString(f_versionNum));
+		element.setAttribute("presetName", f_presetName);
 
 		for (Parameter param : getParameters())
 		{
-			element.appendChild(param.toElement(doc));
+			element.appendChild(param.toElement(p_doc));
 		}
 
 		return element;
@@ -201,22 +207,22 @@ public class Algorithm
 
 	/**
 	 * @update_comment
-	 * @param key
+	 * @param p_key
 	 * @return
 	 */
-	public ProductReaderFactory<? extends ProductReader> getProductReaderFactory(Key key)
+	public ProductReaderFactory<? extends ProductReader> getProductReaderFactory(Key p_key)
 	{
-		return productFactoryCreation.createReader(this, key);
+		return f_productFactoryCreation.createReader(this, p_key);
 	}
 
 	/**
 	 * @update_comment
-	 * @param key
+	 * @param p_key
 	 * @return
 	 */
-	public ProductWriterFactory<? extends ProductWriter> getProductWriterFactory(Key key)
+	public ProductWriterFactory<? extends ProductWriter> getProductWriterFactory(Key p_key)
 	{
-		return productFactoryCreation.createWriter(this, key);
+		return f_productFactoryCreation.createWriter(this, p_key);
 	}
 
 	/**
@@ -224,15 +230,15 @@ public class Algorithm
 	 */
 	public String getPresetName()
 	{
-		return presetName;
+		return f_presetName;
 	}
 
 	/**
-	 * @param presetName the presetName to set
+	 * @param p_presetName the presetName to set
 	 */
-	public void setPresetName(String presetName)
+	public void setPresetName(String p_presetName)
 	{
-		this.presetName = presetName;
+		this.f_presetName = p_presetName;
 	}
 
 	/**
@@ -240,14 +246,14 @@ public class Algorithm
 	 */
 	public String getDescription()
 	{
-		return description;
+		return f_description;
 	}
 
 	/**
-	 * @param description the description to set
+	 * @param p_description the description to set
 	 */
-	public void setDescription(String description)
+	public void setDescription(String p_description)
 	{
-		this.description = description;
+		this.f_description = p_description;
 	}
 }

@@ -16,30 +16,45 @@ import product.ProductWriter;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class ImageWriter extends Image implements ProductWriter
 {
 
-	public ImageWriter(Algorithm algo, Key key)
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 */
+	public ImageWriter(Algorithm p_algo, Key p_key)
 	{
-		super(algo, key);
+		super(p_algo, p_key);
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductWriter#newProduct()
+	 */
 	@Override
 	public void newProduct()
 	{
 		// should really use the rgb configuration parameter somehow
-		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		f_img = new BufferedImage(f_width, f_height, BufferedImage.TYPE_INT_RGB);
 
 		reset();
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductWriter#write(byte)
+	 */
 	@Override
-	public boolean write(byte b)
+	public boolean write(byte p_byte)
 	{
 		try
 		{
-			int index = randOrder.next();
-			byte toSet = ByteConversion.intToByte(b ^ random.nextByte());
+			int index = f_randOrder.next();
+			byte toSet = ByteConversion.intToByte(p_byte ^ f_random.nextByte());
 			setImageByte(index, toSet);
 			return true;
 		}
@@ -49,29 +64,35 @@ public class ImageWriter extends Image implements ProductWriter
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductWriter#write(byte[], int, int)
+	 */
 	@Override
-	public int write(byte[] bytes, int offset, int length)
+	public int write(byte[] p_bytes, int p_offset, int p_length)
 	{
-		for (int x = offset; x < offset + length; ++x)
+		for (int x = p_offset; x < p_offset + p_length; ++x)
 		{
-			if (!write(bytes[x]))
-				return x - offset;
+			if (!write(p_bytes[x]))
+				return x - p_offset;
 		}
 
-		return length;
+		return p_length;
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductWriter#saveFile(java.io.File, java.lang.String)
+	 */
 	@Override
-	public void saveFile(File productStagingFolder, String fileName)
+	public void saveFile(File p_productStagingFolder, String p_fileName)
 	{
 		try
 		{
-			File imgFile = new File(productStagingFolder.getAbsolutePath(), fileName + ".png");
+			File imgFile = new File(p_productStagingFolder.getAbsolutePath(), p_fileName + ".png");
 			Logger.log(LogLevel.k_info,
 							"Saving product file: " + imgFile.getAbsolutePath());
 			if (!imgFile.getParentFile().exists())
 				imgFile.getParentFile().mkdirs();
-			ImageIO.write(img, "PNG", imgFile);
+			ImageIO.write(f_img, "PNG", imgFile);
 
 			// update progress
 			JobStatus.incrementProductsCreated(1);
@@ -82,24 +103,29 @@ public class ImageWriter extends Image implements ProductWriter
 		}
 	}
 
-	private void setImageByte(int index, byte data)
+	/**
+	 * @update_comment
+	 * @param p_index
+	 * @param p_data
+	 */
+	private void setImageByte(int p_index, byte p_data)
 	{
-		int color = index % 3;
-		int pixel = index / 3;
-		int y = pixel / img.getWidth();
-		int x = pixel % img.getWidth();
+		int color = p_index % 3;
+		int pixel = p_index / 3;
+		int y = pixel / f_img.getWidth();
+		int x = pixel % f_img.getWidth();
 
 		if (color == 0)
 		{
-			img.setRGB(x, y, ImageUtil.setRed(img.getRGB(x, y), data));
+			f_img.setRGB(x, y, ImageUtil.setRed(f_img.getRGB(x, y), p_data));
 		}
 		else if (color == 1)
 		{
-			img.setRGB(x, y, ImageUtil.setGreen(img.getRGB(x, y), data));
+			f_img.setRGB(x, y, ImageUtil.setGreen(f_img.getRGB(x, y), p_data));
 		}
 		else
 		{
-			img.setRGB(x, y, ImageUtil.setBlue(img.getRGB(x, y), data));
+			f_img.setRGB(x, y, ImageUtil.setBlue(f_img.getRGB(x, y), p_data));
 		}
 	}
 }

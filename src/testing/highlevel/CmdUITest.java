@@ -110,7 +110,7 @@ public class CmdUITest
 	//@Test
 	public void image_1_sf() { image_1(SMALL_FILE); }
 	
-	//@Test
+	@Test
 	public void image_1_st() { image_1(SMALL_TREE); }
 	
 	//@Test
@@ -148,7 +148,7 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
 	}
 	
-	//@Test
+	@Test
 	public void image_2_bf() { image_2(BIG_FILE); }
 	
 	//@Test
@@ -752,7 +752,7 @@ public class CmdUITest
 		Imagine.run(open);
 	}
 
-	@Test
+	//@Test
 	public void image_6_bt() { image_6(BIG_TREE); }
 	
 	//----------------------------------------

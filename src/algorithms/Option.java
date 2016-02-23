@@ -6,54 +6,77 @@ import org.w3c.dom.Element;
 import logging.LogLevel;
 import logging.Logger;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class Option
 {
-	private String value;
-	private String startRange;
-	private String endRange;
+	private String f_value;
+	private String f_startRange;
+	private String f_endRange;
 
 	public static final Option PROMPT_OPTION = new Option("Prompt For Value");
 
-	public Option(String value)
+	/**
+	 * @update_comment
+	 * @param p_value
+	 */
+	public Option(String p_value)
 	{
-		this.value = value;
+		f_value = p_value;
 	}
 	
-	public Option(String startRange, String endRange)
+	/**
+	 * @update_comment
+	 * @param p_startRange
+	 * @param p_endRange
+	 */
+	public Option(String p_startRange, String p_endRange)
 	{
-		this.startRange = startRange;
-		this.endRange = endRange;
+		f_startRange = p_startRange;
+		f_endRange = p_endRange;
 	}
 
-	public Option(Element optionNode)
+	/**
+	 * @update_comment
+	 * @param p_optionNode
+	 */
+	public Option(Element p_optionNode)
 	{
-		if (optionNode.hasAttribute("value"))
-			this.value = optionNode.getAttribute("value");
+		if (p_optionNode.hasAttribute("value"))
+			f_value = p_optionNode.getAttribute("value");
 		
-		if (optionNode.hasAttribute("startRange"))
-			this.startRange = optionNode.getAttribute("startRange");
+		if (p_optionNode.hasAttribute("startRange"))
+			f_startRange = p_optionNode.getAttribute("startRange");
 		
-		if (optionNode.hasAttribute("endRange"))
-			this.endRange = optionNode.getAttribute("endRange");
+		if (p_optionNode.hasAttribute("endRange"))
+			f_endRange = p_optionNode.getAttribute("endRange");
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
 	@Override
 	public Option clone()
 	{
-		Option clone = new Option(value);
-		clone.startRange = startRange;
-		clone.endRange = endRange;
+		Option clone = new Option(f_value);
+		clone.f_startRange = f_startRange;
+		clone.f_endRange = f_endRange;
 
 		return clone;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString()
 	{
-		if (value != null)
-			return value;
+		if (f_value != null)
+			return f_value;
 		
-		if (startRange != null && endRange != null)
-			return "[" + startRange + ", " + endRange + "]";
+		if (f_startRange != null && f_endRange != null)
+			return "[" + f_startRange + ", " + f_endRange + "]";
 		
 		return "null";
 	}
@@ -63,7 +86,7 @@ public class Option
 	 */
 	public String getStartRange()
 	{
-		return startRange;
+		return f_startRange;
 	}
 
 	/**
@@ -71,7 +94,7 @@ public class Option
 	 */
 	public String getEndRange()
 	{
-		return endRange;
+		return f_endRange;
 	}
 
 	/**
@@ -79,52 +102,63 @@ public class Option
 	 */
 	public String getValue()
 	{
-		return value;
+		return f_value;
 	}
 
-	public Element toElement(Document doc)
+	/**
+	 * @update_comment
+	 * @param p_doc
+	 * @return
+	 */
+	public Element toElement(Document p_doc)
 	{
-		Element element = doc.createElement("Option");
+		Element element = p_doc.createElement("Option");
 
-		if (value != null)
+		if (f_value != null)
 		{
-			element.setAttribute("value", value);
+			element.setAttribute("value", f_value);
 		}
 		else
 		{
-			element.setAttribute("startRange", startRange);
-			element.setAttribute("endRange", endRange);
+			element.setAttribute("startRange", f_startRange);
+			element.setAttribute("endRange", f_endRange);
 		}
 
 		return element;
 	}
 
-	public boolean validate(String value, String type)
+	/**
+	 * @update_comment
+	 * @param p_value
+	 * @param p_type
+	 * @return
+	 */
+	public boolean validate(String p_value, String p_type)
 	{
-		if (type.equals(Parameter.STRING_TYPE))
+		if (p_type.equals(Parameter.STRING_TYPE))
 		{
-			if (this.value != null)
+			if (this.f_value != null)
 			{
-				return this.value.equals("*") || this.value.equals(value);
+				return this.f_value.equals("*") || this.f_value.equals(p_value);
 			}
 
 			return false; // no ranges for strings
 		}
-		else if (type.equals(Parameter.INT_TYPE))
+		else if (p_type.equals(Parameter.INT_TYPE))
 		{
-			if (this.value != null)
+			if (this.f_value != null)
 			{
-				return this.value.equals("*") || this.value.equals(value);
+				return this.f_value.equals("*") || this.f_value.equals(p_value);
 			}
 			else
 			{
 				try
 				{
-					int myStartRange = startRange.equals("*") ? Integer.MIN_VALUE
-									: Integer.parseInt(startRange);
-					int myEndRange = startRange.equals("*") ? Integer.MAX_VALUE
-									: Integer.parseInt(endRange);
-					int vOtherInt = Integer.parseInt(value);
+					int myStartRange = f_startRange.equals("*") ? Integer.MIN_VALUE
+									: Integer.parseInt(f_startRange);
+					int myEndRange = f_startRange.equals("*") ? Integer.MAX_VALUE
+									: Integer.parseInt(f_endRange);
+					int vOtherInt = Integer.parseInt(p_value);
 	
 					return vOtherInt >= myStartRange && vOtherInt <= myEndRange;
 				}
@@ -134,30 +168,30 @@ public class Option
 				}
 			}
 		}
-		else if (type.equals(Parameter.BOOLEAN_TYPE))
+		else if (p_type.equals(Parameter.BOOLEAN_TYPE))
 		{
-			if (this.value != null)
+			if (this.f_value != null)
 			{
-				return this.value.equals("*") || this.value.equals(value);
+				return this.f_value.equals("*") || this.f_value.equals(p_value);
 			}
 
 			return false; // no ranges for booleans
 		}
-		else if (type.equals(Parameter.LONG_TYPE))
+		else if (p_type.equals(Parameter.LONG_TYPE))
 		{
-			if (this.value != null)
+			if (this.f_value != null)
 			{
-				return this.value.equals("*") || this.value.equals(value);
+				return this.f_value.equals("*") || this.f_value.equals(p_value);
 			}
 			else
 			{
 				try
 				{
-					long myStartRange = startRange.equals("*") ? Long.MIN_VALUE
-									: Long.parseLong(startRange);
-					long myEndRange = startRange.equals("*") ? Long.MAX_VALUE
-									: Long.parseLong(endRange);
-					long vOtherLong = Long.parseLong(value);
+					long myStartRange = f_startRange.equals("*") ? Long.MIN_VALUE
+									: Long.parseLong(f_startRange);
+					long myEndRange = f_startRange.equals("*") ? Long.MAX_VALUE
+									: Long.parseLong(f_endRange);
+					long vOtherLong = Long.parseLong(p_value);
 	
 					return vOtherLong >= myStartRange && vOtherLong <= myEndRange;
 				}
@@ -167,14 +201,14 @@ public class Option
 				}
 			}
 		}
-		else if (type.equals(Parameter.FILE_TYPE))
+		else if (p_type.equals(Parameter.FILE_TYPE))
 		{
 			//for now, any non-empty string could be valid
-			return value != null && !value.isEmpty();
+			return p_value != null && !p_value.isEmpty();
 		}
 		else
 		{
-			Logger.log(LogLevel.k_fatal, "Unrecognized data type: " + type);
+			Logger.log(LogLevel.k_fatal, "Unrecognized data type: " + p_type);
 			return false;
 		}
 	}
@@ -187,9 +221,9 @@ public class Option
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((endRange == null) ? 0 : endRange.hashCode());
-		result = prime * result + ((startRange == null) ? 0 : startRange.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		result = prime * result + ((f_endRange == null) ? 0 : f_endRange.hashCode());
+		result = prime * result + ((f_startRange == null) ? 0 : f_startRange.hashCode());
+		result = prime * result + ((f_value == null) ? 0 : f_value.hashCode());
 		return result;
 	}
 
@@ -197,35 +231,35 @@ public class Option
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object obj)
+	public boolean equals(Object p_obj)
 	{
-		if (this == obj)
+		if (this == p_obj)
 			return true;
-		if (obj == null)
+		if (p_obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (getClass() != p_obj.getClass())
 			return false;
-		Option other = (Option) obj;
-		if (endRange == null)
+		Option other = (Option) p_obj;
+		if (f_endRange == null)
 		{
-			if (other.endRange != null)
+			if (other.f_endRange != null)
 				return false;
 		}
-		else if (!endRange.equals(other.endRange))
+		else if (!f_endRange.equals(other.f_endRange))
 			return false;
-		if (startRange == null)
+		if (f_startRange == null)
 		{
-			if (other.startRange != null)
+			if (other.f_startRange != null)
 				return false;
 		}
-		else if (!startRange.equals(other.startRange))
+		else if (!f_startRange.equals(other.f_startRange))
 			return false;
-		if (value == null)
+		if (f_value == null)
 		{
-			if (other.value != null)
+			if (other.f_value != null)
 				return false;
 		}
-		else if (!value.equals(other.value))
+		else if (!f_value.equals(other.f_value))
 			return false;
 		return true;
 	}

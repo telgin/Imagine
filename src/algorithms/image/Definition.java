@@ -13,6 +13,10 @@ import product.ProductReaderFactory;
 import product.ProductWriter;
 import product.ProductWriterFactory;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class Definition implements algorithms.Definition
 {
 	private static final String NAME = "Image";
@@ -22,7 +26,7 @@ public class Definition implements algorithms.Definition
 					+ "image is not large enough to contain the file header, the conversion "
 					+ "will fail. If the image file is too large, a lot of space may be wasted depending "
 					+ "on how fully the embedded data fills the last output image.)";
-	private static Definition self;
+	private static Definition s_self;
 	
 	
 	public static final String IMAGE_TYPE_PARAM = "ImageType";
@@ -30,24 +34,37 @@ public class Definition implements algorithms.Definition
 	public static final String HEIGHT_PARAM = "Height";
 	public static final String COLORS_PARAM = "Colors";
 
+	/**
+	 * @update_comment
+	 */
 	private Definition()
 	{
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public static Definition getInstance()
 	{
-		if (self == null)
-			self = new Definition();
+		if (s_self == null)
+			s_self = new Definition();
 
-		return self;
+		return s_self;
 	}
 
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getName()
+	 */
 	@Override
 	public String getName()
 	{
 		return NAME;
 	}
 
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#constructDefaultAlgorithm()
+	 */
 	@Override
 	public Algorithm constructDefaultAlgorithm()
 	{
@@ -104,6 +121,9 @@ public class Definition implements algorithms.Definition
 		return algo;
 	}
 
+	/* (non-Javadoc)
+	 * @see algorithms.Definition#getProductFactoryCreation()
+	 */
 	@Override
 	public ProductFactoryCreation getProductFactoryCreation()
 	{

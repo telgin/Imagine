@@ -3,6 +3,7 @@ package algorithms;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import key.Key;
 import logging.LogLevel;
@@ -12,21 +13,25 @@ import product.ProductReaderFactory;
 import product.ProductWriter;
 import product.ProductWriterFactory;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class AlgorithmRegistry
 {
-	private static HashMap<String, Definition> definitions;	
+	private static Map<String, Definition> s_definitions;	
 	
 	static
 	{
-		definitions = new HashMap<String, Definition>();
+		s_definitions = new HashMap<String, Definition>();
 		
-		definitions.put(algorithms.text.Definition.getInstance().getName(),
+		s_definitions.put(algorithms.text.Definition.getInstance().getName(),
 				algorithms.text.Definition.getInstance());
 		
-		definitions.put(algorithms.image.Definition.getInstance().getName(),
+		s_definitions.put(algorithms.image.Definition.getInstance().getName(),
 				algorithms.image.Definition.getInstance());
 		
-		definitions.put(algorithms.imageoverlay.Definition.getInstance().getName(),
+		s_definitions.put(algorithms.imageoverlay.Definition.getInstance().getName(),
 				algorithms.imageoverlay.Definition.getInstance());
 	}
 	
@@ -35,44 +40,67 @@ public class AlgorithmRegistry
 	 */
 	private AlgorithmRegistry(){}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public static List<String> getAlgorithmNames()
 	{
-		List<String> names = new ArrayList<String>(definitions.keySet());
+		List<String> names = new ArrayList<String>(s_definitions.keySet());
 		names.sort(null);
 		
 		return names;
 	}
 	
-	public static Algorithm getDefaultAlgorithm(String name)
+	/**
+	 * @update_comment
+	 * @param p_name
+	 * @return
+	 */
+	public static Algorithm getDefaultAlgorithm(String p_name)
 	{
-		return definitions.get(name).constructDefaultAlgorithm();
+		return s_definitions.get(p_name).constructDefaultAlgorithm();
 	}
 	
 	/**
 	 * @update_comment
-	 * @param algoName
+	 * @param p_name
 	 * @return
 	 */
-	public static List<Algorithm> getAlgorithmPresets(String name)
+	public static List<Algorithm> getAlgorithmPresets(String p_name)
 	{
-		return definitions.get(name).getAlgorithmPresets();
+		return s_definitions.get(p_name).getAlgorithmPresets();
 	}
 	
-	public static ProductReaderFactory<? extends ProductReader> getProductReaderFactory(Algorithm algo, Key key) //make this a part of the algorithm class?
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 * @return
+	 */
+	public static ProductReaderFactory<? extends ProductReader> 
+		getProductReaderFactory(Algorithm p_algo, Key p_key)
 	{
-		if (!definitions.containsKey(algo.getName()))
-			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + algo.getName());
+		if (!s_definitions.containsKey(p_algo.getName()))
+			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + p_algo.getName());
 		
-		return definitions.get(algo.getName()).getProductFactoryCreation()
-				.createReader(algo, key);
+		return s_definitions.get(p_algo.getName()).getProductFactoryCreation()
+				.createReader(p_algo, p_key);
 	}
 	
-	public static ProductWriterFactory<? extends ProductWriter> getProductWriterFactory(Algorithm algo, Key key)
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 * @return
+	 */
+	public static ProductWriterFactory<? extends ProductWriter> 
+		getProductWriterFactory(Algorithm p_algo, Key p_key)
 	{
-		if (!definitions.containsKey(algo.getName()))
-			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + algo.getName());
+		if (!s_definitions.containsKey(p_algo.getName()))
+			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + p_algo.getName());
 		
-		return definitions.get(algo.getName()).getProductFactoryCreation()
-				.createWriter(algo, key);
+		return s_definitions.get(p_algo.getName()).getProductFactoryCreation()
+				.createWriter(p_algo, p_key);
 	}
 }
