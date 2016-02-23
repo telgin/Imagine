@@ -1,5 +1,8 @@
 package testing.highlevel;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -8,16 +11,9 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 
-import algorithms.imageoverlay.ConsumptionMode;
 import product.ConversionJob;
-import product.JobStatus;
-import report.Report;
 import system.Imagine;
 import system.SystemManager;
 import testing.Comparisons;
@@ -67,7 +63,6 @@ public class CmdUITest
 	private static File reportFolder = new File("testing/reports/");
 	private static File reportFile = new File(reportFolder, "report.txt");
 	private static File bigTreeFileList = new File("testing/file_lists/bigTree.txt");
-	private static boolean shutdownCalled = false;
 	private static ArrayList<ConversionJob> jobs = new ArrayList<ConversionJob>();
 	
 	
@@ -303,6 +298,37 @@ public class CmdUITest
 	
 	//@Test
 	public void image_6_st() throws IOException { image_6(); }
+	
+	/**
+	 * Wrong key file
+	 */
+	public void image_7(String testFileName)
+	{
+		//setup
+		File inputFolder = setup(testFileName);
+		
+		//embed
+		String[] embed = new String[]{"--embed",
+						"-i", inputFolder.getPath(),
+						"-a", "image_default",
+						"-o", outputFolder.getPath(),
+						"-k", keyFile.getPath()};
+		Imagine.run(embed);
+		
+		//extract
+		String[] extract = new String[]{"--extract",
+						"-i", outputFolder.getPath(),
+						"-a", "image_default", 
+						"-o", extractionFolder.getPath(),
+						"-k", imagesFolder.list()[0]};
+		Imagine.run(extract);
+		
+		//verify nothing exists
+		assertEquals(0, extractionFolder.listFiles().length);
+	}
+	
+	//@Test
+	public void image_7_bt() { image_7(BIG_TREE); }
 	
 	//----------------------------------------
 	//Image Overlay Tests
@@ -552,7 +578,7 @@ public class CmdUITest
 		assertEquals(0, imagesFolder.listFiles().length);
 	}
 	
-	@Test
+	//@Test
 	public void image_overlay_7_st() { image_overlay_7(SMALL_TREE); }
 
 	//----------------------------------------
@@ -641,13 +667,97 @@ public class CmdUITest
 	//Manual Tests
 	//----------------------------------------
 	
-	//password
+	/**
+	 * manual password
+	 */
+	public void text_3(String testFileName)
+	{
+		//setup
+		File inputFolder = setup(testFileName);
+		
+		//embed
+		String[] embed = new String[]{"--embed",
+						"-i", inputFolder.getPath(),
+						"-a", "text_default",
+						"-o", outputFolder.getPath(),
+						"-p"};
+		Imagine.run(embed);
+		
+		//extract
+		String[] extract = new String[]{"--extract",
+						"-i", outputFolder.getPath(),
+						"-a", "text_default", 
+						"-o", extractionFolder.getPath(),
+						"-p"};
+		Imagine.run(extract);
+		
+		//compare
+		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+	}
 	
-	//image folder
+	//@Test
+	public void text_3_bt() { text_3(BIG_TREE); }
+
+	/**
+	 * manual image folder (50)
+	 */
+	public void image_overlay_8(String testFileName)
+	{
+		//setup
+		File inputFolder = setup(testFileName);
+		
+		//embed
+		String[] embed = new String[]{"--embed",
+						"-i", inputFolder.getPath(),
+						"-a", "image_overlay_heavy",
+						"-o", outputFolder.getPath(),
+						"-k", keyFile.getPath()};
+		Imagine.run(embed);
+		
+		//extract
+		String[] extract = new String[]{"--extract",
+						"-i", outputFolder.getPath(),
+						"-a", "image_overlay_heavy", 
+						"-o", extractionFolder.getPath(),
+						"-k", keyFile.getPath()};
+		Imagine.run(extract);
+		
+		//compare
+		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+	}
 	
-	//manual open
+	//@Test
+	public void image_overlay_8_bt() { image_overlay_8(BIG_TREE); }
 	
-	//wrong password
+	/**
+	 * manual open
+	 */
+	public void image_6(String testFileName)
+	{
+		//setup
+		File inputFolder = setup(testFileName);
+		
+		//embed
+		String[] embed = new String[]{"--embed",
+						"-i", inputFolder.getPath(),
+						"-a", "image_default",
+						"-o", outputFolder.getPath()};
+		Imagine.run(embed);
+		
+		//open
+		String[] open = new String[]{"--open",
+						"-i", outputFolder.listFiles()[0].getPath(),
+						"-a", "image_default", 
+						"-o", extractionFolder.getPath()};
+		Imagine.run(open);
+	}
+
+	@Test
+	public void image_6_bt() { image_6(BIG_TREE); }
+	
+	//----------------------------------------
+	//Support Functions (end test cases)
+	//----------------------------------------
 	
 	private static File setup(String treeName)
 	{
@@ -699,8 +809,6 @@ public class CmdUITest
 		}
 		
 		SystemManager.reset();
-		
-		shutdownCalled = true;
 	}
 	private static void reset(String treeName)
 	{

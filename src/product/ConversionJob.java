@@ -9,12 +9,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
 import config.Settings;
-import logging.LogLevel;
-import logging.Logger;
 import data.IndexWorker;
 import data.Metadata;
 import data.ProductWorker;
 import key.Key;
+import logging.LogLevel;
+import logging.Logger;
 
 public class ConversionJob implements Runnable
 {

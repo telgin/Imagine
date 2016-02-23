@@ -2,7 +2,6 @@ package util.algorithms;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import util.ByteConversion;

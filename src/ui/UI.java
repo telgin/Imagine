@@ -3,7 +3,6 @@ package ui;
 import java.io.File;
 
 import algorithms.Parameter;
-import system.SystemManager;
 
 public abstract class UI
 {

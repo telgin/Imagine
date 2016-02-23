@@ -14,7 +14,6 @@ import java.util.Set;
 import logging.LogLevel;
 import logging.Logger;
 import ui.UIContext;
-import util.ByteConversion;
 import util.FileSystemUtil;
 
 /**
@@ -23,14 +22,12 @@ import util.FileSystemUtil;
  */
 public class ExtractionManager
 {
-	private Map<String, File> extractedFiles;
 	private Map<String, File> cachedFileNames;
 	private Set<File> exploredFiles;
 	private File enclosingFolder;
 	
 	public ExtractionManager()
 	{
-		extractedFiles = new HashMap<String, File>();
 		cachedFileNames = new HashMap<String, File>();
 		exploredFiles = new HashSet<File>();
 	}
@@ -39,17 +36,6 @@ public class ExtractionManager
 	{
 		enclosingFolder = folder;
 	}
-	
-	//TODO remove extractedFiles if it's never needed
-//	public void addExtractedFile(byte[] hash, File finalLocation)
-//	{
-//		extractedFiles.put(ByteConversion.bytesToHex(hash), finalLocation);
-//	}
-	
-//	public File getPreviouslyExtractedFile(byte[] hash)
-//	{
-//		return extractedFiles.get(ByteConversion.bytesToHex(hash));
-//	}
 	
 	public void setExplored(File productFile)
 	{
@@ -169,7 +155,6 @@ public class ExtractionManager
 			Files.move(assembled.toPath(), created.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			Logger.log(LogLevel.k_info, "Assembled file moved to: "
 							+ created.getAbsolutePath());
-			//addExtractedFile(fileContents.getMetadata().getFileHash(), created);
 		}
 		catch (IOException e)
 		{
@@ -199,9 +184,6 @@ public class ExtractionManager
 			Files.copy(source.toPath(), created.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			Logger.log(LogLevel.k_info, "Assembled file moved to: "
 							+ created.getAbsolutePath());
-			
-			//update cache that this file was already extracted
-			//addExtractedFile(fileContents.getMetadata().getFileHash(), created);
 			
 			//set permissions of file
 			FileSystemUtil.setNumericFilePermissions(created, fileContents.getMetadata().getPermissions());

@@ -14,7 +14,6 @@ public class StringProperty extends ConfigurationProperty
 {
 	private String name;
 	private TextField field;
-	private Consumer<String> callback;
 	
 	public StringProperty(String name)
 	{

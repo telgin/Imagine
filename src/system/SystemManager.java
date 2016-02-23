@@ -68,25 +68,4 @@ public class SystemManager
 		
 		return true;
 	}
-	
-	private static class Exiter implements Runnable
-	{
-		/* (non-Javadoc)
-		 * @see java.lang.Runnable#run()
-		 */
-		@Override
-		public void run()
-		{
-			while (!SystemManager.isShutdown())
-			{
-				try
-				{
-					Thread.sleep(100);
-				}
-				catch (InterruptedException e){}
-			}
-			
-			System.exit(0);
-		}
-	}
 }

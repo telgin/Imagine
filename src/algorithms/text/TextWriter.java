@@ -3,10 +3,8 @@ package algorithms.text;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 
 import algorithms.Algorithm;
-import config.Constants;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;

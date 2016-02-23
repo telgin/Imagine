@@ -12,13 +12,13 @@ import java.util.Queue;
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
 import config.Constants;
+import data.FileType;
+import data.Metadata;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import util.ByteConversion;
 import util.FileSystemUtil;
-import data.FileType;
-import data.Metadata;
-import key.Key;
 
 public class ProductExtractor {
 	
@@ -418,7 +418,7 @@ public class ProductExtractor {
 						{
 							extractAllFromProduct(sub, extractionFolder);
 						}
-						catch (IOException e)
+						catch (Exception e)
 						{
 							Logger.log(LogLevel.k_error, "Failed to extract all files from " + sub.getAbsolutePath());
 							Logger.log(LogLevel.k_debug, e, false);

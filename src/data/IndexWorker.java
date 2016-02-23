@@ -1,15 +1,11 @@
 package data;
 
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import logging.LogLevel;
 import logging.Logger;
-import util.ByteConversion;
 import util.FileSystemUtil;
 
 public class IndexWorker implements Runnable

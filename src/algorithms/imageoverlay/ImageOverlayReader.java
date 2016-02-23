@@ -2,6 +2,7 @@ package algorithms.imageoverlay;
 
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
 import algorithms.Algorithm;

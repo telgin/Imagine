@@ -5,15 +5,12 @@ import java.io.IOException;
 import java.util.List;
 
 import algorithms.Algorithm;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.ConversionJob;
 import product.ProductContents;
 import product.ProductExtractor;
-import config.Configuration;
-import config.Constants;
-import key.Key;
-import key.StaticKey;
 
 public abstract class ConversionAPI
 {

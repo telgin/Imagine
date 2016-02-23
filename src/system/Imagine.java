@@ -1,17 +1,17 @@
 package system;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import logging.LogLevel;
+import logging.Logger;
 import ui.ArgParseResult;
 import ui.UIContext;
 import ui.cmd.CmdUI;
 import ui.graphical.GUI;
 import util.myUtilities;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import logging.LogLevel;
-import logging.Logger;
 
 public class Imagine
 {
@@ -95,6 +95,8 @@ public class Imagine
 			result.action = CmdAction.k_extract;
 		else if (args.contains("--install"))
 			result.action = CmdAction.k_install;
+		else
+			result.action = CmdAction.k_unspecified;
 		
 		try
 		{
@@ -131,7 +133,7 @@ public class Imagine
 				result.keyFile = new File(args.get(args.indexOf("-k")+1));
 
 			//use password
-			result.usePassword = args.contains("-p");
+			result.usingPassword = args.contains("-p");
 			
 			//result file
 			if (args.contains("-r"))

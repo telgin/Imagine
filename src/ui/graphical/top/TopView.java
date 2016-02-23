@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import algorithms.Parameter;
-import api.ConfigurationAPI;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import system.Imagine;
 import ui.ArgParseResult;
 import ui.graphical.View;
 import ui.graphical.algorithmeditor.AlgorithmEditorView;

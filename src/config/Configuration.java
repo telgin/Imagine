@@ -1,21 +1,16 @@
 package config;
 
-import util.ConfigUtil;
-
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import logging.Logger;
-import logging.LogLevel;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import algorithms.Algorithm;
-import key.FileKey;
-import key.Key;
-import key.PasswordKey;
-import key.StaticKey;
+import logging.LogLevel;
+import logging.Logger;
+import util.ConfigUtil;
 
 public class Configuration {
 	private static Document doc;
@@ -169,14 +164,5 @@ public class Configuration {
 						ConfigUtil.children(root, "AlgorithmPresets"));
 		Element toRemove = getAlgorithmPresetElement(presetName);
 		algoPresetsNode.removeChild(toRemove);
-	}
-	
-	private static Element mkPathNode(String name, String value)
-	{
-		Element element = doc.createElement("Path");
-		if (name != null)
-			element.setAttribute("name", name);
-		element.setAttribute("value", value);
-		return element;
 	}
 }

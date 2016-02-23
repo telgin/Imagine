@@ -23,5 +23,4 @@ public class ArgParseResult
 	public boolean usingPassword = false;
 	public boolean guiMode = false;
 	public CmdAction action = null;
-	public boolean usePassword = false;
 }

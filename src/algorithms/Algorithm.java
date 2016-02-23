@@ -104,7 +104,7 @@ public class Algorithm
 		Parameter param = parameters.get(name.toLowerCase());
 		if (param == null)
 			throw new UsageException("No such parameter '" + name + "' in algorithm '"
-							+ this.name + "'");
+				+ this.name + "'");
 		else if (!param.setValue(value))
 			throw new UsageException("Could not set parameter'" + name + "' to value '" + value + "'");
 	}
@@ -119,7 +119,7 @@ public class Algorithm
 		Parameter param = parameters.get(name.toLowerCase());
 		if (param == null)
 			Logger.log(LogLevel.k_error, "No such parameter '" + name + "' in algorithm '"
-							+ this.name + "'");
+				+ this.name + "'");
 		else
 			param.setEnabled(enabled);
 	}
@@ -171,8 +171,8 @@ public class Algorithm
 		Parameter param = parameters.get(name.toLowerCase());
 		if (param == null)
 		{
-			Logger.log(LogLevel.k_error, "No such parameter '" + name + "' in algorithm '"
-							+ this.name + "'");
+			Logger.log(LogLevel.k_error, "No such parameter '" + name + "' in algorithm '" 
+				+ this.name + "'");
 			return null;
 		}
 

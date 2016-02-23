@@ -5,14 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeCell;
-import javafx.scene.control.TreeItem;
 import product.ConversionJobFileState;
-import util.FileSystemUtil;
-import javafx.beans.value.ObservableValue;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)

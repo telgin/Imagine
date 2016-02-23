@@ -4,11 +4,11 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
 import algorithms.Algorithm;
 import algorithms.Option;
-import algorithms.Parameter;
 import api.UsageException;
 import config.Settings;
 import key.Key;

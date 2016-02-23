@@ -6,11 +6,11 @@ import java.io.IOException;
 
 import config.Constants;
 import config.Settings;
+import data.FileType;
+import data.Metadata;
 import logging.LogLevel;
 import logging.Logger;
 import report.Report;
-import data.FileType;
-import data.Metadata;
 import util.ByteConversion;
 import util.Clock;
 import util.FileSystemUtil;
@@ -223,26 +223,6 @@ public class ProductLoader
 
 		// update progress
 		JobStatus.incrementInputFilesProcessed(1);
-	}
-
-	//TODO maybe use this function to increase reader speed
-	private void writeFileHeaderSize(int fileHeaderSize) throws ProductIOException
-	{
-		if (!writeFull(ByteConversion.intToBytes(fileHeaderSize)))
-		{
-			// there wasn't enough space, reset
-			currentProduct.saveFile(fileOutputManager.getOutputFolder(), getSaveName());
-			resetToNextProduct();
-
-			// try again
-			if (!writeFull(ByteConversion.intToBytes(fileHeaderSize)))
-			{
-				// a second failure after reset means that the product size is
-				// too small
-				throw new ProductIOException(
-								"Cannot write file header, product size is too small.");
-			}
-		}
 	}
 
 	private boolean writeFileHeader(Metadata fileMetadata, long fragmentNumber,

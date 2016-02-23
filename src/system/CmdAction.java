@@ -11,5 +11,6 @@ public enum CmdAction
 	k_extract,
 	k_editor,
 	k_help,
-	k_install;
+	k_install,
+	k_unspecified;
 }

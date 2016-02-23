@@ -5,7 +5,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import testing.highlevel.CmdUITest;
-import util.test.ByteConversionTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({

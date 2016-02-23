@@ -1,8 +1,5 @@
 package product;
 
-import java.io.File;
-
-import config.Constants;
 import data.Metadata;
 
 public class FileContents

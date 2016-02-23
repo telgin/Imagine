@@ -3,8 +3,11 @@ package algorithms.image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
+import algorithms.Algorithm;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.JobStatus;
@@ -12,8 +15,6 @@ import product.ProductIOException;
 import product.ProductWriter;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
-import algorithms.Algorithm;
-import key.Key;
 
 public class ImageWriter extends Image implements ProductWriter
 {

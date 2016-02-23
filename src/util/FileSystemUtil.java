@@ -1,8 +1,5 @@
 package util;
 
-import logging.LogLevel;
-import logging.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -24,13 +21,14 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
 
 import data.FileType;
 import data.Metadata;
+import logging.LogLevel;
+import logging.Logger;
 
 public class FileSystemUtil
 {

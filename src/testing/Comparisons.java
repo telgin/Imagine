@@ -18,7 +18,6 @@ import data.Metadata;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
-import util.ByteConversion;
 import util.FileSystemUtil;
 import util.Hashing;
 

@@ -7,24 +7,16 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Random;
 import java.util.Set;
-import java.util.Timer;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.css.CssMetaData;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -39,7 +31,6 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
-import javafx.scene.control.cell.ProgressBarTreeTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -48,8 +39,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import logging.LogLevel;
 import logging.Logger;
-import product.FileContents;
-import product.JobStatus;
 import system.CmdAction;
 import ui.ArgParseResult;
 import ui.graphical.BooleanProperty;
@@ -147,7 +136,7 @@ public class EmbedView extends View
 				toggleKeySection();
 			}
 			
-			if (args.usePassword)
+			if (args.usingPassword)
 			{
 				togglePasswordSection();
 			}
@@ -182,23 +171,6 @@ public class EmbedView extends View
 		filesCreatedLabel = new Label("");
 		setFilesCreated(0);
 		hbox.getChildren().add(filesCreatedLabel);
-		
-		
-		return hbox;
-	}
-
-	/**
-	 * @update_comment
-	 * @return
-	 */
-	private Node setupFileSection()
-	{
-		HBox hbox = new HBox();
-		hbox.setSpacing(3);
-		hbox.setPadding(new Insets(10,10,10,10));
-		
-		hbox.getChildren().add(setupInputFileSection());
-		hbox.getChildren().add(setupTargetFileSection());
 		
 		
 		return hbox;

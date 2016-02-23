@@ -1,13 +1,14 @@
 package algorithms.image;
 
 import java.awt.image.BufferedImage;
+
+import algorithms.Algorithm;
+import config.Constants;
+import key.Key;
 import product.Product;
 import util.ByteConversion;
 import util.algorithms.HashRandom;
 import util.algorithms.UniqueRandomRange;
-import algorithms.Algorithm;
-import config.Constants;
-import key.Key;
 
 public class Image implements Product
 {

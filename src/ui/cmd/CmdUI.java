@@ -3,8 +3,7 @@ package ui.cmd;
 import java.io.Console;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
 import algorithms.Algorithm;
 import algorithms.Parameter;
 import api.ConfigurationAPI;
@@ -24,12 +23,10 @@ import product.FileContents;
 import product.JobStatus;
 import product.ProductContents;
 import report.Report;
-import system.CmdAction;
 import system.Imagine;
 import system.SystemManager;
 import ui.ArgParseResult;
 import ui.UI;
-import util.myUtilities;
 
 public class CmdUI extends UI
 {
@@ -56,7 +53,7 @@ public class CmdUI extends UI
 		{
 			Logger.log(LogLevel.k_fatal, "Input files must be specified.");
 		}
-		else if (args.keyFile != null && args.usePassword)
+		else if (args.keyFile != null && args.usingPassword)
 		{
 			Logger.log(LogLevel.k_fatal, "You cannot use both a key file (-k) and a password (-p).");
 		}
@@ -168,22 +165,35 @@ public class CmdUI extends UI
 			
 			for (FileContents fileContents : productContents.getFileContents())
 			{
-				String ref =    "(reference) ";
-				String folder = "(folder)    ";
-				String file =   "(file)      ";
+				String folder =      "(folder)        ";
+				String file =        "(file)          ";
 				String path = fileContents.getMetadata().getFile().getPath();
 				
-				if (fileContents.getMetadata().getType().equals(FileType.k_file))
+				if (fileContents.getFragmentNumber() > 1)
+				{
+					String fragment = "(fragment " + fileContents.getFragmentNumber() + ")";
+					while (fragment.length() < folder.length())
+						fragment += " "; //not efficient, but this is rare
+					contentsMenu.addOption(fragment + path);
+				}
+				else if (fileContents.getMetadata().getType().equals(FileType.k_file))
 					contentsMenu.addOption(file + path);
-				else if (fileContents.getMetadata().getType().equals(FileType.k_folder))
-					contentsMenu.addOption(folder + path);
 				else
-					contentsMenu.addOption(ref + path);
+					contentsMenu.addOption(folder + path);
 			}
 			
 			contentsMenu.display();
 			
 			int choice = contentsMenu.getChosenIndex();
+			
+			if (choice == 0 && productContents.getFileContents().get(0).getFragmentNumber() > 1)
+			{
+				Logger.log(LogLevel.k_warning, "This fragment is not the first fragment. Only the first fragment may start an extraction chain.");
+				Logger.log(LogLevel.k_warning, "If you extract this fragment, your result will only contain a portion of the original data.");
+				p("Select the fragment again to continue, otherwise you may choose something else.");
+				contentsMenu.inputChoice();
+				choice = contentsMenu.getChosenIndex();
+			}
 			
 			//use local dir if no output folder set
 			if (result.outputFolder == null)
@@ -212,7 +222,7 @@ public class CmdUI extends UI
 	private Key getKey(ArgParseResult result)
 	{
 		Key key = null;
-		
+
 		if (result.keyFile != null)
 		{
 			key = new FileKey(result.keyFile);
@@ -238,7 +248,7 @@ public class CmdUI extends UI
 		{
 			Algorithm algo = getAlgorithm(result);
 			Key key = getKey(result);
-			
+
 			//must have input files
 			if (result.inputFiles.size() == 0)
 				throw new UsageException("No input files could be found.");

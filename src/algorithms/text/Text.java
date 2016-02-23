@@ -1,14 +1,14 @@
 package algorithms.text;
 
 import algorithms.Algorithm;
+import config.Constants;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.Product;
 import util.ByteConversion;
 import util.algorithms.HashRandom;
 import util.algorithms.UniqueRandomRange;
-import config.Constants;
-import key.Key;
 
 public abstract class Text implements Product
 {

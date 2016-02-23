@@ -5,11 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import algorithms.Parameter;
-import api.ConfigurationAPI;
-import system.Imagine;
 import ui.ArgParseResult;
 import ui.UI;
-import ui.graphical.archiveviewer.OpenArchiveView;
 import ui.graphical.top.TopView;
 
 public class GUI extends UI

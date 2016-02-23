@@ -5,15 +5,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import config.Constants;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -34,14 +31,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import product.FileContents;
 import system.CmdAction;
 import ui.ArgParseResult;
 import ui.graphical.FileProperty;
-import ui.graphical.ScrollAlert;
 import ui.graphical.View;
 
 /**
@@ -116,7 +110,7 @@ public class OpenArchiveView extends View
 				toggleKeySection();
 			}
 			
-			if (args.usePassword)
+			if (args.usingPassword)
 			{
 				togglePasswordSection();
 			}

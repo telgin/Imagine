@@ -5,14 +5,14 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import algorithms.Algorithm;
+import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductIOException;
 import product.ProductReader;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
-import algorithms.Algorithm;
-import key.Key;
 
 public class ImageReader extends Image implements ProductReader
 {

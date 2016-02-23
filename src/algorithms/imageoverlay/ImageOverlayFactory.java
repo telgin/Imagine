@@ -1,8 +1,6 @@
 package algorithms.imageoverlay;
 
 import algorithms.Algorithm;
-import algorithms.imageoverlay.ImageOverlayReader;
-import algorithms.imageoverlay.ImageOverlayWriter;
 import key.Key;
 import product.ProductReaderFactory;
 import product.ProductWriterFactory;

@@ -2,7 +2,6 @@ package ui.cmd;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import logging.LogLevel;
 import logging.Logger;
@@ -64,6 +63,11 @@ public class Menu
 		if (subtext != null)
 			System.out.println("\n" + subtext);
 		
+		inputChoice();
+	}	
+	
+	public void inputChoice()
+	{
 		int choice = 0;
 		while (choice == 0)
 		{
@@ -95,6 +99,7 @@ public class Menu
 		
 		canceled = false;
 	}
+	
 	
 	protected void cancel()
 	{
