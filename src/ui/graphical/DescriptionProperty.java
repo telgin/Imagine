@@ -16,7 +16,7 @@ public class DescriptionProperty extends ConfigurationProperty
 	
 	public DescriptionProperty(String name)
 	{
-		this.name = name;
+		this.setName(name);
 		setLabel(new Label(name));
 	}
 	
@@ -62,11 +62,8 @@ public class DescriptionProperty extends ConfigurationProperty
 	@Override
 	public void setEnabled(boolean enabled)
 	{
-		System.out.println(name + " enabled: " + enabled);
-		
 		getLabel().disableProperty().set(!enabled);
 		area.disableProperty().set(!enabled);
-		
 		
 		if (!enabled)
 		{
@@ -94,5 +91,21 @@ public class DescriptionProperty extends ConfigurationProperty
 	{
 		getLabel().setPadding(new Insets(insets.getTop(), insets.getRight(), 0, insets.getLeft()));
 		area.setPadding(new Insets(0, insets.getRight(), insets.getBottom(), insets.getLeft()));
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 }

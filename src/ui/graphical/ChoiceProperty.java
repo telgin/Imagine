@@ -23,7 +23,7 @@ public class ChoiceProperty extends ConfigurationProperty
 	
 	public ChoiceProperty(String name, List<String> choices, Consumer<Integer> callback)
 	{
-		this.name = name;
+		this.setName(name);
 		this.choices = choices;
 		this.callback = callback;
 		setLabel(new Label(name));
@@ -80,11 +80,8 @@ public class ChoiceProperty extends ConfigurationProperty
 	@Override
 	public void setEnabled(boolean enabled)
 	{
-		System.out.println(name + " enabled: " + enabled);
-		
 		getLabel().disableProperty().set(!enabled);
 		choiceBox.disableProperty().set(!enabled);
-		
 		
 		if (!enabled)
 		{
@@ -108,6 +105,22 @@ public class ChoiceProperty extends ConfigurationProperty
 			choiceBox.setStyle("-fx-highlight-fill: red");
 		else
 			choiceBox.setStyle("-fx-highlight-fill: white");
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 }

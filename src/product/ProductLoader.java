@@ -48,11 +48,9 @@ public class ProductLoader
 	{
 		Logger.log(LogLevel.k_debug, "Product loader shutting down.");
 
-		// fileWritten indicates a file is written, but there is as least some
-		// space left
+		// fileWritten indicates a file is written, but there is as least some space left
 		// if there is more space than the size of the end code, the end code is
-		// written to indicate no more reading should be done (there is no next
-		// file)
+		// written to indicate no more reading should be done (there is no next file)
 		if (fileWritten)
 		{
 			// if there's not enough space for the end code, the reader logic
@@ -91,12 +89,6 @@ public class ProductLoader
 
 		if (!writeFull(currentUUID))
 			throw new ProductIOException("Cannot write product uuid.");
-
-		//System.out.println("Was " + ByteConversion.bytesToLong(streamUUID));
-		//System.out.println("Was " + (sequenceNumber - 1));
-		//System.out.println("Wrote " + ByteConversion.getStreamUUID(currentUUID));
-		//System.out.println(
-		//				"Wrote " + ByteConversion.getProductSequenceNumber(currentUUID));
 
 		// set the uuid in case it is used internally by the product
 		currentProduct.setUUID(currentUUID);
@@ -228,7 +220,6 @@ public class ProductLoader
 	private boolean writeFileHeader(Metadata fileMetadata, long fragmentNumber,
 					long fileLengthRemaining)
 	{
-		//System.out.println("Fragment number: " + fragmentNumber);
 		// fragment number
 		if (!writeFull(ByteConversion.longToBytes(fragmentNumber)))
 			return false;
@@ -286,18 +277,11 @@ public class ProductLoader
 	{
 		do
 		{
-			//System.out.println("Bytes requested to be written: " + (dataLength));
 			int bytesWritten = currentProduct.write(buffer, dataOffset, dataLength);
-			//System.out.println("Buffer length: " + buffer.length);
-			//System.out.println("bytes written: " + bytesWritten);
-			//Logger.log(LogLevel.k_debug, "Writing " + dataLength + " bytes was requested and " + 
-			//				bytesWritten + " were written.");
 			
 			dataOffset += bytesWritten;
 			dataLength -= bytesWritten;
 			fileLengthRemaining -= bytesWritten;
-
-			//System.out.println("File length remaining: " + fileLengthRemaining);
 
 			if (dataOffset == buffer.length)
 			{

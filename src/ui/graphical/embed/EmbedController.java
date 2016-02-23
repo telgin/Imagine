@@ -380,8 +380,6 @@ public class EmbedController implements ActiveComponent
 	
 	public void cssUpdateLoop(int run)
 	{
-		//System.out.println("Looping..." + filesCreated);
-		
 		//update things if they're different
 		
 		//files created
@@ -430,8 +428,6 @@ public class EmbedController implements ActiveComponent
 		if (item != null)
 		{
 			FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
-			//System.err.println(fileStatus.getStatus() + "\t" + item.getFile().getName());
-
 			item.setStatus(fileStatus.getState());
 			item.setProgress(fileStatus.getProgress());
 		}
@@ -442,8 +438,6 @@ public class EmbedController implements ActiveComponent
 		if (item != null)
 		{
 			FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
-			//System.err.println(fileStatus.getStatus() + "\t" + item.getFile().getName());
-
 			item.setStatus(fileStatus.getState());
 		}
 	}

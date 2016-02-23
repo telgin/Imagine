@@ -17,7 +17,7 @@ public class StringProperty extends ConfigurationProperty
 	
 	public StringProperty(String name)
 	{
-		this.name = name;
+		this.setName(name);
 		setLabel(new Label(name));
 	}
 	
@@ -66,11 +66,8 @@ public class StringProperty extends ConfigurationProperty
 	@Override
 	public void setEnabled(boolean enabled)
 	{
-		System.out.println(name + " enabled: " + enabled);
-		
 		getLabel().disableProperty().set(!enabled);
 		field.disableProperty().set(!enabled);
-		
 		
 		if (!enabled)
 		{
@@ -101,5 +98,21 @@ public class StringProperty extends ConfigurationProperty
 		{
 			field.setStyle("");
 		}
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 }

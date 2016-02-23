@@ -22,7 +22,7 @@ public class BooleanProperty extends ConfigurationProperty
 	
 	public BooleanProperty(String name, Consumer<Boolean> callback)
 	{
-		this.name = name;
+		this.setName(name);
 		this.callback = callback;
 		setLabel(new Label(name));
 	}
@@ -66,11 +66,8 @@ public class BooleanProperty extends ConfigurationProperty
 	@Override
 	public void setEnabled(boolean enabled)
 	{
-		System.out.println(name + " enabled: " + enabled);
-		
 		getLabel().disableProperty().set(!enabled);
 		checkBox.disableProperty().set(!enabled);
-		
 		
 		if (!enabled)
 		{
@@ -112,6 +109,22 @@ public class BooleanProperty extends ConfigurationProperty
 	public void setPadding(Insets insets)
 	{
 		propertyRow.setPadding(insets);
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 }

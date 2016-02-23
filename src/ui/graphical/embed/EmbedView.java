@@ -515,8 +515,6 @@ public class EmbedView extends View
 
 	void setKeySectionEnabled(boolean enabled)
 	{
-		System.out.println("Key section enabled: " + enabled);
-		
 		noKeyToggle.disableProperty().set(!enabled);
 		keyFileToggle.disableProperty().set(!enabled);
 		passwordToggle.disableProperty().set(!enabled);
@@ -570,7 +568,6 @@ public class EmbedView extends View
 	private void keyTypeSelected(ObservableValue<? extends Toggle> value,
 					Toggle oldSelection, Toggle newSelection)
 	{
-		System.out.println("Key type selected: " + newSelection.getUserData());
 		if (newSelection.getUserData().equals(noKeyToggleString))
 		{
 			setPasswordSectionEnabled(false);
@@ -580,13 +577,11 @@ public class EmbedView extends View
 		{
 			setPasswordSectionEnabled(true);
 			setKeyFileSectionEnabled(false);
-			//clearKeyFileSection();
 		}
 		else //assumed file toggled
 		{
 			setPasswordSectionEnabled(false);
 			setKeyFileSectionEnabled(true);
-			//clearPasswordSection();
 		}
 	}
 	
@@ -604,8 +599,6 @@ public class EmbedView extends View
 	 */
 	private void setKeyFileSectionEnabled(boolean enabled)
 	{
-		System.out.println("Key file section enabled: " + enabled);
-		
 		keyFilePath.disableProperty().set(!enabled);
 		keyFileBrowseButton.disableProperty().set(!enabled);
 		keyFileLabel.disableProperty().set(!enabled);
@@ -631,8 +624,6 @@ public class EmbedView extends View
 	 */
 	private void setPasswordSectionEnabled(boolean enabled)
 	{
-		System.out.println("Password section enabled: " + enabled);
-		
 		passwordField.disableProperty().set(!enabled);
 		passwordLabel.disableProperty().set(!enabled);
 		

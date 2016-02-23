@@ -52,7 +52,6 @@ public class UniqueRandomRange
 
 			--index;
 
-			// System.out.println(temp);
 			return temp;
 		}
 		catch (ArrayIndexOutOfBoundsException e)

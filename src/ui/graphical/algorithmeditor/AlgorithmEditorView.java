@@ -443,8 +443,7 @@ public class AlgorithmEditorView extends View
 		{
 			BooleanProperty prop = new BooleanProperty("Define at run time?", b -> controller.promptOptionSelected(b));
 			prop.setup(optionSection);
-			
-			System.out.println("The value: " + parameter.getValue());
+
 			if (parameter.getValue() != null)
 				prop.setChecked(parameter.getValue().equals(Option.PROMPT_OPTION.getValue()));
 		}

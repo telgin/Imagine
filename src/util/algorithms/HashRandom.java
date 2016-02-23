@@ -78,24 +78,8 @@ public class HashRandom
 		if (index >= STOP - 3)
 			refresh();
 
-		// int next = ((curHash[index] << 24) | (curHash[index+1] << 16) |
-		// (curHash[index+2] << 8) | (curHash[index+3]));
-		// int next2 = ( ((val >> 24) & 0xff) | ((val >> 8) & 0xff00) | ((val <<
-		// 8) & 0xff0000) | ((val << 24) & 0xff000000) );
-		// int next3 = (curHash[index] << 24 | (curHash[index+1] & 0xFF) << 16 |
-		// (curHash[index+2] & 0xFF) << 8 | (curHash[index+3] & 0xFF));
-		// int next = ((~curHash[index] & 0xff) << 24) | ((~curHash[index+1] &
-		// 0xff) << 16) | ((~curHash[index+2] & 0xff) << 8) | (~curHash[index+3]
-		// & 0xff);
-		// byte[] test = new
-		// byte[]{curHash[index],curHash[index+1],curHash[index+2],curHash[index+3]};
-		// Byte
-		// next = ByteConversion.bytesToInt(test);
-
 		index += 4;
-		// System.out.println(next);
-		// System.out.println(Math.abs(next % to));
-		// return Math.abs(Integer.reverseBytes(next3) % to);
+
 		return Math.abs((curHash[index] << 24 | (curHash[index + 1] & 0xFF) << 16
 						| (curHash[index + 2] & 0xFF) << 8 | (curHash[index + 3] & 0xFF))
 						% to);
@@ -122,9 +106,9 @@ public class HashRandom
 		long dump = 0;
 		for (int i = 0; i < rotations; ++i)
 		{
-			dump += random.nextInt(averageImageSize); // this number is not
-														// important for
-														// profiling
+			// this number is not important for profiling
+			dump += random.nextInt(averageImageSize);
+			
 			dump += random.nextByte();
 		}
 
@@ -140,8 +124,9 @@ public class HashRandom
 	{
 		int averageImageSize = 6022800;
 		int maxApplicationSize = 8000000;
-		int images = 100000000 / averageImageSize; // the number of images close
-													// to iterative profiling
+		
+		// the number of images close to iterative profiling
+		int images = 100000000 / averageImageSize; 
 
 		CodeTimer ct = new CodeTimer();
 		ct.start();

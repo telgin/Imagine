@@ -1,6 +1,7 @@
 package product;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -162,16 +163,23 @@ public class ConversionJob implements Runnable
 	{
 		this.maxWaitingFiles = maxWaitingFiles;
 	}
-
-	public void printState()
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
 	{
-		String text = "State:\n";
-		text += "shuttingdown=" + shuttingDown + "\n";
-		text += "active=" + active + "\n";
-		text += "finished=" + finished + "\n";
-		text += "queue.size()=" + queue.size() + "\n";
-		text += "indexWorker.isActive()=" + indexWorker.isActive() + "\n";
-		text += "productWorkersActive()=" + !productWorkersInactive();
-		System.out.println(text);
+		return "ConversionJob [shuttingDown=" + shuttingDown + ", active=" + active
+			+ ", finished=" + finished + ", maxWaitingFiles="
+			+ maxWaitingFiles + ", queue=" + queue + ", indexWorker="
+			+ indexWorker + ", productWorkers=" + productWorkers
+			+ ", workerThreads=" + Arrays.toString(workerThreads)
+			+ ", productWorkerCount=" + productWorkerCount + ", inputFiles="
+			+ inputFiles + ", manager=" + manager + ", factory=" + factory
+			+ "queue.size()=" + queue.size()
+			+ "indexWorker.isActive()=" + indexWorker.isActive()
+			+ "productWorkersActive()=" + !productWorkersInactive()
+			+ "]";
 	}
 }

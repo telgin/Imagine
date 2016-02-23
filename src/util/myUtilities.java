@@ -201,8 +201,6 @@ public abstract class myUtilities
 
 			oObject.close();
 			fStream.close();
-
-			System.out.println("File Loaded: " + inFile.getPath());
 		}
 		catch (IOException e)
 		{
@@ -233,7 +231,6 @@ public abstract class myUtilities
 
 			oObject.close();
 			fStream.close();
-			System.out.println("File Saved: " + outFile.getPath());
 			return true;
 		}
 		catch (IOException e)

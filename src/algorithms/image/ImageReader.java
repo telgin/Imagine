@@ -16,7 +16,6 @@ import util.algorithms.ImageUtil;
 
 public class ImageReader extends Image implements ProductReader
 {
-
 	public ImageReader(Algorithm algo, Key key)
 	{
 		super(algo, key);
@@ -24,16 +23,13 @@ public class ImageReader extends Image implements ProductReader
 
 	private byte read() throws ProductIOException
 	{
-		// Logger.log(LogLevel.k_debug, "Reading " + 1 + " byte.");
 		byte secured = getImageByte(randOrder.next());
-		// System.out.print(ByteConversion.bytesToHex(new byte[]{secured}));
 		return ByteConversion.intToByte(secured ^ random.nextByte());
 	}
 
 	@Override
 	public int read(byte[] bytes, int offset, int length)
 	{
-		// Logger.log(LogLevel.k_debug, "Reading " + bytes.length + " bytes.");
 		for (int x = offset; x < offset + length; ++x)
 		{
 			try
@@ -45,7 +41,6 @@ public class ImageReader extends Image implements ProductReader
 				return x;
 			}
 		}
-		//// System.out.println();
 
 		return offset + length;
 	}

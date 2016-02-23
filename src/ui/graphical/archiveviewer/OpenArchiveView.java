@@ -328,8 +328,6 @@ public class OpenArchiveView extends View
 
 	void setKeySectionEnabled(boolean enabled)
 	{
-		System.out.println("Key section enabled: " + enabled);
-		
 		noKeyToggle.disableProperty().set(!enabled);
 		keyFileToggle.disableProperty().set(!enabled);
 		passwordToggle.disableProperty().set(!enabled);
@@ -383,7 +381,6 @@ public class OpenArchiveView extends View
 	private void keyTypeSelected(ObservableValue<? extends Toggle> value,
 					Toggle oldSelection, Toggle newSelection)
 	{
-		System.out.println("Key type selected: " + newSelection.getUserData());
 		if (newSelection.getUserData().equals(noKeyToggleString))
 		{
 			setPasswordSectionEnabled(false);
@@ -436,8 +433,6 @@ public class OpenArchiveView extends View
 	 */
 	private void setKeyFileSectionEnabled(boolean enabled)
 	{
-		System.out.println("Key file section enabled: " + enabled);
-		
 		keyFilePath.disableProperty().set(!enabled);
 		keyFileBrowseButton.disableProperty().set(!enabled);
 		keyFileLabel.disableProperty().set(!enabled);
@@ -463,8 +458,6 @@ public class OpenArchiveView extends View
 	 */
 	private void setPasswordSectionEnabled(boolean enabled)
 	{
-		System.out.println("Password section enabled: " + enabled);
-		
 		passwordField.disableProperty().set(!enabled);
 		passwordLabel.disableProperty().set(!enabled);
 		
@@ -507,8 +500,6 @@ public class OpenArchiveView extends View
 	 */
 	public void setOpenButtonEnabled(boolean enabled)
 	{
-		System.out.println("Open button enabled: " + enabled);
-		
 		openButton.disableProperty().set(!enabled);
 
 		if (!enabled)
@@ -523,8 +514,6 @@ public class OpenArchiveView extends View
 	
 	public void setExtractionButtonsEnabled(boolean enabled)
 	{
-		System.out.println("Extraction buttons enabled: " + enabled);
-		
 		extractSelectedButton.disableProperty().set(!enabled);
 		extractAllButton.disableProperty().set(!enabled);
 

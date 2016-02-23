@@ -559,9 +559,6 @@ public class ProductExtractor {
 				contents.setStreamUUID(ByteConversion.getStreamUUID(product.getUUID()));
 				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(product.getUUID()));
 			}
-			
-			//System.out.println("Read stream uuid " + ByteConversion.getStreamUUID(product.getUUID()));
-			//System.out.println("Read product sequence number " + ByteConversion.getProductSequenceNumber(product.getUUID()));
 				
 			product.secureStream();
 
@@ -618,9 +615,6 @@ public class ProductExtractor {
 				contents.setFragmentNumber(curFragmentNumber);
 			}
 			
-			//Logger.log(LogLevel.k_debug, "read fragment number: " + curFragmentNumber + 
-			//				", " + (curFragmentNumber == Constants.END_CODE));
-			
 			//if end code, no more files
 			if (curFragmentNumber == Constants.END_CODE)
 			{
@@ -632,7 +626,6 @@ public class ProductExtractor {
 			if (!readFull(Constants.FILE_TYPE_SIZE))
 				return null;
 			int fileTypeNum = ByteConversion.byteToInt(buffer[0]);
-			//System.out.println("File type number: " + fileTypeNum);
 			FileType fileType = FileType.toFileType(fileTypeNum);
 			if (fileType == null)
 				throw new ProductIOException("Failed to read file type.");
@@ -646,9 +639,7 @@ public class ProductExtractor {
 				if (!readFull(Constants.FILE_NAME_LENGTH_SIZE))
 					return null;
 				short fileNameLength = ByteConversion.bytesToShort(buffer, 0);
-				
-				//System.out.println("Read file name length of " + fileNameLength);
-				
+
 				//file name
 				if (parseData)
 				{
@@ -714,9 +705,7 @@ public class ProductExtractor {
 				if (!readFull(Constants.FILE_NAME_LENGTH_SIZE))
 					return null;
 				short fileNameLength = ByteConversion.bytesToShort(buffer, 0);
-				
-				//System.out.println("Read file name length of " + fileNameLength);
-				
+
 				//file name
 				if (parseData)
 				{
@@ -730,13 +719,6 @@ public class ProductExtractor {
 						return null;
 				}
 			}
-				
-			//System.out.println("parse data? " + parseData);
-			//if (contents != null)
-			//	System.out.println(contents.toString());
-			
-			//if (contents != null)
-			//	System.out.println(contents.toString());
 			
 			return contents;
 

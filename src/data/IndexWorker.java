@@ -35,8 +35,7 @@ public class IndexWorker implements Runnable
 		active = true;
 
 		Logger.log(LogLevel.k_debug, "Index worker running, " + 
-						inputFiles.size() +
-						" initial files/folders");
+			inputFiles.size() + " initial files/folders");
 
 		// index all top level folders
 		for (File inputFile : inputFiles)
@@ -99,7 +98,7 @@ public class IndexWorker implements Runnable
 					
 				//new file, so add to queue
 				Logger.log(LogLevel.k_debug, "Queueing metadata for file: " + 
-								fileMetadata.getFile().getAbsolutePath());
+					fileMetadata.getFile().getAbsolutePath());
 				queue.add(fileMetadata);
 			}
 		}
@@ -107,8 +106,6 @@ public class IndexWorker implements Runnable
 
 	public boolean isActive()
 	{
-		// System.out.println("Returning active state: " + active + ", " +
-		// initialFolders.size() + " initialFolders left");
 		return active;
 	}
 }

@@ -38,11 +38,9 @@ public class ImageWriter extends Image implements ProductWriter
 	{
 		try
 		{
-			// Logger.log(LogLevel.k_debug, "Writing " + 1 + " byte.");
 			int index = randOrder.next();
 			byte toSet = ByteConversion.intToByte(b ^ random.nextByte());
 			setImageByte(index, toSet);
-			// System.out.print(ByteConversion.bytesToHex(new byte[]{toSet}));
 			return true;
 		}
 		catch (ProductIOException e)
@@ -54,13 +52,11 @@ public class ImageWriter extends Image implements ProductWriter
 	@Override
 	public int write(byte[] bytes, int offset, int length)
 	{
-		// Logger.log(LogLevel.k_debug, "Writing " + bytes.length + " bytes.");
 		for (int x = offset; x < offset + length; ++x)
 		{
 			if (!write(bytes[x]))
 				return x - offset;
 		}
-		//// System.out.println();
 
 		return length;
 	}

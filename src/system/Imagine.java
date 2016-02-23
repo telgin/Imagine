@@ -174,7 +174,7 @@ public class Imagine
 	public static void usage(String message)
 	{
 		if (message != null)
-			System.err.println(message);
+			System.err.println(message); //TODO update
 		
 		System.err.println("Usage:");
 		System.err.println("(See 'imagine --help' for more details.)");

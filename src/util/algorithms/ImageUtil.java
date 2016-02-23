@@ -90,7 +90,6 @@ public class ImageUtil
 		
 		for (int s=1; s<31; ++s)
 		{
-			//System.out.println(s);
 			for (int x=0; x<256; ++x)
 			{
 				int x0 = s*x;

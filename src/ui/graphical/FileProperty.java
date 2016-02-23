@@ -21,7 +21,7 @@ public class FileProperty extends ConfigurationProperty
 	
 	public FileProperty(String name, Consumer<Void> callback)
 	{
-		this.name = name;
+		this.setName(name);
 		this.callback = callback;
 		setLabel(new Label(name));
 	}
@@ -63,8 +63,6 @@ public class FileProperty extends ConfigurationProperty
 	@Override
 	public void setEnabled(boolean enabled)
 	{
-		System.out.println(name + " enabled: " + enabled);
-		
 		path.disableProperty().set(!enabled);
 		browse.disableProperty().set(!enabled);
 		getLabel().disableProperty().set(!enabled);
@@ -100,6 +98,22 @@ public class FileProperty extends ConfigurationProperty
 		{
 			path.setStyle("");
 		}
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 }

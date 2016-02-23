@@ -6,8 +6,6 @@ import java.nio.file.Files;
 
 import algorithms.Algorithm;
 import key.Key;
-import logging.LogLevel;
-import logging.Logger;
 import product.ProductIOException;
 import product.ProductReader;
 import util.ByteConversion;
@@ -40,7 +38,6 @@ public class TextReader extends Text implements ProductReader{
 				return x;
 			}
 		}
-		////System.out.println();
 		
 		return offset + length;
 	}
@@ -78,9 +75,6 @@ public class TextReader extends Text implements ProductReader{
 			// couldn't skip as many as requested,
 			// nothing to do
 		}
-
-		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes was requested and "
-						+ skipped + " were skipped.");
 
 		return skipped;
 	}

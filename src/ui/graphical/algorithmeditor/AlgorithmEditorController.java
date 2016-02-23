@@ -322,12 +322,8 @@ public class AlgorithmEditorController
 	
 	public void optionSelected(String value)
 	{
-		System.out.println("Value coming in as: " + value);
 		boolean success = selectedParameter.setValue(value);
-		System.out.println("Success? " + success);
 		view.setOptionSelectionErrorState(!success);
-		
-		System.out.println("Value coming out as: " + selectedParameter.getValue());
 	}
 
 

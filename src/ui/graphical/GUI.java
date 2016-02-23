@@ -92,7 +92,7 @@ public class GUI extends UI
 	 * @see ui.UI#reportMessage(java.lang.String)
 	 */
 	@Override
-	public void reportMessage(String message)
+	public void reportMessage(String message) //TODO does this do anything?
 	{
 		//for the moment, there's nothing better to do
 		//some kinds of notifications are handled elsewhere through stats

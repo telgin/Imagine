@@ -151,12 +151,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	{
 		int width = (int) cell.getWidth();
 		int rightInset = width - (int) (width * this.progress);
-		//System.out.println("Progress: " + getProgress() + ", Right inset: " + rightInset + ", Status: " + status);
-		
-		//directories with contents are not added directly and should not show progress
-		//bars, just states
-		//boolean directlyAdded = !file.isDirectory() || FileSystemUtil.directoryEmpty(file);
-		
+
 		//create a progress bar out of the background color by setting the insets
 		//according to the progress of the item
 		String bar = "";
