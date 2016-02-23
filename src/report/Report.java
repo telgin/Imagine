@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import config.Constants;
 import data.Metadata;
 import logging.LogLevel;
 import logging.Logger;
@@ -18,11 +19,6 @@ public abstract class Report
 {
 	private static List<String> lines;
 	
-	static
-	{
-		reset();
-	}
-	
 	public static void reset()
 	{
 		lines = new LinkedList<String>();
@@ -34,10 +30,10 @@ public abstract class Report
 	 */
 	public static void saveConversionRecord(Metadata fileMetadata)
 	{
-		String fileName = fileMetadata.getFile().getName();
+		String filePath = fileMetadata.getFile().getPath();
 		String f1uuid = FileSystemUtil.getProductName(fileMetadata.getProductUUID());
 		String fragmentCount = Long.toString(fileMetadata.getFragmentCount());
-		lines.add(fileName + ", " + f1uuid + ", " + fragmentCount);
+		lines.add(filePath + Constants.FILE_DELIMITER + f1uuid + Constants.FILE_DELIMITER + fragmentCount);
 	}
 	
 	public static void writeReport(File reportFile)

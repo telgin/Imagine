@@ -3,8 +3,11 @@ package system;
 import java.util.LinkedList;
 import java.util.List;
 
+import config.Settings;
 import logging.LogLevel;
 import logging.Logger;
+import product.JobStatus;
+import report.Report;
 
 public class SystemManager
 {
@@ -20,6 +23,11 @@ public class SystemManager
 	{
 		//release pointers
 		components = new LinkedList<ActiveComponent>();
+		
+		//reset static components
+		Settings.reset();
+		JobStatus.reset();
+		Report.reset();
 	}
 
 	public static void registerActiveComponent(ActiveComponent component)

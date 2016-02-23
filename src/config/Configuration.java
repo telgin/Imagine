@@ -49,6 +49,7 @@ public class Configuration {
 	public static void saveConfig()
 	{
 		ConfigUtil.saveConfig(doc, Constants.CONFIG_FILE);
+		Logger.log(LogLevel.k_info, "Configuration saved to file: " + Constants.CONFIG_FILE.getAbsolutePath());
 	}
 	
 	public static void deleteTrackingGroup(String groupName)

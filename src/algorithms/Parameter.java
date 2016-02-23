@@ -114,13 +114,10 @@ public class Parameter
 
 	public boolean setValue(String value)
 	{
-		System.out.println("----"  + value);
 		boolean success = validate(value);
-		System.out.println("----"  + value);
+		
 		if (success)
 			this.value = value;
-		
-		System.out.println(success + "----"  + this.value + "----" + value);
 		
 		return success;
 	}

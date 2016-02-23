@@ -26,6 +26,7 @@ import product.ProductContents;
 import report.Report;
 import system.CmdAction;
 import system.Imagine;
+import system.SystemManager;
 import ui.ArgParseResult;
 import ui.UI;
 import util.myUtilities;
@@ -47,93 +48,117 @@ public class CmdUI extends UI
 	@Override
 	public void init()
 	{
-		switch (args.action)
+		if (args.presetName == null)
 		{
-			case k_open:
-				openArchive(args);
-				break;
-				
-			case k_embed:
-				embed(args);
-				break;
-				
-			case k_extract:
-				extract(args);
-				break;
-				
-			case k_install:
-				ConfigurationAPI.install();
-				break;
-				
-			case k_help:
-				helpSection();
-				break;
-		
-			case k_editor:
-				Imagine.usage("Algorithm editor is not supported in command line mode.");
-				break;
-				
-			default:
-				Imagine.usage("A valid action must be specified.");
+			Logger.log(LogLevel.k_fatal, "An algorithm preset name must be specified.");
+		}
+		else if (args.inputFiles.isEmpty())
+		{
+			Logger.log(LogLevel.k_fatal, "Input files must be specified.");
+		}
+		else if (args.keyFile != null && args.usePassword)
+		{
+			Logger.log(LogLevel.k_fatal, "You cannot use both a key file (-k) and a password (-p).");
+		}
+		else
+		{
+			//reset static components
+			SystemManager.reset();
+			
+			//execute correct action
+			switch (args.action)
+			{
+				case k_open:
+					openArchive(args);
+					break;
+					
+				case k_embed:
+					embed(args);
+					break;
+					
+				case k_extract:
+					extract(args);
+					break;
+					
+				case k_install:
+					ConfigurationAPI.install();
+					break;
+					
+				case k_help:
+					helpSection();
+					break;
+			
+				case k_editor:
+					Imagine.usage("Algorithm editor is not supported in command line mode.");
+					break;
+					
+				default:
+					Imagine.usage("A valid action must be specified.");
+			}
 		}
 	}
 
 	/**
 	 * @update_comment
 	 */
-	private void helpSection() //TODO spelling
+	private void helpSection()
 	{
 		p("Currently, the command line interface supports some common operations for");
-		p("viewing, embedding, and extracting data. However, at this time, specific");
-		p("configuration edits (editing profiles or algorithms) must be done in the GUI.\n");
+		p("viewing, embedding, and extracting data. Changes to algorithms must be ");
+		p("done through the GUI.\n");
 		
 		p("Command Syntax:");
 		p("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k [keyfile]]\n");
 		p("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]\n");
 		p("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]\n");
 		
-		p("--open     ");
+		p("--open");
 		p("    open an archive and selectively extract its contents");
-		p("--embed    ");
-		p("    embed data into a supported format");
-		p("--extract  ");
-		p("    extract all data from an archive file or folder or multiple archives\n");
+		p("--embed");
+		p("    embed data into a supported format (create archives)");
+		p("--extract");
+		p("    extract all data from an archive file or folder of multiple archives\n");
+		p("--gui");
+		p("    open the gui (default) (not all flags supported)");
 		
-		p("-a         algorithm preset name");
-		p("-i         input file or folder");
-		p("-o         output folder");
-		p("-k         key file or empty for password (optional)");
-		p("-p         use a password");
-		p("-P         specify additional algorithm parameter");
+		p("-a <algorithm>");
+		p("    algorithm preset name");
+		p("-i <file/folder>");
+		p("    input file or folder (multiple flags supported)");
+		p("-I <file>");
+		p("    a file containing a list of input files (1 per line)");
+		p("-o <folder>");
+		p("    output folder");
+		p("-k [file]");
+		p("    key file or empty for password (optional)");
+		p("-p");
+		p("    prompt for a password");
+		p("-P <\"name=value\">");
+		p("    override algorithm parameter (quotes optional)");
+		p("-r <file>");
+		p("    create a report file of which archive each file was added to");
 	}
 
-//		if (!subargs.contains("-p") && !subargs.contains("-a"))
-//		{
-//			Imagine.usage("Either a profile name (-p) or an algorithm preset name (-a) must be specified.");
-//		}
-//		else if (action.equals(CmdAction.k_embed) && subargs.contains("-p") && subargs.contains("-i"))
-//		{
-//			Imagine.usage("Profiles have a locked set of data input locations. Seperate input cannot be specified.");
-//		}
-//		else if (!subargs.contains("-i") || (action.equals(CmdAction.k_embed) && !subargs.contains("-i") && !subargs.contains("-I")))
-//		{
-//			Imagine.usage("Input files must be specified.");
-//		}
-//		else if (subargs.contains("-p") && subargs.contains("-a"))
-//		{
-//			Imagine.usage("Either specify an algorithm preset name or a profile name, not both.");
-//		}
-//		else if (subargs.contains("-p") && subargs.contains("-k"))
-//		{
-//			Imagine.usage("You cannot specify both a profile and a key. Keys are contained within profiles.");
-//		}
-
+	private Algorithm getAlgorithm(ArgParseResult result) throws UsageException
+	{
+		Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.presetName);
+		
+		for (String[] pair : result.parameters)
+		{
+			String name = pair[0];
+			String value = pair[1];
+			
+			algo.setParameter(name, value);
+		}
+		
+		return algo;
+	}
 	
 	private void openArchive(ArgParseResult result)
 	{
 		try
 		{
-			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.presetName);
+			Algorithm algo = getAlgorithm(result);
 			Key key = getKey(result);
 			
 			ProductContents productContents = ConversionAPI.openArchive(algo, key, result.inputFiles.get(0));
@@ -211,7 +236,7 @@ public class CmdUI extends UI
 	{
 		try
 		{
-			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.presetName);
+			Algorithm algo = getAlgorithm(result);
 			Key key = getKey(result);
 			
 			//must have input files
@@ -228,7 +253,6 @@ public class CmdUI extends UI
 			if (result.resultFile != null)
 			{
 				Settings.setGenerateReport(true);
-				Report.reset();
 			}
 			
 			//do not track file status in cmd
@@ -237,10 +261,16 @@ public class CmdUI extends UI
 			//run the job thread
 			ConversionJob job = ConversionAPI.runConversion(result.inputFiles, algo, key, Constants.DEFAULT_THREAD_COUNT);
 			
+			String previousStat = "";
 			while (!job.isFinished())
 			{
-				if (!outputPaused)
-					showStats();
+				String currentStat = "Files Processed: " + JobStatus.getInputFilesProcessed() + 
+								", Products Created: " + JobStatus.getProductsCreated();
+				if (!outputPaused && !previousStat.equals(currentStat))
+				{
+					Logger.log(LogLevel.k_info, currentStat);
+					previousStat = currentStat;
+				}
 				
 				Thread.sleep(1000);
 			}
@@ -270,7 +300,7 @@ public class CmdUI extends UI
 	{
 		try
 		{
-			Algorithm algo = ConfigurationAPI.getAlgorithmPreset(result.presetName);
+			Algorithm algo = getAlgorithm(result);
 			Key key = getKey(result);
 			
 			//otherwise use local dir
@@ -300,12 +330,6 @@ public class CmdUI extends UI
 		p("The algorithm parameter '" + param.getName() + "' must be set.");
 		p("Parameter description: " + param.getDescription());
 		return promptInput("Please enter the parameter value: ");
-	}
-
-	private void showStats()
-	{
-		Logger.log(LogLevel.k_info, "Files Processed: " + JobStatus.getInputFilesProcessed() + 
-			", Products Created: " + JobStatus.getProductsCreated());
 	}
 
 	private static String promptInput(String prompt)
@@ -438,5 +462,4 @@ public class CmdUI extends UI
 	{
 		p(message);
 	}
-
 }

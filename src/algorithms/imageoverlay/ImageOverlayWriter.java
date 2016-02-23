@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
+import api.UsageException;
 import config.Settings;
 import key.Key;
 import logging.LogLevel;
@@ -33,7 +34,16 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		//prompt for the image folder if the one listed doesn't exist
 		if (!imageFolder.exists())
 		{
-			algo.setParameter(Definition.IMAGE_FOLDER_PARAM, Option.PROMPT_OPTION.getValue());
+			try
+			{
+				algo.setParameter(Definition.IMAGE_FOLDER_PARAM, Option.PROMPT_OPTION.getValue());
+			}
+			catch (UsageException e)
+			{
+				Logger.log(LogLevel.k_debug, e, false);
+				Logger.log(LogLevel.k_fatal, e.getMessage());
+			}
+			
 			imageFolder = new File(algo.getParameterValue(Definition.IMAGE_FOLDER_PARAM));
 		}
 		
@@ -50,28 +60,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	}
 
 	private void loadCleanFile() throws ProductIOException
-	{
-		//set the previous file as used if it exists
-		if (imgFile != null)
-		{
-			try
-			{
-				manager.setFileUsed(imgFile);
-				
-				//update status to show previous image file was used
-				if (Settings.trackFileStatus())
-					JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileState.FINISHED);
-			}
-			catch (IOException e)
-			{
-				//probably the file doesn't exist anymore, that's ok
-				//otherwise it's a permissions problem
-				Logger.log(LogLevel.k_debug, "The target image file could not be 'set used'. "
-								+ "This may be ok. " + imgFile.getAbsolutePath());
-				Logger.log(LogLevel.k_debug, e, false);
-			}
-		}
-		
+	{		
 		//get the next image
 		imgFile = manager.nextImageFile();
 		
@@ -121,7 +110,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	 */
 	private void reinterpretColorModel()
 	{
-		Logger.log(LogLevel.k_debug, "Removing alpha from input image.");
+		Logger.log(LogLevel.k_debug, "Changing input image color model to rgb.");
 		
 		BufferedImage copy = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2d = copy.createGraphics();
@@ -230,23 +219,41 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	@Override
 	public void saveFile(File productStagingFolder, String fileName)
 	{
+		File productFile = new File(productStagingFolder.getAbsolutePath(), fileName + ".png");
+		Logger.log(LogLevel.k_info, "Saving product file: " + productFile.getAbsolutePath());
+		
 		try
 		{
-			File imgFile = new File(productStagingFolder.getAbsolutePath(), fileName + ".png");
-			Logger.log(LogLevel.k_info,
-							"Saving product file: " + imgFile.getAbsolutePath());
+			if (!productFile.getParentFile().exists())
+				productFile.getParentFile().mkdirs();
 			
-			if (!imgFile.getParentFile().exists())
-				imgFile.getParentFile().mkdirs();
-			
-			ImageIO.write(img, "png", imgFile);
+			ImageIO.write(img, "png", productFile);
 
 			// update progress
 			JobStatus.incrementProductsCreated(1);
+
+			try
+			{
+				//update manager
+				manager.setFileUsed(imgFile);
+				
+				//update status to show previous image file was used
+				if (Settings.trackFileStatus())
+					JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileState.FINISHED);
+			}
+			catch (IOException e)
+			{
+				//probably the file doesn't exist anymore, that's ok
+				//otherwise it's a permissions problem
+				Logger.log(LogLevel.k_debug, "The target image file could not be 'set used'. "
+								+ "This may be ok. " + imgFile.getAbsolutePath());
+				Logger.log(LogLevel.k_debug, e, false);
+			}
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Logger.log(LogLevel.k_debug, e, false);
+			Logger.log(LogLevel.k_fatal, "Cannot save archive file: " + productFile.getAbsolutePath());
 		}
 	}
 }

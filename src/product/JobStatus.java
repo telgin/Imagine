@@ -14,12 +14,6 @@ public abstract class JobStatus
 	private static int inputFilesProcessed;
 	
 	private static Map<File, FileStatus> fileStati;
-	
-	static
-	{
-		reset();
-	}
-	
 
 	public static void reset()
 	{

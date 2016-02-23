@@ -7,6 +7,7 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import api.UsageException;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
@@ -96,15 +97,16 @@ public class Algorithm
 	 * @update_comment
 	 * @param name
 	 * @param value
+	 * @throws UsageException 
 	 */
-	public void setParameter(String name, String value)
+	public void setParameter(String name, String value) throws UsageException
 	{
 		Parameter param = parameters.get(name.toLowerCase());
 		if (param == null)
-			Logger.log(LogLevel.k_error, "No such parameter '" + name + "' in algorithm '"
+			throw new UsageException("No such parameter '" + name + "' in algorithm '"
 							+ this.name + "'");
-		else
-			param.setValue(value);
+		else if (!param.setValue(value))
+			throw new UsageException("Could not set parameter'" + name + "' to value '" + value + "'");
 	}
 
 	/**

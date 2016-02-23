@@ -6,7 +6,10 @@ import java.util.List;
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
+import api.UsageException;
 import key.Key;
+import logging.LogLevel;
+import logging.Logger;
 import product.ProductFactoryCreation;
 import product.ProductReader;
 import product.ProductReaderFactory;
@@ -140,18 +143,23 @@ public class Definition implements algorithms.Definition
 	{
 		List<Algorithm> presets = new LinkedList<Algorithm>();
 		
-		//light
-		Algorithm light = constructDefaultAlgorithm();
-		light.setPresetName("image_overlay_light");
-		light.setParameter(IMAGE_FOLDER_PARAM, "testing/input_images");//TODO remove this
-		presets.add(light);
-		
-		//heavy
-		Algorithm heavy = constructDefaultAlgorithm();
-		heavy.setPresetName("image_overlay_heavy");
-		heavy.setParameter(INSERTION_DENSITY_PARAM, "50%");
-		heavy.setParameter(IMAGE_FOLDER_PARAM, "testing/input_images");//TODO remove this
-		presets.add(heavy);
+		try
+		{
+			//light
+			Algorithm light = constructDefaultAlgorithm();
+			light.setPresetName("image_overlay_light");
+			presets.add(light);
+			
+			//heavy
+			Algorithm heavy = constructDefaultAlgorithm();
+			heavy.setPresetName("image_overlay_heavy");
+			heavy.setParameter(INSERTION_DENSITY_PARAM, "50%");
+			presets.add(heavy);
+		}
+		catch (UsageException e)
+		{
+			Logger.log(LogLevel.k_debug,  e, false);
+		}
 		
 		return presets;
 	}

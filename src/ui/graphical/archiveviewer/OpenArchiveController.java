@@ -5,13 +5,9 @@ import java.io.IOException;
 import java.util.List;
 
 import algorithms.Algorithm;
-import algorithms.Option;
-import algorithms.Parameter;
-import algorithms.imageoverlay.Definition;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
-import javafx.beans.Observable;
 import key.FileKey;
 import key.Key;
 import key.PasswordKey;
@@ -145,9 +141,11 @@ public class OpenArchiveController
 		try
 		{
 			if (nonInitialFragment)
-				Logger.log(LogLevel.k_error, "The first file has a fragment number greater than 1. "
-								+ "Only initial fragments may start an extraction chain, "
-								+ "so this file will not be complete.");
+			{
+				Logger.log(LogLevel.k_error, "The first file has a fragment number greater than 1.");
+				Logger.log(LogLevel.k_error, "Only initial fragments may start an extraction chain, "
+							+ "so this file will not be complete.");
+			}
 				
 			ConversionAPI.extractAll(selectedAlgorithm, getKey(), getInputFile(), getOutputFolder());
 		}
@@ -204,8 +202,8 @@ public class OpenArchiveController
 			{
 				if (index == 0 && nonInitialFragment)
 				{
-					Logger.log(LogLevel.k_error, "The first file has a fragment number greater than 1. "
-									+ "Only initial fragments may start an extraction chain, "
+					Logger.log(LogLevel.k_error, "The first file has a fragment number greater than 1.");
+					Logger.log(LogLevel.k_error, "Only initial fragments may start an extraction chain, "
 									+ "so this file will not be complete.");
 				}
 

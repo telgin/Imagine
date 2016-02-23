@@ -43,24 +43,24 @@ public abstract class ConversionAPI
 		return extractor.viewAll(productFile);
 	}
 	
-	public static void extractAll(Algorithm algo, Key key, File productFile, File extractionFolder) throws IOException, UsageException
+	public static void extractAll(Algorithm algo, Key key, File productLocation, File extractionFolder) throws IOException, UsageException
 	{
-		if (!productFile.exists())
-			throw new UsageException("The specified product file cannot be found.");
+		if (!productLocation.exists())
+			throw new UsageException("The specified product location cannot be found.");
 		
 		//specifying a directory indicates it is also the enclosing folder
 		File enclosingFolder = null;
-		if (productFile.isDirectory())
-			enclosingFolder = productFile;
+		if (productLocation.isDirectory())
+			enclosingFolder = productLocation;
 		else
-			enclosingFolder = productFile.getAbsoluteFile().getParentFile();
+			enclosingFolder = productLocation.getAbsoluteFile().getParentFile();
 		
 		ProductExtractor extractor = new ProductExtractor(algo, key, enclosingFolder);
 		
-		if (productFile.isDirectory())
-			extractor.extractAllFromProductFolder(productFile, extractionFolder);
+		if (productLocation.isDirectory())
+			extractor.extractAllFromProductFolder(productLocation, extractionFolder);
 		else
-			extractor.extractAllFromProduct(productFile, extractionFolder);
+			extractor.extractAllFromProduct(productLocation, extractionFolder);
 	}
 	
 	public static void extractFile(Algorithm algo, Key key, File productFile, File extractionFolder, int index) throws IOException, UsageException

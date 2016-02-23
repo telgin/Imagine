@@ -8,10 +8,18 @@ import java.io.File;
  */
 public class Settings
 {
-	private static File outputFolder = new File(".");
-	private static boolean usesStructuredOutput = false;
+	private static File outputFolder;
+	private static boolean usesStructuredOutput;
 	private static boolean trackFileStatus;
 	private static boolean generateReport;
+	
+	public static void reset()
+	{
+		outputFolder = new File(".");
+		usesStructuredOutput = false;
+		trackFileStatus = false;
+		generateReport = false;
+	}
 	
 	/**
 	 * @update_comment

@@ -25,7 +25,10 @@ public class Definition implements algorithms.Definition
 	private static Definition self;
 	
 	
-	public static final String IMAGE_TYPE_PROPERTY = "ImageType";
+	public static final String IMAGE_TYPE_PARAM = "ImageType";
+	public static final String WIDTH_PARAM = "Width";
+	public static final String HEIGHT_PARAM = "Height";
+	public static final String COLORS_PARAM = "Colors";
 
 	private Definition()
 	{
@@ -52,10 +55,10 @@ public class Definition implements algorithms.Definition
 
 		{
 			// colors
-			Parameter param = new Parameter("Colors", Parameter.STRING_TYPE, false, true);
+			Parameter param = new Parameter(COLORS_PARAM, Parameter.STRING_TYPE, false, true);
 			param.setDescription("The way to represent colors in the output image.");
 			
-			param.addOption(new Option("rgb", "Use one byte each for red, green, and blue to represent each pixel color."));
+			param.addOption(new Option("rgb"));
 
 			param.setValue("rgb");
 			
@@ -64,7 +67,7 @@ public class Definition implements algorithms.Definition
 
 		{
 			// width
-			Parameter param = new Parameter("Width", Parameter.INT_TYPE, false, true);
+			Parameter param = new Parameter(WIDTH_PARAM, Parameter.INT_TYPE, false, true);
 			param.setDescription("The width of the output image.");
 
 			param.addOption(new Option("1", "10000"));
@@ -76,7 +79,7 @@ public class Definition implements algorithms.Definition
 
 		{
 			// height
-			Parameter param = new Parameter("Height", Parameter.INT_TYPE, false, true);
+			Parameter param = new Parameter(HEIGHT_PARAM, Parameter.INT_TYPE, false, true);
 			param.setDescription("The height of the output image.");
 
 			param.addOption(new Option("1", "10000"));
@@ -88,7 +91,7 @@ public class Definition implements algorithms.Definition
 		
 		{
 			// image type
-			Parameter param = new Parameter(IMAGE_TYPE_PROPERTY, Parameter.STRING_TYPE, false, true);
+			Parameter param = new Parameter(IMAGE_TYPE_PARAM, Parameter.STRING_TYPE, false, true);
 			param.setDescription("The file format to output images in.");
 
 			param.addOption(new Option("png"));

@@ -26,8 +26,8 @@ public class Image implements Product
 	{
 		this.algorithm = algo;
 		this.key = key;
-		width = Integer.parseInt(algo.getParameterValue("width"));
-		height = Integer.parseInt(algo.getParameterValue("height"));
+		width = Integer.parseInt(algo.getParameterValue(Definition.WIDTH_PARAM));
+		height = Integer.parseInt(algo.getParameterValue(Definition.HEIGHT_PARAM));
 		maxWriteSize = width * height * 3;
 	}
 

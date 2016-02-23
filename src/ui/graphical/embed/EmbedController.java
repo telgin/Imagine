@@ -25,6 +25,7 @@ import product.ConversionJobFileState;
 import product.FileStatus;
 import product.JobStatus;
 import system.ActiveComponent;
+import system.SystemManager;
 import ui.UIContext;
 import ui.graphical.FileProperty;
 import ui.graphical.GUI;
@@ -327,12 +328,12 @@ public class EmbedController implements ActiveComponent
 					totalFilesThisRun = 0;
 				}
 			
+				SystemManager.reset();
 				Settings.setOutputFolder(view.getOutputFolder());
 				Settings.setUsingStructuredOutput(structuredOutput);
 				Settings.setGenerateReport(false);
 				Settings.setTrackFileStatus(true);
-				
-				JobStatus.reset();
+
 				ConversionJob job = ConversionAPI.runConversion(inputFiles, selectedAlgorithm, getKey(), 1);
 	
 				if (guiUpdateDaemon == null || !guiUpdateDaemon.isAlive())

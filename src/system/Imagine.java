@@ -30,27 +30,6 @@ public class Imagine
 	
 	
 	/**
-	 * Args:
-	 * 
-	 * [nothing] <-- implies cmd main menu
-	 * 
-	 * --help
-	 * 
-	 * --gui
-	 * --gui --treeview <treefile|treefolder>
-	 * --gui --open -i <file>
-	 * --gui --embed -i <file/folder>
-	 * --gui --extract -i <file/folder>
-	 * 
-	 * --open -g <groupname> -i <file>
-	 * --open -a <presetname> -i <file> [-k <keyfile>]
-	 * 
-	 * --embed -g <groupname> -i <file/folder> -o <folder>
-	 * --embed -a <presetname> -i <file/folder> -o <folder> [-k <keyfile>]
-	 * 
-	 * --extract -g <groupname> -i <file/folder> -o <folder>
-	 * --extract -a <presetname> -i <file/folder> -o <folder> [-k <keyfile>]
-	 * 
 	 * @param args
 	 */
 	public static void main(String[] args)
@@ -102,7 +81,7 @@ public class Imagine
 	{
 		ArgParseResult result = new ArgParseResult();
 		
-		//gui mode
+		//gui mode (no arguments -> gui mode)
 		result.guiMode = args.contains("--gui") || args.isEmpty();
 
 		//actions
