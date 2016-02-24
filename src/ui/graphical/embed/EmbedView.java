@@ -53,46 +53,44 @@ import ui.graphical.archiveviewer.FileContentsTableRecord;
 public class EmbedView extends View
 {
 	//constants
-	private final String noKeyToggleString = "No Key";
-	private final String passwordToggleString = "Password";
-	private final String keyFileToggleString = "Key File";
-	private final String filesCreatedString = "Total output files created: ";
+	private static final String s_noKeyToggleString = "No Key";
+	private static final String s_passwordToggleString = "Password";
+	private static final String s_keyFileToggleString = "Key File";
+	private static final String s_filesCreatedString = "Total output files created: ";
 	
 	//gui elements
-	private ChoiceBox<String> algorithmSelect;
-	private PasswordField passwordField;
-	private TextField keyFilePath;
-	private Button keyFileBrowseButton, inputAddFileButton, inputAddFolderButton,
-		inputRemoveButton, targetSelectFolderButton, runConversionButton;
-	private ToggleGroup keySelectionButtons;
-	private RadioButton noKeyToggle, keyFileToggle, passwordToggle;
-	private TableView<FileContentsTableRecord> table;
-	private Label passwordLabel, keyFileLabel, keySelectionLabel, algorithmLabel,
-		inputFilesLabel, targetFilesLabel, filesCreatedLabel;
-	private FileProperty outputFolder;
-	private BooleanProperty structuredOutput;
-	private TreeView<String> inputFiles, targetFiles;
-	private ProgressBar conversionProgress;
-	private InputFileTreeItem inputFileRoot;
-	private TargetFileTreeItem targetFileRoot;
+	private ChoiceBox<String> f_algorithmSelect;
+	private PasswordField f_passwordField;
+	private TextField f_keyFilePath;
+	private Button f_keyFileBrowseButton, f_inputAddFileButton, f_inputAddFolderButton,
+		f_inputRemoveButton, f_targetSelectFolderButton, f_runConversionButton;
+	private ToggleGroup f_keySelectionButtons;
+	private RadioButton f_noKeyToggle, f_keyFileToggle, f_passwordToggle;
+	private TableView<FileContentsTableRecord> f_table;
+	private Label f_passwordLabel, f_keyFileLabel, f_keySelectionLabel, f_algorithmLabel,
+		f_inputFilesLabel, f_targetFilesLabel, f_filesCreatedLabel;
+	private FileProperty f_outputFolder;
+	private BooleanProperty f_structuredOutput;
+	private TreeView<String> f_inputFiles, f_targetFiles;
+	private ProgressBar f_conversionProgress;
+	private InputFileTreeItem f_inputFileRoot;
+	private TargetFileTreeItem f_targetFileRoot;
 	
-	//controller
-	private EmbedController controller;
-	
-	private ArgParseResult args;
-	
-	private Map<TreeCell<String>, InputFileTreeItem> activeInputItems;
-	private Map<TreeCell<String>, TargetFileTreeItem> activeTargetItems;
-	boolean updatingCells = false;
+	//state fields
+	private EmbedController f_controller;
+	private ArgParseResult f_args;
+	private Map<TreeCell<String>, InputFileTreeItem> f_activeInputItems;
+	private Map<TreeCell<String>, TargetFileTreeItem> f_activeTargetItems;
+	boolean f_updatingCells = false;
 
-	public EmbedView(Stage window, ArgParseResult args)
+	public EmbedView(Stage p_window, ArgParseResult p_args)
 	{
-		super(window);
+		super(p_window);
 		
-		this.args = args;
-		controller = new EmbedController(this);
-		activeInputItems = new HashMap<TreeCell<String>, InputFileTreeItem>();
-		activeTargetItems = new HashMap<TreeCell<String>, TargetFileTreeItem>();
+		f_args = p_args;
+		f_controller = new EmbedController(this);
+		f_activeInputItems = new HashMap<TreeCell<String>, InputFileTreeItem>();
+		f_activeTargetItems = new HashMap<TreeCell<String>, TargetFileTreeItem>();
 	}
 
 	/**
@@ -108,44 +106,44 @@ public class EmbedView extends View
 		borderPane.setCenter(setupInputFileSection());
 		borderPane.setBottom(setupProgressSection());
 		
-		keySelectionButtons.selectToggle(noKeyToggle);
+		f_keySelectionButtons.selectToggle(f_noKeyToggle);
 		setInputSectionEnabled(false);
 		setTargetSectionEnabled(false);
 		setRunConversionEnabled(false);
 		
 		//setup stuff specified in args
-		if (args.action == CmdAction.k_embed)
+		if (f_args.action == CmdAction.k_embed)
 		{
-			for (File input : args.inputFiles)
+			for (File input : f_args.inputFiles)
 				if (input.exists())
 					addInput(input);
 			
-			if (args.presetName != null && controller.getPresetNames().contains(args.presetName))
+			if (f_args.presetName != null && f_controller.getPresetNames().contains(f_args.presetName))
 			{
-				setAlgorithmSelection(args.presetName);
+				setAlgorithmSelection(f_args.presetName);
 			}
 			
-			if (args.outputFolder != null && args.outputFolder.exists())
+			if (f_args.outputFolder != null && f_args.outputFolder.exists())
 			{
-				setOutputFolder(args.outputFolder);
+				setOutputFolder(f_args.outputFolder);
 			}
 			
-			if (args.keyFile != null && args.keyFile.exists())
+			if (f_args.keyFile != null && f_args.keyFile.exists())
 			{
-				setKeyFilePath(args.keyFile.getAbsolutePath());
+				setKeyFilePath(f_args.keyFile.getAbsolutePath());
 				toggleKeySection();
 			}
 			
-			if (args.usingPassword)
+			if (f_args.usingPassword)
 			{
 				togglePasswordSection();
 			}
 		}
 		
 		//set to the first one if not specified (so everything's not grayed out)
-		if (algorithmSelect.getSelectionModel().isEmpty())
+		if (f_algorithmSelect.getSelectionModel().isEmpty())
 		{
-			setAlgorithmSelection(controller.getPresetNames().get(0));
+			setAlgorithmSelection(f_controller.getPresetNames().get(0));
 		}
 		
 		return borderPane;
@@ -163,14 +161,14 @@ public class EmbedView extends View
 		hbox.setAlignment(Pos.CENTER);
 		
 		//progress bar
-		conversionProgress = new ProgressBar(0);
-		conversionProgress.setPrefWidth(230);
-		hbox.getChildren().add(conversionProgress);
+		f_conversionProgress = new ProgressBar(0);
+		f_conversionProgress.setPrefWidth(230);
+		hbox.getChildren().add(f_conversionProgress);
 
 		//files created label
-		filesCreatedLabel = new Label("");
+		f_filesCreatedLabel = new Label("");
 		setFilesCreated(0);
-		hbox.getChildren().add(filesCreatedLabel);
+		hbox.getChildren().add(f_filesCreatedLabel);
 		
 		
 		return hbox;
@@ -187,24 +185,24 @@ public class EmbedView extends View
 		vbox.setPadding(new Insets(10,10,10,10));
 		
 		//input files label
-		inputFilesLabel = new Label("Input Files:");
-		vbox.getChildren().add(inputFilesLabel);
+		f_inputFilesLabel = new Label("Input Files:");
+		vbox.getChildren().add(f_inputFilesLabel);
 		
 		//input file tree
-		inputFiles = new TreeView<String>();
-		inputFiles.setEditable(true);
-		inputFiles.setShowRoot(false);
+		f_inputFiles = new TreeView<String>();
+		f_inputFiles.setEditable(true);
+		f_inputFiles.setShowRoot(false);
 		
-		inputFileRoot = new InputFileTreeItem("");
-		inputFiles.setRoot(inputFileRoot);
-		inputFiles.setCellFactory(e -> {
+		f_inputFileRoot = new InputFileTreeItem("");
+		f_inputFiles.setRoot(f_inputFileRoot);
+		f_inputFiles.setCellFactory(e -> {
 			TreeCell<String> cell = CheckBoxTreeCell.<String>forTreeView().call(e);
 			
 			//make sure items know focused state so they can change color slightly
 			cell.focusedProperty().addListener(
 							(ObservableValue<? extends Boolean> value,
 								Boolean oldValue, Boolean newValue) -> {
-										InputFileTreeItem item = activeInputItems.get(cell);
+										InputFileTreeItem item = f_activeInputItems.get(cell);
 										if (item != null)
 											item.setFocused(newValue.booleanValue());
 										
@@ -215,16 +213,16 @@ public class EmbedView extends View
 
 			//update active cell map when a cell changes its item
 			cell.treeItemProperty().addListener((obs, oldItem, newItem) -> {
-				activeInputItems.put(cell, (InputFileTreeItem) newItem);
+				f_activeInputItems.put(cell, (InputFileTreeItem) newItem);
 				
 				//update this specific cell now
-				controller.updateInputItem((InputFileTreeItem) newItem);
+				f_controller.updateInputItem((InputFileTreeItem) newItem);
 				updateInputCellStyle(cell);
 			});
 
 			return cell;
 		});
-		vbox.getChildren().add(inputFiles);
+		vbox.getChildren().add(f_inputFiles);
 		
 		HBox buttonRow1 = new HBox();
 		buttonRow1.setSpacing(10);
@@ -232,85 +230,82 @@ public class EmbedView extends View
 		buttonRow1.setPadding(new Insets(10,10,10,10));
 		
 		//add file button
-		inputAddFileButton = new Button("Add File");
-		inputAddFileButton.setOnAction(e -> controller.inputAddFilePressed());
-		buttonRow1.getChildren().add(inputAddFileButton);
+		f_inputAddFileButton = new Button("Add File");
+		f_inputAddFileButton.setOnAction(e -> f_controller.inputAddFilePressed());
+		buttonRow1.getChildren().add(f_inputAddFileButton);
 		
 		//add folder button
-		inputAddFolderButton = new Button("Add Folder");
-		inputAddFolderButton.setOnAction(e -> controller.inputAddFolderPressed());
-		buttonRow1.getChildren().add(inputAddFolderButton);
+		f_inputAddFolderButton = new Button("Add Folder");
+		f_inputAddFolderButton.setOnAction(e -> f_controller.inputAddFolderPressed());
+		buttonRow1.getChildren().add(f_inputAddFolderButton);
 		
 		//remove entry
-		inputRemoveButton = new Button("Remove Input");
-		inputRemoveButton.setOnAction(e -> controller.removeInputPressed());
-		buttonRow1.getChildren().add(inputRemoveButton);
+		f_inputRemoveButton = new Button("Remove Input");
+		f_inputRemoveButton.setOnAction(e -> f_controller.removeInputPressed());
+		buttonRow1.getChildren().add(f_inputRemoveButton);
 		vbox.getChildren().add(buttonRow1);
-		
-		//vbox.getChildren().add(setupProgressSection());
-		
+
 		return vbox;
 	}
 	
-	public void updateInputCellStyle(TreeCell<String> cell)
+	/**
+	 * @update_comment
+	 * @param p_cell
+	 */
+	public void updateInputCellStyle(TreeCell<String> p_cell)
 	{
-		InputFileTreeItem item = activeInputItems.get(cell);
+		InputFileTreeItem item = f_activeInputItems.get(p_cell);
 		if (item == null)
 		{
 			//cell is blank, remove progress bar
-			cell.setStyle(null);
+			p_cell.setStyle(null);
 		}
 		else
 		{
 			//set the cell style according to the item's status and progress
-			item.setCellStyle(cell);
+			item.setCellStyle(p_cell);
 		}
 	}
 	
-	public void updateTargetCellStyle(TreeCell<String> cell)
+	/**
+	 * @update_comment
+	 * @param p_cell
+	 */
+	public void updateTargetCellStyle(TreeCell<String> p_cell)
 	{
-		TargetFileTreeItem item = activeTargetItems.get(cell);
+		TargetFileTreeItem item = f_activeTargetItems.get(p_cell);
 		if (item == null)
 		{
 			//cell is blank, remove progress bar
-			cell.setStyle(null);
+			p_cell.setStyle(null);
 		}
 		else
 		{
 			//set the cell style according to the item's status and progress
-			item.setCellStyle(cell);
+			item.setCellStyle(p_cell);
 		}
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	public void updateAllActiveCells()
 	{
-		if (!updatingCells)
+		if (!f_updatingCells)
 		{
-			updatingCells = true;
+			f_updatingCells = true;
 			
 			Platform.runLater(() -> {
 				//input cells
-				for (TreeCell<String> cell : activeInputItems.keySet())
+				for (TreeCell<String> cell : f_activeInputItems.keySet())
 					updateInputCellStyle(cell);
 				
 				//target cells
-				for (TreeCell<String> cell : activeTargetItems.keySet())
+				for (TreeCell<String> cell : f_activeTargetItems.keySet())
 					updateTargetCellStyle(cell);
 
-				updatingCells = false;
+				f_updatingCells = false;
 			});
-		}
-	}
-	
-	//TODO remove
-	public void setAll(double set)
-	{
-		for (InputFileTreeItem item : activeInputItems.values())
-		{
-			if (item != null)
-			{
-				item.setProgress(set);
-			}
 		}
 	}
 
@@ -325,17 +320,17 @@ public class EmbedView extends View
 		vbox.setPadding(new Insets(10,10,10,10));
 		
 		//target files label
-		targetFilesLabel = new Label("Target Files:");
-		vbox.getChildren().add(targetFilesLabel);
+		f_targetFilesLabel = new Label("Target Files:");
+		vbox.getChildren().add(f_targetFilesLabel);
 				
 		//input file tree
-		targetFiles = new TreeView<String>();
-		targetFiles.setEditable(true);
-		targetFiles.setShowRoot(false);
+		f_targetFiles = new TreeView<String>();
+		f_targetFiles.setEditable(true);
+		f_targetFiles.setShowRoot(false);
 		
-		targetFileRoot = new TargetFileTreeItem("");
-		targetFiles.setRoot(targetFileRoot);
-		targetFiles.setCellFactory(e -> 
+		f_targetFileRoot = new TargetFileTreeItem("");
+		f_targetFiles.setRoot(f_targetFileRoot);
+		f_targetFiles.setCellFactory(e -> 
 		{
 			TreeCell<String> cell = new TreeCell<String>()
 			{
@@ -355,7 +350,7 @@ public class EmbedView extends View
 			cell.focusedProperty().addListener(
 				(ObservableValue<? extends Boolean> value,
 					Boolean oldValue, Boolean newValue) -> {
-							TargetFileTreeItem item = activeTargetItems.get(cell);
+							TargetFileTreeItem item = f_activeTargetItems.get(cell);
 							if (item != null)
 								item.setFocused(newValue.booleanValue());
 							
@@ -366,16 +361,16 @@ public class EmbedView extends View
 			
 			//update active cell map when a cell changes its item
 			cell.treeItemProperty().addListener((obs, oldItem, newItem) -> {
-				activeTargetItems.put(cell, (TargetFileTreeItem) newItem);
+				f_activeTargetItems.put(cell, (TargetFileTreeItem) newItem);
 				
 				//update this specific cell now
-				controller.updateTargetItem((TargetFileTreeItem) newItem);
+				f_controller.updateTargetItem((TargetFileTreeItem) newItem);
 				updateTargetCellStyle(cell);
 			});
 
 			return cell;
 		});
-		vbox.getChildren().add(targetFiles);
+		vbox.getChildren().add(f_targetFiles);
 		
 		HBox buttonRow1 = new HBox();
 		buttonRow1.setSpacing(3);
@@ -383,14 +378,17 @@ public class EmbedView extends View
 		buttonRow1.setPadding(new Insets(10,10,10,10));
 		
 		//select folder button
-		targetSelectFolderButton = new Button("Select Folder");
-		targetSelectFolderButton.setOnAction(e -> controller.targetSelectFolderPressed());
-		buttonRow1.getChildren().add(targetSelectFolderButton);
+		f_targetSelectFolderButton = new Button("Select Folder");
+		f_targetSelectFolderButton.setOnAction(e -> f_controller.targetSelectFolderPressed());
+		buttonRow1.getChildren().add(f_targetSelectFolderButton);
 		vbox.getChildren().add(buttonRow1);
 		
 		return vbox;
 	}
 
+	/* (non-Javadoc)
+	 * @see ui.graphical.View#getTabName()
+	 */
 	@Override
 	public String getTabName()
 	{
@@ -414,118 +412,128 @@ public class EmbedView extends View
 		configSelection.getChildren().add(insertionConfigurationLabel);
 		
 		//algorithm label
-		algorithmLabel = new Label("Algorithm:");
-		configSelection.getChildren().add(algorithmLabel);
+		f_algorithmLabel = new Label("Algorithm:");
+		configSelection.getChildren().add(f_algorithmLabel);
 		
 		//algorithm select
-		algorithmSelect = new ChoiceBox<>();
-		setAlgorithmPresets(controller.getPresetNames());
-		algorithmSelect.getSelectionModel().selectedIndexProperty().addListener(
+		f_algorithmSelect = new ChoiceBox<>();
+		setAlgorithmPresets(f_controller.getPresetNames());
+		f_algorithmSelect.getSelectionModel().selectedIndexProperty().addListener(
 						(ObservableValue<? extends Number> value,
 										Number oldIndex, Number newIndex) ->
-											controller.algorithmSelected(newIndex.intValue()));
-		algorithmSelect.focusedProperty().addListener(
+											f_controller.algorithmSelected(newIndex.intValue()));
+		f_algorithmSelect.focusedProperty().addListener(
 						(ObservableValue<? extends Boolean> value,
 										Boolean oldValue, Boolean newValue) ->
-											controller.algorithmSelectFocus(newValue.booleanValue()));
-		configSelection.getChildren().add(indentElement(1, algorithmSelect));
+											f_controller.algorithmSelectFocus(newValue.booleanValue()));
+		configSelection.getChildren().add(indentElement(1, f_algorithmSelect));
 		
 		//output folder
-		outputFolder = new FileProperty("Output Folder", e -> controller.browseOutputFolder());
-		outputFolder.setup(configSelection);
+		f_outputFolder = new FileProperty("Output Folder", e -> f_controller.browseOutputFolder());
+		f_outputFolder.setup(configSelection);
 		
 		//structured output
-		structuredOutput = new BooleanProperty("Use Structured Output Folders?",
-						b -> controller.structuredOutputChecked(b));
-		structuredOutput.setup(configSelection);
+		f_structuredOutput = new BooleanProperty("Use Structured Output Folders?",
+						b -> f_controller.structuredOutputChecked(b));
+		f_structuredOutput.setup(configSelection);
 		
 		
 		//key selection label
-		keySelectionLabel = new Label("Key Selection:");
-		configSelection.getChildren().add(keySelectionLabel);
+		f_keySelectionLabel = new Label("Key Selection:");
+		configSelection.getChildren().add(f_keySelectionLabel);
 		
 		//key selection buttons
-		keySelectionButtons = new ToggleGroup();
+		f_keySelectionButtons = new ToggleGroup();
 		
-		noKeyToggle = new RadioButton(noKeyToggleString);
-		noKeyToggle.setToggleGroup(keySelectionButtons);
-		noKeyToggle.setUserData(noKeyToggleString);
-		keyFileToggle = new RadioButton(keyFileToggleString);
-		keyFileToggle.setToggleGroup(keySelectionButtons);
-		keyFileToggle.setUserData(keyFileToggleString);
-		passwordToggle = new RadioButton(passwordToggleString);
-		passwordToggle.setUserData(passwordToggleString);
-		passwordToggle.setToggleGroup(keySelectionButtons);
-		keySelectionButtons.selectedToggleProperty().addListener(
+		f_noKeyToggle = new RadioButton(s_noKeyToggleString);
+		f_noKeyToggle.setToggleGroup(f_keySelectionButtons);
+		f_noKeyToggle.setUserData(s_noKeyToggleString);
+		f_keyFileToggle = new RadioButton(s_keyFileToggleString);
+		f_keyFileToggle.setToggleGroup(f_keySelectionButtons);
+		f_keyFileToggle.setUserData(s_keyFileToggleString);
+		f_passwordToggle = new RadioButton(s_passwordToggleString);
+		f_passwordToggle.setUserData(s_passwordToggleString);
+		f_passwordToggle.setToggleGroup(f_keySelectionButtons);
+		f_keySelectionButtons.selectedToggleProperty().addListener(
 						(ObservableValue<? extends Toggle> value,
 										Toggle oldSelection, Toggle newSelection) ->
 											keyTypeSelected(value, oldSelection, newSelection));
 		
 		HBox radioBox = new HBox();
 		radioBox.setSpacing(10);
-		radioBox.getChildren().addAll(noKeyToggle, passwordToggle, keyFileToggle);
+		radioBox.getChildren().addAll(f_noKeyToggle, f_passwordToggle, f_keyFileToggle);
 		configSelection.getChildren().add(indentElement(1, radioBox));
 		
 		//password label
-		passwordLabel = new Label("Password:");
-		configSelection.getChildren().add(passwordLabel);
+		f_passwordLabel = new Label("Password:");
+		configSelection.getChildren().add(f_passwordLabel);
 		
 		//password text field
-		passwordField = new PasswordField();
-		configSelection.getChildren().add(indentElement(1, passwordField));
+		f_passwordField = new PasswordField();
+		configSelection.getChildren().add(indentElement(1, f_passwordField));
 		
 		//key file path label
-		keyFileLabel = new Label("Key File Path:");
-		configSelection.getChildren().add(keyFileLabel);
+		f_keyFileLabel = new Label("Key File Path:");
+		configSelection.getChildren().add(f_keyFileLabel);
 		
 		//key file path
-		keyFilePath = new TextField();
-		keyFilePath.setEditable(false);
+		f_keyFilePath = new TextField();
+		f_keyFilePath.setEditable(false);
 		
 		//key file browse button
-		keyFileBrowseButton = new Button();
-		keyFileBrowseButton.setText("Browse");
-		keyFileBrowseButton.setOnAction(e -> controller.chooseKeyFile());
-		HBox keyFilePathRow = indentElement(1, keyFilePath);
-		keyFilePathRow.getChildren().add(keyFileBrowseButton);
+		f_keyFileBrowseButton = new Button();
+		f_keyFileBrowseButton.setText("Browse");
+		f_keyFileBrowseButton.setOnAction(e -> f_controller.chooseKeyFile());
+		HBox keyFilePathRow = indentElement(1, f_keyFilePath);
+		keyFilePathRow.getChildren().add(f_keyFileBrowseButton);
 		configSelection.getChildren().add(keyFilePathRow);
 		
 		//run conversion
 		HBox hbox = new HBox();
 		hbox.setAlignment(Pos.CENTER);
 		
-		runConversionButton = new Button("Run Conversion");
-		runConversionButton.setOnAction(e -> controller.runConversionPressed());
-		hbox.getChildren().add(runConversionButton);
+		f_runConversionButton = new Button("Run Conversion");
+		f_runConversionButton.setOnAction(e -> f_controller.runConversionPressed());
+		hbox.getChildren().add(f_runConversionButton);
 		configSelection.getChildren().add(hbox);
 
 		return configSelection;
 	}
 	
-	private HBox indentElement(int indent, Node element)
+	/**
+	 * @update_comment
+	 * @param p_indent
+	 * @param p_element
+	 * @return
+	 */
+	private HBox indentElement(int p_indent, Node p_element)
 	{
 		String indentation = "    ";
 		HBox hbox = new HBox();
 		hbox.setPadding(new Insets(10, 0, 10, 0));
 		hbox.setSpacing(10);
-		Label space = new Label(new String(new char[indent]).replace("\0", indentation));
-		hbox.getChildren().addAll(space, element);
+		Label space = new Label(new String(new char[p_indent]).replace("\0", indentation));
+		hbox.getChildren().addAll(space, p_element);
 		return hbox;
 	}
 
-	void setKeySectionEnabled(boolean enabled)
+	/**
+	 * @update_comment
+	 * @param p_enabled
+	 */
+	void setKeySectionEnabled(boolean p_enabled)
 	{
-		noKeyToggle.disableProperty().set(!enabled);
-		keyFileToggle.disableProperty().set(!enabled);
-		passwordToggle.disableProperty().set(!enabled);
-		keySelectionLabel.disableProperty().set(!enabled);
+		f_noKeyToggle.disableProperty().set(!p_enabled);
+		f_keyFileToggle.disableProperty().set(!p_enabled);
+		f_passwordToggle.disableProperty().set(!p_enabled);
+		f_keySelectionLabel.disableProperty().set(!p_enabled);
 		
-		if (!enabled)
+		if (!p_enabled)
 		{
-			noKeyToggle.setStyle("-fx-opacity: .75");
-			keyFileToggle.setStyle("-fx-opacity: .75");
-			passwordToggle.setStyle("-fx-opacity: .75");
-			keySelectionLabel.setStyle("-fx-opacity: .5");
+			f_noKeyToggle.setStyle("-fx-opacity: .75");
+			f_keyFileToggle.setStyle("-fx-opacity: .75");
+			f_passwordToggle.setStyle("-fx-opacity: .75");
+			f_keySelectionLabel.setStyle("-fx-opacity: .5");
 			
 			//disable everything
 			setKeyFileSectionEnabled(false);
@@ -533,18 +541,18 @@ public class EmbedView extends View
 		}
 		else
 		{
-			noKeyToggle.setStyle("-fx-opacity: 1");
-			keyFileToggle.setStyle("-fx-opacity: 1");
-			passwordToggle.setStyle("-fx-opacity: 1");
-			keySelectionLabel.setStyle("-fx-opacity: 1");
+			f_noKeyToggle.setStyle("-fx-opacity: 1");
+			f_keyFileToggle.setStyle("-fx-opacity: 1");
+			f_passwordToggle.setStyle("-fx-opacity: 1");
+			f_keySelectionLabel.setStyle("-fx-opacity: 1");
 
 			//enable only the selected one
-			if (keySelectionButtons.getSelectedToggle().getUserData().equals(keyFileToggleString))
+			if (f_keySelectionButtons.getSelectedToggle().getUserData().equals(s_keyFileToggleString))
 			{
 				setKeyFileSectionEnabled(true);
 				setPasswordSectionEnabled(false);
 			}
-			else if (keySelectionButtons.getSelectedToggle().getUserData().equals(passwordToggleString))
+			else if (f_keySelectionButtons.getSelectedToggle().getUserData().equals(s_passwordToggleString))
 			{
 				setKeyFileSectionEnabled(false);
 				setPasswordSectionEnabled(true);
@@ -560,20 +568,20 @@ public class EmbedView extends View
 	
 	/**
 	 * @update_comment
-	 * @param value
-	 * @param oldSelection
-	 * @param newSelection
+	 * @param p_value
+	 * @param p_oldSelection
+	 * @param p_newSelection
 	 * @return
 	 */
-	private void keyTypeSelected(ObservableValue<? extends Toggle> value,
-					Toggle oldSelection, Toggle newSelection)
+	private void keyTypeSelected(ObservableValue<? extends Toggle> p_value,
+					Toggle p_oldSelection, Toggle p_newSelection)
 	{
-		if (newSelection.getUserData().equals(noKeyToggleString))
+		if (p_newSelection.getUserData().equals(s_noKeyToggleString))
 		{
 			setPasswordSectionEnabled(false);
 			setKeyFileSectionEnabled(false);
 		}
-		else if (newSelection.getUserData().equals(passwordToggleString))
+		else if (p_newSelection.getUserData().equals(s_passwordToggleString))
 		{
 			setPasswordSectionEnabled(true);
 			setKeyFileSectionEnabled(false);
@@ -590,218 +598,310 @@ public class EmbedView extends View
 	 */
 	void clearTable()
 	{
-		table.setItems(null);
+		f_table.setItems(null);
 	}
 
 	/**
 	 * @update_comment
-	 * @param enabled
+	 * @param p_enabled
 	 */
-	private void setKeyFileSectionEnabled(boolean enabled)
+	private void setKeyFileSectionEnabled(boolean p_enabled)
 	{
-		keyFilePath.disableProperty().set(!enabled);
-		keyFileBrowseButton.disableProperty().set(!enabled);
-		keyFileLabel.disableProperty().set(!enabled);
+		f_keyFilePath.disableProperty().set(!p_enabled);
+		f_keyFileBrowseButton.disableProperty().set(!p_enabled);
+		f_keyFileLabel.disableProperty().set(!p_enabled);
 		
-		if (!enabled)
+		if (!p_enabled)
 		{
-			keyFilePath.setStyle("-fx-opacity: .75");
-			keyFileBrowseButton.setStyle("-fx-opacity: .75");
-			keyFileLabel.setStyle("-fx-opacity: .5");
+			f_keyFilePath.setStyle("-fx-opacity: .75");
+			f_keyFileBrowseButton.setStyle("-fx-opacity: .75");
+			f_keyFileLabel.setStyle("-fx-opacity: .5");
 		}
 		else
 		{
-			keyFilePath.setStyle("-fx-opacity: 1");
-			keyFileBrowseButton.setStyle("-fx-opacity: 1");
-			keyFileLabel.setStyle("-fx-opacity: 1");
+			f_keyFilePath.setStyle("-fx-opacity: 1");
+			f_keyFileBrowseButton.setStyle("-fx-opacity: 1");
+			f_keyFileLabel.setStyle("-fx-opacity: 1");
 		}
 		
 	}
 
 	/**
 	 * @update_comment
-	 * @param b
+	 * @param p_enabled
 	 */
-	private void setPasswordSectionEnabled(boolean enabled)
+	private void setPasswordSectionEnabled(boolean p_enabled)
 	{
-		passwordField.disableProperty().set(!enabled);
-		passwordLabel.disableProperty().set(!enabled);
+		f_passwordField.disableProperty().set(!p_enabled);
+		f_passwordLabel.disableProperty().set(!p_enabled);
 		
-		if (!enabled)
+		if (!p_enabled)
 		{
-			passwordField.setStyle("-fx-opacity: .75");
-			passwordLabel.setStyle("-fx-opacity: .5");
+			f_passwordField.setStyle("-fx-opacity: .75");
+			f_passwordLabel.setStyle("-fx-opacity: .5");
 		}
 		else
 		{
-			passwordField.setStyle("-fx-opacity: 1");
-			passwordLabel.setStyle("-fx-opacity: 1");
+			f_passwordField.setStyle("-fx-opacity: 1");
+			f_passwordLabel.setStyle("-fx-opacity: 1");
 		}
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	public void clearPasswordSection()
 	{
-		passwordField.clear();
+		f_passwordField.clear();
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public void clearKeyFileSection()
 	{
-		keyFilePath.clear();
+		f_keyFilePath.clear();
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	void clearKeySection()
 	{
 		clearPasswordSection();
 		clearKeyFileSection();
 	}
 	
-	public void setAlgorithmSelection(String presetName)
+	/**
+	 * @update_comment
+	 * @param p_presetName
+	 */
+	public void setAlgorithmSelection(String p_presetName)
 	{
-		algorithmSelect.setValue(presetName);
+		f_algorithmSelect.setValue(p_presetName);
 	}
 	
-	public void setAlgorithmPresets(List<String> presetNames)
+	/**
+	 * @update_comment
+	 * @param p_presetNames
+	 */
+	public void setAlgorithmPresets(List<String> p_presetNames)
 	{
-		algorithmSelect.setItems(FXCollections.observableArrayList(presetNames));
+		f_algorithmSelect.setItems(FXCollections.observableArrayList(p_presetNames));
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public String getAlgorithmSelection()
 	{
-		return (String) algorithmSelect.getValue();
+		return (String) f_algorithmSelect.getValue();
 	}
 	
 	
-	public void setAlgorithmSelectionEnabled(boolean enabled)
+	/**
+	 * @update_comment
+	 * @param p_enabled
+	 */
+	public void setAlgorithmSelectionEnabled(boolean p_enabled)
 	{
-		algorithmSelect.disableProperty().set(!enabled);
+		f_algorithmSelect.disableProperty().set(!p_enabled);
 		
-		if (!enabled)
+		if (!p_enabled)
 		{
-			algorithmSelect.setStyle("-fx-opacity: .75");
+			f_algorithmSelect.setStyle("-fx-opacity: .75");
 		}
 		else
 		{
-			algorithmSelect.setStyle("-fx-opacity: 1");
+			f_algorithmSelect.setStyle("-fx-opacity: 1");
 		}
 	}
 	
-	public void setPasswordPrompt(String prompt)
+	/**
+	 * @update_comment
+	 * @param p_prompt
+	 */
+	public void setPasswordPrompt(String p_prompt)
 	{
-		passwordField.setPromptText(prompt);
+		f_passwordField.setPromptText(p_prompt);
 	}
 	
-	public void addInput(File inputFile)
+	/**
+	 * @update_comment
+	 * @param p_inputFile
+	 */
+	public void addInput(File p_inputFile)
 	{
-		final InputFileTreeItem item = new InputFileTreeItem(inputFile);
+		final InputFileTreeItem item = new InputFileTreeItem(p_inputFile);
 		item.setSelected(true);
 		
-		inputFileRoot.getChildren().add(item);
+		f_inputFileRoot.getChildren().add(item);
 	}
 	
-	public void setTarget(File targetFolder)
+	/**
+	 * @update_comment
+	 * @param p_targetFolder
+	 */
+	public void setTarget(File p_targetFolder)
 	{
-		final TargetFileTreeItem item = new TargetFileTreeItem(targetFolder);
+		final TargetFileTreeItem item = new TargetFileTreeItem(p_targetFolder);
 		
-		targetFileRoot.getChildren().clear();
-		targetFileRoot.getChildren().add(item);
+		f_targetFileRoot.getChildren().clear();
+		f_targetFileRoot.getChildren().add(item);
 	}
 	
-	public void setTargetSectionEnabled(boolean enabled)
+	/**
+	 * @update_comment
+	 * @param p_enabled
+	 */
+	public void setTargetSectionEnabled(boolean p_enabled)
 	{
-		targetFiles.disableProperty().set(!enabled);
-		targetSelectFolderButton.disableProperty().set(!enabled);
+		f_targetFiles.disableProperty().set(!p_enabled);
+		f_targetSelectFolderButton.disableProperty().set(!p_enabled);
 		
-		if (!enabled)
+		if (!p_enabled)
 		{
-			targetFilesLabel.setStyle("-fx-opacity: .5");
+			f_targetFilesLabel.setStyle("-fx-opacity: .5");
 		}
 		else
 		{
-			targetFilesLabel.setStyle("-fx-opacity: 1");
+			f_targetFilesLabel.setStyle("-fx-opacity: 1");
 		}
 	}
 	
-	public void setInputSectionEnabled(boolean enabled)
+	/**
+	 * @update_comment
+	 * @param p_enabled
+	 */
+	public void setInputSectionEnabled(boolean p_enabled)
 	{
-		inputFiles.disableProperty().set(!enabled);
-		inputAddFileButton.disableProperty().set(!enabled);
-		inputAddFolderButton.disableProperty().set(!enabled);
-		inputRemoveButton.disableProperty().set(!enabled);
+		f_inputFiles.disableProperty().set(!p_enabled);
+		f_inputAddFileButton.disableProperty().set(!p_enabled);
+		f_inputAddFolderButton.disableProperty().set(!p_enabled);
+		f_inputRemoveButton.disableProperty().set(!p_enabled);
 		
-		if (!enabled)
+		if (!p_enabled)
 		{
-			inputFilesLabel.setStyle("-fx-opacity: .5");
+			f_inputFilesLabel.setStyle("-fx-opacity: .5");
 		}
 		else
 		{
-			inputFilesLabel.setStyle("-fx-opacity: 1");
+			f_inputFilesLabel.setStyle("-fx-opacity: 1");
 		}
 	}
 	
-	public void setRunConversionEnabled(boolean enabled)
+	/**
+	 * @update_comment
+	 * @param p_enabled
+	 */
+	public void setRunConversionEnabled(boolean p_enabled)
 	{
-		runConversionButton.disableProperty().set(!enabled);
+		f_runConversionButton.disableProperty().set(!p_enabled);
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	public void clearPasswordPrompt()
 	{
-		passwordField.setPromptText("");
+		f_passwordField.setPromptText("");
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	public void toggleKeySection()
 	{
-		keySelectionButtons.selectToggle(keyFileToggle);
+		f_keySelectionButtons.selectToggle(f_keyFileToggle);
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	public void togglePasswordSection()
 	{
-		keySelectionButtons.selectToggle(passwordToggle);
+		f_keySelectionButtons.selectToggle(f_passwordToggle);
 	}
 	
-	public void setKeyFilePath(String path)
+	/**
+	 * @update_comment
+	 * @param p_path
+	 */
+	public void setKeyFilePath(String p_path)
 	{
-		keyFilePath.setText(path);
+		f_keyFilePath.setText(p_path);
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public boolean keyFileEnabled()
 	{
-		return !keyFilePath.disableProperty().get();
+		return !f_keyFilePath.disableProperty().get();
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public boolean passwordEnabled()
 	{
-		return !passwordField.disableProperty().get();
+		return !f_passwordField.disableProperty().get();
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public String getKeyFilePath()
 	{
-		return keyFilePath.getText();
+		return f_keyFilePath.getText();
 	}
 	
+	/* (non-Javadoc)
+	 * @see ui.graphical.View#getPassword()
+	 */
 	public String getPassword()
 	{
-		return passwordField.getText();
+		return f_passwordField.getText();
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public Map<TreeCell<String>, InputFileTreeItem> getActiveInputItems()
 	{
-		return activeInputItems;
+		return f_activeInputItems;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public Map<TreeCell<String>, TargetFileTreeItem> getActiveTargetItems()
 	{
-		return activeTargetItems;
+		return f_activeTargetItems;
 	}
 	
-	public void setFilesCreated(int number)
+	/**
+	 * @update_comment
+	 * @param p_number
+	 */
+	public void setFilesCreated(int p_number)
 	{
-		//Platform.runLater(() -> filesCreatedStringProperty.set(filesCreatedString + number));
-		Platform.runLater(() -> filesCreatedLabel.setText(filesCreatedString + number));
+		Platform.runLater(() -> f_filesCreatedLabel.setText(s_filesCreatedString + p_number));
 	}
 	
+	/**
+	 * @update_comment
+	 * @param progress
+	 */
 	public void setConversionProgress(double progress)
 	{
-		Platform.runLater(() -> conversionProgress.setProgress(progress));
+		Platform.runLater(() -> f_conversionProgress.setProgress(progress));
 	}
 
 	/**
@@ -813,7 +913,7 @@ public class EmbedView extends View
 	{
 		List<Integer> indices = new LinkedList<Integer>();
 		
-		ObservableList<TablePosition> selectedRows = table.getSelectionModel().getSelectedCells();
+		ObservableList<TablePosition> selectedRows = f_table.getSelectionModel().getSelectedCells();
 		for (int x = 0; x < selectedRows.size(); ++x)
 		{
 			TablePosition position = (TablePosition) selectedRows.get(x);
@@ -829,22 +929,26 @@ public class EmbedView extends View
 	@Override
 	public File getEnclosingFolder()
 	{
-		//this shouldn't happen in embed
+		//not used in embed
 		return null;
 	}
 
 	/**
 	 * @update_comment
-	 * @param folder
+	 * @param p_folder
 	 */
-	public void setOutputFolder(File folder)
+	public void setOutputFolder(File p_folder)
 	{
-		outputFolder.setPath(folder.getAbsolutePath());
+		f_outputFolder.setPath(p_folder.getAbsolutePath());
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public File getOutputFolder()
 	{
-		String path = outputFolder.getPath();
+		String path = f_outputFolder.getPath();
 		
 		if (path == null || path.isEmpty())
 			return null;
@@ -857,12 +961,12 @@ public class EmbedView extends View
 	 */
 	public void removeSelectedInput()
 	{
-		TreeItem<String> selected = inputFiles.getSelectionModel().getSelectedItem();
+		TreeItem<String> selected = f_inputFiles.getSelectionModel().getSelectedItem();
 		if (selected != null)
 		{
-			if (inputFileRoot.getChildren().contains(selected))
+			if (f_inputFileRoot.getChildren().contains(selected))
 			{
-				inputFileRoot.getChildren().remove(selected);
+				f_inputFileRoot.getChildren().remove(selected);
 			}
 			else
 			{
@@ -880,7 +984,7 @@ public class EmbedView extends View
 	{
 		Set<File> files = new HashSet<File>();
 		
-		for (TreeItem<String> child : inputFileRoot.getChildren())
+		for (TreeItem<String> child : f_inputFileRoot.getChildren())
 		{
 			collectInputFiles(files, (InputFileTreeItem) child);
 		}
@@ -890,25 +994,25 @@ public class EmbedView extends View
 
 	/**
 	 * @update_comment
-	 * @param files
-	 * @param parent
+	 * @param p_files
+	 * @param p_parent
 	 */
-	private void collectInputFiles(Set<File> files, InputFileTreeItem parent)
+	private void collectInputFiles(Set<File> p_files, InputFileTreeItem p_parent)
 	{
-		if (parent.isIndeterminate())
+		if (p_parent.isIndeterminate())
 		{
 			//parent is not selected, but some children are selected or indeterminate
 			//(must be a folder and must have been expanded)
-			for (TreeItem<String> child : parent.getChildren())
+			for (TreeItem<String> child : p_parent.getChildren())
 			{
-				collectInputFiles(files, (InputFileTreeItem) child);
+				collectInputFiles(p_files, (InputFileTreeItem) child);
 			}
 		}
-		else if (parent.isSelected())
+		else if (p_parent.isSelected())
 		{
 			//parent is selected
 			//(file or folder, just add it)
-			files.add(parent.getFile());
+			p_files.add(p_parent.getFile());
 		}
 		
 		//else: unselected, don't add

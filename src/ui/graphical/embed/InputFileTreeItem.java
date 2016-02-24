@@ -17,39 +17,42 @@ import product.ConversionJobFileState;
  */
 public class InputFileTreeItem extends CheckBoxTreeItem<String>
 {
-	private double progress;
-	private File file;
-	private ConversionJobFileState status;
-	private boolean focused;
+	private double f_progress;
+	private File f_file;
+	private ConversionJobFileState f_status;
+	private boolean f_focused;
 	
-	private static final InputFileTreeItem tempExpandableChildItem = new InputFileTreeItem("Loading...");
+	private static final InputFileTreeItem s_tempExpandableChildItem =
+		new InputFileTreeItem("Loading...");
+	private static final Map<ConversionJobFileState, String> s_fxStatusColors = 
+		new HashMap<ConversionJobFileState, String>();
+	private static final String s_textFillColor = "-fx-text-fill: black; ";
 	
-	private static final Map<ConversionJobFileState, String> fxStatusColors = 
-					new HashMap<ConversionJobFileState, String>();
-	
-	private static final String textFillColor = "-fx-text-fill: black; ";
-	
-	static//-fx-accent: #0093ff; 
+	static
 	{
-		fxStatusColors.put(ConversionJobFileState.NOT_STARTED, "-fx-accent: rgba(200, 200, 200, 1); ");
-		fxStatusColors.put(ConversionJobFileState.WRITING, "-fx-background-color: rgba(11, 156, 0, .5); ");
-		fxStatusColors.put(ConversionJobFileState.PAUSED, "-fx-background-color: rgba(156, 146, 0, .5); ");
-		fxStatusColors.put(ConversionJobFileState.FINISHED, "-fx-background-color: rgba(11, 156, 0, .7); ");
-		fxStatusColors.put(ConversionJobFileState.ERRORED, "-fx-background-color: rgba(244, 20, 0, .75); ");
+		s_fxStatusColors.put(ConversionJobFileState.NOT_STARTED,
+			"-fx-accent: rgba(200, 200, 200, 1); ");
+		s_fxStatusColors.put(ConversionJobFileState.WRITING,
+			"-fx-background-color: rgba(11, 156, 0, .5); ");
+		s_fxStatusColors.put(ConversionJobFileState.PAUSED,
+			"-fx-background-color: rgba(156, 146, 0, .5); ");
+		s_fxStatusColors.put(ConversionJobFileState.FINISHED,
+			"-fx-background-color: rgba(11, 156, 0, .7); ");
+		s_fxStatusColors.put(ConversionJobFileState.ERRORED,
+			"-fx-background-color: rgba(244, 20, 0, .75); ");
 	}
 	
-
 	/**
 	 * @update_comment
-	 * @param string
+	 * @param p_file
 	 */
-	public InputFileTreeItem(File file)
+	public InputFileTreeItem(File p_file)
 	{
-		super(file.getName());
-		this.file = file;
-		status = ConversionJobFileState.NOT_STARTED;
+		super(p_file.getName());
+		this.f_file = p_file;
+		f_status = ConversionJobFileState.NOT_STARTED;
 		
-		if (file.isDirectory() && file.listFiles().length > 0)
+		if (p_file.isDirectory() && p_file.listFiles().length > 0)
 		{
 			//load actual children once expanded
 			expandedProperty().addListener(
@@ -59,13 +62,13 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 			
 			//add a temporary entry so the input file entry will show up as expandable
 			//this will be replaced when it is expanded
-			getChildren().add(tempExpandableChildItem);
+			getChildren().add(s_tempExpandableChildItem);
 		}
 	}
 	
-	public InputFileTreeItem(String display)
+	public InputFileTreeItem(String p_display)
 	{
-		super(display);
+		super(p_display);
 	}
 
 	/**
@@ -73,15 +76,15 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	 */
 	public double getProgress()
 	{
-		return progress;
+		return f_progress;
 	}
 
 	/**
-	 * @param progress the progress to set
+	 * @param p_progress the progress to set
 	 */
-	public void setProgress(double progress)
+	public void setProgress(double p_progress)
 	{
-		this.progress = progress;
+		this.f_progress = p_progress;
 	}
 
 	/**
@@ -89,16 +92,16 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	 */
 	public File getFile()
 	{
-		return file;
+		return f_file;
 	}
 
 	/**
-	 * @param file the file to set
+	 * @param p_file the file to set
 	 */
-	public void setFile(File file)
+	public void setFile(File p_file)
 	{
-		this.file = file;
-		setValue(file.getName());
+		this.f_file = p_file;
+		setValue(p_file.getName());
 	}
 
 	/**
@@ -106,28 +109,25 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	 */
 	public ConversionJobFileState getStatus()
 	{
-		return status;
+		return f_status;
 	}
 
 	/**
-	 * @param status the status to set
+	 * @param p_status the status to set
 	 */
-	public void setStatus(ConversionJobFileState status)
+	public void setStatus(ConversionJobFileState p_status)
 	{
-		this.status = status;
+		this.f_status = p_status;
 	}
-	
+
 	/**
-	 * @param item 
 	 * @update_comment
-	 * @param booleanValue
-	 * @param inputFile
-	 * @return
+	 * @param p_expanded
 	 */
-	private void folderEntryExpanded(boolean expanded)
+	private void folderEntryExpanded(boolean p_expanded)
 	{
 		//only load children if they haven't been loaded yet
-		if (expanded && getChildren().get(0).equals(tempExpandableChildItem))
+		if (p_expanded && getChildren().get(0).equals(s_tempExpandableChildItem))
 		{
 			List<InputFileTreeItem> loadedItems = new ArrayList<InputFileTreeItem>();
 			
@@ -147,23 +147,27 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 		}
 	}
 	
-	public void setCellStyle(TreeCell<?> cell)
+	/**
+	 * @update_comment
+	 * @param p_cell
+	 */
+	public void setCellStyle(TreeCell<?> p_cell)
 	{
-		int width = (int) cell.getWidth();
-		int rightInset = width - (int) (width * this.progress);
+		int width = (int) p_cell.getWidth();
+		int rightInset = width - (int) (width * this.f_progress);
 
 		//create a progress bar out of the background color by setting the insets
 		//according to the progress of the item
 		String bar = "";
-		if ((status.equals(ConversionJobFileState.WRITING) || 
-						status.equals(ConversionJobFileState.PAUSED)))
+		if ((f_status.equals(ConversionJobFileState.WRITING) || 
+						f_status.equals(ConversionJobFileState.PAUSED)))
 		{
 			bar = " -fx-background-insets: 0 " + rightInset + " 0 0";
 		}
 		
-		String focusedOpacity = focused ? "-fx-opacity: 1; " : "-fx-opacity: .9; ";
+		String focusedOpacity = f_focused ? "-fx-opacity: 1; " : "-fx-opacity: .9; ";
 		
-		cell.setStyle(focusedOpacity + textFillColor + fxStatusColors.get(status) + bar);
+		p_cell.setStyle(focusedOpacity + s_textFillColor + s_fxStatusColors.get(f_status) + bar);
 	}
 
 	/**
@@ -171,14 +175,14 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	 */
 	public boolean isFocused()
 	{
-		return focused;
+		return f_focused;
 	}
 
 	/**
-	 * @param focused the focused to set
+	 * @param p_focused the focused to set
 	 */
-	public void setFocused(boolean focused)
+	public void setFocused(boolean p_focused)
 	{
-		this.focused = focused;
+		this.f_focused = p_focused;
 	}
 }

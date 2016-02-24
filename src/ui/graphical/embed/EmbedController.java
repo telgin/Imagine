@@ -34,31 +34,30 @@ import util.FileSystemUtil;
  */
 public class EmbedController implements ActiveComponent
 {
-	private EmbedView view;
-	private GUI gui;
+	private EmbedView f_view;
+	private GUI f_gui;
 	
 	//state variables
-	private List<String> presetNames;
-	private Algorithm selectedAlgorithm = null;
-	private File selectedTargetFolder = null;
-	private boolean structuredOutput = false;
-	
-	private boolean shuttingDown = false;
-	private int totalFilesThisRun = 0;
-	private int filesCreated = 0;
-	private double conversionProgress = 0;
-	private Thread guiUpdateDaemon;
+	private List<String> f_presetNames;
+	private Algorithm f_selectedAlgorithm = null;
+	private File f_selectedTargetFolder = null;
+	private boolean f_structuredOutput = false;
+	private boolean f_shuttingDown = false;
+	private int f_totalFilesThisRun = 0;
+	private int f_filesCreated = 0;
+	private double f_conversionProgress = 0;
+	private Thread f_guiUpdateDaemon;
 		
 	/**
 	 * @update_comment
 	 * @param file
 	 */
-	public EmbedController(EmbedView view)
+	public EmbedController(EmbedView p_view)
 	{
-		this.view = view;
-		this.gui = (GUI) UIContext.getUI();
+		f_view = p_view;
+		f_gui = (GUI) UIContext.getUI();
 		
-		presetNames = ConfigurationAPI.getAlgorithmPresetNames();
+		f_presetNames = ConfigurationAPI.getAlgorithmPresetNames();
 	}
 
 	/**
@@ -66,15 +65,15 @@ public class EmbedController implements ActiveComponent
 	 */
 	public Algorithm getSelectedAlgorithm()
 	{
-		return selectedAlgorithm;
+		return f_selectedAlgorithm;
 	}
 
 	/**
-	 * @param selectedAlgorithm the selectedAlgorithm to set
+	 * @param p_selectedAlgorithm the selectedAlgorithm to set
 	 */
-	public void setSelectedAlgorithm(Algorithm selectedAlgorithm)
+	public void setSelectedAlgorithm(Algorithm p_selectedAlgorithm)
 	{
-		this.selectedAlgorithm = selectedAlgorithm;
+		f_selectedAlgorithm = p_selectedAlgorithm;
 	}
 	
 	/**
@@ -83,10 +82,10 @@ public class EmbedController implements ActiveComponent
 	 */
 	void chooseKeyFile()
 	{
-		File chosen = view.chooseFile();
+		File chosen = f_view.chooseFile();
 		if (chosen != null)
 		{
-			view.setKeyFilePath(chosen.getAbsolutePath());
+			f_view.setKeyFilePath(chosen.getAbsolutePath());
 		}
 	}
 
@@ -97,11 +96,11 @@ public class EmbedController implements ActiveComponent
 	private Key getKey()
 	{
 		Key key = null;
-		if (view.keyFileEnabled())
+		if (f_view.keyFileEnabled())
 		{
-			key = new FileKey(new File(view.getKeyFilePath()));
+			key = new FileKey(new File(f_view.getKeyFilePath()));
 		}
-		else if (view.passwordEnabled())
+		else if (f_view.passwordEnabled())
 		{
 			key = new PasswordKey();
 		}
@@ -113,43 +112,47 @@ public class EmbedController implements ActiveComponent
 		return key;
 	}
 	
-	public void algorithmSelected(int index)
+	/**
+	 * @update_comment
+	 * @param p_index
+	 */
+	public void algorithmSelected(int p_index)
 	{
-		if (index == -1)
+		if (p_index == -1)
 		{
 			//nothing selected
-			view.setKeySectionEnabled(false);
-			view.setInputSectionEnabled(false);
-			view.setTargetSectionEnabled(false);
-			view.setRunConversionEnabled(false);
-			selectedAlgorithm = null;
+			f_view.setKeySectionEnabled(false);
+			f_view.setInputSectionEnabled(false);
+			f_view.setTargetSectionEnabled(false);
+			f_view.setRunConversionEnabled(false);
+			f_selectedAlgorithm = null;
 		}
 		//else if the selected algorithm is a new selection...
-		else if (selectedAlgorithm == null || !selectedAlgorithm.getPresetName().equals(presetNames.get(index)))
+		else if (f_selectedAlgorithm == null || !f_selectedAlgorithm.getPresetName().equals(f_presetNames.get(p_index)))
 		{
 			try
 			{
-				selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(presetNames.get(index));
-				view.setKeySectionEnabled(true);
-				view.setInputSectionEnabled(true);
-				view.setRunConversionEnabled(true);
+				f_selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(f_presetNames.get(p_index));
+				f_view.setKeySectionEnabled(true);
+				f_view.setInputSectionEnabled(true);
+				f_view.setRunConversionEnabled(true);
 				
 				//Enable the target section if the algorithm uses it
 				//TODO create a better way to handle this (or update it once more algos exist)
-				Parameter imageFolder = selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
+				Parameter imageFolder = f_selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
 				if (imageFolder != null)
 				{
-					view.setTargetSectionEnabled(true);
+					f_view.setTargetSectionEnabled(true);
 					
 					//reflect the set target folder if it exists
 					if (imageFolder.getValue() != null && !imageFolder.getValue().equals(Option.PROMPT_OPTION.getValue()))
 					{
-						view.setTarget(new File(imageFolder.getValue()));
+						f_view.setTarget(new File(imageFolder.getValue()));
 					}
 				}
 				else
 				{
-					view.setTargetSectionEnabled(false);
+					f_view.setTargetSectionEnabled(false);
 				}
 			}
 			catch (UsageException e)
@@ -157,14 +160,14 @@ public class EmbedController implements ActiveComponent
 				Logger.log(LogLevel.k_error, e.getMessage());
 				Logger.log(LogLevel.k_debug, e, false);
 				
-				view.setAlgorithmSelection(null);
+				f_view.setAlgorithmSelection(null);
 			}
 		}
 		
-		if (gui.hasErrors())
+		if (f_gui.hasErrors())
 		{
-			view.showErrors(gui.getErrors(), "algorithm lookup");
-			gui.clearErrors();
+			f_view.showErrors(f_gui.getErrors(), "algorithm lookup");
+			f_gui.clearErrors();
 		}
 	}
 
@@ -173,7 +176,7 @@ public class EmbedController implements ActiveComponent
 	 */
 	public List<String> getPresetNames()
 	{
-		return presetNames;
+		return f_presetNames;
 	}
 
 	/**
@@ -181,44 +184,44 @@ public class EmbedController implements ActiveComponent
 	 * @param b
 	 * @return
 	 */
-	public void algorithmSelectFocus(boolean focused)
+	public void algorithmSelectFocus(boolean p_focused)
 	{
 		//update the list if focused on
-		if (focused)
+		if (p_focused)
 		{
 			List<String> currentPresetNames = ConfigurationAPI.getAlgorithmPresetNames();
 			
 			//update the list only if it changed
-			if (presetNames.size() != currentPresetNames.size() || 
-							!presetNames.containsAll(currentPresetNames))
+			if (f_presetNames.size() != currentPresetNames.size() || 
+							!f_presetNames.containsAll(currentPresetNames))
 			{
 				//save algorithm modifications
-				Algorithm previousSelection = selectedAlgorithm;
+				Algorithm previousSelection = f_selectedAlgorithm;
 				
 				//refresh the preset names to the new list
-				presetNames = currentPresetNames;
-				view.setAlgorithmPresets(presetNames);
+				f_presetNames = currentPresetNames;
+				f_view.setAlgorithmPresets(f_presetNames);
 			
 				//try to restore the changes that were made
-				if (previousSelection != null && presetNames.contains(previousSelection.getPresetName()))
+				if (previousSelection != null && f_presetNames.contains(previousSelection.getPresetName()))
 				{
-					view.setAlgorithmSelection(previousSelection.getPresetName());
-					selectedAlgorithm = previousSelection;
+					f_view.setAlgorithmSelection(previousSelection.getPresetName());
+					f_selectedAlgorithm = previousSelection;
 					
 					//reset the target section
-					Parameter imageFolder = selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
+					Parameter imageFolder = f_selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
 					if (imageFolder != null)
 					{
 						//reflect the set target folder if it exists
 						if (!imageFolder.getValue().equals(Option.PROMPT_OPTION.getValue()))
 						{
-							view.setTarget(new File(imageFolder.getValue()));
+							f_view.setTarget(new File(imageFolder.getValue()));
 						}
 					}
 				}
 				else
 				{
-					view.setAlgorithmSelection(null);
+					f_view.setAlgorithmSelection(null);
 				}
 			}
 		}
@@ -230,11 +233,11 @@ public class EmbedController implements ActiveComponent
 	 */
 	public void inputAddFilePressed()
 	{
-		File file = view.chooseFile();
+		File file = f_view.chooseFile();
 
 		if (file != null)
 		{
-			view.addInput(FileSystemUtil.relativizeByCurrentLocation(file));
+			f_view.addInput(FileSystemUtil.relativizeByCurrentLocation(file));
 		}
 	}
 
@@ -244,11 +247,11 @@ public class EmbedController implements ActiveComponent
 	 */
 	public void inputAddFolderPressed()
 	{
-		File folder = view.chooseFolder();
+		File folder = f_view.chooseFolder();
 
 		if (folder != null)
 		{
-			view.addInput(FileSystemUtil.relativizeByCurrentLocation(folder));
+			f_view.addInput(FileSystemUtil.relativizeByCurrentLocation(folder));
 		}
 	}
 
@@ -258,12 +261,12 @@ public class EmbedController implements ActiveComponent
 	 */
 	public void removeInputPressed()
 	{
-		view.removeSelectedInput();
+		f_view.removeSelectedInput();
 		
-		if (gui.hasErrors())
+		if (f_gui.hasErrors())
 		{
-			view.showErrors(gui.getErrors(), "input entry removal");
-			gui.clearErrors();
+			f_view.showErrors(f_gui.getErrors(), "input entry removal");
+			f_gui.clearErrors();
 		}
 	}
 
@@ -273,11 +276,11 @@ public class EmbedController implements ActiveComponent
 	 */
 	public void browseOutputFolder()
 	{
-		File folder = view.chooseFolder();
+		File folder = f_view.chooseFolder();
 		
 		if (folder != null)
 		{
-			view.setOutputFolder(folder);
+			f_view.setOutputFolder(folder);
 		}
 	}
 
@@ -286,9 +289,9 @@ public class EmbedController implements ActiveComponent
 	 * @param b
 	 * @return
 	 */
-	public void structuredOutputChecked(boolean checked)
+	public void structuredOutputChecked(boolean p_checked)
 	{
-		structuredOutput = checked;
+		f_structuredOutput = p_checked;
 	}
 
 	/**
@@ -299,45 +302,45 @@ public class EmbedController implements ActiveComponent
 	{
 		try
 		{
-			File outputFolder = view.getOutputFolder();
+			File outputFolder = f_view.getOutputFolder();
 			
 			if (outputFolder == null)
 			{
 				Logger.log(LogLevel.k_error, "An output folder must be chosen.");
 			}
-			else if (selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM) != null && 
-							(selectedTargetFolder == null || !selectedTargetFolder.exists()))
+			else if (f_selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM) != null && 
+							(f_selectedTargetFolder == null || !f_selectedTargetFolder.exists()))
 			{
 				Logger.log(LogLevel.k_error, "A valid target folder must be chosen.");
 			}
 			else
 			{
-				List<File> inputFiles = view.getInputFileList();
-				totalFilesThisRun = 0;
+				List<File> inputFiles = f_view.getInputFileList();
+				f_totalFilesThisRun = 0;
 				try
 				{
 					for (File input : inputFiles)
-						totalFilesThisRun += FileSystemUtil.countEligableFiles(input);
+						f_totalFilesThisRun += FileSystemUtil.countEligableFiles(input);
 				}
 				catch (IOException e1)
 				{
 					Logger.log(LogLevel.k_debug, "Could not count files for an entry.");
-					totalFilesThisRun = 0;
+					f_totalFilesThisRun = 0;
 				}
 			
 				SystemManager.reset();
-				Settings.setOutputFolder(view.getOutputFolder());
-				Settings.setUsingStructuredOutput(structuredOutput);
+				Settings.setOutputFolder(f_view.getOutputFolder());
+				Settings.setUsingStructuredOutput(f_structuredOutput);
 				Settings.setGenerateReport(false);
 				Settings.setTrackFileStatus(true);
 
-				ConversionJob job = ConversionAPI.runConversion(inputFiles, selectedAlgorithm, getKey(), 1);
+				ConversionJob job = ConversionAPI.runConversion(inputFiles, f_selectedAlgorithm, getKey(), 1);
 	
-				if (guiUpdateDaemon == null || !guiUpdateDaemon.isAlive())
+				if (f_guiUpdateDaemon == null || !f_guiUpdateDaemon.isAlive())
 				{
-					guiUpdateDaemon = new Thread(() -> updateCSS(job));
-					guiUpdateDaemon.setDaemon(true);
-					guiUpdateDaemon.start();
+					f_guiUpdateDaemon = new Thread(() -> updateCSS(job));
+					f_guiUpdateDaemon.setDaemon(true);
+					f_guiUpdateDaemon.start();
 				}
 			}
 		}
@@ -347,71 +350,79 @@ public class EmbedController implements ActiveComponent
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 		
-		if (gui.hasErrors())
+		if (f_gui.hasErrors())
 		{
-			view.showErrors(gui.getErrors(), "conversion");
-			gui.clearErrors();
+			f_view.showErrors(f_gui.getErrors(), "conversion");
+			f_gui.clearErrors();
 		}
 	}
 	
-	public void updateCSS(ConversionJob job)
+	/**
+	 * @update_comment
+	 * @param p_job
+	 */
+	public void updateCSS(ConversionJob p_job)
 	{
 		int run = 0;
-		while (!shuttingDown && !job.isFinished())
+		while (!f_shuttingDown && !p_job.isFinished())
 		{
 			cssUpdateLoop(run++);
 		}
 		
 		//finalize any progress that was made one last time
-		if (!shuttingDown && job.isFinished())
+		if (!f_shuttingDown && p_job.isFinished())
 		{
 			cssUpdateLoop(run++);
 		}
 		
-		if (gui.hasErrors())
+		if (f_gui.hasErrors())
 		{
 			Platform.runLater(() -> 
 			{
-				view.showErrors(gui.getErrors(), "conversion");
-				gui.clearErrors();
+				f_view.showErrors(f_gui.getErrors(), "conversion");
+				f_gui.clearErrors();
 			});
 		}
 	}
 	
-	public void cssUpdateLoop(int run)
+	/**
+	 * @update_comment
+	 * @param p_run
+	 */
+	public void cssUpdateLoop(int p_run)
 	{
 		//update things if they're different
 		
 		//files created
 		int currentFilesCreated = JobStatus.getProductsCreated();
-		if (currentFilesCreated != filesCreated)
+		if (currentFilesCreated != f_filesCreated)
 		{
-			filesCreated = JobStatus.getProductsCreated();
-			view.setFilesCreated(filesCreated);
+			f_filesCreated = JobStatus.getProductsCreated();
+			f_view.setFilesCreated(f_filesCreated);
 		}
 		
 		//conversion progress
-		double currentConversionProgress = (double) JobStatus.getInputFilesProcessed() / totalFilesThisRun;
-		if (conversionProgress != currentConversionProgress)
+		double currentConversionProgress = (double) JobStatus.getInputFilesProcessed() / f_totalFilesThisRun;
+		if (f_conversionProgress != currentConversionProgress)
 		{
-			conversionProgress = currentConversionProgress;
-			view.setConversionProgress(conversionProgress);
+			f_conversionProgress = currentConversionProgress;
+			f_view.setConversionProgress(f_conversionProgress);
 		}
 		
 		//update input file item status/progress for visible/loaded cells
-		for (InputFileTreeItem item : view.getActiveInputItems().values())
+		for (InputFileTreeItem item : f_view.getActiveInputItems().values())
 		{
 			updateInputItem(item);
 		}
 		
 		//update target file item status for visible/loaded cells
-		for (TargetFileTreeItem item : view.getActiveTargetItems().values())
+		for (TargetFileTreeItem item : f_view.getActiveTargetItems().values())
 		{
 			updateTargetItem(item);
 		}
 		
 		//update the cell css
-		view.updateAllActiveCells();
+		f_view.updateAllActiveCells();
 		
 		try
 		{
@@ -423,22 +434,30 @@ public class EmbedController implements ActiveComponent
 		}
 	}
 	
-	public synchronized void updateInputItem(InputFileTreeItem item)
+	/**
+	 * @update_comment
+	 * @param p_item
+	 */
+	public synchronized void updateInputItem(InputFileTreeItem p_item)
 	{
-		if (item != null)
+		if (p_item != null)
 		{
-			FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
-			item.setStatus(fileStatus.getState());
-			item.setProgress(fileStatus.getProgress());
+			FileStatus fileStatus = JobStatus.getFileStatus(p_item.getFile());
+			p_item.setStatus(fileStatus.getState());
+			p_item.setProgress(fileStatus.getProgress());
 		}
 	}
 	
-	public synchronized void updateTargetItem(TargetFileTreeItem item)
+	/**
+	 * @update_comment
+	 * @param p_item
+	 */
+	public synchronized void updateTargetItem(TargetFileTreeItem p_item)
 	{
-		if (item != null)
+		if (p_item != null)
 		{
-			FileStatus fileStatus = JobStatus.getFileStatus(item.getFile());
-			item.setStatus(fileStatus.getState());
+			FileStatus fileStatus = JobStatus.getFileStatus(p_item.getFile());
+			p_item.setStatus(fileStatus.getState());
 		}
 	}
 
@@ -448,14 +467,14 @@ public class EmbedController implements ActiveComponent
 	 */
 	public void targetSelectFolderPressed()
 	{
-		File folder = view.chooseFolder();
+		File folder = f_view.chooseFolder();
 		
 		if (folder != null)
 		{
-			view.setTarget(folder);
-			selectedTargetFolder = folder;
+			f_view.setTarget(folder);
+			f_selectedTargetFolder = folder;
 			
-			Parameter imageFolder = selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
+			Parameter imageFolder = f_selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
 			if (imageFolder != null)
 			{
 				//set the current algorithm's image folder to the selected one
@@ -465,9 +484,13 @@ public class EmbedController implements ActiveComponent
 		}
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public int getTotalFilesThisRun()
 	{
-		return totalFilesThisRun;
+		return f_totalFilesThisRun;
 	}
 
 	/* (non-Javadoc)
@@ -476,7 +499,7 @@ public class EmbedController implements ActiveComponent
 	@Override
 	public void shutdown()
 	{
-		shuttingDown = true;
+		f_shuttingDown = true;
 	}
 
 	/* (non-Javadoc)

@@ -368,7 +368,7 @@ public class CmdUITest
 	//@Test
 	public void image_overlay_1_sf() { image_overlay_1(SMALL_FILE); }
 	
-	//@Test
+	@Test
 	public void image_overlay_1_st() { image_overlay_1(SMALL_TREE); }
 	
 	//@Test
@@ -624,7 +624,7 @@ public class CmdUITest
 	//@Test
 	public void text_1_bf() { text_1(BIG_FILE); }
 	
-	//@Test
+	@Test
 	public void text_1_bt() { text_1(BIG_TREE); }
 	
 	

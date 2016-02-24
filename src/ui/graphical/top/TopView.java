@@ -22,20 +22,25 @@ import ui.graphical.embed.EmbedView;
  */
 public class TopView extends View
 {
-	private List<View> tabViews;
-	private ArgParseResult args;
-	private TabPane tabPane;
+	private List<View> f_tabViews;
+	private ArgParseResult f_args;
+	private TabPane f_tabPane;
 	
-	public TopView(Stage window, ArgParseResult args)
+	/**
+	 * @update_comment
+	 * @param p_window
+	 * @param p_args
+	 */
+	public TopView(Stage p_window, ArgParseResult p_args)
 	{
-		super(window);
+		super(p_window);
 		
-		this.args = args;
+		f_args = p_args;
 		
-		tabViews = new ArrayList<View>();
-		tabViews.add(new EmbedView(window, args));
-		tabViews.add(new OpenArchiveView(window, args));
-		tabViews.add(new AlgorithmEditorView(window, args));
+		f_tabViews = new ArrayList<View>();
+		f_tabViews.add(new EmbedView(p_window, p_args));
+		f_tabViews.add(new OpenArchiveView(p_window, p_args));
+		f_tabViews.add(new AlgorithmEditorView(p_window, p_args));
 	}
 	
 	/* (non-Javadoc)
@@ -45,8 +50,8 @@ public class TopView extends View
 	public String getPassword()
 	{
 		//pass to correct tab
-		int selectedTabIndex = tabPane.getSelectionModel().getSelectedIndex();
-		return tabViews.get(selectedTabIndex).getPassword();
+		int selectedTabIndex = f_tabPane.getSelectionModel().getSelectedIndex();
+		return f_tabViews.get(selectedTabIndex).getPassword();
 	}
 
 	/* (non-Javadoc)
@@ -56,29 +61,29 @@ public class TopView extends View
 	public Pane setupPane()
 	{
 		BorderPane borderPane = new BorderPane();
-		tabPane = new TabPane();
+		f_tabPane = new TabPane();
 
-		for (View view : tabViews)
+		for (View view : f_tabViews)
 		{
 			Tab tab = new Tab();
 			tab.setClosable(false);
 			tab.setText(view.getTabName());
 			Pane pane = view.setupPane();
 			tab.setContent(pane);
-			tabPane.getTabs().add(tab);
+			f_tabPane.getTabs().add(tab);
 		}
 		
-		borderPane.setCenter(tabPane);
+		borderPane.setCenter(f_tabPane);
 		
 		//set active tab
-		switch (args.action)
+		switch (f_args.action)
 		{
 			case k_editor:
-				tabPane.getSelectionModel().select(2);
+				f_tabPane.getSelectionModel().select(2);
 				break;
 				
 			case k_embed:
-				tabPane.getSelectionModel().select(0);
+				f_tabPane.getSelectionModel().select(0);
 				break;
 				
 			case k_open:
@@ -86,7 +91,7 @@ public class TopView extends View
 			case k_install:
 			case k_help:
 			default:
-				tabPane.getSelectionModel().select(1);
+				f_tabPane.getSelectionModel().select(1);
 		}
 		
 		return borderPane;
@@ -99,8 +104,8 @@ public class TopView extends View
 	public File getEnclosingFolder()
 	{
 		//pass to correct tab
-		int selectedTabIndex = tabPane.getSelectionModel().getSelectedIndex();
-		return tabViews.get(selectedTabIndex).getEnclosingFolder();
+		int selectedTabIndex = f_tabPane.getSelectionModel().getSelectedIndex();
+		return f_tabViews.get(selectedTabIndex).getEnclosingFolder();
 	}
 
 	/* (non-Javadoc)
@@ -112,14 +117,14 @@ public class TopView extends View
 		return "Top View";
 	}
 
-	/**
-	 * @update_comment
-	 * @return
+	/* (non-Javadoc)
+	 * @see ui.graphical.View#promptParameterValue(algorithms.Parameter)
 	 */
-	public String promptParameterValue(Parameter parameter)
+	@Override
+	public String promptParameterValue(Parameter p_parameter)
 	{
-		int selectedTabIndex = tabPane.getSelectionModel().getSelectedIndex();
-		return tabViews.get(selectedTabIndex).promptParameterValue(parameter);
+		int selectedTabIndex = f_tabPane.getSelectionModel().getSelectedIndex();
+		return f_tabViews.get(selectedTabIndex).promptParameterValue(p_parameter);
 	}
 
 }
