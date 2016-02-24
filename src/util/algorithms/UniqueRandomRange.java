@@ -2,38 +2,64 @@ package util.algorithms;
 
 import product.ProductIOException;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class UniqueRandomRange
 {
-	private int index;
-	private int[] array;
-	private HashRandom random;
+	private int f_index;
+	private int[] f_array;
+	private HashRandom f_random;
 
-	public UniqueRandomRange(HashRandom random, int range)
+	/**
+	 * @update_comment
+	 * @param p_random
+	 * @param p_range
+	 */
+	public UniqueRandomRange(HashRandom p_random, int p_range)
 	{
-		this.random = random;
+		f_random = p_random;
 
-		index = range;
-		array = new int[range];
+		f_index = p_range;
+		f_array = new int[p_range];
 
-		for (int i = 0; i < range; ++i)
-			array[i] = i;
+		for (int i = 0; i < p_range; ++i)
+			f_array[i] = i;
 	}
 
-	public void reseed(byte[] seed)
+	/**
+	 * @update_comment
+	 * @param p_seed
+	 */
+	public void reseed(byte[] p_seed)
 	{
-		random = new HashRandom(seed);
+		f_random = new HashRandom(p_seed);
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public int remainingNumbers()
 	{
-		return index;
+		return f_index;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public boolean hasRemainingNumbers()
 	{
-		return index > 0;
+		return f_index > 0;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 * @throws ProductIOException
+	 */
 	public int next() throws ProductIOException
 	{
 		if (!hasRemainingNumbers())
@@ -41,12 +67,12 @@ public class UniqueRandomRange
 
 		try
 		{
-			int swapIndex = random.nextInt(index);
-			int temp = array[swapIndex];
-			array[swapIndex] = array[index - 1];
-			array[index - 1] = temp;
+			int swapIndex = f_random.nextInt(f_index);
+			int temp = f_array[swapIndex];
+			f_array[swapIndex] = f_array[f_index - 1];
+			f_array[f_index - 1] = temp;
 
-			--index;
+			--f_index;
 
 			return temp;
 		}

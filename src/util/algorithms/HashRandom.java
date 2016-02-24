@@ -6,36 +6,54 @@ import java.security.NoSuchAlgorithmException;
 import testing.CodeTimer;
 import util.ByteConversion;
 
+
 /**
- * @author Tom The random of my heart.
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
  */
 public class HashRandom
 {
-	private byte[] curHash;
-	private MessageDigest md;
+	private byte[] f_curHash;
+	private MessageDigest f_digest;
+	private int f_index = 0;
 	private final int STOP = ((512 / 8) / 2); // half way
-	private int index = 0;
-
-	public HashRandom(byte[] seed)
+	
+	/**
+	 * @update_comment
+	 * @param p_seed
+	 */
+	public HashRandom(byte[] p_seed)
 	{
-		init(seed);
+		init(p_seed);
 	}
 
-	public HashRandom(String seed)
+	/**
+	 * @update_comment
+	 * @param p_seed
+	 */
+	public HashRandom(String p_seed)
 	{
-		init(seed.getBytes());
+		init(p_seed.getBytes());
 	}
 
-	public HashRandom(Long seed)
+	/**
+	 * @update_comment
+	 * @param p_seed
+	 */
+	public HashRandom(Long p_seed)
 	{
-		init(ByteConversion.longToBytes(seed));
+		init(ByteConversion.longToBytes(p_seed));
 	}
 
-	private void init(byte[] seed)
+	/**
+	 * @update_comment
+	 * @param p_seed
+	 */
+	private void init(byte[] p_seed)
 	{
 		try
 		{
-			md = MessageDigest.getInstance("SHA-512");
+			f_digest = MessageDigest.getInstance("SHA-512");
 		}
 		catch (NoSuchAlgorithmException e)
 		{
@@ -43,56 +61,77 @@ public class HashRandom
 			System.exit(1);
 		}
 
-		curHash = md.digest(seed);
+		f_curHash = f_digest.digest(p_seed);
 	}
 
-	public short nextShort(short to)
+	/**
+	 * @update_comment
+	 * @param p_to
+	 * @return
+	 */
+	public short nextShort(short p_to)
 	{
-		if (index >= STOP - 1)
+		if (f_index >= STOP - 1)
 			refresh();
 
-		short next = (short) ((curHash[index] << 8) | (curHash[index + 1]));
-		index += 2;
-		return (short) Math.abs(next % to);
+		short next = (short) ((f_curHash[f_index] << 8) | (f_curHash[f_index + 1]));
+		f_index += 2;
+		return (short) Math.abs(next % p_to);
 	}
 
+	/**
+	 * @update_comment
+	 */
 	private void refresh()
 	{
-		index = 0;
-		curHash = md.digest(curHash);
+		f_index = 0;
+		f_curHash = f_digest.digest(f_curHash);
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public byte nextByte()
 	{
-		if (index >= STOP)
+		if (f_index >= STOP)
 			refresh();
 
-		return curHash[index++];
+		return f_curHash[f_index++];
 	}
 
-	public int nextInt(int to)
+	/**
+	 * @update_comment
+	 * @param p_to
+	 * @return
+	 */
+	public int nextInt(int p_to)
 	{
-		if (to == 0)
+		if (p_to == 0)
 			return 0;
 
-		if (index >= STOP - 3)
+		if (f_index >= STOP - 3)
 			refresh();
 
-		index += 4;
+		f_index += 4;
 
-		return Math.abs((curHash[index] << 24 | (curHash[index + 1] & 0xFF) << 16
-						| (curHash[index + 2] & 0xFF) << 8 | (curHash[index + 3] & 0xFF))
-						% to);
+		return Math.abs((f_curHash[f_index] << 24 | (f_curHash[f_index + 1] & 0xFF) << 16
+			| (f_curHash[f_index + 2] & 0xFF) << 8 | (f_curHash[f_index + 3] & 0xFF)) % p_to);
 	}
 
-	public static void main(String args[])
+	/**
+	 * @update_comment
+	 * @param args
+	 */
+	public static void main(String p_args[])
 	{
-
 		profileIntIterative();
 		profileIntPreGeneration();
-
 	}
 
+	/**
+	 * @update_comment
+	 */
 	private static void profileIntIterative()
 	{
 		int averageImageSize = 6022800;
@@ -115,11 +154,14 @@ public class HashRandom
 		ct.end();
 		System.out.println("Dump: " + dump);
 		System.out.println(rotations + " rotations in " + ct.getElapsedTime()
-						+ " milliseconds.");
+			+ " milliseconds.");
 		System.out.println(
-						"(~" + (ct.getElapsedTime() / images) + " milliseconds/image)");
+			"(~" + (ct.getElapsedTime() / images) + " milliseconds/image)");
 	}
 
+	/**
+	 * @update_comment
+	 */
 	private static void profileIntPreGeneration()
 	{
 		int averageImageSize = 6022800;
@@ -153,8 +195,8 @@ public class HashRandom
 		ct.end();
 		System.out.println("Dump: " + dump);
 		System.out.println("Generated " + images + " images in " + ct.getElapsedTime()
-						+ " milliseconds.");
+			+ " milliseconds.");
 		System.out.println(
-						"(~" + (ct.getElapsedTime() / images) + " milliseconds/image)");
+			"(~" + (ct.getElapsedTime() / images) + " milliseconds/image)");
 	}
 }

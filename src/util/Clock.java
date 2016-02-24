@@ -3,12 +3,15 @@ package util;
 import logging.LogLevel;
 import logging.Logger;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class Clock
 {
 
 	/**
 	 * Gets a unique ms time near the time of the function call.
-	 * 
 	 * @return
 	 */
 	public static synchronized long getUniqueTime()

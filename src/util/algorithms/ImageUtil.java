@@ -6,65 +6,107 @@ import java.awt.image.BufferedImage;
 
 import util.ByteConversion;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class ImageUtil
 {
 
-	public static byte getRed(int rgb)
+	/**
+	 * @update_comment
+	 * @param p_rgb
+	 * @return
+	 */
+	public static byte getRed(int p_rgb)
 	{
-		return (byte) ((rgb >> 16) & 0xFF);
+		return (byte) ((p_rgb >> 16) & 0xFF);
 	}
 
-	public static int setRed(int rgb, byte red)
+	/**
+	 * @update_comment
+	 * @param p_rgb
+	 * @param p_red
+	 * @return
+	 */
+	public static int setRed(int p_rgb, byte p_red)
 	{
-		return 0xFF000000 | ((red << 16) & 0x00FF0000)
-						| ((getGreen(rgb) << 8) & 0x0000FF00)
-						| (getBlue(rgb) & 0x000000FF);
+		return 0xFF000000 | ((p_red << 16) & 0x00FF0000)
+						| ((getGreen(p_rgb) << 8) & 0x0000FF00)
+						| (getBlue(p_rgb) & 0x000000FF);
 	}
 
-	public static byte getGreen(int rgb)
+	/**
+	 * @update_comment
+	 * @param p_rgb
+	 * @return
+	 */
+	public static byte getGreen(int p_rgb)
 	{
-		return (byte) ((rgb >> 8) & 0xFF);
+		return (byte) ((p_rgb >> 8) & 0xFF);
 	}
 
-	public static int setGreen(int rgb, byte green)
+	/**
+	 * @update_comment
+	 * @param p_rgb
+	 * @param p_green
+	 * @return
+	 */
+	public static int setGreen(int p_rgb, byte p_green)
 	{
-		return 0xFF000000 | ((getRed(rgb) << 16) & 0x00FF0000)
-						| ((green << 8) & 0x0000FF00) | (getBlue(rgb) & 0x000000FF);
+		return 0xFF000000 | ((getRed(p_rgb) << 16) & 0x00FF0000)
+						| ((p_green << 8) & 0x0000FF00) | (getBlue(p_rgb) & 0x000000FF);
 	}
 
-	public static byte getBlue(int rgb)
+	/**
+	 * @update_comment
+	 * @param p_rgb
+	 * @return
+	 */
+	public static byte getBlue(int p_rgb)
 	{
-		return (byte) (rgb & 0xFF);
+		return (byte) (p_rgb & 0xFF);
 	}
 
-	public static int setBlue(int rgb, byte blue)
+	/**
+	 * @update_comment
+	 * @param p_rgb
+	 * @param p_blue
+	 * @return
+	 */
+	public static int setBlue(int p_rgb, byte p_blue)
 	{
-		return 0xFF000000 | ((getRed(rgb) << 16) & 0x00FF0000)
-						| ((getGreen(rgb) << 8) & 0x0000FF00) | (blue & 0x000000FF);
+		return 0xFF000000 | ((getRed(p_rgb) << 16) & 0x00FF0000)
+						| ((getGreen(p_rgb) << 8) & 0x0000FF00) | (p_blue & 0x000000FF);
 	}
 	
-	public static void compareImages(BufferedImage img1, BufferedImage img2)
+	/**
+	 * @update_comment
+	 * @param p_img1
+	 * @param p_img2
+	 */
+	public static void compareImages(BufferedImage p_img1, BufferedImage p_img2)
 	{
-		for (int x = 0; x < img2.getWidth(); ++x)
+		for (int x = 0; x < p_img2.getWidth(); ++x)
 		{
-			for (int y = 0; y < img2.getHeight(); ++y)
+			for (int y = 0; y < p_img2.getHeight(); ++y)
 			{
-				if (img2.getRGB(x, y) != img2.getRGB(x, y))
+				if (p_img2.getRGB(x, y) != p_img2.getRGB(x, y))
 				{
 					System.out.println("Not right: " + x + ", " + y);
 				}
 
-				int r1 = ByteConversion.byteToInt(ImageUtil.getRed(img1.getRGB(x, y)));
+				int r1 = ByteConversion.byteToInt(ImageUtil.getRed(p_img1.getRGB(x, y)));
 				int g1 = ByteConversion
-								.byteToInt(ImageUtil.getGreen(img1.getRGB(x, y)));
+								.byteToInt(ImageUtil.getGreen(p_img1.getRGB(x, y)));
 				int b1 = ByteConversion
-								.byteToInt(ImageUtil.getBlue(img1.getRGB(x, y)));
+								.byteToInt(ImageUtil.getBlue(p_img1.getRGB(x, y)));
 				int r2 = ByteConversion
-								.byteToInt(ImageUtil.getRed(img2.getRGB(x, y)));
+								.byteToInt(ImageUtil.getRed(p_img2.getRGB(x, y)));
 				int g2 = ByteConversion
-								.byteToInt(ImageUtil.getGreen(img2.getRGB(x, y)));
+								.byteToInt(ImageUtil.getGreen(p_img2.getRGB(x, y)));
 				int b2 = ByteConversion
-								.byteToInt(ImageUtil.getBlue(img2.getRGB(x, y)));
+								.byteToInt(ImageUtil.getBlue(p_img2.getRGB(x, y)));
 
 				if (r1 != r2)
 					System.out.println("Red not right: " + r1 + ", " + r2);
@@ -79,6 +121,13 @@ public class ImageUtil
 	}
 	
 	
+	/**
+	 * Construct a image of ever increasing sizes of green squares. 
+	 * Color increases from black to green from right to left. Square 
+	 * size increases from top to bottom. This image is intended to show
+	 * how compression works with similar but different color values.
+	 * @return
+	 */
 	public static BufferedImage constructTestWebImage1()
 	{
 		BufferedImage img = new BufferedImage(1000,500,BufferedImage.TYPE_INT_RGB);
@@ -112,6 +161,12 @@ public class ImageUtil
 		return img;
 	}
 	
+	/**
+	 * Construct a black and white image where pixels of white are surrounded
+	 * by pixels of black. This is used to show how compression works when colors
+	 * are very different but close together.
+	 * @return
+	 */
 	public static BufferedImage constructTestWebImage2()
 	{
 		BufferedImage img = new BufferedImage(100,100,BufferedImage.TYPE_INT_RGB);
@@ -133,12 +188,17 @@ public class ImageUtil
 		return img;
 	}
 	
-	private static int consecSum(int i)
+	/**
+	 * @update_comment
+	 * @param p_num
+	 * @return
+	 */
+	private static int consecSum(int p_num)
 	{
-		if (i == 0)
+		if (p_num == 0)
 			return 0;
 		else
-			return i + consecSum(i-1);
+			return p_num + consecSum(p_num-1);
 	}
 
 }

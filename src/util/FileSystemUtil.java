@@ -30,34 +30,47 @@ import data.Metadata;
 import logging.LogLevel;
 import logging.Logger;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class FileSystemUtil
 {
-
-	public static void loadMetadataFromFile(Metadata metadata, File file)
+	/**
+	 * @update_comment
+	 * @param p_metadata
+	 * @param p_file
+	 */
+	public static void loadMetadataFromFile(Metadata p_metadata, File p_file)
 	{
 		// check every field, only add if it's not set already
-		if (metadata.getDateCreated() == -1)
-			metadata.setDateCreated(getDateCreated(file));
+		if (p_metadata.getDateCreated() == -1)
+			p_metadata.setDateCreated(getDateCreated(p_file));
 
-		if (metadata.getDateModified() == -1)
-			metadata.setDateModified(getDateModified(file));
+		if (p_metadata.getDateModified() == -1)
+			p_metadata.setDateModified(getDateModified(p_file));
 
-		if (metadata.getFile() == null)
-			metadata.setFile(file);
+		if (p_metadata.getFile() == null)
+			p_metadata.setFile(p_file);
 
-		if (metadata.getPermissions() == -1)
-			metadata.setPermissions(getNumericFilePermissions(file));
+		if (p_metadata.getPermissions() == -1)
+			p_metadata.setPermissions(getNumericFilePermissions(p_file));
 		
-		if (metadata.getType() == null)
-			metadata.setType(file.isDirectory() ? FileType.k_folder : FileType.k_file);
+		if (p_metadata.getType() == null)
+			p_metadata.setType(p_file.isDirectory() ? FileType.k_folder : FileType.k_file);
 	}
 
-	public static short getNumericFilePermissions(File file)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 * @return
+	 */
+	public static short getNumericFilePermissions(File p_file)
 	{
 		try
 		{
 			Set<PosixFilePermission> permissions =
-							Files.getPosixFilePermissions(file.toPath());
+							Files.getPosixFilePermissions(p_file.toPath());
 			return (short) permissionsToInt(permissions);
 		}
 		catch (IOException e)
@@ -67,53 +80,63 @@ public class FileSystemUtil
 		}
 	}
 	
-	public static void setNumericFilePermissions(File file, short permissions)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 * @param p_permissions
+	 */
+	public static void setNumericFilePermissions(File p_file, short p_permissions)
 	{
 		try
 		{
-			Files.setPosixFilePermissions(file.toPath(), intToPermissions(permissions));
+			Files.setPosixFilePermissions(p_file.toPath(), intToPermissions(p_permissions));
 		}
 		catch (IOException e)
 		{
 			Logger.log(LogLevel.k_debug, e, false);
-			Logger.log(LogLevel.k_warning, "Cannot set permissions for file: " + file.getName());
+			Logger.log(LogLevel.k_warning, "Cannot set permissions for file: " + p_file.getName());
 		}
 	}
 
 	/**
 	 * @credit https://github.com/gradle/gradle
-	 * @param mode
+	 * @param p_mode
 	 * @return
 	 */
-	public static Set<PosixFilePermission> intToPermissions(int mode)
+	/**
+	 * @update_comment
+	 * @param p_mode
+	 * @return
+	 */
+	public static Set<PosixFilePermission> intToPermissions(int p_mode)
 	{
 		Set<PosixFilePermission> result = EnumSet.noneOf(PosixFilePermission.class);
 
-		if (isSet(mode, 0400))
+		if (isSet(p_mode, 0400))
 			result.add(PosixFilePermission.OWNER_READ);
 
-		if (isSet(mode, 0200))
+		if (isSet(p_mode, 0200))
 			result.add(PosixFilePermission.OWNER_WRITE);
 
-		if (isSet(mode, 0100))
+		if (isSet(p_mode, 0100))
 			result.add(PosixFilePermission.OWNER_EXECUTE);
 
-		if (isSet(mode, 040))
+		if (isSet(p_mode, 040))
 			result.add(PosixFilePermission.GROUP_READ);
 
-		if (isSet(mode, 020))
+		if (isSet(p_mode, 020))
 			result.add(PosixFilePermission.GROUP_WRITE);
 
-		if (isSet(mode, 010))
+		if (isSet(p_mode, 010))
 			result.add(PosixFilePermission.GROUP_EXECUTE);
 
-		if (isSet(mode, 04))
+		if (isSet(p_mode, 04))
 			result.add(PosixFilePermission.OTHERS_READ);
 
-		if (isSet(mode, 02))
+		if (isSet(p_mode, 02))
 			result.add(PosixFilePermission.OTHERS_WRITE);
 
-		if (isSet(mode, 01))
+		if (isSet(p_mode, 01))
 			result.add(PosixFilePermission.OTHERS_EXECUTE);
 
 		return result;
@@ -121,80 +144,90 @@ public class FileSystemUtil
 
 	/**
 	 * @credit https://github.com/gradle/gradle
-	 * @param mode
-	 * @param testbit
+	 * @param p_mode
+	 * @param p_testbit
 	 * @return
 	 */
-	private static boolean isSet(int mode, int testbit)
+	private static boolean isSet(int p_mode, int p_testbit)
 	{
-		return (mode & testbit) == testbit;
+		return (p_mode & p_testbit) == p_testbit;
 	}
 
 	/**
 	 * @credit https://github.com/gradle/gradle
-	 * @param permissions
+	 * @param p_permissions
 	 * @return
 	 */
-	public static int permissionsToInt(Set<PosixFilePermission> permissions)
+	public static int permissionsToInt(Set<PosixFilePermission> p_permissions)
 	{
 		int result = 0;
 
-		if (permissions.contains(PosixFilePermission.OWNER_READ))
+		if (p_permissions.contains(PosixFilePermission.OWNER_READ))
 			result = result | 0400;
 
-		if (permissions.contains(PosixFilePermission.OWNER_WRITE))
+		if (p_permissions.contains(PosixFilePermission.OWNER_WRITE))
 			result = result | 0200;
 
-		if (permissions.contains(PosixFilePermission.OWNER_EXECUTE))
+		if (p_permissions.contains(PosixFilePermission.OWNER_EXECUTE))
 			result = result | 0100;
 
-		if (permissions.contains(PosixFilePermission.GROUP_READ))
+		if (p_permissions.contains(PosixFilePermission.GROUP_READ))
 			result = result | 040;
 
-		if (permissions.contains(PosixFilePermission.GROUP_WRITE))
+		if (p_permissions.contains(PosixFilePermission.GROUP_WRITE))
 			result = result | 020;
 
-		if (permissions.contains(PosixFilePermission.GROUP_EXECUTE))
+		if (p_permissions.contains(PosixFilePermission.GROUP_EXECUTE))
 			result = result | 010;
 
-		if (permissions.contains(PosixFilePermission.OTHERS_READ))
+		if (p_permissions.contains(PosixFilePermission.OTHERS_READ))
 			result = result | 04;
 
-		if (permissions.contains(PosixFilePermission.OTHERS_WRITE))
+		if (p_permissions.contains(PosixFilePermission.OTHERS_WRITE))
 			result = result | 02;
 
-		if (permissions.contains(PosixFilePermission.OTHERS_EXECUTE))
+		if (p_permissions.contains(PosixFilePermission.OTHERS_EXECUTE))
 			result = result | 01;
 
 		return result;
 	}
 
-	public static long getDateCreated(File file)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 * @return
+	 */
+	public static long getDateCreated(File p_file)
 	{
 		try
 		{
-			BasicFileAttributes attr = Files.readAttributes(file.toPath(),
+			BasicFileAttributes attr = Files.readAttributes(p_file.toPath(),
 							BasicFileAttributes.class);
 			return attr.creationTime().toMillis();
 		}
 		catch (IOException e)
 		{
-			Logger.log(LogLevel.k_error, "Cannot date created for: " + file.getPath());
+			Logger.log(LogLevel.k_error, "Cannot date created for: " + p_file.getPath());
 			return -1;
 		}
 	}
 
-	public static long getDateModified(File file)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 * @return
+	 */
+	public static long getDateModified(File p_file)
 	{
 		try
 		{
-			BasicFileAttributes attr = Files.readAttributes(file.toPath(),
+			BasicFileAttributes attr = Files.readAttributes(p_file.toPath(),
 							BasicFileAttributes.class);
 			return attr.lastModifiedTime().toMillis();
 		}
 		catch (IOException e)
 		{
-			Logger.log(LogLevel.k_error, "Cannot date created for: " + file.getPath());
+			Logger.log(LogLevel.k_error, "Cannot date created for: " + p_file.getPath());
 			return -1;
 		}
 	}
@@ -202,46 +235,63 @@ public class FileSystemUtil
 	/**
 	 * @update_comment
 	 * @credit http://stackoverflow.com/questions/9198184/setting-file-creation-timestamp-in-java
-	 * @param file
-	 * @param dateModified
-	 * @param dateAccessed
-	 * @param dateCreated
+	 * @param p_file
+	 * @param p_dateModified
+	 * @param p_dateAccessed
+	 * @param p_dateCreated
 	 * @throws IOException
 	 */
-	public static void setFileDates(File file, long dateCreated, long dateModified,
-					long dateAccessed)
+	public static void setFileDates(File p_file, long p_dateCreated, long p_dateModified,
+					long p_dateAccessed)
 	{
 
         BasicFileAttributeView attributes = Files.getFileAttributeView(
-        				file.toPath(), BasicFileAttributeView.class);
+        				p_file.toPath(), BasicFileAttributeView.class);
         try
 		{
-			attributes.setTimes(FileTime.fromMillis(dateModified), 
-							FileTime.fromMillis(dateAccessed), 
-							FileTime.fromMillis(dateCreated));
+			attributes.setTimes(FileTime.fromMillis(p_dateModified), 
+							FileTime.fromMillis(p_dateAccessed), 
+							FileTime.fromMillis(p_dateCreated));
 		}
 		catch (IOException e)
 		{
 			Logger.log(LogLevel.k_debug, e, false);
-			Logger.log(LogLevel.k_warning, "Cannot set dates for file: " + file.getName());
+			Logger.log(LogLevel.k_warning, "Cannot set dates for file: " + p_file.getName());
 		}
     }
 	
-	public static void setFileDates(File file, long dateCreated, long dateModified)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 * @param p_dateCreated
+	 * @param p_dateModified
+	 */
+	public static void setFileDates(File p_file, long p_dateCreated, long p_dateModified)
 	{
-		setFileDates(file, dateCreated, dateModified, dateModified);
+		setFileDates(p_file, p_dateCreated, p_dateModified, p_dateModified);
 	}
 
-	public static Metadata loadMetadataFromFile(File file)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 * @return
+	 */
+	public static Metadata loadMetadataFromFile(File p_file)
 	{
 		Metadata metadata = new Metadata();
-		loadMetadataFromFile(metadata, file);
+		loadMetadataFromFile(metadata, p_file);
 		return metadata;
 	}
 
-	public static boolean trackedBy(File f, HashSet<File> fileSet)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 * @param p_fileSet
+	 * @return
+	 */
+	public static boolean trackedBy(File p_file, Set<File> p_fileSet)
 	{
-		if (fileSet.contains(f))
+		if (p_fileSet.contains(p_file))
 		{
 			// the file or folder is specifically listed in the file set
 			return true;
@@ -254,12 +304,11 @@ public class FileSystemUtil
 			File parent = null;
 			try
 			{
-				parent = f.getCanonicalFile().getParentFile();
+				parent = p_file.getCanonicalFile().getParentFile();
 			}
 			catch (IOException e)
 			{
-				Logger.log(LogLevel.k_error,
-								"Cannot get canonical file for: " + f.getPath());
+				Logger.log(LogLevel.k_error, "Cannot get canonical file for: " + p_file.getPath());
 			}
 
 			while (parent != null)
@@ -272,7 +321,7 @@ public class FileSystemUtil
 			// listed
 			for (File file : parents)
 			{
-				if (fileSet.contains(file))
+				if (p_fileSet.contains(file))
 				{
 					return true;
 				}
@@ -284,13 +333,12 @@ public class FileSystemUtil
 
 	/**
 	 * @credit Jeff Learman
-	 * @credit http://stackoverflow.com/questions/20281835/how-to-delete-a-
-	 *         folder-with-files-using-java
-	 * @param file
+	 * @credit http://stackoverflow.com/questions/20281835/how-to-delete-a-folder-with-files-using-java
+	 * @param p_file
 	 */
-	public static void deleteDir(File file)
+	public static void deleteDir(File p_file)
 	{
-		File[] contents = file.listFiles();
+		File[] contents = p_file.listFiles();
 		if (contents != null)
 		{
 			for (File f : contents)
@@ -298,27 +346,27 @@ public class FileSystemUtil
 				deleteDir(f);
 			}
 		}
-		file.delete();
+		p_file.delete();
 	}
 
 	/**
 	 * @credit http://www.mkyong.com/java/how-to-copy-directory-in-java/
-	 * @param src
-	 * @param dest
+	 * @param p_src
+	 * @param p_dest
 	 * @throws IOException
 	 */
-	public static void copyDir2(File src, File dest) throws IOException
+	public static void copyDir2(File p_src, File p_dest) throws IOException
 	{
-		if (src.isDirectory())
+		if (p_src.isDirectory())
 		{
 
-			if (!dest.exists())
-				dest.mkdir();
+			if (!p_dest.exists())
+				p_dest.mkdir();
 
-			for (String file : src.list())
+			for (String file : p_src.list())
 			{
-				File srcFile = new File(src, file);
-				File destFile = new File(dest, file);
+				File srcFile = new File(p_src, file);
+				File destFile = new File(p_dest, file);
 
 				copyDir2(srcFile, destFile);
 			}
@@ -326,23 +374,22 @@ public class FileSystemUtil
 		}
 		else
 		{
-			Files.copy(src.toPath(), dest.toPath());
+			Files.copy(p_src.toPath(), p_dest.toPath());
 		}
 	}
 
 	/**
 	 * (Can't believe it's this complicated in Java)
 	 * 
-	 * @credit http://javatutorialhq.com/java/example-source-code/io/nio/folder-
-	 *         copy/
-	 * @param from
-	 * @param to
+	 * @credit http://javatutorialhq.com/java/example-source-code/io/nio/folder-copy/
+	 * @param p_from
+	 * @param p_to
 	 * @throws IOException
 	 */
-	public static void copyDir(File from, File to) throws IOException
+	public static void copyDir(File p_from, File p_to) throws IOException
 	{
-		Path source = from.toPath();
-		Path target = to.toPath();
+		Path source = p_from.toPath();
+		Path target = p_to.toPath();
 
 		CopyOption[] copyOptions = new CopyOption[] { StandardCopyOption.COPY_ATTRIBUTES,
 						StandardCopyOption.REPLACE_EXISTING };
@@ -399,9 +446,14 @@ public class FileSystemUtil
 		}
 	}
 	
-	public static File relativizeByCurrentLocation(File input)
+	/**
+	 * @update_comment
+	 * @param p_input
+	 * @return
+	 */
+	public static File relativizeByCurrentLocation(File p_input)
 	{
-		return Paths.get("").toAbsolutePath().relativize(input.toPath()).toFile();
+		return Paths.get("").toAbsolutePath().relativize(p_input.toPath()).toFile();
 	}
 	
 	/**
@@ -421,15 +473,26 @@ public class FileSystemUtil
 		}
 	}
 	
-	public static String getProductName(long streamUUID, long sequenceNumber)
+	/**
+	 * @update_comment
+	 * @param p_streamUUID
+	 * @param p_sequenceNumber
+	 * @return
+	 */
+	public static String getProductName(long p_streamUUID, long p_sequenceNumber)
 	{
-		return streamUUID + "_" + sequenceNumber;
+		return p_streamUUID + "_" + p_sequenceNumber;
 	}
 	
-	public static String getProductName(byte[] productUUID)
+	/**
+	 * @update_comment
+	 * @param p_productUUID
+	 * @return
+	 */
+	public static String getProductName(byte[] p_productUUID)
 	{
-		return getProductName(ByteConversion.getStreamUUID(productUUID),
-						ByteConversion.getProductSequenceNumber(productUUID));
+		return getProductName(ByteConversion.getStreamUUID(p_productUUID),
+			ByteConversion.getProductSequenceNumber(p_productUUID));
 	}
 	
 	/**
@@ -455,15 +518,15 @@ public class FileSystemUtil
 	 * Counts the number of files which could be added to an archive. Specifically,
 	 * this would be any files and empty folders. If the input file a leaf, this function
 	 * will return 1.
-	 * @param file
+	 * @param p_file
 	 * @return
 	 * @throws IOException 
 	 */
-	public static int countEligableFiles(File file) throws IOException
+	public static int countEligableFiles(File p_file) throws IOException
 	{
-		if (file.isDirectory())
+		if (p_file.isDirectory())
 		{
-			File[] children = file.listFiles();
+			File[] children = p_file.listFiles();
 			if (children.length == 0)
 			{
 				return 1;
@@ -486,14 +549,14 @@ public class FileSystemUtil
 	/**
 	 * @credit http://stackoverflow.com/questions/5930087/how-to-check-if-a-directory-is-empty-in-java
 	 * @update_comment
-	 * @param folder
+	 * @param p_folder
 	 * @return
 	 */
-	public static boolean directoryEmpty(File folder)
+	public static boolean directoryEmpty(File p_folder)
 	{
 		try
 		{
-			DirectoryStream<Path> dirStream = Files.newDirectoryStream(folder.toPath());
+			DirectoryStream<Path> dirStream = Files.newDirectoryStream(p_folder.toPath());
 			boolean empty = !dirStream.iterator().hasNext();
 			dirStream.close();
 			return empty;

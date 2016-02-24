@@ -28,26 +28,25 @@ public class Imagine
 		});
 	}
 	
-	
 	/**
-	 * @param args
+	 * @param p_args
 	 */
-	public static void main(String[] args)
+	public static void main(String[] p_args)
 	{
 		//using extra function step for easier testing automation
-		run(args);
+		run(p_args);
 	}
 	
 	/**
 	 * The main entry point, separated for automated
 	 * testing purposes.
-	 * @param args
+	 * @param p_args
 	 */
-	public static void run(String[] args)
+	public static void run(String[] p_args)
 	{
 		//process args as gui vs. command line interface
 		
-		List<String> argList = new ArrayList<String>(Arrays.asList(args));
+		List<String> argList = new ArrayList<String>(Arrays.asList(p_args));
 		ArgParseResult result = processArgs(argList);
 		try
 		{
@@ -77,23 +76,28 @@ public class Imagine
 	}
 	
 	
-	private static ArgParseResult processArgs(List<String> args)
+	/**
+	 * @update_comment
+	 * @param p_args
+	 * @return
+	 */
+	private static ArgParseResult processArgs(List<String> p_args)
 	{
 		ArgParseResult result = new ArgParseResult();
 		
 		//gui mode (no arguments -> gui mode)
-		result.guiMode = args.contains("--gui") || args.isEmpty();
+		result.guiMode = p_args.contains("--gui") || p_args.isEmpty();
 
 		//actions
-		if (args.contains("--help"))
+		if (p_args.contains("--help"))
 			result.action = CmdAction.k_help;
-		else if (args.contains("--open"))
+		else if (p_args.contains("--open"))
 			result.action = CmdAction.k_open;
-		else if (args.contains("--embed"))
+		else if (p_args.contains("--embed"))
 			result.action = CmdAction.k_embed;
-		else if (args.contains("--extract"))
+		else if (p_args.contains("--extract"))
 			result.action = CmdAction.k_extract;
-		else if (args.contains("--install"))
+		else if (p_args.contains("--install"))
 			result.action = CmdAction.k_install;
 		else
 			result.action = CmdAction.k_unspecified;
@@ -101,22 +105,22 @@ public class Imagine
 		try
 		{
 			//algorithm preset name
-			if (args.contains("-a"))
-				result.presetName = args.get(args.indexOf("-a")+1);
+			if (p_args.contains("-a"))
+				result.presetName = p_args.get(p_args.indexOf("-a")+1);
 			
 			//manually specified input files
-			while (args.contains("-i"))
+			while (p_args.contains("-i"))
 			{
-				int flagIndex = args.indexOf("-i");
-				result.inputFiles.add(new File(args.get(flagIndex+1)));
-				args.remove(flagIndex+1);
-				args.remove(flagIndex);
+				int flagIndex = p_args.indexOf("-i");
+				result.inputFiles.add(new File(p_args.get(flagIndex+1)));
+				p_args.remove(flagIndex+1);
+				p_args.remove(flagIndex);
 			}
 			
 			//input files specified in a input list
-			if (args.contains("-I"))
+			if (p_args.contains("-I"))
 			{
-				for (String path : myUtilities.readListFromFile(new File(args.get(args.indexOf("-I")+1))))
+				for (String path : myUtilities.readListFromFile(new File(p_args.get(p_args.indexOf("-I")+1))))
 				{
 					path = path.trim();
 					if (path.length() > 0)
@@ -125,25 +129,25 @@ public class Imagine
 			}
 			
 			//output folder
-			if (args.contains("-o"))
-				result.outputFolder = new File(args.get(args.indexOf("-o")+1));
+			if (p_args.contains("-o"))
+				result.outputFolder = new File(p_args.get(p_args.indexOf("-o")+1));
 			
 			//key file
-			if (args.contains("-k"))
-				result.keyFile = new File(args.get(args.indexOf("-k")+1));
+			if (p_args.contains("-k"))
+				result.keyFile = new File(p_args.get(p_args.indexOf("-k")+1));
 
 			//use password
-			result.usingPassword = args.contains("-p");
+			result.usingPassword = p_args.contains("-p");
 			
 			//result file
-			if (args.contains("-r"))
-				result.resultFile = new File(args.get(args.indexOf("-r")+1));
+			if (p_args.contains("-r"))
+				result.resultFile = new File(p_args.get(p_args.indexOf("-r")+1));
 			
 			//parameter
-			while (args.contains("-P"))
+			while (p_args.contains("-P"))
 			{
-				int flagIndex = args.indexOf("-P");
-				String pair = args.get(flagIndex+1);
+				int flagIndex = p_args.indexOf("-P");
+				String pair = p_args.get(flagIndex+1);
 				
 				//remove quotes
 				if (pair.charAt(0) == '"' && pair.charAt(pair.length()-1) == '"')
@@ -158,8 +162,8 @@ public class Imagine
 				}
 				
 				//remove this parameter
-				args.remove(flagIndex+1);
-				args.remove(flagIndex);
+				p_args.remove(flagIndex+1);
+				p_args.remove(flagIndex);
 			}
 			
 			return result;
@@ -171,16 +175,19 @@ public class Imagine
 		}
 	}
 
-	public static void usage(String message)
+	/**
+	 * @update_comment
+	 * @param p_message
+	 */
+	public static void usage(String p_message)
 	{
-		if (message != null)
-			System.err.println(message); //TODO update
+		if (p_message != null)
+			System.err.println(p_message);
 		
-		System.err.println("Usage:");
-		System.err.println("(See 'imagine --help' for more details.)");
+		System.err.println("Example Usage: (See 'imagine --help' for more details.)");
 		System.err.println("imagine --gui\n");
-		System.err.println("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k [keyfile]]\n");
-		System.err.println("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]\n");
-		System.err.println("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]");
+		System.err.println("imagine --open -a <algorithm> -i <file> [-o <folder>] [-p]\n");
+		System.err.println("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-p]\n");
+		System.err.println("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-p]");
 	}
 }

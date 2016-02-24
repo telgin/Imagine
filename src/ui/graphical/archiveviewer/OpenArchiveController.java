@@ -11,7 +11,7 @@ import api.UsageException;
 import key.FileKey;
 import key.Key;
 import key.PasswordKey;
-import key.StaticKey;
+import key.DefaultKey;
 import logging.LogLevel;
 import logging.Logger;
 import product.ProductContents;
@@ -179,7 +179,7 @@ public class OpenArchiveController
 		}
 		else //key section not enabled
 		{
-			key = new StaticKey();
+			key = new DefaultKey();
 		}
 		
 		return key;

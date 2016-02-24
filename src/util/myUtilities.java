@@ -30,16 +30,16 @@ public abstract class myUtilities
 {
 	/**
 	 * @update_comment
-	 * @param out
-	 * @param list
+	 * @param p_out
+	 * @param p_list
 	 * @return
 	 */
-	public static boolean writeListToFile(File out, List<String> list)
+	public static boolean writeListToFile(File p_out, List<String> p_list)
 	{
 		try
 		{
-			OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(out));
-			for (String line : list)
+			OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(p_out));
+			for (String line : p_list)
 			{
 				osw.write(line + System.lineSeparator());
 				osw.flush();
@@ -59,16 +59,16 @@ public abstract class myUtilities
 	
 	/**
 	 * @update_comment
-	 * @param out
-	 * @param str
+	 * @param p_out
+	 * @param p_str
 	 * @return
 	 */
-	public static boolean writeStringToFile(File out, String str)
+	public static boolean writeStringToFile(File p_out, String p_str)
 	{
 		try
 		{
-			OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(out));
-			osw.write(str + System.lineSeparator());
+			OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(p_out));
+			osw.write(p_str + System.lineSeparator());
 			osw.flush();
 			osw.close();
 		}
@@ -85,15 +85,15 @@ public abstract class myUtilities
 
 	/**
 	 * @update_comment
-	 * @param in
+	 * @param p_in
 	 * @return
 	 */
-	public static ArrayList<String> readListFromFile(File in)
+	public static ArrayList<String> readListFromFile(File p_in)
 	{
 		ArrayList<String> text = new ArrayList<String>();
 		try
 		{
-			InputStreamReader fisr = new InputStreamReader(new FileInputStream(in));
+			InputStreamReader fisr = new InputStreamReader(new FileInputStream(p_in));
 			BufferedReader br = new BufferedReader(fisr);
 
 			String inLine = br.readLine();
@@ -112,11 +112,16 @@ public abstract class myUtilities
 		return text;
 	}
 	
-	public static String readStringFromFile(File in)
+	/**
+	 * @update_comment
+	 * @param p_in
+	 * @return
+	 */
+	public static String readStringFromFile(File p_in)
 	{
 		try
 		{
-			byte[] bytes = Files.readAllBytes(in.toPath());
+			byte[] bytes = Files.readAllBytes(p_in.toPath());
 			return new String(bytes, Constants.CHARSET);
 		}
 		catch (IOException e)
@@ -127,16 +132,16 @@ public abstract class myUtilities
 
 	/**
 	 * @update_comment
-	 * @param url
+	 * @param p_url
 	 * @return
 	 */
-	public static ArrayList<String> readListFromURL(URL url)
+	public static ArrayList<String> readListFromURL(URL p_url)
 	{
 
 		ArrayList<String> text = new ArrayList<String>();
 		try
 		{
-			URLConnection urlc = url.openConnection();
+			URLConnection urlc = p_url.openConnection();
 			InputStreamReader fisr = new InputStreamReader(urlc.getInputStream());
 			BufferedReader br = new BufferedReader(fisr);
 
@@ -157,16 +162,16 @@ public abstract class myUtilities
 
 	/**
 	 * @update_comment
-	 * @param url
+	 * @param p_url
 	 * @return
 	 */
-	public static String readStringFromURL(URL url)
+	public static String readStringFromURL(URL p_url)
 	{
 
 		String text = "";
 		try
 		{
-			URLConnection urlc = url.openConnection();
+			URLConnection urlc = p_url.openConnection();
 			InputStreamReader fisr = new InputStreamReader(urlc.getInputStream());
 			BufferedReader br = new BufferedReader(fisr);
 
@@ -187,15 +192,15 @@ public abstract class myUtilities
 
 	/**
 	 * @update_comment
-	 * @param inFile
+	 * @param p_inFile
 	 * @return
 	 */
-	public static Object readObject(File inFile)
+	public static Object readObject(File p_inFile)
 	{
 		Object in = null;
 		try
 		{
-			FileInputStream fStream = new FileInputStream(inFile);
+			FileInputStream fStream = new FileInputStream(p_inFile);
 			ObjectInputStream oObject = new ObjectInputStream(fStream);
 			in = oObject.readObject();
 
@@ -216,18 +221,18 @@ public abstract class myUtilities
 
 	/**
 	 * @update_comment
-	 * @param o
-	 * @param outFile
+	 * @param p_object
+	 * @param p_outFile
 	 * @return
 	 */
-	public static boolean writeObject(Object o, File outFile)
+	public static boolean writeObject(Object p_object, File p_outFile)
 	{
 		try
 		{
-			FileOutputStream fStream = new FileOutputStream(outFile);
+			FileOutputStream fStream = new FileOutputStream(p_outFile);
 			ObjectOutputStream oObject = new ObjectOutputStream(fStream);
 
-			oObject.writeObject(o);
+			oObject.writeObject(p_object);
 
 			oObject.close();
 			fStream.close();
@@ -242,49 +247,49 @@ public abstract class myUtilities
 
 	/**
 	 * @update_comment
-	 * @param d
-	 * @param decimals
+	 * @param p_d
+	 * @param p_decimals
 	 * @return
 	 */
-	public static String formatPercent(double d, int decimals)
+	public static String formatPercent(double p_d, int p_decimals)
 	{
 		NumberFormat format = NumberFormat.getPercentInstance();
-		format.setMinimumFractionDigits(decimals);
-		return format.format(d);
+		format.setMinimumFractionDigits(p_decimals);
+		return format.format(p_d);
 	}
 	
 	/**
 	 * @update_comment
-	 * @param currentTimeMillis
+	 * @param p_millis
 	 * @return
 	 */
-	public static String formatDateTimeFileSafe(long millis)
+	public static String formatDateTimeFileSafe(long p_millis)
 	{
-		Date date = new Date(millis);
+		Date date = new Date(p_millis);
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss.SSS");
 		return formatter.format(date);
 	}
 	
 	/**
 	 * @update_comment
-	 * @param currentTimeMillis
+	 * @param p_millis
 	 * @return
 	 */
-	public static String formatDateTime(long millis)
+	public static String formatDateTime(long p_millis)
 	{
-		Date date = new Date(millis);
+		Date date = new Date(p_millis);
 		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss.SSS");
 		return formatter.format(date);
 	}
 	
 	/**
 	 * @update_comment
-	 * @param currentTimeMillis
+	 * @param p_millis
 	 * @return
 	 */
-	public static String formatDate(long millis)
+	public static String formatDate(long p_millis)
 	{
-		Date date = new Date(millis);
+		Date date = new Date(p_millis);
 		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
 		return formatter.format(date);
 	}

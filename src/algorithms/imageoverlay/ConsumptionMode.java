@@ -13,18 +13,23 @@ public enum ConsumptionMode
 	k_cycle,
 	k_delete;
 	
-	private static Map<String, ConsumptionMode> map;
+	private static Map<String, ConsumptionMode> s_map;
 	
 	static
 	{
-		map = new HashMap<String, ConsumptionMode>();
-		map.put("move", k_move);
-		map.put("cycle", k_cycle);
-		map.put("delete", k_delete);
+		s_map = new HashMap<String, ConsumptionMode>();
+		s_map.put("move", k_move);
+		s_map.put("cycle", k_cycle);
+		s_map.put("delete", k_delete);
 	}
 	
-	public static ConsumptionMode parseMode(String str)
+	/**
+	 * @update_comment
+	 * @param p_str
+	 * @return
+	 */
+	public static ConsumptionMode parseMode(String p_str)
 	{
-		return map.get(str.toLowerCase());
+		return s_map.get(p_str.toLowerCase());
 	}
 }
