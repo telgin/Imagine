@@ -6,15 +6,23 @@ package ui;
  */
 public abstract class UIContext
 {
-	public static UI uiContext;
+	private static UI s_uiContext;
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public static UI getUI()
 	{
-		return uiContext;
+		return s_uiContext;
 	}
 	
-	public static void setUI(UI gui)
+	/**
+	 * @update_comment
+	 * @param p_gui
+	 */
+	public static void setUI(UI p_gui)
 	{
-		uiContext = gui;
+		s_uiContext = p_gui;
 	}
 }

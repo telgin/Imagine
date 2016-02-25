@@ -12,74 +12,105 @@ import logging.Logger;
  */
 public class Menu
 {
-	private String title;
-	protected List<String> options;
-	private int currentChoice;
-	private String subtext;
-	private boolean canceled;
+	private String f_title;
+	protected List<String> f_options;
+	private int f_currentChoice;
+	private String f_subtext;
+	private boolean f_canceled;
 	
-	public Menu(String title)
+	/**
+	 * @update_comment
+	 * @param p_title
+	 */
+	public Menu(String p_title)
 	{
-		this.title = title;
-		options = new ArrayList<String>();
-		canceled = false;
-		currentChoice = 0;
+		f_title = p_title;
+		f_options = new ArrayList<String>();
+		f_canceled = false;
+		f_currentChoice = 0;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public int getChosenIndex()
 	{
-		return currentChoice;
+		return f_currentChoice;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public String getChosenOption()
 	{
-		return options.get(currentChoice);
+		return f_options.get(f_currentChoice);
 	}
 	
-	public void addOption(String option)
+	/**
+	 * @update_comment
+	 * @param p_option
+	 */
+	public void addOption(String p_option)
 	{
-		options.add(option);
+		f_options.add(p_option);
 	}
 	
-	public void setSubtext(String text)
+	/**
+	 * @update_comment
+	 * @param p_text
+	 */
+	public void setSubtext(String p_text)
 	{
-		subtext = text;
+		f_subtext = p_text;
 	}
 	
-	public int getIndexOfOption(String option)
+	/**
+	 * @update_comment
+	 * @param p_option
+	 * @return
+	 */
+	public int getIndexOfOption(String p_option)
 	{
-		return options.indexOf(option);
+		return f_options.indexOf(p_option);
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	protected void display()
 	{
-		System.out.println(title + ":\n");
+		System.out.println(f_title + ":\n");
 		
-		for (int i=0; i<options.size(); ++i)
+		for (int i=0; i<f_options.size(); ++i)
 		{
-			System.out.println("\t" + (i+1) + "\t" + options.get(i));
+			System.out.println("\t" + (i+1) + "\t" + f_options.get(i));
 		}
 		
-		if (subtext != null)
-			System.out.println("\n" + subtext);
+		if (f_subtext != null)
+			System.out.println("\n" + f_subtext);
 		
 		inputChoice();
 	}	
 	
+	/**
+	 * @update_comment
+	 */
 	public void inputChoice()
 	{
 		int choice = 0;
 		while (choice == 0)
 		{
-			if (canceled)
+			if (f_canceled)
 				break;
 			
 			try
 			{
 				choice = Integer.parseInt(CMDInput.getLine());
-				if (choice-1 >= 0 && choice-1 < options.size())
+				if (choice-1 >= 0 && choice-1 < f_options.size())
 				{
-					currentChoice = choice-1;
+					f_currentChoice = choice-1;
 					optionChosen(choice-1);
 					break;
 				}
@@ -97,19 +128,30 @@ public class Menu
 			}
 		}
 		
-		canceled = false;
+		f_canceled = false;
 	}
 	
 	
+	/**
+	 * @update_comment
+	 */
 	protected void cancel()
 	{
-		canceled = true;
+		f_canceled = true;
 	}
 	
-	protected void optionChosen(int choice){}
+	/**
+	 * @update_comment
+	 * @param p_choice
+	 */
+	protected void optionChosen(int p_choice){}
 	
-	protected void incorrectInput(String what)
+	/**
+	 * @update_comment
+	 * @param p_what
+	 */
+	protected void incorrectInput(String p_what)
 	{
-		System.out.println("Incorrect Input: " + what);
+		System.out.println("Incorrect Input: " + p_what);
 	}
 }

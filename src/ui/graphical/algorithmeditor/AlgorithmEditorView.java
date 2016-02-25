@@ -88,11 +88,11 @@ public class AlgorithmEditorView extends View
 		reset();
 		
 		//setup stuff specified in args
-		if (f_args.action == CmdAction.k_editor)
+		if (f_args.getAction() == CmdAction.k_editor)
 		{
-			if (f_args.presetName != null && f_controller.getPresetNames().contains(f_args.presetName))
+			if (f_args.getPresetName() != null && f_controller.getPresetNames().contains(f_args.getPresetName()))
 			{
-				f_presetList.getSelectionModel().select(f_args.presetName);
+				f_presetList.getSelectionModel().select(f_args.getPresetName());
 			}
 		}
 		

@@ -91,30 +91,30 @@ public class OpenArchiveView extends View
 		f_keySelectionButtons.selectToggle(f_noKeyToggle);
 		
 		//setup stuff specified in args
-		if (f_args.action == CmdAction.k_open)
+		if (f_args.getAction() == CmdAction.k_open)
 		{
-			if (f_args.inputFiles.size() > 0 && f_args.inputFiles.get(0).exists())
+			if (f_args.getInputFiles().size() > 0 && f_args.getInputFiles().get(0).exists())
 			{
-				setInputFilePath(f_args.inputFiles.get(0).getAbsolutePath());
+				setInputFilePath(f_args.getInputFiles().get(0).getAbsolutePath());
 			}
 			
-			if (f_args.presetName != null && f_controller.getPresetNames().contains(f_args.presetName))
+			if (f_args.getPresetName() != null && f_controller.getPresetNames().contains(f_args.getPresetName()))
 			{
-				setAlgorithmSelection(f_args.presetName);
+				setAlgorithmSelection(f_args.getPresetName());
 			}
 
-			if (f_args.outputFolder != null && f_args.outputFolder.exists())
+			if (f_args.getOutputFolder() != null && f_args.getOutputFolder().exists())
 			{
-				setOutputFolderPath(f_args.outputFolder.getAbsolutePath());
+				setOutputFolderPath(f_args.getOutputFolder().getAbsolutePath());
 			}
 			
-			if (f_args.keyFile != null && f_args.keyFile.exists())
+			if (f_args.getKeyFile() != null && f_args.getKeyFile().exists())
 			{
-				setKeyFilePath(f_args.keyFile.getAbsolutePath());
+				setKeyFilePath(f_args.getKeyFile().getAbsolutePath());
 				toggleKeySection();
 			}
 			
-			if (f_args.usingPassword)
+			if (f_args.isUsingPassword())
 			{
 				togglePasswordSection();
 			}

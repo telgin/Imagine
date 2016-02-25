@@ -112,29 +112,29 @@ public class EmbedView extends View
 		setRunConversionEnabled(false);
 		
 		//setup stuff specified in args
-		if (f_args.action == CmdAction.k_embed)
+		if (f_args.getAction() == CmdAction.k_embed)
 		{
-			for (File input : f_args.inputFiles)
+			for (File input : f_args.getInputFiles())
 				if (input.exists())
 					addInput(input);
 			
-			if (f_args.presetName != null && f_controller.getPresetNames().contains(f_args.presetName))
+			if (f_args.getPresetName() != null && f_controller.getPresetNames().contains(f_args.getPresetName()))
 			{
-				setAlgorithmSelection(f_args.presetName);
+				setAlgorithmSelection(f_args.getPresetName());
 			}
 			
-			if (f_args.outputFolder != null && f_args.outputFolder.exists())
+			if (f_args.getOutputFolder() != null && f_args.getOutputFolder().exists())
 			{
-				setOutputFolder(f_args.outputFolder);
+				setOutputFolder(f_args.getOutputFolder());
 			}
 			
-			if (f_args.keyFile != null && f_args.keyFile.exists())
+			if (f_args.getKeyFile() != null && f_args.getKeyFile().exists())
 			{
-				setKeyFilePath(f_args.keyFile.getAbsolutePath());
+				setKeyFilePath(f_args.getKeyFile().getAbsolutePath());
 				toggleKeySection();
 			}
 			
-			if (f_args.usingPassword)
+			if (f_args.isUsingPassword())
 			{
 				togglePasswordSection();
 			}

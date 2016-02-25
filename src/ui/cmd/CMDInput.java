@@ -12,15 +12,19 @@ import java.util.Queue;
  */
 public abstract class CMDInput
 {
-	private static Queue<String> simulatedLines = new LinkedList<String>();
-	private static BufferedReader cin= new BufferedReader(new InputStreamReader(System.in));
+	private static Queue<String> s_simulatedLines = new LinkedList<String>();
+	private static BufferedReader s_cin = new BufferedReader(new InputStreamReader(System.in));
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public static String getLine()
 	{
 		//simulate the user entering a line if any are queued
-		if (!simulatedLines.isEmpty())
+		if (!s_simulatedLines.isEmpty())
 		{
-			String simulated = simulatedLines.poll();
+			String simulated = s_simulatedLines.poll();
 			System.out.println("[SIMULATED USER INPUT]: \"" + simulated + "\"");
 			return simulated;
 		}
@@ -28,7 +32,7 @@ public abstract class CMDInput
 		//read the actual line from stdin
 		try
 		{
-			return cin.readLine();
+			return s_cin.readLine();
 		}
 		catch (IOException e)
 		{
@@ -36,8 +40,12 @@ public abstract class CMDInput
 		}
 	}
 	
-	public static void simulateLine(String line)
+	/**
+	 * @update_comment
+	 * @param p_line
+	 */
+	public static void simulateLine(String p_line)
 	{
-		simulatedLines.add(line);
+		s_simulatedLines.add(p_line);
 	}
 }

@@ -76,7 +76,7 @@ public class TopView extends View
 		borderPane.setCenter(f_tabPane);
 		
 		//set active tab
-		switch (f_args.action)
+		switch (f_args.getAction())
 		{
 			case k_editor:
 				f_tabPane.getSelectionModel().select(2);

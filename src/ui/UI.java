@@ -4,10 +4,22 @@ import java.io.File;
 
 import algorithms.Parameter;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public abstract class UI
 {
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public abstract File promptKeyFileLocation();
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public abstract String promptKey();
 
 	/**
@@ -18,21 +30,29 @@ public abstract class UI
 	/**
 	 * @update_comment
 	 * @param enclosingFolder
-	 * @param curProductFolder
-	 * @param productSearchName
+	 * @param p_curProductFolder
+	 * @param p_productSearchName
 	 * @return
 	 */
-	public abstract File promptEnclosingFolder(File curEnclosingFolder, File curProductFolder,
-					String productSearchName);
+	public abstract File promptEnclosingFolder(File p_curEnclosingFolder, File p_curProductFolder,
+					String p_productSearchName);
 
 	/**
 	 * @update_comment
-	 * @param parameter
+	 * @param p_parameter
 	 * @return
 	 */
-	public abstract String promptParameterValue(Parameter parameter);
+	public abstract String promptParameterValue(Parameter p_parameter);
 	
-	public abstract void reportMessage(String message);
+	/**
+	 * @update_comment
+	 * @param p_message
+	 */
+	public abstract void reportMessage(String p_message);
 	
-	public abstract void reportError(String message);
+	/**
+	 * @update_comment
+	 * @param p_message
+	 */
+	public abstract void reportError(String p_message);
 }

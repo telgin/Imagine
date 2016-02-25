@@ -10,38 +10,55 @@ import java.util.function.Consumer;
  */
 public class CallbackMenu extends Menu
 {
-	private Map<Integer, Consumer<Void>> callbacks;
-	private Map<Integer, Menu> menus;
+	private Map<Integer, Consumer<Void>> f_callbacks;
+	private Map<Integer, Menu> f_menus;
 	
-	public CallbackMenu(String title)
+	/**
+	 * @update_comment
+	 * @param p_title
+	 */
+	public CallbackMenu(String p_title)
 	{
-		super(title);
-		callbacks = new HashMap<Integer, Consumer<Void>>();
-		menus = new HashMap<Integer, Menu>();
+		super(p_title);
+		f_callbacks = new HashMap<Integer, Consumer<Void>>();
+		f_menus = new HashMap<Integer, Menu>();
 	}
 	
-	public void addOption(String option, Consumer<Void> callback)
+	/**
+	 * @update_comment
+	 * @param p_option
+	 * @param p_callback
+	 */
+	public void addOption(String p_option, Consumer<Void> p_callback)
 	{
-		options.add(option);
-		callbacks.put(options.size()-1,callback);
+		f_options.add(p_option);
+		f_callbacks.put(f_options.size()-1,p_callback);
 	}
 	
-	public void addOption(String option, Menu linkedMenu)
+	/**
+	 * @update_comment
+	 * @param p_option
+	 * @param p_linkedMenu
+	 */
+	public void addOption(String p_option, Menu p_linkedMenu)
 	{
-		options.add(option);
-		menus.put(options.size()-1, linkedMenu);
+		f_options.add(p_option);
+		f_menus.put(f_options.size()-1, p_linkedMenu);
 	}
 	
+	/* (non-Javadoc)
+	 * @see ui.cmd.Menu#optionChosen(int)
+	 */
 	@Override
-	protected void optionChosen(int choice)
+	protected void optionChosen(int p_choice)
 	{
-		if (callbacks.containsKey(choice))
+		if (f_callbacks.containsKey(p_choice))
 		{
-			callbacks.get(choice).accept(null);
+			f_callbacks.get(p_choice).accept(null);
 		}
-		else if (menus.containsKey(choice))
+		else if (f_menus.containsKey(p_choice))
 		{
-			menus.get(choice).display();
+			f_menus.get(p_choice).display();
 		}
 		
 		//else it is just the option text, which the

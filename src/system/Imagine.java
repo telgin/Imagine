@@ -13,6 +13,10 @@ import ui.cmd.CmdUI;
 import ui.graphical.GUI;
 import util.myUtilities;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class Imagine
 {
 	static
@@ -54,7 +58,7 @@ public class Imagine
 			{
 				usage("Could not parse arguments.");
 			}
-			else if (result.guiMode)
+			else if (result.isGuiMode())
 			{
 				GUI gui = new GUI(result);
 				UIContext.setUI(gui);
@@ -86,33 +90,33 @@ public class Imagine
 		ArgParseResult result = new ArgParseResult();
 		
 		//gui mode (no arguments -> gui mode)
-		result.guiMode = p_args.contains("--gui") || p_args.isEmpty();
+		result.setGuiMode(p_args.contains("--gui") || p_args.isEmpty());
 
 		//actions
 		if (p_args.contains("--help"))
-			result.action = CmdAction.k_help;
+			result.setAction(CmdAction.k_help);
 		else if (p_args.contains("--open"))
-			result.action = CmdAction.k_open;
+			result.setAction(CmdAction.k_open);
 		else if (p_args.contains("--embed"))
-			result.action = CmdAction.k_embed;
+			result.setAction(CmdAction.k_embed);
 		else if (p_args.contains("--extract"))
-			result.action = CmdAction.k_extract;
+			result.setAction(CmdAction.k_extract);
 		else if (p_args.contains("--install"))
-			result.action = CmdAction.k_install;
+			result.setAction(CmdAction.k_install);
 		else
-			result.action = CmdAction.k_unspecified;
+			result.setAction(CmdAction.k_unspecified);
 		
 		try
 		{
 			//algorithm preset name
 			if (p_args.contains("-a"))
-				result.presetName = p_args.get(p_args.indexOf("-a")+1);
+				result.setPresetName(p_args.get(p_args.indexOf("-a")+1));
 			
 			//manually specified input files
 			while (p_args.contains("-i"))
 			{
 				int flagIndex = p_args.indexOf("-i");
-				result.inputFiles.add(new File(p_args.get(flagIndex+1)));
+				result.addInputFile(new File(p_args.get(flagIndex+1)));
 				p_args.remove(flagIndex+1);
 				p_args.remove(flagIndex);
 			}
@@ -124,24 +128,24 @@ public class Imagine
 				{
 					path = path.trim();
 					if (path.length() > 0)
-						result.inputFiles.add(new File(path));
+						result.addInputFile(new File(path));
 				}
 			}
 			
 			//output folder
 			if (p_args.contains("-o"))
-				result.outputFolder = new File(p_args.get(p_args.indexOf("-o")+1));
+				result.setOutputFolder(new File(p_args.get(p_args.indexOf("-o")+1)));
 			
 			//key file
 			if (p_args.contains("-k"))
-				result.keyFile = new File(p_args.get(p_args.indexOf("-k")+1));
+				result.setKeyFile(new File(p_args.get(p_args.indexOf("-k")+1)));
 
 			//use password
-			result.usingPassword = p_args.contains("-p");
+			result.setUsingPassword(p_args.contains("-p"));
 			
 			//result file
 			if (p_args.contains("-r"))
-				result.resultFile = new File(p_args.get(p_args.indexOf("-r")+1));
+				result.setResultFile(new File(p_args.get(p_args.indexOf("-r")+1)));
 			
 			//parameter
 			while (p_args.contains("-P"))
@@ -158,7 +162,7 @@ public class Imagine
 				{
 					String name = pair.substring(0, pair.indexOf('='));
 					String value = pair.substring(pair.indexOf('=')+1);
-					result.parameters.add(new String[]{name, value});
+					result.addParameter(new String[]{name, value});
 				}
 				
 				//remove this parameter
