@@ -8,10 +8,10 @@ import logging.LogLevel;
 import logging.Logger;
 import product.ConversionJobFileState;
 import product.FileOutputManager;
-import product.JobStatus;
 import product.ProductLoader;
 import product.ProductWriter;
 import product.ProductWriterFactory;
+import report.JobStatus;
 
 /**
  * Dequeues from the given queue and loads files to the ProductLoader Might not

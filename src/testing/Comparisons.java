@@ -27,50 +27,65 @@ import util.Hashing;
  */
 public class Comparisons
 {
-	public static void compareMetadata(Metadata m1, Metadata m2)
+	/**
+	 * @update_comment
+	 * @param p_metadata1
+	 * @param p_metadata2
+	 */
+	public static void compareMetadata(Metadata p_metadata1, Metadata p_metadata2)
 	{
-		if (m1 == null || m2 == null)
+		if (p_metadata1 == null || p_metadata2 == null)
 		{
-			assertEquals(m1, null);
-			assertEquals(m2, null);
+			assertEquals(p_metadata1, null);
+			assertEquals(p_metadata2, null);
 		}
 		else
 		{
-			assertEquals(m1.getFile().getAbsolutePath(), m2.getFile().getAbsolutePath());
-			assertEquals(m1.getFile().getPath(), m2.getFile().getPath());
-			assertEquals(m1.getPermissions(), m2.getPermissions());
-			assertEquals(m1.getDateCreated(), m2.getDateCreated());
-			assertEquals(m1.getDateModified(), m2.getDateModified());
-			assertEquals(m1.getProductUUID(), m2.getProductUUID());
-			assertEquals(m1.getType(), m2.getType());
+			assertEquals(p_metadata1.getFile().getAbsolutePath(), p_metadata2.getFile().getAbsolutePath());
+			assertEquals(p_metadata1.getFile().getPath(), p_metadata2.getFile().getPath());
+			assertEquals(p_metadata1.getPermissions(), p_metadata2.getPermissions());
+			assertEquals(p_metadata1.getDateCreated(), p_metadata2.getDateCreated());
+			assertEquals(p_metadata1.getDateModified(), p_metadata2.getDateModified());
+			assertEquals(p_metadata1.getProductUUID(), p_metadata2.getProductUUID());
+			assertEquals(p_metadata1.getType(), p_metadata2.getType());
 		}
 	}
 
-	public static void compareMetadataFile(File f, Metadata m)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 * @param p_metadata
+	 */
+	public static void compareMetadataFile(File p_file, Metadata p_metadata)
 	{
-		assertEquals(f.getAbsolutePath(), m.getFile().getAbsolutePath());
-		assertEquals(f.getPath(), m.getFile().getPath());
-		assertEquals(FileSystemUtil.getNumericFilePermissions(f), m.getPermissions());
-		assertEquals(FileSystemUtil.getDateCreated(f), m.getDateCreated());
-		assertEquals(FileSystemUtil.getDateModified(f), m.getDateModified());
+		assertEquals(p_file.getAbsolutePath(), p_metadata.getFile().getAbsolutePath());
+		assertEquals(p_file.getPath(), p_metadata.getFile().getPath());
+		assertEquals(FileSystemUtil.getNumericFilePermissions(p_file), p_metadata.getPermissions());
+		assertEquals(FileSystemUtil.getDateCreated(p_file), p_metadata.getDateCreated());
+		assertEquals(FileSystemUtil.getDateModified(p_file), p_metadata.getDateModified());
 	}
 	
-	public static void compareAlgorithms(Algorithm a1, Algorithm a2)
+	/**
+	 * @update_comment
+	 * @param p_algorithm1
+	 * @param p_algorithm2
+	 */
+	public static void compareAlgorithms(Algorithm p_algorithm1, Algorithm p_algorithm2)
 	{
-		if (a1 == null || a2 == null)
+		if (p_algorithm1 == null || p_algorithm2 == null)
 		{
-			assertEquals(a1, a2);
+			assertEquals(p_algorithm1, p_algorithm2);
 		}
 		else
 		{
-			assertEquals(a1.getName(), a2.getName());
-			assertEquals(a1.getPresetName(), a2.getPresetName());
-			assertEquals(a1.getVersion(), a2.getVersion());
-			assertEquals(a1.getParameters().size(), a2.getParameters().size());
+			assertEquals(p_algorithm1.getName(), p_algorithm2.getName());
+			assertEquals(p_algorithm1.getPresetName(), p_algorithm2.getPresetName());
+			assertEquals(p_algorithm1.getVersion(), p_algorithm2.getVersion());
+			assertEquals(p_algorithm1.getParameters().size(), p_algorithm2.getParameters().size());
 			
-			for (Parameter p1 : a1.getParameters())
+			for (Parameter p1 : p_algorithm1.getParameters())
 			{
-				Parameter p2 = a2.getParameter(p1.getName());
+				Parameter p2 = p_algorithm2.getParameter(p1.getName());
 				assertTrue(p2 != null);
 				
 				assertEquals(p1.getName(), p2.getName());
@@ -80,14 +95,19 @@ public class Comparisons
 		}
 	}
 	
-	public static void compareFileSets(Set<File> set1, Set<File> set2)
+	/**
+	 * @update_comment
+	 * @param p_set1
+	 * @param p_set2
+	 */
+	public static void compareFileSets(Set<File> p_set1, Set<File> p_set2)
 	{
-		assertEquals(set1.size(), set2.size());
+		assertEquals(p_set1.size(), p_set2.size());
 		List<String> paths1 = new ArrayList<String>();
 		List<String> paths2 = new ArrayList<String>();
-		for (File f1 : set1)
+		for (File f1 : p_set1)
 			paths1.add(f1.getPath());
-		for (File f2 : set2)
+		for (File f2 : p_set2)
 			paths2.add(f2.getPath());
 		
 		paths1.sort(null);
@@ -99,13 +119,19 @@ public class Comparisons
 		}
 	}
 	
-	public static void compareExtractedFileStructure(File originalRoot, File extractedRoot, boolean absolutePaths)
+	/**
+	 * @update_comment
+	 * @param p_originalRoot
+	 * @param p_extractedRoot
+	 * @param p_absolutePaths
+	 */
+	public static void compareExtractedFileStructure(File p_originalRoot, File p_extractedRoot, boolean p_absolutePaths)
 	{
 		Logger.log(LogLevel.k_debug, "Comparing file structure...");
 		
 		//bfs through folders
 		Queue<File> folders = new LinkedList<File>();
-		folders.add(originalRoot);
+		folders.add(p_originalRoot);
 		
 		while (folders.size() > 0)
 		{
@@ -118,7 +144,7 @@ public class Comparisons
 					{
 						folders.add(sub);
 						
-						File expected = getExpectedExtractionFile(originalRoot, extractedRoot, sub, absolutePaths);
+						File expected = getExpectedExtractionFile(p_originalRoot, p_extractedRoot, sub, p_absolutePaths);
 						System.out.println("Expecting file: " + expected.getPath());
 						if (!expected.exists())
 							System.out.println("FILE NOT FOUND");
@@ -127,7 +153,7 @@ public class Comparisons
 				}
 				else
 				{
-					File expected = getExpectedExtractionFile(originalRoot, extractedRoot, sub, absolutePaths);
+					File expected = getExpectedExtractionFile(p_originalRoot, p_extractedRoot, sub, p_absolutePaths);
 					System.out.println("Expecting file: " + expected.getPath());
 					if (!expected.exists())
 						System.out.println("FILE NOT FOUND");
@@ -138,21 +164,21 @@ public class Comparisons
 		}
 		
 		
-		assertEquals(countFiles(originalRoot), countFiles(extractedRoot));
+		assertEquals(countFiles(p_originalRoot), countFiles(p_extractedRoot));
 	}
 	
 	/**
 	 * @update_comment
-	 * @param root
+	 * @param p_root
 	 * @return
 	 */
-	private static int countFiles(File root)
+	private static int countFiles(File p_root)
 	{
 		int count = 0;
 		
 		//bfs through folders
 		Queue<File> folders = new LinkedList<File>();
-		folders.add(root);
+		folders.add(p_root);
 		
 		while (folders.size() > 0)
 		{
@@ -176,46 +202,66 @@ public class Comparisons
 		return count;
 	}
 
-	public static File getExpectedExtractionFile(File originalRoot, File extractedRoot,
-					File originalFile, boolean absolutePaths)
+	/**
+	 * @update_comment
+	 * @param p_originalRoot
+	 * @param p_extractedRoot
+	 * @param p_originalFile
+	 * @param p_absolutePaths
+	 * @return
+	 */
+	public static File getExpectedExtractionFile(File p_originalRoot, File p_extractedRoot,
+					File p_originalFile, boolean p_absolutePaths)
 	{
-		if (absolutePaths)
+		if (p_absolutePaths)
 		{
-			return new File(extractedRoot, originalFile.getAbsolutePath());
+			return new File(p_extractedRoot, p_originalFile.getAbsolutePath());
 		}
 		else
 		{
-			//String relPath = originalRoot.toURI().relativize(originalFile.toURI()).getPath();
-			//return new File(extractedRoot, relPath);
-			
-			return new File(extractedRoot, originalFile.getPath());
+			return new File(p_extractedRoot, p_originalFile.getPath());
 		}
 	}
 	
-	public static void compareFileHashes(File f1, File f2)
+	/**
+	 * @update_comment
+	 * @param p_file1
+	 * @param p_file2
+	 */
+	public static void compareFileHashes(File p_file1, File p_file2)
 	{
 		//use this correctly
-		assertTrue(!f1.isDirectory());
-		assertTrue(!f2.isDirectory());
+		assertTrue(!p_file1.isDirectory());
+		assertTrue(!p_file2.isDirectory());
 		
-		assertArrayEquals(Hashing.hash(f1), Hashing.hash(f2));
+		assertArrayEquals(Hashing.hash(p_file1), Hashing.hash(p_file2));
 	}
 	
-	public static void compareFilePaths(File f1, File f2)
+	/**
+	 * @update_comment
+	 * @param p_file1
+	 * @param p_file2
+	 */
+	public static void compareFilePaths(File p_file1, File p_file2)
 	{
-		assertEquals(f1.getPath(), f2.getPath());
+		assertEquals(p_file1.getPath(), p_file2.getPath());
 	}
 	
-	public static void compareKeys(Key k1, Key k2)
+	/**
+	 * @update_comment
+	 * @param p_key1
+	 * @param p_key2
+	 */
+	public static void compareKeys(Key p_key1, Key p_key2)
 	{
-		if (k1 == null || k2 == null)
+		if (p_key1 == null || p_key2 == null)
 		{
-			assertEquals(k1, k2);
+			assertEquals(p_key1, p_key2);
 		}
 		else
 		{
-			assertEquals(k1.getType(), k2.getType());
-			assertArrayEquals(k1.getKeyHash(), k2.getKeyHash());
+			assertEquals(p_key1.getType(), p_key2.getType());
+			assertArrayEquals(p_key1.getKeyHash(), p_key2.getKeyHash());
 		}
 	}
 	

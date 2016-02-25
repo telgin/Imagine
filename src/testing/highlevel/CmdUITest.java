@@ -22,56 +22,31 @@ import util.FileSystemUtil;
 import util.myUtilities;
 
 /**
- * Currently, the command line interface supports some common operations for
-	viewing, embedding, and extracting data. However, at this time, specific
-	configuration edits (editing profiles or algorithms) must be done in the GUI.
-	
-	Command Syntax:
-	imagine --open -p <profile> -i <file> [-o <folder>]
-	imagine --open -a <algorithm> -i <file> [-o <folder>] [-k <keyfile>]
-	
-	imagine --embed -p <profile> [-o <folder>]
-	imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k <keyfile>]
-	
-	imagine --extract -p <profile> -i <file/folder> [-o <folder>]
-	imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k <keyfile>]
-	
-	--open     
-	    open an archive and selectively extract its contents
-	--embed    
-	    embed data into a supported format
-	--extract  
-	    extract all data from an archive file or folder or multiple archives
-	
-	-a         algorithm preset name
-	-p         profile name
-	-i         input file or folder
-	-o         output folder
-	-k         key file (optional)
-
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-
 public class CmdUITest
 {
-	static File homeFolder = new File("testing/highlevel/");
-	private static File outputFolder = new File("testing/output/");
-	private static File extractionFolder = new File("testing/extraction/");
-	private static File imagesFolder = new File("testing/input_images/");
-	private static File keyFile = new File("testing/keys/key1.txt");
-	private static File reportFolder = new File("testing/reports/");
-	private static File reportFile = new File(reportFolder, "report.txt");
-	private static File bigTreeFileList = new File("testing/file_lists/bigTree.txt");
-	private static ArrayList<ConversionJob> jobs = new ArrayList<ConversionJob>();
-	
+	private static final File HOME_FOLDER = new File("testing/highlevel/");
+	private static final File OUTPUT_FOLDER = new File("testing/output/");
+	private static final File EXTRACTION_FOLDER = new File("testing/extraction/");
+	private static final File IMAGE_FOLDER = new File("testing/input_images/");
+	private static final File KEY_FILE = new File("testing/keys/key1.txt");
+	private static final File REPORT_FOLDER = new File("testing/reports/");
+	private static final File REPORT_FILE = new File(REPORT_FOLDER, "report.txt");
+	private static final File BIG_TREE_FILE_LIST = new File("testing/file_lists/bigTree.txt");
+	private static ArrayList<ConversionJob> s_jobs = new ArrayList<ConversionJob>();
 	
 	private static final String EMPTY_FOLDER = "emptyFolder";
 	private static final String SMALL_FILE = "smallFile";
 	private static final String SMALL_TREE = "smallTree";
 	private static final String BIG_FILE = "bigFile";
 	private static final String BIG_TREE = "bigTree";
-
+	
+	private static final String DEFAULT_IMAGE_PRESET = "image_default";
+	private static final String IMAGE_OVERALY_25_PRESET = "image_overlay_light";
+	private static final String IMAGE_OVERALY_50_PRESET = "image_overlay_heavy";
+	private static final String DEFAULT_TEXT_PRESET = "text_default";
 	
 	//----------------------------------------
 	//Image Tests
@@ -88,19 +63,19 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_default",
-						"-o", outputFolder.getPath()};
+						"-a", DEFAULT_IMAGE_PRESET,
+						"-o", OUTPUT_FOLDER.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_default", 
-						"-o", extractionFolder.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", DEFAULT_IMAGE_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
 	//test all for start
@@ -131,21 +106,21 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_default",
-						"-o", outputFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-a", DEFAULT_IMAGE_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_default", 
-						"-o", extractionFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", DEFAULT_IMAGE_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
 	@Test
@@ -166,16 +141,16 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_default",
-						"-o", outputFolder.getPath(),
-						"-k", keyFile.getPath(),
-						"-r", reportFile.getPath()};
+						"-a", DEFAULT_IMAGE_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath(),
+						"-r", REPORT_FILE.getPath()};
 		Imagine.run(embed);
 
-		assertTrue(reportFile.exists());
+		assertTrue(REPORT_FILE.exists());
 		
 		int expectedLines = FileSystemUtil.countEligableFiles(inputFolder);
-		int actualLines = myUtilities.readListFromFile(reportFile).size();
+		int actualLines = myUtilities.readListFromFile(REPORT_FILE).size();
 		
 		assertEquals(expectedLines, actualLines);
 	}
@@ -194,25 +169,25 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-I", fileList.getPath(),
-						"-a", "image_default",
-						"-o", outputFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-a", DEFAULT_IMAGE_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_default", 
-						"-o", extractionFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", DEFAULT_IMAGE_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, true);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, true);
 	}
 	
 	//@Test
-	public void image_4_bt() throws IOException { image_4(BIG_TREE, bigTreeFileList); }
+	public void image_4_bt() throws IOException { image_4(BIG_TREE, BIG_TREE_FILE_LIST); }
 	
 	/**
 	 * Parameter test (image size)
@@ -226,15 +201,15 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_default",
-						"-o", outputFolder.getPath(),
-						"-k", keyFile.getPath(),
+						"-a", DEFAULT_IMAGE_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath(),
 						"-P", algorithms.image.Definition.WIDTH_PARAM + "=500",
 						"-P", algorithms.image.Definition.HEIGHT_PARAM + "=500"};
 		Imagine.run(embed);
 		
 		
-		BufferedImage img = ImageIO.read(outputFolder.listFiles()[0]);
+		BufferedImage img = ImageIO.read(OUTPUT_FOLDER.listFiles()[0]);
 		assertEquals(500, img.getWidth());
 		assertEquals(500, img.getHeight());
 	}
@@ -279,21 +254,21 @@ public class CmdUITest
 						"-i", "/home/tom/git/Imagine/testing/highlevel/smallTree/tracked_topfolder_r/t4.txt",
 						"-i", "/home/tom/git/Imagine/testing/highlevel/smallTree/tracked_topfolder_r/t2.txt",
 						"-i", "/home/tom/git/Imagine/testing/highlevel/smallTree/tracked_topfolder_r/t1.txt",
-						"-a", "image_default",
-						"-o", outputFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-a", DEFAULT_IMAGE_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_default", 
-						"-o", extractionFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", DEFAULT_IMAGE_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, true);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, true);
 	}
 	
 	//@Test
@@ -310,21 +285,21 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_default",
-						"-o", outputFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-a", DEFAULT_IMAGE_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_default", 
-						"-o", extractionFolder.getPath(),
-						"-k", imagesFolder.list()[0]};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", DEFAULT_IMAGE_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
+						"-k", IMAGE_FOLDER.list()[0]};
 		Imagine.run(extract);
 		
 		//verify nothing exists
-		assertEquals(0, extractionFolder.listFiles().length);
+		assertEquals(0, EXTRACTION_FOLDER.listFiles().length);
 	}
 	
 	//@Test
@@ -344,21 +319,21 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_overlay_light",
-						"-o", outputFolder.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath()};
+						"-a", IMAGE_OVERALY_25_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_overlay_light", 
-						"-o", extractionFolder.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", IMAGE_OVERALY_25_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
+						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
 	//test all for start
@@ -389,23 +364,23 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_overlay_light",
-						"-o", outputFolder.getPath(),
-						"-k", keyFile.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath()};
+						"-a", IMAGE_OVERALY_25_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath(),
+						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_overlay_light", 
-						"-o", extractionFolder.getPath(),
-						"-k", keyFile.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", IMAGE_OVERALY_25_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath(),
+						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
 	//@Test
@@ -425,23 +400,23 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_overlay_heavy",
-						"-o", outputFolder.getPath(),
-						"-k", keyFile.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath()};
+						"-a", IMAGE_OVERALY_50_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath(),
+						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_overlay_heavy", 
-						"-o", extractionFolder.getPath(),
-						"-k", keyFile.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", IMAGE_OVERALY_50_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath(),
+						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
 	//@Test
@@ -461,21 +436,21 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_overlay_light",
-						"-o", outputFolder.getPath(),
-						"-P", "\"" + algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath() + "\""};
+						"-a", IMAGE_OVERALY_25_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-P", "\"" + algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath() + "\""};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_overlay_light", 
-						"-o", extractionFolder.getPath(),
-						"-P", "\"" + algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath() + "\""};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", IMAGE_OVERALY_25_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
+						"-P", "\"" + algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath() + "\""};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
 	//@Test
@@ -490,18 +465,18 @@ public class CmdUITest
 		File inputFolder = setup(testFileName);
 		
 		//remove images
-		clearFolder(imagesFolder);
+		clearFolder(IMAGE_FOLDER);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_overlay_light",
-						"-o", outputFolder.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath()};
+						"-a", IMAGE_OVERALY_25_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath()};
 		Imagine.run(embed);
 		
 		//verify nothing exists
-		assertEquals(0, outputFolder.listFiles().length);
+		assertEquals(0, OUTPUT_FOLDER.listFiles().length);
 	}
 	
 	//@Test
@@ -518,25 +493,25 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_overlay_light",
-						"-o", outputFolder.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath(),
+						"-a", IMAGE_OVERALY_25_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath(),
 						"-P", algorithms.imageoverlay.Definition.IMAGE_CONSUMPTION_MODE_PARAM + "=" + 
 										"move"};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_overlay_light", 
-						"-o", extractionFolder.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", IMAGE_OVERALY_25_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 		
 		//make sure there's an image that's done
-		File doneFolder = new File(imagesFolder, "done");
+		File doneFolder = new File(IMAGE_FOLDER, "done");
 		
 		assertTrue(doneFolder.exists());
 		
@@ -557,25 +532,25 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_overlay_light",
-						"-o", outputFolder.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + imagesFolder.getPath(),
+						"-a", IMAGE_OVERALY_25_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath(),
 						"-P", algorithms.imageoverlay.Definition.IMAGE_CONSUMPTION_MODE_PARAM + "=" + 
 										"delete"};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_overlay_light", 
-						"-o", extractionFolder.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", IMAGE_OVERALY_25_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 		
 		//make sure there are not files in the input image folder
-		assertEquals(0, imagesFolder.listFiles().length);
+		assertEquals(0, IMAGE_FOLDER.listFiles().length);
 	}
 	
 	//@Test
@@ -596,19 +571,19 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "text_default",
-						"-o", outputFolder.getPath()};
+						"-a", DEFAULT_TEXT_PRESET,
+						"-o", OUTPUT_FOLDER.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "text_default", 
-						"-o", extractionFolder.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", DEFAULT_TEXT_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
 	//test all for start
@@ -639,21 +614,21 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "text_default",
-						"-o", outputFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-a", DEFAULT_TEXT_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "text_default", 
-						"-o", extractionFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", DEFAULT_TEXT_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
 	//@Test
@@ -678,21 +653,21 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "text_default",
-						"-o", outputFolder.getPath(),
+						"-a", DEFAULT_TEXT_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
 						"-p"};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "text_default", 
-						"-o", extractionFolder.getPath(),
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", DEFAULT_TEXT_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
 						"-p"};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
 	//@Test
@@ -709,21 +684,21 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_overlay_heavy",
-						"-o", outputFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-a", IMAGE_OVERALY_50_PRESET,
+						"-o", OUTPUT_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(embed);
 		
 		//extract
 		String[] extract = new String[]{"--extract",
-						"-i", outputFolder.getPath(),
-						"-a", "image_overlay_heavy", 
-						"-o", extractionFolder.getPath(),
-						"-k", keyFile.getPath()};
+						"-i", OUTPUT_FOLDER.getPath(),
+						"-a", IMAGE_OVERALY_50_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath(),
+						"-k", KEY_FILE.getPath()};
 		Imagine.run(extract);
 		
 		//compare
-		Comparisons.compareExtractedFileStructure(inputFolder, extractionFolder, false);
+		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
 	//@Test
@@ -740,15 +715,15 @@ public class CmdUITest
 		//embed
 		String[] embed = new String[]{"--embed",
 						"-i", inputFolder.getPath(),
-						"-a", "image_default",
-						"-o", outputFolder.getPath()};
+						"-a", DEFAULT_IMAGE_PRESET,
+						"-o", OUTPUT_FOLDER.getPath()};
 		Imagine.run(embed);
 		
 		//open
 		String[] open = new String[]{"--open",
-						"-i", outputFolder.listFiles()[0].getPath(),
-						"-a", "image_default", 
-						"-o", extractionFolder.getPath()};
+						"-i", OUTPUT_FOLDER.listFiles()[0].getPath(),
+						"-a", DEFAULT_IMAGE_PRESET, 
+						"-o", EXTRACTION_FOLDER.getPath()};
 		Imagine.run(open);
 	}
 
@@ -766,7 +741,7 @@ public class CmdUITest
 			shutdown();
 
 		// setup
-		File inputFolder = TestFileTrees.getRoot(homeFolder, treeName);
+		File inputFolder = TestFileTrees.getRoot(HOME_FOLDER, treeName);
 		reset(treeName);
 		
 		setupInputImages();
@@ -776,14 +751,14 @@ public class CmdUITest
 	
 	private static void setupInputImages()
 	{
-		File root = TestFileTrees.getRoot(homeFolder, "inputImages");
+		File root = TestFileTrees.getRoot(HOME_FOLDER, "inputImages");
 		reset("inputImages");
 		
 		for (File imageFile : root.listFiles()[0].listFiles())
 		{
 			try
 			{
-				Files.copy(imageFile.toPath(), new File(imagesFolder, imageFile.getName()).toPath());
+				Files.copy(imageFile.toPath(), new File(IMAGE_FOLDER, imageFile.getName()).toPath());
 			}
 			catch (IOException e)
 			{
@@ -795,9 +770,9 @@ public class CmdUITest
 	private static void shutdown()
 	{
 		SystemManager.shutdown();
-		for (ConversionJob job : jobs)
+		for (ConversionJob job : s_jobs)
 			job.shutdown();
-		jobs = new ArrayList<ConversionJob>();
+		s_jobs = new ArrayList<ConversionJob>();
 		
 		while (!SystemManager.isShutdown())
 		{
@@ -812,11 +787,11 @@ public class CmdUITest
 	}
 	private static void reset(String treeName)
 	{
-		clearFolder(outputFolder);
-		clearFolder(extractionFolder);
-		clearFolder(imagesFolder);
-		clearFolder(reportFolder);
-		TestFileTrees.reset(homeFolder, treeName);
+		clearFolder(OUTPUT_FOLDER);
+		clearFolder(EXTRACTION_FOLDER);
+		clearFolder(IMAGE_FOLDER);
+		clearFolder(REPORT_FOLDER);
+		TestFileTrees.reset(HOME_FOLDER, treeName);
 	}
 
 	private static void clearFolder(File folder)

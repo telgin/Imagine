@@ -359,7 +359,6 @@ public class FileSystemUtil
 	{
 		if (p_src.isDirectory())
 		{
-
 			if (!p_dest.exists())
 				p_dest.mkdir();
 
@@ -370,79 +369,10 @@ public class FileSystemUtil
 
 				copyDir2(srcFile, destFile);
 			}
-
 		}
 		else
 		{
 			Files.copy(p_src.toPath(), p_dest.toPath());
-		}
-	}
-
-	/**
-	 * (Can't believe it's this complicated in Java)
-	 * 
-	 * @credit http://javatutorialhq.com/java/example-source-code/io/nio/folder-copy/
-	 * @param p_from
-	 * @param p_to
-	 * @throws IOException
-	 */
-	public static void copyDir(File p_from, File p_to) throws IOException
-	{
-		Path source = p_from.toPath();
-		Path target = p_to.toPath();
-
-		CopyOption[] copyOptions = new CopyOption[] { StandardCopyOption.COPY_ATTRIBUTES,
-						StandardCopyOption.REPLACE_EXISTING };
-
-		if (Files.isDirectory(source))
-		{
-			Files.walkFileTree(source, EnumSet.of(FileVisitOption.FOLLOW_LINKS),
-				Integer.MAX_VALUE, new FileVisitor<Path>()
-				{
-					@Override
-					public FileVisitResult postVisitDirectory(Path dir,
-									IOException exc) throws IOException
-					{
-						return FileVisitResult.CONTINUE;
-					}
-
-					@Override
-					public FileVisitResult preVisitDirectory(Path dir,
-									BasicFileAttributes attrs)
-					{
-						Path newDirectory = target
-										.resolve(source.relativize(dir));
-						try
-						{
-							Files.copy(dir, newDirectory, copyOptions);
-						}
-						catch (FileAlreadyExistsException x)
-						{
-						}
-						catch (IOException x)
-						{
-							return FileVisitResult.SKIP_SUBTREE;
-						}
-
-						return FileVisitResult.CONTINUE;
-					}
-
-					@Override
-					public FileVisitResult visitFile(Path file,
-									BasicFileAttributes attrs)
-													throws IOException
-					{
-						Files.copy(source, target, copyOptions);
-						return FileVisitResult.CONTINUE;
-					}
-
-					@Override
-					public FileVisitResult visitFileFailed(Path file,
-									IOException exc) throws IOException
-					{
-						return FileVisitResult.CONTINUE;
-					}
-				});
 		}
 	}
 	

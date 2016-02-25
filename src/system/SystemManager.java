@@ -6,23 +6,30 @@ import java.util.List;
 import config.Settings;
 import logging.LogLevel;
 import logging.Logger;
-import product.JobStatus;
+import report.JobStatus;
 import report.Report;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class SystemManager
 {
-	private static List<ActiveComponent> components;
-	private static boolean shutdownCalled = false;
+	private static List<ActiveComponent> s_components;
+	private static boolean s_shutdownCalled = false;
 
 	static
 	{
 		reset();
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	public static void reset()
 	{
 		//release pointers
-		components = new LinkedList<ActiveComponent>();
+		s_components = new LinkedList<ActiveComponent>();
 		
 		//reset static components
 		Settings.reset();
@@ -30,20 +37,27 @@ public class SystemManager
 		Report.reset();
 	}
 
-	public static void registerActiveComponent(ActiveComponent component)
+	/**
+	 * @update_comment
+	 * @param p_component
+	 */
+	public static void registerActiveComponent(ActiveComponent p_component)
 	{
-		components.add(component);
+		s_components.add(p_component);
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public static void shutdown()
 	{
-		if (!shutdownCalled)
+		if (!s_shutdownCalled)
 		{
-			shutdownCalled = true;
+			s_shutdownCalled = true;
 			
 			Logger.log(LogLevel.k_debug, "System Manager shutting down.");
 			
-			for (ActiveComponent component : components)
+			for (ActiveComponent component : s_components)
 			{
 				component.shutdown();
 			}
@@ -53,12 +67,16 @@ public class SystemManager
 		}
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public static boolean isShutdown()
 	{
-		if (components.isEmpty())
+		if (s_components.isEmpty())
 			return true;
 		
-		for (ActiveComponent component : components)
+		for (ActiveComponent component : s_components)
 		{
 			if (!component.isShutdown())
 			{

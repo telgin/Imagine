@@ -7,35 +7,53 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * A simple class used to display an image for testing purposes.
+ */
 public class ImagePanel extends JPanel
 {
 	private static final long serialVersionUID = 1L;
-	private Image image;
-	private Color bgColor = new Color(0, 0, 0);
+	private Image f_image;
+	private Color f_bgColor;
 
-	public ImagePanel(Color backgroundColor)
+	/**
+	 * @update_comment
+	 * @param p_backgroundColor
+	 */
+	public ImagePanel(Color p_backgroundColor)
 	{
-		bgColor = backgroundColor;
-		this.setBackground(bgColor);
+		f_bgColor = p_backgroundColor;
+		this.setBackground(f_bgColor);
 	}
 
-	public void setImage(Image i)
+	/**
+	 * @update_comment
+	 * @param p_image
+	 */
+	public void setImage(Image p_image)
 	{
-		image = i;
+		f_image = p_image;
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public void drawing()
 	{
 		repaint();
 	}
 
-	public void paintComponent(Graphics g)
+	/* (non-Javadoc)
+	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+	 */
+	public void paintComponent(Graphics p_graphics)
 	{
-		super.paintComponent(g);
+		super.paintComponent(p_graphics);
 
-		if (image != null)
+		if (f_image != null)
 		{
-			ImageIcon testwh = new ImageIcon(image);
+			ImageIcon testwh = new ImageIcon(f_image);
 			int w = testwh.getIconWidth();
 			int h = testwh.getIconHeight();
 
@@ -51,12 +69,12 @@ public class ImagePanel extends JPanel
 			if (h > this.getHeight())
 				h = this.getHeight();
 
-			g.drawImage(image, x1, y1, w, h, null);
+			p_graphics.drawImage(f_image, x1, y1, w, h, null);
 		}
 		else
 		{
-			g.setColor(bgColor);
-			g.fillRect(0, 0, this.getWidth(), this.getHeight());
+			p_graphics.setColor(f_bgColor);
+			p_graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
 		}
 	}
 }

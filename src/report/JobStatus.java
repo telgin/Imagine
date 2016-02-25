@@ -1,8 +1,10 @@
-package product;
+package report;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import product.ConversionJobFileState;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)

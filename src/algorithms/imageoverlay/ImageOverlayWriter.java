@@ -15,9 +15,9 @@ import key.Key;
 import logging.LogLevel;
 import logging.Logger;
 import product.ConversionJobFileState;
-import product.JobStatus;
 import product.ProductIOException;
 import product.ProductWriter;
+import report.JobStatus;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
 

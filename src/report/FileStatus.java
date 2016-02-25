@@ -1,4 +1,4 @@
-package product;
+package report;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import product.ConversionJobFileState;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)

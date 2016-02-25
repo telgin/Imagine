@@ -10,6 +10,7 @@ import data.FileType;
 import data.Metadata;
 import logging.LogLevel;
 import logging.Logger;
+import report.JobStatus;
 import report.Report;
 import util.ByteConversion;
 import util.Clock;

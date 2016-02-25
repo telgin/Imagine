@@ -10,70 +10,110 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * A simple class used to display an image for testing purposes.
+ */
 @SuppressWarnings("serial")
 public class ImageFrame extends JFrame implements WindowListener
 {
 
-	public ImageFrame(BufferedImage img)
+	/**
+	 * @update_comment
+	 * @param p_img
+	 */
+	public ImageFrame(BufferedImage p_img)
 	{
-		JLabel label = new JLabel(new ImageIcon(img));
+		JLabel label = new JLabel(new ImageIcon(p_img));
 		getContentPane().add(label, BorderLayout.CENTER);
 		pack();
 		setLocationRelativeTo(null);
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public void display()
 	{
 		setVisible(true);
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public void destroy()
 	{
 		setVisible(false);
 		dispose();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+	 */
 	@Override
-	public void windowActivated(WindowEvent arg0)
+	public void windowActivated(WindowEvent p_arg)
 	{
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+	 */
 	@Override
-	public void windowClosed(WindowEvent arg0)
+	public void windowClosed(WindowEvent p_arg)
+	{
+		destroy();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowClosing(WindowEvent p_arg)
 	{
 		destroy();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+	 */
 	@Override
-	public void windowClosing(WindowEvent arg0)
-	{
-		destroy();
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent arg0)
+	public void windowDeactivated(WindowEvent p_arg)
 	{
 		destroy();
 
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+	 */
 	@Override
-	public void windowDeiconified(WindowEvent arg0)
+	public void windowDeiconified(WindowEvent p_arg)
 	{
 		destroy();
 
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+	 */
 	@Override
-	public void windowIconified(WindowEvent arg0)
+	public void windowIconified(WindowEvent p_arg)
 	{
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+	 */
 	@Override
-	public void windowOpened(WindowEvent arg0)
+	public void windowOpened(WindowEvent p_arg)
 	{
 	}
 
+	/**
+	 * Sets the window in a random location on the screen.
+	 * Just a fun method, used to display multiple small images without
+	 * them overlapping so much.
+	 */
 	public void setRandomLocation()
 	{
 		int xMax = 1920 - (getWidth() + 50);

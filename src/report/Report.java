@@ -17,30 +17,37 @@ import util.myUtilities;
  */
 public abstract class Report
 {
-	private static List<String> lines;
+	private static List<String> s_lines;
 	
+	/**
+	 * @update_comment
+	 */
 	public static void reset()
 	{
-		lines = new LinkedList<String>();
+		s_lines = new LinkedList<String>();
 	}
 	
 	/**
 	 * @update_comment
-	 * @param fileMetadata
+	 * @param p_fileMetadata
 	 */
-	public static void saveConversionRecord(Metadata fileMetadata)
+	public static void saveConversionRecord(Metadata p_fileMetadata)
 	{
-		String filePath = fileMetadata.getFile().getPath();
-		String f1uuid = FileSystemUtil.getProductName(fileMetadata.getProductUUID());
-		String fragmentCount = Long.toString(fileMetadata.getFragmentCount());
-		lines.add(filePath + Constants.FILE_DELIMITER + f1uuid + Constants.FILE_DELIMITER + fragmentCount);
+		String filePath = p_fileMetadata.getFile().getPath();
+		String f1uuid = FileSystemUtil.getProductName(p_fileMetadata.getProductUUID());
+		String fragmentCount = Long.toString(p_fileMetadata.getFragmentCount());
+		s_lines.add(filePath + Constants.FILE_DELIMITER + f1uuid + Constants.FILE_DELIMITER + fragmentCount);
 	}
 	
-	public static void writeReport(File reportFile)
+	/**
+	 * @update_comment
+	 * @param p_reportFile
+	 */
+	public static void writeReport(File p_reportFile)
 	{
-		myUtilities.writeListToFile(reportFile, lines);
+		myUtilities.writeListToFile(p_reportFile, s_lines);
 		
-		Logger.log(LogLevel.k_general, "Generated Archive Contents Report: " + reportFile.getAbsolutePath());
+		Logger.log(LogLevel.k_general, "Generated Archive Contents Report: " + p_reportFile.getAbsolutePath());
 	}
 
 }

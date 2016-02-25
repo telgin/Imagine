@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.Map;
 
 import util.FileSystemUtil;
 
@@ -13,29 +14,29 @@ import util.FileSystemUtil;
  */
 public class TestFileTrees
 {
-	private static HashMap<String, FileTree> trees;
-	private static File bank = new File("testing/bank/");
+	private static Map<String, FileTree> s_trees;
+	private static File s_bank = new File(new File("testing"), "bank");
 
 	static
 	{
 		// trees:
-		trees = new HashMap<String, FileTree>();
-		trees.put("emptyfolder", getEmptyFolderTree());
-		trees.put("smallfile", getSmallFileTree());
-		trees.put("smalltree", getSmallTree());
-		trees.put("bigfile", getBigFileTree());
-		trees.put("bigtree", getBigTree());
-		trees.put("inputimages", getInputImages());
+		s_trees = new HashMap<String, FileTree>();
+		s_trees.put("emptyfolder", getEmptyFolderTree());
+		s_trees.put("smallfile", getSmallFileTree());
+		s_trees.put("smalltree", getSmallTree());
+		s_trees.put("bigfile", getBigFileTree());
+		s_trees.put("bigtree", getBigTree());
+		s_trees.put("inputimages", getInputImages());
 	}
 
 	/**
 	 * @update_comment
-	 * @param parent
-	 * @param name
+	 * @param p_parent
+	 * @param p_name
 	 */
-	public static void clear(File parent, String name)
+	public static void clear(File p_parent, String p_name)
 	{
-		clearFolder(trees.get(name.toLowerCase()).getRoot(parent));
+		clearFolder(s_trees.get(p_name.toLowerCase()).getRoot(p_parent));
 	}
 
 	/**
@@ -81,7 +82,7 @@ public class TestFileTrees
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(bank, "message.txt"), getRoot(parent));
+				addFile(new File(s_bank, "message.txt"), getRoot(parent));
 			}
 
 		};
@@ -107,7 +108,7 @@ public class TestFileTrees
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(bank, "tracked_topfolder_r/"),
+				addFile(new File(s_bank, "tracked_topfolder_r/"),
 								getRoot(parent));
 			}
 
@@ -134,7 +135,7 @@ public class TestFileTrees
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(bank, "Computer Art.zip"), getRoot(parent));
+				addFile(new File(s_bank, "Computer Art.zip"), getRoot(parent));
 			}
 
 		};
@@ -160,7 +161,7 @@ public class TestFileTrees
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(bank, "eclipse-installer/"), getRoot(parent));
+				addFile(new File(s_bank, "eclipse-installer/"), getRoot(parent));
 			}
 
 		};
@@ -187,7 +188,7 @@ public class TestFileTrees
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(bank, "input_images/"), getRoot(parent));
+				addFile(new File(s_bank, "input_images/"), getRoot(parent));
 			}
 
 		};
@@ -197,60 +198,60 @@ public class TestFileTrees
 
 	/**
 	 * @update_comment
-	 * @param parent
-	 * @param name
+	 * @param p_parent
+	 * @param p_name
 	 */
-	public static void reset(File parent, String name)
+	public static void reset(File p_parent, String p_name)
 	{
-		clear(parent, name.toLowerCase());
-		create(parent, name.toLowerCase());
+		clear(p_parent, p_name.toLowerCase());
+		create(p_parent, p_name.toLowerCase());
 	}
 
 	/**
 	 * @update_comment
-	 * @param parent
-	 * @param name
+	 * @param p_parent
+	 * @param p_name
 	 */
-	public static void create(File parent, String name)
+	public static void create(File p_parent, String p_name)
 	{
-		trees.get(name.toLowerCase()).create(parent);
+		s_trees.get(p_name.toLowerCase()).create(p_parent);
 	}
 
 	/**
 	 * @update_comment
-	 * @param folder
+	 * @param p_folder
 	 */
-	private static void clearFolder(File folder)
+	private static void clearFolder(File p_folder)
 	{
-		FileSystemUtil.deleteDir(folder);
-		folder.mkdir();
+		FileSystemUtil.deleteDir(p_folder);
+		p_folder.mkdir();
 	}
 
 	/**
 	 * @update_comment
-	 * @param parent
-	 * @param name
+	 * @param p_parent
+	 * @param p_name
 	 * @return
 	 */
-	public static File getRoot(File parent, String name)
+	public static File getRoot(File p_parent, String p_name)
 	{
-		return trees.get(name.toLowerCase()).getRoot(parent);
+		return s_trees.get(p_name.toLowerCase()).getRoot(p_parent);
 	}
 
 	/**
 	 * @update_comment
-	 * @param target
-	 * @param newParent
+	 * @param p_target
+	 * @param p_newParent
 	 */
-	private static void addFile(File target, File newParent)
+	private static void addFile(File p_target, File p_newParent)
 	{
-		File copyTo = new File(newParent, target.getName());
+		File copyTo = new File(p_newParent, p_target.getName());
 		try
 		{
-			if (target.isDirectory())
-				FileSystemUtil.copyDir2(target, copyTo);
+			if (p_target.isDirectory())
+				FileSystemUtil.copyDir2(p_target, copyTo);
 			else
-				Files.copy(target.toPath(), copyTo.toPath());
+				Files.copy(p_target.toPath(), copyTo.toPath());
 		}
 		catch (IOException e)
 		{

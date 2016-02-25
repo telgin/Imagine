@@ -1,26 +1,43 @@
 package testing;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class CodeTimer
 {
-	private long startMillis = 0;
-	private long endMillis = 0;
+	private long f_startMillis = 0;
+	private long f_endMillis = 0;
 
+	/**
+	 * @update_comment
+	 */
 	public CodeTimer()
 	{
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public void start()
 	{
-		startMillis = System.currentTimeMillis();
+		f_startMillis = System.currentTimeMillis();
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public void end()
 	{
-		endMillis = System.currentTimeMillis();
+		f_endMillis = System.currentTimeMillis();
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public long getElapsedTime()
 	{
-		return (endMillis - startMillis);
+		return (f_endMillis - f_startMillis);
 	}
 }
