@@ -24,24 +24,24 @@ import ui.graphical.GUI;
  */
 public class OpenArchiveController
 {
-	private OpenArchiveView view;
-	private GUI gui;
+	private OpenArchiveView f_view;
+	private GUI f_gui;
 	
-	//state variables
-	private List<String> presetNames;
-	private Algorithm selectedAlgorithm = null;
-	private boolean nonInitialFragment;
+	//state fields
+	private List<String> f_presetNames;
+	private Algorithm f_selectedAlgorithm = null;
+	private boolean f_nonInitialFragment;
 		
 	/**
 	 * @update_comment
 	 * @param file
 	 */
-	public OpenArchiveController(OpenArchiveView view)
+	public OpenArchiveController(OpenArchiveView p_view)
 	{
-		this.view = view;
-		this.gui = (GUI) UIContext.getUI();
+		f_view = p_view;
+		f_gui = (GUI) UIContext.getUI();
 		
-		presetNames = ConfigurationAPI.getAlgorithmPresetNames();
+		f_presetNames = ConfigurationAPI.getAlgorithmPresetNames();
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class OpenArchiveController
 	 */
 	public Algorithm getSelectedAlgorithm()
 	{
-		return selectedAlgorithm;
+		return f_selectedAlgorithm;
 	}
 
 	/**
@@ -57,49 +57,56 @@ public class OpenArchiveController
 	 */
 	public void setSelectedAlgorithm(Algorithm selectedAlgorithm)
 	{
-		this.selectedAlgorithm = selectedAlgorithm;
+		this.f_selectedAlgorithm = selectedAlgorithm;
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	void openArchive()
 	{
 		try
 		{
-			view.setOpenButtonEnabled(false);
-			view.setAlgorithmSelectionEnabled(false);
+			f_view.setOpenButtonEnabled(false);
+			f_view.setAlgorithmSelectionEnabled(false);
 			
-			ProductContents productContents = ConversionAPI.openArchive(selectedAlgorithm, getKey(), getInputFile());
+			ProductContents productContents = ConversionAPI.openArchive(f_selectedAlgorithm, getKey(), getInputFile());
 			
 			if (!productContents.getFileContents().isEmpty())
-				nonInitialFragment = productContents.getFileContents().get(0).getFragmentNumber() > 1;
+				f_nonInitialFragment = productContents.getFileContents().get(0).getFragmentNumber() > 1;
 			else
-				nonInitialFragment = false;
+				f_nonInitialFragment = false;
 			
-			view.setTableData(productContents.getFileContents());
-			view.setExtractionButtonsEnabled(true);
+			f_view.setTableData(productContents.getFileContents());
+			f_view.setExtractionButtonsEnabled(true);
 		}
 		catch (Exception e)
 		{
 			Logger.log(LogLevel.k_debug, e, false);
 			Logger.log(LogLevel.k_error, e.getMessage());
 			
-			view.setOpenButtonEnabled(true);
-			view.setAlgorithmSelectionEnabled(true);
-			view.clearTable();
+			f_view.setOpenButtonEnabled(true);
+			f_view.setAlgorithmSelectionEnabled(true);
+			f_view.clearTable();
 		}
 		
-		if (gui.hasErrors())
+		if (f_gui.hasErrors())
 		{
-			view.showErrors(gui.getErrors(), "archive parsing");
-			gui.clearErrors();
+			f_view.showErrors(f_gui.getErrors(), "archive parsing");
+			f_gui.clearErrors();
 		}
 	}
 	
-	
+	/**
+	 * @update_comment
+	 * @return
+	 * @throws UsageException
+	 */
 	private File getInputFile() throws UsageException
 	{
 		File inputFile = null;
-		if (view.getInputFilePath() != null && !view.getInputFilePath().isEmpty())
-			inputFile = new File(view.getInputFilePath());
+		if (f_view.getInputFilePath() != null && !f_view.getInputFilePath().isEmpty())
+			inputFile = new File(f_view.getInputFilePath());
 
 		if (inputFile == null)
 			throw new UsageException("The input file must exist.");
@@ -107,11 +114,16 @@ public class OpenArchiveController
 		return inputFile;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 * @throws UsageException
+	 */
 	private File getOutputFolder() throws UsageException
 	{
 		File outputFolder = null;
-		if (view.getOutputFolderPath() != null && !view.getOutputFolderPath().isEmpty())
-			outputFolder = new File(view.getOutputFolderPath());
+		if (f_view.getOutputFolderPath() != null && !f_view.getOutputFolderPath().isEmpty())
+			outputFolder = new File(f_view.getOutputFolderPath());
 
 		if (outputFolder == null)
 			throw new UsageException("The output folder must exist.");
@@ -125,10 +137,10 @@ public class OpenArchiveController
 	 */
 	void chooseKeyFile()
 	{
-		File chosen = view.chooseFile();
+		File chosen = f_view.chooseFile();
 		if (chosen != null)
 		{
-			view.setKeyFilePath(chosen.getAbsolutePath());
+			f_view.setKeyFilePath(chosen.getAbsolutePath());
 		}
 	}
 
@@ -140,14 +152,14 @@ public class OpenArchiveController
 	{
 		try
 		{
-			if (nonInitialFragment)
+			if (f_nonInitialFragment)
 			{
 				Logger.log(LogLevel.k_error, "The first file has a fragment number greater than 1.");
 				Logger.log(LogLevel.k_error, "Only initial fragments may start an extraction chain, "
 							+ "so this file will not be complete.");
 			}
 				
-			ConversionAPI.extractAll(selectedAlgorithm, getKey(), getInputFile(), getOutputFolder());
+			ConversionAPI.extractAll(f_selectedAlgorithm, getKey(), getInputFile(), getOutputFolder());
 		}
 		catch (Exception e)
 		{
@@ -155,10 +167,10 @@ public class OpenArchiveController
 			Logger.log(LogLevel.k_error, e.getMessage());
 		}
 		
-		if (gui.hasErrors())
+		if (f_gui.hasErrors())
 		{
-			view.showErrors(gui.getErrors(), "data extraction");
-			gui.clearErrors();
+			f_view.showErrors(f_gui.getErrors(), "data extraction");
+			f_gui.clearErrors();
 		}
 	}
 
@@ -169,11 +181,11 @@ public class OpenArchiveController
 	private Key getKey()
 	{
 		Key key = null;
-		if (view.keyFileEnabled())
+		if (f_view.keyFileEnabled())
 		{
-			key = new FileKey(new File(view.getKeyFilePath()));
+			key = new FileKey(new File(f_view.getKeyFilePath()));
 		}
-		else if (view.passwordEnabled())
+		else if (f_view.passwordEnabled())
 		{
 			key = new PasswordKey();
 		}
@@ -191,7 +203,7 @@ public class OpenArchiveController
 	 */
 	public void extractSelected()
 	{
-		List<Integer> indices = view.getSelectedRows();
+		List<Integer> indices = f_view.getSelectedRows();
 		
 		try
 		{
@@ -200,7 +212,7 @@ public class OpenArchiveController
 			
 			for (int index : indices)
 			{
-				if (index == 0 && nonInitialFragment)
+				if (index == 0 && f_nonInitialFragment)
 				{
 					Logger.log(LogLevel.k_error, "The first file has a fragment number greater than 1.");
 					Logger.log(LogLevel.k_error, "Only initial fragments may start an extraction chain, "
@@ -209,7 +221,7 @@ public class OpenArchiveController
 
 				try
 				{
-					ConversionAPI.extractFile(selectedAlgorithm, getKey(), inputFile, outputFolder, index);
+					ConversionAPI.extractFile(f_selectedAlgorithm, getKey(), inputFile, outputFolder, index);
 				}
 				catch (IOException | UsageException e)
 				{
@@ -225,42 +237,46 @@ public class OpenArchiveController
 			Logger.log(LogLevel.k_error, e.getMessage());
 		}
 		
-		if (gui.hasErrors())
+		if (f_gui.hasErrors())
 		{
-			view.showErrors(gui.getErrors(), "data extraction");
-			gui.clearErrors();
+			f_view.showErrors(f_gui.getErrors(), "data extraction");
+			f_gui.clearErrors();
 		}
 	}
 	
-	public void algorithmSelected(int index)
+	/**
+	 * @update_comment
+	 * @param p_index
+	 */
+	public void algorithmSelected(int p_index)
 	{
-		if (index == -1)
+		if (p_index == -1)
 		{
 			//nothing selected
-			view.setKeySectionEnabled(false);
-			view.setOpenButtonEnabled(false);
+			f_view.setKeySectionEnabled(false);
+			f_view.setOpenButtonEnabled(false);
 		}
 		else
 		{
 			try
 			{
-				selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(presetNames.get(index));
-				view.setKeySectionEnabled(true);
-				view.setOpenButtonEnabled(true);
+				f_selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(f_presetNames.get(p_index));
+				f_view.setKeySectionEnabled(true);
+				f_view.setOpenButtonEnabled(true);
 			}
 			catch (UsageException e)
 			{
 				Logger.log(LogLevel.k_error, e.getMessage());
 				Logger.log(LogLevel.k_debug, e, false);
 				
-				view.setAlgorithmSelection(null);
+				f_view.setAlgorithmSelection(null);
 			}
 		}
 		
-		if (gui.hasErrors())
+		if (f_gui.hasErrors())
 		{
-			view.showErrors(gui.getErrors(), "algorithm lookup");
-			gui.clearErrors();
+			f_view.showErrors(f_gui.getErrors(), "algorithm lookup");
+			f_gui.clearErrors();
 		}
 	}
 
@@ -269,40 +285,40 @@ public class OpenArchiveController
 	 */
 	public List<String> getPresetNames()
 	{
-		return presetNames;
+		return f_presetNames;
 	}
 
 	/**
 	 * @update_comment
-	 * @param b
+	 * @param p_focused
 	 * @return
 	 */
-	public void algorithmSelectFocus(boolean focused)
+	public void algorithmSelectFocus(boolean p_focused)
 	{
 		//update the list if focused on
-		if (focused)
+		if (p_focused)
 		{
 			List<String> currentPresetNames = ConfigurationAPI.getAlgorithmPresetNames();
 			
 			//update the list only if it changed
-			if (presetNames.size() != currentPresetNames.size() || 
-							!presetNames.containsAll(currentPresetNames))
+			if (f_presetNames.size() != currentPresetNames.size() || 
+							!f_presetNames.containsAll(currentPresetNames))
 			{
 				//save algorithm modifications
-				Algorithm previousSelection = selectedAlgorithm;
+				Algorithm previousSelection = f_selectedAlgorithm;
 				
 				//refresh the preset names to the new list
-				presetNames = currentPresetNames;
-				view.setAlgorithmPresets(presetNames);
+				f_presetNames = currentPresetNames;
+				f_view.setAlgorithmPresets(f_presetNames);
 			
-				if (presetNames.contains(previousSelection.getPresetName()))
+				if (f_presetNames.contains(previousSelection.getPresetName()))
 				{
-					view.setAlgorithmSelection(previousSelection.getPresetName());
-					selectedAlgorithm = previousSelection;
+					f_view.setAlgorithmSelection(previousSelection.getPresetName());
+					f_selectedAlgorithm = previousSelection;
 				}
 				else
 				{
-					view.setAlgorithmSelection(null);
+					f_view.setAlgorithmSelection(null);
 				}
 			}
 		}
@@ -314,17 +330,17 @@ public class OpenArchiveController
 	 */
 	public void browseInputFile()
 	{
-		File file = view.chooseFile();
+		File file = f_view.chooseFile();
 		
 		if (file != null)
 		{
-			view.setInputFilePath(file.getAbsolutePath());
+			f_view.setInputFilePath(file.getAbsolutePath());
 			
 			//reset
-			view.setOpenButtonEnabled(true);
-			view.setAlgorithmSelectionEnabled(true);
-			view.clearTable();
-			view.setExtractionButtonsEnabled(false);
+			f_view.setOpenButtonEnabled(true);
+			f_view.setAlgorithmSelectionEnabled(true);
+			f_view.clearTable();
+			f_view.setExtractionButtonsEnabled(false);
 		}
 	}
 
@@ -334,11 +350,11 @@ public class OpenArchiveController
 	 */
 	public void browseOutputFolder()
 	{
-		File folder = view.chooseFolder();
+		File folder = f_view.chooseFolder();
 		
 		if (folder != null)
 		{
-			view.setOutputFolderPath(folder.getAbsolutePath());
+			f_view.setOutputFolderPath(folder.getAbsolutePath());
 		}
 	}
 }

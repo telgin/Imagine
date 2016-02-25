@@ -41,8 +41,8 @@ import logging.LogLevel;
 import logging.Logger;
 import system.CmdAction;
 import ui.ArgParseResult;
-import ui.graphical.BooleanProperty;
-import ui.graphical.FileProperty;
+import ui.graphical.BooleanModule;
+import ui.graphical.FileModule;
 import ui.graphical.View;
 import ui.graphical.archiveviewer.FileContentsTableRecord;
 
@@ -69,8 +69,8 @@ public class EmbedView extends View
 	private TableView<FileContentsTableRecord> f_table;
 	private Label f_passwordLabel, f_keyFileLabel, f_keySelectionLabel, f_algorithmLabel,
 		f_inputFilesLabel, f_targetFilesLabel, f_filesCreatedLabel;
-	private FileProperty f_outputFolder;
-	private BooleanProperty f_structuredOutput;
+	private FileModule f_outputFolder;
+	private BooleanModule f_structuredOutput;
 	private TreeView<String> f_inputFiles, f_targetFiles;
 	private ProgressBar f_conversionProgress;
 	private InputFileTreeItem f_inputFileRoot;
@@ -429,11 +429,11 @@ public class EmbedView extends View
 		configSelection.getChildren().add(indentElement(1, f_algorithmSelect));
 		
 		//output folder
-		f_outputFolder = new FileProperty("Output Folder", e -> f_controller.browseOutputFolder());
+		f_outputFolder = new FileModule("Output Folder", e -> f_controller.browseOutputFolder());
 		f_outputFolder.setup(configSelection);
 		
 		//structured output
-		f_structuredOutput = new BooleanProperty("Use Structured Output Folders?",
+		f_structuredOutput = new BooleanModule("Use Structured Output Folders?",
 						b -> f_controller.structuredOutputChecked(b));
 		f_structuredOutput.setup(configSelection);
 		

@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class Constants
 {
-
 	// program names
 	public static final String APPLICATION_NAME_FULL = "Imagine Obfuscation Utility";
 	public static final String APPLICATION_NAME_SHORT = "Imagine";
@@ -14,7 +13,7 @@ public abstract class Constants
 	// program version
 	public static final int APPLICATION_MAJOR_VERSION = 0;
 	public static final int APPLICATION_MINOR_VERSION = 0;
-	public static final int APPLICATION_UPDATE_VERSION = 1;
+	public static final int APPLICATION_UPDATE_VERSION = 0;
 	public static final String APPLICATION_FORMATTED_VERSION =
 					Integer.toString(APPLICATION_MAJOR_VERSION) + "."
 									+ Integer.toString(APPLICATION_MINOR_VERSION) + "."
@@ -61,13 +60,4 @@ public abstract class Constants
 	public static final int FILE_PERMISSIONS_SIZE = 1;
 	public static final int FILE_LENGTH_REMAINING_SIZE = 8;
 	public static final int FILE_TYPE_SIZE = 1;
-	
-
-
-	
-	
-	
-	
-	
-
 }

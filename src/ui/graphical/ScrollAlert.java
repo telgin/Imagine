@@ -14,27 +14,35 @@ public class ScrollAlert extends Alert
 {
 	/**
 	 * @update_comment
-	 * @param alertType
+	 * @param p_alertType
 	 */
-	public ScrollAlert(AlertType alertType)
+	public ScrollAlert(AlertType p_alertType)
 	{
-		super(alertType);
+		super(p_alertType);
 		this.resizableProperty().set(true);
 	}
 	
-	public void setScrollText(String text)
+	/**
+	 * @update_comment
+	 * @param p_text
+	 */
+	public void setScrollText(String p_text)
 	{
 		ScrollPane scroll = new ScrollPane();
-		Text content = new Text(text);
+		Text content = new Text(p_text);
 		scroll.setContent(content);
 		scroll.setPrefSize(700, 120);
 		scroll.setStyle("-fx-focus-color: transparent;"); //remove focus highlight
 		getDialogPane().setContent(scroll);
 	}
 	
-	public void setScrollText(List<String> lines)
+	/**
+	 * @update_comment
+	 * @param p_lines
+	 */
+	public void setScrollText(List<String> p_lines)
 	{
-		setScrollText(String.join("\n", lines));
+		setScrollText(String.join("\n", p_lines));
 	}
 
 }

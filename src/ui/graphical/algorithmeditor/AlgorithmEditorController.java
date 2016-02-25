@@ -19,22 +19,23 @@ import ui.graphical.GUI;
  */
 public class AlgorithmEditorController
 {
-	private AlgorithmEditorView view;
-	private GUI gui;
+	private AlgorithmEditorView f_view;
+	private GUI f_gui;
 	
-	private Algorithm storedAlgorithm;
-	private Algorithm workingAlgorithm;
+	private Algorithm f_storedAlgorithm;
+	private Algorithm f_workingAlgorithm;
+	private Parameter f_selectedParameter;
+	private String f_optionValue;
 	
-	private Parameter selectedParameter;
-	
-	private String optionValue;
-	
-	public AlgorithmEditorController(AlgorithmEditorView view)
+	/**
+	 * @update_comment
+	 * @param p_view
+	 */
+	public AlgorithmEditorController(AlgorithmEditorView p_view)
 	{
-		this.view = view;
-		this.gui = (GUI) UIContext.getUI();
+		f_view = p_view;
+		f_gui = (GUI) UIContext.getUI();
 	}
-	
 	
 	/**
 	 * @update_comment
@@ -47,30 +48,29 @@ public class AlgorithmEditorController
 
 	/**
 	 * @update_comment
-	 * @param i
-	 * @return
+	 * @param p_index
 	 */
-	public void presetSelected(int i)
+	public void presetSelected(int p_index)
 	{
-		if (i == -1)
+		if (p_index == -1)
 		{
-			storedAlgorithm = null;
-			workingAlgorithm = null;
+			f_storedAlgorithm = null;
+			f_workingAlgorithm = null;
 		}
 		else
 		{
-			String presetName = ConfigurationAPI.getAlgorithmPresetNames().get(i);
+			String presetName = ConfigurationAPI.getAlgorithmPresetNames().get(p_index);
 			try
 			{
-				storedAlgorithm = ConfigurationAPI.getAlgorithmPreset(presetName);
+				f_storedAlgorithm = ConfigurationAPI.getAlgorithmPreset(presetName);
 				
 				//make a copy of the preset for editing
-				workingAlgorithm = storedAlgorithm.clone();
-				view.setPresetName(workingAlgorithm.getPresetName());
-				view.setAlgorithmNames(ConfigurationAPI.getAlgorithmDefinitionNames());
-				view.setEditsEnabled(true);
-				view.setSelectedAlgorithm(workingAlgorithm.getName());
-				view.setSelectedParameter(-1);
+				f_workingAlgorithm = f_storedAlgorithm.clone();
+				f_view.setPresetName(f_workingAlgorithm.getPresetName());
+				f_view.setAlgorithmNames(ConfigurationAPI.getAlgorithmDefinitionNames());
+				f_view.setEditsEnabled(true);
+				f_view.setSelectedAlgorithm(f_workingAlgorithm.getName());
+				f_view.setSelectedParameter(-1);
 			}
 			catch (UsageException e)
 			{
@@ -78,44 +78,42 @@ public class AlgorithmEditorController
 				Logger.log(LogLevel.k_error, e.getMessage());
 			}
 	
-			if (gui.hasErrors())
+			if (f_gui.hasErrors())
 			{
-				view.showErrors(gui.getErrors(), "algorithm preset lookup");
-				gui.clearErrors();
+				f_view.showErrors(f_gui.getErrors(), "algorithm preset lookup");
+				f_gui.clearErrors();
 			}
 		}
 	}
 	
 	/**
 	 * @update_comment
-	 * @param i
-	 * @return
+	 * @param p_index
 	 */
-	public void parameterSelected(int index)
+	public void parameterSelected(int p_index)
 	{
-		view.removeParameterOptions();
-		optionValue = "sdfgsdfgdsfg";
+		f_view.removeParameterOptions();
+		f_optionValue = "sdfgsdfgdsfg";
 		
-		if (index == -1)
+		if (p_index == -1)
 		{
-			selectedParameter = null;
+			f_selectedParameter = null;
 			
-			view.setParameterDescription(null);
+			f_view.setParameterDescription(null);
 		}
 		else
 		{
-			String parameterName = getParameterNames().get(index);
-			selectedParameter = workingAlgorithm.getParameter(parameterName);
+			String parameterName = getParameterNames().get(p_index);
+			f_selectedParameter = f_workingAlgorithm.getParameter(parameterName);
 			
-			view.setParameterDescription(selectedParameter.getDescription());
+			f_view.setParameterDescription(f_selectedParameter.getDescription());
 			
-			view.displayParameterOptions(selectedParameter);
+			f_view.displayParameterOptions(f_selectedParameter);
 		}
 	}
 
 	/**
 	 * @update_comment
-	 * @return
 	 */
 	public void createNewPressed()
 	{
@@ -124,14 +122,14 @@ public class AlgorithmEditorController
 		//set the working algorithm to the first default algorithm
 		try
 		{
-			view.reset();
+			f_view.reset();
 			
-			storedAlgorithm = null;
-			workingAlgorithm = ConfigurationAPI.getDefaultAlgorithm(algoName);
-			view.setAlgorithmNames(ConfigurationAPI.getAlgorithmDefinitionNames());
-			view.setEditsEnabled(true);
-			view.setSelectedAlgorithm(algoName);
-			view.setPresetName("New Algorithm Preset");
+			f_storedAlgorithm = null;
+			f_workingAlgorithm = ConfigurationAPI.getDefaultAlgorithm(algoName);
+			f_view.setAlgorithmNames(ConfigurationAPI.getAlgorithmDefinitionNames());
+			f_view.setEditsEnabled(true);
+			f_view.setSelectedAlgorithm(algoName);
+			f_view.setPresetName("New Algorithm Preset");
 		}
 		catch (UsageException e)
 		{
@@ -139,32 +137,31 @@ public class AlgorithmEditorController
 			Logger.log(LogLevel.k_error, e.getMessage());
 		}
 
-		if (gui.hasErrors())
+		if (f_gui.hasErrors())
 		{
-			view.showErrors(gui.getErrors(), "new algorithm creation");
-			gui.clearErrors();
+			f_view.showErrors(f_gui.getErrors(), "new algorithm creation");
+			f_gui.clearErrors();
 		}
 
 	}
-	
+
 	/**
 	 * @update_comment
-	 * @return
 	 */
 	public void savePressed()
 	{
-		if (workingAlgorithm != null)
+		if (f_workingAlgorithm != null)
 		{
-			if (storedAlgorithm == null)
+			if (f_storedAlgorithm == null)
 			{
 				try
 				{
 					//the working algorithm is a new preset, so just add it:
 					
 					//take the existing preset name
-					workingAlgorithm.setPresetName(view.getPresetName());
+					f_workingAlgorithm.setPresetName(f_view.getPresetName());
 					
-					ConfigurationAPI.addNewAlgorithmPreset(workingAlgorithm);
+					ConfigurationAPI.addNewAlgorithmPreset(f_workingAlgorithm);
 				}
 				catch (UsageException e)
 				{
@@ -177,11 +174,11 @@ public class AlgorithmEditorController
 				//update the stored algorithm by deleting it and replacing it with the working copy
 				try
 				{
-					ConfigurationAPI.deleteAlgorithmPreset(storedAlgorithm.getPresetName());
+					ConfigurationAPI.deleteAlgorithmPreset(f_storedAlgorithm.getPresetName());
 					
 					try
 					{
-						ConfigurationAPI.addNewAlgorithmPreset(workingAlgorithm);
+						ConfigurationAPI.addNewAlgorithmPreset(f_workingAlgorithm);
 					}
 					catch (UsageException e)
 					{
@@ -189,7 +186,7 @@ public class AlgorithmEditorController
 						Logger.log(LogLevel.k_error, e.getMessage());
 						
 						//failure adding working algorithm, so re-add stored algorithm
-						ConfigurationAPI.addNewAlgorithmPreset(storedAlgorithm);
+						ConfigurationAPI.addNewAlgorithmPreset(f_storedAlgorithm);
 					}
 				}
 				catch (UsageException e)
@@ -199,14 +196,14 @@ public class AlgorithmEditorController
 				}
 			}
 			
-			if (gui.hasErrors())
+			if (f_gui.hasErrors())
 			{
-				view.showErrors(gui.getErrors(), "algorithm save");
-				gui.clearErrors();
+				f_view.showErrors(f_gui.getErrors(), "algorithm save");
+				f_gui.clearErrors();
 			}
 			else
 			{
-				view.reset();
+				f_view.reset();
 			}
 		}
 	}
@@ -222,37 +219,37 @@ public class AlgorithmEditorController
 
 	/**
 	 * @update_comment
-	 * @return
+	 * @param p_index
 	 */
-	public void algorithmSelected(int index)
+	public void algorithmSelected(int p_index)
 	{
-		if (index == -1)
+		if (p_index == -1)
 		{
-			workingAlgorithm = null;
+			f_workingAlgorithm = null;
 		}
 		else
 		{
-			String selectedName = ConfigurationAPI.getAlgorithmDefinitionNames().get(index);
+			String selectedName = ConfigurationAPI.getAlgorithmDefinitionNames().get(p_index);
 			try
 			{
 				//set current algorithm unless it's the same algorithm type
-				if (!workingAlgorithm.getName().equalsIgnoreCase(selectedName))
+				if (!f_workingAlgorithm.getName().equalsIgnoreCase(selectedName))
 				{
 					Algorithm defaultAlgorithm = ConfigurationAPI.getDefaultAlgorithm(selectedName);
 					
 					//keep the preset name
-					defaultAlgorithm.setPresetName(workingAlgorithm.getPresetName());
-					workingAlgorithm = defaultAlgorithm;
+					defaultAlgorithm.setPresetName(f_workingAlgorithm.getPresetName());
+					f_workingAlgorithm = defaultAlgorithm;
 				}
 	
 				//set description
-				view.setAlgorithmDescription(workingAlgorithm.getDescription());
+				f_view.setAlgorithmDescription(f_workingAlgorithm.getDescription());
 			
 				//set parameter list
-				view.setParameterNames(getParameterNames());
+				f_view.setParameterNames(getParameterNames());
 				
 				//un-select any selected item
-				view.setSelectedParameter(-1);
+				f_view.setSelectedParameter(-1);
 			}
 			catch (UsageException e)
 			{
@@ -260,10 +257,10 @@ public class AlgorithmEditorController
 				Logger.log(LogLevel.k_error, e.getMessage());
 			}
 	
-			if (gui.hasErrors())
+			if (f_gui.hasErrors())
 			{
-				view.showErrors(gui.getErrors(), "algorithm definition lookup");
-				gui.clearErrors();
+				f_view.showErrors(f_gui.getErrors(), "algorithm definition lookup");
+				f_gui.clearErrors();
 			}
 		}
 	}
@@ -276,9 +273,9 @@ public class AlgorithmEditorController
 	{
 		List<String> parameterNames = new ArrayList<String>();
 		
-		if (workingAlgorithm != null)
+		if (f_workingAlgorithm != null)
 		{
-			for (Parameter p : workingAlgorithm.getParameters())
+			for (Parameter p : f_workingAlgorithm.getParameters())
 				parameterNames.add(p.getName());
 			parameterNames.sort(null);
 		}
@@ -288,66 +285,66 @@ public class AlgorithmEditorController
 
 	/**
 	 * @update_comment
-	 * @return
+	 * @param p_checked
 	 */
-	public void parameterEnabledChecked(boolean checked)
+	public void parameterEnabledChecked(boolean p_checked)
 	{
-		if (selectedParameter != null && checked != selectedParameter.isEnabled())
+		if (f_selectedParameter != null && p_checked != f_selectedParameter.isEnabled())
 		{
-			selectedParameter.setEnabled(checked);
+			f_selectedParameter.setEnabled(p_checked);
 			
 			//errors may occur here if it gets disabled and it's not optional
-			if (gui.hasErrors())
+			if (f_gui.hasErrors())
 			{
-				view.showErrors(gui.getErrors(), "algorithm definition lookup");
-				gui.clearErrors();
+				f_view.showErrors(f_gui.getErrors(), "algorithm definition lookup");
+				f_gui.clearErrors();
 			}
 			
 			//reflect the actual state of the parameter
-			view.setParameterEnabled(selectedParameter.isEnabled());
+			f_view.setParameterEnabled(f_selectedParameter.isEnabled());
 		}
 	}
 
-
 	/**
 	 * @update_comment
-	 * @param e
-	 * @return
+	 * @param p_index
 	 */
-	public void optionSelected(int index)
+	public void optionSelected(int p_index)
 	{
 		//get the string value of the selected option
-		optionSelected(selectedParameter.getOptionDisplayValues().get(index));
+		optionSelected(f_selectedParameter.getOptionDisplayValues().get(p_index));
 	}
 	
-	public void optionSelected(String value)
+	/**
+	 * @update_comment
+	 * @param p_value
+	 */
+	public void optionSelected(String p_value)
 	{
-		boolean success = selectedParameter.setValue(value);
-		view.setOptionSelectionErrorState(!success);
+		boolean success = f_selectedParameter.setValue(p_value);
+		f_view.setOptionSelectionErrorState(!success);
 	}
-
 
 	/**
 	 * @update_comment
-	 * @param b
-	 * @return
+	 * @param p_checked
 	 */
-	public void promptOptionSelected(boolean checked)
+	public void promptOptionSelected(boolean p_checked)
 	{
-		view.setOptionSelectionEnabled(!checked);
+		f_view.setOptionSelectionEnabled(!p_checked);
 		
-		if (checked)
+		if (p_checked)
 		{
-			optionValue = selectedParameter.getValue();
+			f_optionValue = f_selectedParameter.getValue();
 			optionSelected(Option.PROMPT_OPTION.getValue());
 		}
 		else
 		{
-			if (optionValue != null && optionValue.equals(Option.PROMPT_OPTION.getValue()))
-				optionValue = null;
+			if (f_optionValue != null && f_optionValue.equals(Option.PROMPT_OPTION.getValue()))
+				f_optionValue = null;
 			
-			optionSelected(optionValue);
-			optionValue = null;
+			optionSelected(f_optionValue);
+			f_optionValue = null;
 		}
 	}
 }

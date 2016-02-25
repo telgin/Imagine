@@ -16,50 +16,84 @@ import javafx.stage.Stage;
  */
 public abstract class View
 {
-	private Stage window;
+	private Stage f_window;
 	
-	public View(Stage window)
+	/**
+	 * @update_comment
+	 * @param p_window
+	 */
+	public View(Stage p_window)
 	{
-		this.window = window;
+		this.f_window = p_window;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public abstract String getPassword();
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public abstract Pane setupPane();
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public abstract File getEnclosingFolder();
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public abstract String getTabName();
 	
-	public String promptParameterValue(Parameter parameter)
+	/**
+	 * @update_comment
+	 * @param p_parameter
+	 * @return
+	 */
+	public String promptParameterValue(Parameter p_parameter)
 	{
 		return null;
 	}
 
 	/**
 	 * @update_comment
-	 * @param errors
+	 * @param p_errors
+	 * @param p_process
 	 */
-	public void showErrors(List<String> errors, String process)
+	public void showErrors(List<String> p_errors, String p_process)
 	{
 		ScrollAlert popup = new ScrollAlert(Alert.AlertType.ERROR);
-		String header = errors.size() == 1 ? "An error " : "Errors ";
-		header += "occurred during " + process + ":";
+		String header = p_errors.size() == 1 ? "An error " : "Errors ";
+		header += "occurred during " + p_process + ":";
 		
 		popup.setHeaderText(header);
-		popup.setScrollText(errors);
+		popup.setScrollText(p_errors);
 		popup.showAndWait();
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public File chooseFile()
 	{
 		FileChooser fileChooser = new FileChooser();
-		return fileChooser.showOpenDialog(window);
+		return fileChooser.showOpenDialog(f_window);
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public File chooseFolder()
 	{
 		DirectoryChooser dirChooser = new DirectoryChooser();
-		return dirChooser.showDialog(window);
+		return dirChooser.showDialog(f_window);
 	}
 }

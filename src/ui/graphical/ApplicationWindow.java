@@ -19,11 +19,11 @@ public class ApplicationWindow extends Application
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
 	 */
 	@Override
-	public void start(Stage primaryStage) throws Exception
+	public void start(Stage p_primaryStage) throws Exception
 	{	
 		ArgParseResult result = ((GUI) UIContext.getUI()).getArgParseResult();
 		
-		TopView topView = new TopView(primaryStage, result);
+		TopView topView = new TopView(p_primaryStage, result);
 		((GUI) UIContext.getUI()).setTopView(topView);
 		
 		Pane topViewPane = topView.setupPane();
@@ -32,11 +32,11 @@ public class ApplicationWindow extends Application
 		topViewPane.prefHeightProperty().bind(scene.heightProperty());
 		topViewPane.prefWidthProperty().bind(scene.widthProperty());
 		
-		primaryStage.setScene(scene);
+		p_primaryStage.setScene(scene);
 		
-		primaryStage.setTitle(Constants.APPLICATION_NAME_FULL + " " +
+		p_primaryStage.setTitle(Constants.APPLICATION_NAME_FULL + " " +
 						Constants.APPLICATION_FORMATTED_VERSION);
 		
-		primaryStage.show();
+		p_primaryStage.show();
 	}
 }

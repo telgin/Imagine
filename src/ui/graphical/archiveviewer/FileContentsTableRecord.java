@@ -12,31 +12,29 @@ import util.myUtilities;
  */
 public class FileContentsTableRecord
 {
-
-	private final SimpleStringProperty index;
-	private final SimpleStringProperty type;
-	private final SimpleStringProperty name;
-	private final SimpleStringProperty dateCreated;
-	private final SimpleStringProperty dateModified;
-	
-	private long fragmentNumber;
+	private final SimpleStringProperty f_index;
+	private final SimpleStringProperty f_type;
+	private final SimpleStringProperty f_name;
+	private final SimpleStringProperty f_dateCreated;
+	private final SimpleStringProperty f_dateModified;
+	private final long f_fragmentNumber;
 	
 	/**
 	 * @update_comment
-	 * @param i
-	 * @param type
-	 * @param name
-	 * @param dateCreated
-	 * @param dateModified
-	 * @param fragmentNumber
+	 * @param p_index
+	 * @param p_type
+	 * @param f_name
+	 * @param p_dateCreated
+	 * @param p_dateModified
+	 * @param p_fragmentNumber
 	 */
-	public FileContentsTableRecord(int index, FileType type, long fragmentNumber,
-					boolean isFragment, File file, long dateCreated, long dateModified)
+	public FileContentsTableRecord(int p_index, FileType p_type, long p_fragmentNumber,
+					boolean p_isFragment, File p_file, long p_dateCreated, long p_dateModified)
 	{
-		this.index = new SimpleStringProperty(Integer.toString(index));
+		f_index = new SimpleStringProperty(Integer.toString(p_index));
 		
 		String displayType = "";
-		if (type.equals(FileType.k_file))
+		if (p_type.equals(FileType.k_file))
 		{
 			displayType = "File";
 		}
@@ -45,14 +43,14 @@ public class FileContentsTableRecord
 			displayType = "Folder";
 		}
 		
-		if (fragmentNumber > 1 || isFragment)
-			displayType += " (Fragment #" + Long.toString(fragmentNumber) + ")";
+		if (p_fragmentNumber > 1 || p_isFragment)
+			displayType += " (Fragment #" + Long.toString(p_fragmentNumber) + ")";
 		
-		this.fragmentNumber = fragmentNumber;
-		this.type = new SimpleStringProperty(displayType);
-		this.name = new SimpleStringProperty(file.getName());
-		this.dateCreated = new SimpleStringProperty(myUtilities.formatDate(dateCreated));
-		this.dateModified = new SimpleStringProperty(myUtilities.formatDate(dateModified));
+		f_fragmentNumber = p_fragmentNumber;
+		f_type = new SimpleStringProperty(displayType);
+		f_name = new SimpleStringProperty(p_file.getName());
+		f_dateCreated = new SimpleStringProperty(myUtilities.formatDate(p_dateCreated));
+		f_dateModified = new SimpleStringProperty(myUtilities.formatDate(p_dateModified));
 	}
 
 	/**
@@ -60,7 +58,7 @@ public class FileContentsTableRecord
 	 */
 	public String getIndex()
 	{
-		return index.get();
+		return f_index.get();
 	}
 
 	/**
@@ -68,7 +66,7 @@ public class FileContentsTableRecord
 	 */
 	public String getType()
 	{
-		return type.get();
+		return f_type.get();
 	}
 
 	/**
@@ -76,7 +74,7 @@ public class FileContentsTableRecord
 	 */
 	public String getName()
 	{
-		return name.get();
+		return f_name.get();
 	}
 
 	/**
@@ -84,7 +82,7 @@ public class FileContentsTableRecord
 	 */
 	public String getDateCreated()
 	{
-		return dateCreated.get();
+		return f_dateCreated.get();
 	}
 
 	/**
@@ -92,7 +90,7 @@ public class FileContentsTableRecord
 	 */
 	public String getDateModified()
 	{
-		return dateModified.get();
+		return f_dateModified.get();
 	}
 
 	/**
@@ -100,7 +98,7 @@ public class FileContentsTableRecord
 	 */
 	public long getFragmentNumber()
 	{
-		return fragmentNumber;
+		return f_fragmentNumber;
 	}
 
 }

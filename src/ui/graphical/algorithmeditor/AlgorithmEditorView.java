@@ -21,12 +21,12 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import system.CmdAction;
 import ui.ArgParseResult;
-import ui.graphical.BooleanProperty;
-import ui.graphical.ChoiceProperty;
-import ui.graphical.ConfigurationProperty;
-import ui.graphical.DescriptionProperty;
-import ui.graphical.FileProperty;
-import ui.graphical.StringProperty;
+import ui.graphical.BooleanModule;
+import ui.graphical.ChoiceModule;
+import ui.graphical.GUIModule;
+import ui.graphical.DescriptionModule;
+import ui.graphical.FileModule;
+import ui.graphical.StringModule;
 import ui.graphical.View;
 
 /**
@@ -35,30 +35,31 @@ import ui.graphical.View;
  */
 public class AlgorithmEditorView extends View
 {
-	private AlgorithmEditorController controller;
+	private AlgorithmEditorController f_controller;
+	private ArgParseResult f_args;
 
-	private ListView<String> presetList, parameterList;
-	private Button createNewButton, saveButton;
-	private StringProperty presetName;
-	private ChoiceProperty algorithmType;
-	private DescriptionProperty algorithmDescription, parameterDescription;
-	private BooleanProperty parameterEnabled;
-	private VBox optionSection;
-	private ConfigurationProperty optionSelection;
-	private Label parameterLabel;
-	
-	private ArgParseResult args;
+	private ListView<String> f_presetList, f_parameterList;
+	private Button f_createNewButton, f_saveButton;
+	private StringModule f_presetName;
+	private ChoiceModule f_algorithmType;
+	private DescriptionModule f_algorithmDescription, f_parameterDescription;
+	private BooleanModule f_parameterEnabled;
+	private VBox f_optionSection;
+	private GUIModule f_optionSelection;
+	private Label f_parameterLabel;
+
 
 	/**
 	 * @update_comment
-	 * @param window
+	 * @param p_window
+	 * @param p_args
 	 */
-	public AlgorithmEditorView(Stage window, ArgParseResult args)
+	public AlgorithmEditorView(Stage p_window, ArgParseResult p_args)
 	{
-		super(window);
+		super(p_window);
 		
-		this.args = args;
-		controller = new AlgorithmEditorController(this);
+		f_args = p_args;
+		f_controller = new AlgorithmEditorController(this);
 	}
 
 	/* (non-Javadoc)
@@ -87,23 +88,27 @@ public class AlgorithmEditorView extends View
 		reset();
 		
 		//setup stuff specified in args
-		if (args.action == CmdAction.k_editor)
+		if (f_args.action == CmdAction.k_editor)
 		{
-			if (args.presetName != null && controller.getPresetNames().contains(args.presetName))
+			if (f_args.presetName != null && f_controller.getPresetNames().contains(f_args.presetName))
 			{
-				presetList.getSelectionModel().select(args.presetName);
+				f_presetList.getSelectionModel().select(f_args.presetName);
 			}
 		}
 		
 		//set to the first one if not specified (so everything's not grayed out)
-		if (presetList.getSelectionModel().isEmpty())
+		if (f_presetList.getSelectionModel().isEmpty())
 		{
-			presetList.getSelectionModel().select(0);
+			f_presetList.getSelectionModel().select(0);
 		}
 		
 		return base;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private Node setupTitleSection()
 	{
 		HBox hbox = new HBox();
@@ -118,6 +123,10 @@ public class AlgorithmEditorView extends View
 		return hbox;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private Node setupAlgorithmSection()
 	{
 		VBox vbox = new VBox();
@@ -136,6 +145,10 @@ public class AlgorithmEditorView extends View
 		return vbox;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private Node setupParameterSection()
 	{
 		VBox vbox = new VBox();
@@ -154,6 +167,10 @@ public class AlgorithmEditorView extends View
 		return vbox;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private Node setupButtonSection()
 	{
 		HBox hbox = new HBox();
@@ -162,20 +179,24 @@ public class AlgorithmEditorView extends View
 		hbox.setAlignment(Pos.CENTER);
 		
 		//create new preset button
-		createNewButton = new Button();
-		createNewButton.setText("Create New");
-		createNewButton.setOnAction(e -> controller.createNewPressed());
-		hbox.getChildren().add(createNewButton);
+		f_createNewButton = new Button();
+		f_createNewButton.setText("Create New");
+		f_createNewButton.setOnAction(e -> f_controller.createNewPressed());
+		hbox.getChildren().add(f_createNewButton);
 		
 		//save button
-		saveButton = new Button();
-		saveButton.setText("Save");
-		saveButton.setOnAction(e -> controller.savePressed());
-		hbox.getChildren().add(saveButton);
+		f_saveButton = new Button();
+		f_saveButton.setText("Save");
+		f_saveButton.setOnAction(e -> f_controller.savePressed());
+		hbox.getChildren().add(f_saveButton);
 		
 		return hbox;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private Node setupPresetSelectionSection()
 	{
 		VBox vbox = new VBox();
@@ -187,15 +208,15 @@ public class AlgorithmEditorView extends View
 		vbox.getChildren().add(presetsLabel);
 		
 		//preset list
-		presetList = new ListView<String>();
-		presetList.setItems(FXCollections.observableArrayList(controller.getPresetNames()));
-		presetList.setPrefWidth(200);
-		presetList.getSelectionModel().selectedIndexProperty().addListener(
-						(ObservableValue<? extends Number> value,
-										Number oldIndex, Number newIndex) ->
-											presetSelected(value, oldIndex, newIndex));
+		f_presetList = new ListView<String>();
+		f_presetList.setItems(FXCollections.observableArrayList(f_controller.getPresetNames()));
+		f_presetList.setPrefWidth(200);
+		f_presetList.getSelectionModel().selectedIndexProperty().addListener(
+			(ObservableValue<? extends Number> value,
+				Number oldIndex, Number newIndex) ->
+					f_controller.presetSelected(newIndex.intValue()));
 		
-		vbox.getChildren().add(presetList);
+		vbox.getChildren().add(f_presetList);
 		
 		return vbox;
 	}
@@ -211,54 +232,78 @@ public class AlgorithmEditorView extends View
 		vbox.setPadding(new Insets(10,10,10,10));
 		
 		//preset name
-		presetName = new StringProperty("Preset Name");
-		presetName.setup(vbox);
+		f_presetName = new StringModule("Preset Name");
+		f_presetName.setup(vbox);
 		
 		//algorithm type
-		algorithmType = new ChoiceProperty("Algorithm", 
-						controller.getAlgorithmNames(),
-						e -> controller.algorithmSelected(e));
-		algorithmType.setup(vbox);
+		f_algorithmType = new ChoiceModule("Algorithm", 
+						f_controller.getAlgorithmNames(),
+						e -> f_controller.algorithmSelected(e));
+		f_algorithmType.setup(vbox);
 		
 		//algorithm description
-		algorithmDescription = new DescriptionProperty("Algorithm Description");
-		algorithmDescription.setup(vbox);
-		algorithmDescription.getArea().setPrefWidth(200);
-		algorithmDescription.getArea().setPrefHeight(300);
-		algorithmDescription.getArea().setWrapText(true);
+		f_algorithmDescription = new DescriptionModule("Algorithm Description");
+		f_algorithmDescription.setup(vbox);
+		f_algorithmDescription.getArea().setPrefWidth(200);
+		f_algorithmDescription.getArea().setPrefHeight(300);
+		f_algorithmDescription.getArea().setWrapText(true);
 		
 		return vbox;
 	}
 	
-	public void setSelectedAlgorithm(String choice)
+	/**
+	 * @update_comment
+	 * @param p_choice
+	 */
+	public void setSelectedAlgorithm(String p_choice)
 	{
-		algorithmType.setSelectedChoice(choice);
+		f_algorithmType.setSelectedChoice(p_choice);
 	}
 
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public String getPresetName()
 	{
-		return presetName.getText();
+		return f_presetName.getText();
 	}
 	
-	public void setPresetName(String name)
+	/**
+	 * @update_comment
+	 * @param p_name
+	 */
+	public void setPresetName(String p_name)
 	{
-		presetName.setText(name);
+		f_presetName.setText(p_name);
 	}
 	
-	public void setAlgorithmDescription(String text)
+	/**
+	 * @update_comment
+	 * @param p_text
+	 */
+	public void setAlgorithmDescription(String p_text)
 	{
-		algorithmDescription.setText(text);
+		f_algorithmDescription.setText(p_text);
 	}
 	
-	public void setParameterDescription(String text)
+	/**
+	 * @update_comment
+	 * @param p_text
+	 */
+	public void setParameterDescription(String p_text)
 	{
-		parameterDescription.setText(text);
+		f_parameterDescription.setText(p_text);
 	}
 	
-	public void setParameterNames(List<String> parameterNames)
+	/**
+	 * @update_comment
+	 * @param p_parameterNames
+	 */
+	public void setParameterNames(List<String> p_parameterNames)
 	{
-		parameterList.setItems(FXCollections.observableArrayList(parameterNames));
+		f_parameterList.setItems(FXCollections.observableArrayList(p_parameterNames));
 	}
 
 	/**
@@ -272,20 +317,19 @@ public class AlgorithmEditorView extends View
 		vbox.setPadding(new Insets(10,0,10,10));
 		
 		//parameter label
-		parameterLabel = new Label("Parameters");
-		vbox.getChildren().add(parameterLabel);
+		f_parameterLabel = new Label("Parameters");
+		vbox.getChildren().add(f_parameterLabel);
 		
 		//parameter list
-		parameterList = new ListView<String>();
-		parameterList.setItems(FXCollections.observableArrayList(controller.getParameterNames()));
-		parameterList.setPrefWidth(200);
-		//parameterList.setPrefHeight(250);
-		parameterList.getSelectionModel().selectedIndexProperty().addListener(
-						(ObservableValue<? extends Number> value,
-										Number oldIndex, Number newIndex) ->
-											parameterSelected(value, oldIndex, newIndex));
+		f_parameterList = new ListView<String>();
+		f_parameterList.setItems(FXCollections.observableArrayList(f_controller.getParameterNames()));
+		f_parameterList.setPrefWidth(200);
+		f_parameterList.getSelectionModel().selectedIndexProperty().addListener(
+			(ObservableValue<? extends Number> value,
+				Number oldIndex, Number newIndex) ->
+					f_controller.parameterSelected(newIndex.intValue()));
 		
-		vbox.getChildren().add(parameterList);
+		vbox.getChildren().add(f_parameterList);
 				
 		return vbox;
 	}
@@ -301,53 +345,28 @@ public class AlgorithmEditorView extends View
 		vbox.setPadding(new Insets(10,10,10,0));
 		
 		//parameter description
-		parameterDescription = new DescriptionProperty("Parameter Description");
-		parameterDescription.setup(vbox);
-		parameterDescription.getArea().setPrefSize(300, 150);
-		parameterDescription.getArea().setWrapText(true);
-		//parameterDescription.setPadding(new Insets(20, 0, 0, 0));
+		f_parameterDescription = new DescriptionModule("Parameter Description");
+		f_parameterDescription.setup(vbox);
+		f_parameterDescription.getArea().setPrefSize(300, 150);
+		f_parameterDescription.getArea().setWrapText(true);
 		
 		//option section
-		optionSection = new VBox();
-		optionSection.setSpacing(3);
-		//optionSection.setPadding(new Insets(10,10,10,10));
-		optionSection.setPrefHeight(200);
-		optionSection.setPrefWidth(300);
-		vbox.getChildren().add(optionSection);
+		f_optionSection = new VBox();
+		f_optionSection.setSpacing(3);
+		f_optionSection.setPrefHeight(200);
+		f_optionSection.setPrefWidth(300);
+		vbox.getChildren().add(f_optionSection);
 		
 		return vbox;
 	}
 	
-	public void allowParameterEnabledChange(boolean allow)
-	{
-		parameterEnabled.setEnabled(allow);
-	}
-
-
 	/**
 	 * @update_comment
-	 * @param value
-	 * @param oldIndex
-	 * @param newIndex
-	 * @return
+	 * @param p_allow
 	 */
-	private void presetSelected(ObservableValue<? extends Number> value,
-					Number oldIndex, Number newIndex)
+	public void allowParameterEnabledChange(boolean p_allow)
 	{
-		controller.presetSelected(newIndex.intValue());
-	}
-	
-	/**
-	 * @update_comment
-	 * @param value
-	 * @param oldIndex
-	 * @param newIndex
-	 * @return
-	 */
-	private void parameterSelected(ObservableValue<? extends Number> value,
-					Number oldIndex, Number newIndex)
-	{
-		controller.parameterSelected(newIndex.intValue());
+		f_parameterEnabled.setEnabled(p_allow);
 	}
 
 	/* (non-Javadoc)
@@ -371,11 +390,11 @@ public class AlgorithmEditorView extends View
 
 	/**
 	 * @update_comment
-	 * @param object
+	 * @param p_index
 	 */
-	public void setSelectedParameter(int index)
+	public void setSelectedParameter(int p_index)
 	{
-		parameterList.getSelectionModel().select(index);
+		f_parameterList.getSelectionModel().select(p_index);
 	}
 
 	/**
@@ -383,97 +402,104 @@ public class AlgorithmEditorView extends View
 	 */
 	public void removeParameterOptions()
 	{
-		optionSection.getChildren().clear();
-		optionSelection = null;
+		f_optionSection.getChildren().clear();
+		f_optionSelection = null;
 	}
 
 	/**
 	 * @update_comment
-	 * @param selectedParameter
+	 * @param p_parameter
 	 */
-	public void displayParameterOptions(Parameter parameter)
+	public void displayParameterOptions(Parameter p_parameter)
 	{
 		//enabled check box
-		parameterEnabled = new BooleanProperty("Enabled", b -> controller.parameterEnabledChecked(b));
-		parameterEnabled.setup(optionSection);
-		parameterEnabled.setPadding(new Insets(10, 0, 5, 0));
-		parameterEnabled.setChecked(parameter.isEnabled());
-		parameterEnabled.setEnabled(parameter.isOptional());
+		f_parameterEnabled = new BooleanModule("Enabled", b -> f_controller.parameterEnabledChecked(b));
+		f_parameterEnabled.setup(f_optionSection);
+		f_parameterEnabled.setPadding(new Insets(10, 0, 5, 0));
+		f_parameterEnabled.setChecked(p_parameter.isEnabled());
+		f_parameterEnabled.setEnabled(p_parameter.isOptional());
 
-		if (parameter.getType().equals(Parameter.STRING_TYPE))
+		if (p_parameter.getType().equals(Parameter.STRING_TYPE))
 		{
-			if (parameter.getOptions().size() == 1 && parameter.getOptions().get(0).getValue().equals("*"))
+			if (p_parameter.getOptions().size() == 1 && p_parameter.getOptions().get(0).getValue().equals("*"))
 			{
-				StringProperty prop = new StringProperty("Value");
-				prop.setup(optionSection);
-				optionSelection = prop;
+				StringModule prop = new StringModule("Value");
+				prop.setup(f_optionSection);
+				f_optionSelection = prop;
 			}
 			else
 			{
-				ChoiceProperty prop = new ChoiceProperty("Value",
-								parameter.getOptionDisplayValues(), e -> controller.optionSelected(e));
-				prop.setup(optionSection);
-				optionSelection = prop;
-				prop.setSelectedChoice(parameter.getValue());
+				ChoiceModule prop = new ChoiceModule("Value",
+								p_parameter.getOptionDisplayValues(), e -> f_controller.optionSelected(e));
+				prop.setup(f_optionSection);
+				f_optionSelection = prop;
+				prop.setSelectedChoice(p_parameter.getValue());
 			}
 		}
-		else if (parameter.getType().equals(Parameter.INT_TYPE) || parameter.getType().equals(Parameter.LONG_TYPE))
+		else if (p_parameter.getType().equals(Parameter.INT_TYPE) || p_parameter.getType().equals(Parameter.LONG_TYPE))
 		{
-			Option opt = parameter.getOptions().get(0);
+			Option opt = p_parameter.getOptions().get(0);
 
 			//add value input
-			StringProperty prop = new StringProperty("Value: " + opt.toString());
-			prop.setup(optionSection);
-			prop.setEditedCallback(e -> controller.optionSelected(e));
-			optionSelection = prop;
-			prop.setText(parameter.getValue());
+			StringModule prop = new StringModule("Value: " + opt.toString());
+			prop.setup(f_optionSection);
+			prop.setEditedCallback(e -> f_controller.optionSelected(e));
+			f_optionSelection = prop;
+			prop.setText(p_parameter.getValue());
 		}
-		else if (parameter.getType().equals(Parameter.FILE_TYPE))
+		else if (p_parameter.getType().equals(Parameter.FILE_TYPE))
 		{
-			FileProperty prop = new FileProperty("Value", e -> selectOptionFolder());
-			prop.setup(optionSection);
-			optionSelection = prop;
+			FileModule prop = new FileModule("Value", e -> selectOptionFolder());
+			prop.setup(f_optionSection);
+			f_optionSelection = prop;
 			
-			if (parameter.getValue() != null && !parameter.getValue().equals(Option.PROMPT_OPTION.getValue()))
-				prop.setPath(parameter.getValue());
+			if (p_parameter.getValue() != null && !p_parameter.getValue().equals(Option.PROMPT_OPTION.getValue()))
+				prop.setPath(p_parameter.getValue());
 		}
 		
 		//define at runtime check box
-		if (parameter.getOptions().contains(Option.PROMPT_OPTION))
+		if (p_parameter.getOptions().contains(Option.PROMPT_OPTION))
 		{
-			BooleanProperty prop = new BooleanProperty("Define at run time?", b -> controller.promptOptionSelected(b));
-			prop.setup(optionSection);
+			BooleanModule prop = new BooleanModule("Define at run time?", b -> f_controller.promptOptionSelected(b));
+			prop.setup(f_optionSection);
 
-			if (parameter.getValue() != null)
-				prop.setChecked(parameter.getValue().equals(Option.PROMPT_OPTION.getValue()));
+			if (p_parameter.getValue() != null)
+				prop.setChecked(p_parameter.getValue().equals(Option.PROMPT_OPTION.getValue()));
 		}
 	}
 
 	/**
 	 * @update_comment
-	 * @param b
+	 * @param p_error
 	 */
-	public void setOptionSelectionErrorState(boolean error)
+	public void setOptionSelectionErrorState(boolean p_error)
 	{
-		if (optionSelection != null)
+		if (f_optionSelection != null)
 		{
-			optionSelection.setErrorState(error);
+			f_optionSelection.setErrorState(p_error);
 		}
 	}
 	
-	public void setOptionSelectionEnabled(boolean enabled)
+	/**
+	 * @update_comment
+	 * @param p_enabled
+	 */
+	public void setOptionSelectionEnabled(boolean p_enabled)
 	{
-		if (optionSelection != null)
+		if (f_optionSelection != null)
 		{
-			optionSelection.setEnabled(enabled);
+			f_optionSelection.setEnabled(p_enabled);
 		}
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	public void selectOptionFolder()
 	{
 		File folder = chooseFolder();
-		controller.optionSelected(folder == null ? null : folder.getAbsolutePath());
-		((FileProperty) optionSelection).setPath(folder == null ? "[none selected]" : folder.getAbsolutePath());
+		f_controller.optionSelected(folder == null ? null : folder.getAbsolutePath());
+		((FileModule) f_optionSelection).setPath(folder == null ? "[none selected]" : folder.getAbsolutePath());
 	}
 
 	/**
@@ -482,72 +508,79 @@ public class AlgorithmEditorView extends View
 	public void reset()
 	{
 		//clear all content
-		presetList.setItems(null);
-		presetName.setText(null);
-		presetName.setEnabled(false);
-		algorithmType.setSelectedChoice(null);
-		algorithmType.setChoices(null);
-		algorithmType.setEnabled(false);
-		algorithmDescription.setText(null);
-		algorithmDescription.setEnabled(false);
-		parameterList.setItems(null);
+		f_presetList.setItems(null);
+		f_presetName.setText(null);
+		f_presetName.setEnabled(false);
+		f_algorithmType.setSelectedChoice(null);
+		f_algorithmType.setChoices(null);
+		f_algorithmType.setEnabled(false);
+		f_algorithmDescription.setText(null);
+		f_algorithmDescription.setEnabled(false);
+		f_parameterList.setItems(null);
 		setParameterListEnabled(false);
-		parameterDescription.setText(null);
-		parameterDescription.setEnabled(false);
+		f_parameterDescription.setText(null);
+		f_parameterDescription.setEnabled(false);
 		removeParameterOptions();
 		
 		//re-add the list of presets
-		presetList.setItems(FXCollections.observableArrayList(controller.getPresetNames()));
+		f_presetList.setItems(FXCollections.observableArrayList(f_controller.getPresetNames()));
 	}
 
 	/**
 	 * @update_comment
-	 * @param enabled
+	 * @param p_checked
 	 */
-	public void setParameterEnabled(boolean checked)
+	public void setParameterEnabled(boolean p_checked)
 	{
-		parameterEnabled.setChecked(checked);
+		f_parameterEnabled.setChecked(p_checked);
 	}
 
 	/**
 	 * @update_comment
-	 * @param algorithmDefinitionNames
+	 * @param p_algorithmDefinitionNames
 	 */
-	public void setAlgorithmNames(List<String> algorithmDefinitionNames)
+	public void setAlgorithmNames(List<String> p_algorithmDefinitionNames)
 	{
-		algorithmType.setChoices(algorithmDefinitionNames);
+		f_algorithmType.setChoices(p_algorithmDefinitionNames);
 	}
 
 	/**
 	 * @update_comment
-	 * @param b
+	 * @param p_enabled
 	 */
-	public void setEditsEnabled(boolean enabled)
+	public void setEditsEnabled(boolean p_enabled)
 	{
-		presetName.setEnabled(enabled);
-		algorithmType.setEnabled(enabled);
-		algorithmDescription.setEnabled(enabled);
-		parameterDescription.setEnabled(enabled);
-		setParameterListEnabled(enabled);
+		f_presetName.setEnabled(p_enabled);
+		f_algorithmType.setEnabled(p_enabled);
+		f_algorithmDescription.setEnabled(p_enabled);
+		f_parameterDescription.setEnabled(p_enabled);
+		setParameterListEnabled(p_enabled);
 	}
 	
-	public void setParameterListEnabled(boolean enabled)
+	/**
+	 * @update_comment
+	 * @param p_enabled
+	 */
+	public void setParameterListEnabled(boolean p_enabled)
 	{
-		parameterLabel.disableProperty().set(!enabled);
-		parameterList.disableProperty().set(!enabled);
+		f_parameterLabel.disableProperty().set(!p_enabled);
+		f_parameterList.disableProperty().set(!p_enabled);
 		
-		if (!enabled)
+		if (!p_enabled)
 		{
-			parameterLabel.setStyle("-fx-opacity: .5");
-			parameterList.setStyle("-fx-opacity: .75");
+			f_parameterLabel.setStyle("-fx-opacity: .5");
+			f_parameterList.setStyle("-fx-opacity: .75");
 		}
 		else
 		{
-			parameterLabel.setStyle("-fx-opacity: 1");
-			parameterList.setStyle("-fx-opacity: 1");
+			f_parameterLabel.setStyle("-fx-opacity: 1");
+			f_parameterList.setStyle("-fx-opacity: 1");
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see ui.graphical.View#promptParameterValue(algorithms.Parameter)
+	 */
 	@Override
 	public String promptParameterValue(Parameter parameter)
 	{
@@ -555,5 +588,6 @@ public class AlgorithmEditorView extends View
 		//want to prompt the user for the value of a parameter, only
 		//show that we would prompt for the value during execution.
 		return Option.PROMPT_OPTION.getValue();
+		//TODO this works ok but it's weird
 	}
 }
