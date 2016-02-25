@@ -3,25 +3,25 @@ package data;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
+import archive.ArchiveWriter;
+import archive.ArchiveWriterFactory;
+import archive.ConversionJobFileState;
+import archive.FileOutputManager;
+import archive.ArchiveLoader;
 import config.Settings;
 import logging.LogLevel;
 import logging.Logger;
-import product.ConversionJobFileState;
-import product.FileOutputManager;
-import product.ProductLoader;
-import product.ProductWriter;
-import product.ProductWriterFactory;
 import report.JobStatus;
 
 /**
- * Dequeues from the given queue and loads files to the ProductLoader might not
+ * Dequeues from the given queue and loads files to the ArchiveLoader might not
  * need this class
  */
-public class ProductWorker implements Runnable
+public class ArchiveWorker implements Runnable
 {
 	private boolean f_stopping = false;
 	private BlockingQueue<Metadata> f_queue;
-	private ProductLoader f_loader;
+	private ArchiveLoader f_loader;
 
 	/**
 	 * @update_comment
@@ -29,11 +29,11 @@ public class ProductWorker implements Runnable
 	 * @param p_factory
 	 * @param p_manager
 	 */
-	public ProductWorker(BlockingQueue<Metadata> p_queue, 
-		ProductWriterFactory<? extends ProductWriter> p_factory, FileOutputManager p_manager)
+	public ArchiveWorker(BlockingQueue<Metadata> p_queue, 
+		ArchiveWriterFactory<? extends ArchiveWriter> p_factory, FileOutputManager p_manager)
 	{
 		this.f_queue = p_queue;
-		f_loader = new ProductLoader(p_factory, p_manager);
+		f_loader = new ArchiveLoader(p_factory, p_manager);
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class ProductWorker implements Runnable
 		{
 			if (count % 20 == 0)
 				Logger.log(LogLevel.k_debug,
-					"Product worker waiting for queued metadata...");
+					"Archive worker waiting for queued metadata...");
 
 			while (!f_queue.isEmpty() && !f_stopping)
 			{
@@ -84,7 +84,7 @@ public class ProductWorker implements Runnable
 				catch (InterruptedException e)
 				{
 					Logger.log(LogLevel.k_error,
-						"Product worker failed to load a file from the queue.");
+						"Archive worker failed to load a file from the queue.");
 					Logger.log(LogLevel.k_error, e.getMessage());
 					Logger.log(LogLevel.k_debug, e, false);
 				}
@@ -99,7 +99,7 @@ public class ProductWorker implements Runnable
 		}
 		f_loader.shutdown();
 		
-		Logger.log(LogLevel.k_debug, "Product worker is shutdown.");
+		Logger.log(LogLevel.k_debug, "Archive worker is shutdown.");
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package product;
+package archive;
 
 import algorithms.Algorithm;
 import key.Key;
@@ -7,7 +7,7 @@ import key.Key;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public interface ProductFactoryCreation
+public interface ArchiveFactoryCreation
 {
 	/**
 	 * @update_comment
@@ -15,7 +15,7 @@ public interface ProductFactoryCreation
 	 * @param p_key
 	 * @return
 	 */
-	public ProductReaderFactory<? extends ProductReader>
+	public ArchiveReaderFactory<? extends ArchiveReader>
 		createReader(Algorithm p_algo, Key p_key);
 
 	/**
@@ -24,6 +24,6 @@ public interface ProductFactoryCreation
 	 * @param p_key
 	 * @return
 	 */
-	public ProductWriterFactory<? extends ProductWriter> 
+	public ArchiveWriterFactory<? extends ArchiveWriter> 
 		createWriter(Algorithm p_algo, Key p_key);
 }

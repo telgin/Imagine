@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import product.ConversionJobFileState;
+import archive.ConversionJobFileState;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -12,14 +12,14 @@ import product.ConversionJobFileState;
  */
 public abstract class JobStatus
 {
-	private static int productsCreated;
+	private static int archivesCreated;
 	private static int inputFilesProcessed;
 	
 	private static Map<File, FileStatus> fileStati;
 
 	public static void reset()
 	{
-		productsCreated = 0;
+		archivesCreated = 0;
 		inputFilesProcessed = 0;
 		
 		fileStati = new HashMap<File, FileStatus>();
@@ -41,19 +41,19 @@ public abstract class JobStatus
 	}
 
 	/**
-	 * @return the productsCreated
+	 * @return the archivesCreated
 	 */
-	public static int getProductsCreated()
+	public static int getArchivesCreated()
 	{
-		return productsCreated;
+		return archivesCreated;
 	}
 
 	/**
-	 * @param productsCreated the productsCreated to set
+	 * @param archivesCreated the archivesCreated to set
 	 */
-	public static void incrementProductsCreated(int increment)
+	public static void incrementArchivesCreated(int increment)
 	{
-		productsCreated += increment;
+		archivesCreated += increment;
 	}
 
 	/**

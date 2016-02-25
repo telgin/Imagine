@@ -2,7 +2,7 @@ package algorithms;
 
 import java.util.List;
 
-import product.ProductFactoryCreation;
+import archive.ArchiveFactoryCreation;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -32,5 +32,5 @@ public interface Definition
 	 * @update_comment
 	 * @return
 	 */
-	public ProductFactoryCreation getProductFactoryCreation();
+	public ArchiveFactoryCreation getArchiveFactoryCreation();
 }

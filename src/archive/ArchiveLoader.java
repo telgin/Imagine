@@ -1,4 +1,4 @@
-package product;
+package archive;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -20,9 +20,9 @@ import util.FileSystemUtil;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class ProductLoader
+public class ArchiveLoader
 {
-	private static final byte PRODUCT_VERSION_NUMBER = ByteConversion.intToByte(0);
+	private static final byte ARCHIVE_VERSION_NUMBER = ByteConversion.intToByte(0);
 
 	private byte[] f_streamUUID;
 	private byte[] f_currentUUID;
@@ -37,14 +37,14 @@ public class ProductLoader
 	
 	private FileOutputManager f_fileOutputManager;
 
-	private ProductWriter f_currentProduct;
+	private ArchiveWriter f_currentArchive;
 
 	/**
 	 * @update_comment
 	 * @param p_factory
 	 * @param p_manager
 	 */
-	public ProductLoader(ProductWriterFactory<? extends ProductWriter> p_factory,
+	public ArchiveLoader(ArchiveWriterFactory<? extends ArchiveWriter> p_factory,
 				FileOutputManager p_manager)
 	{
 		f_fileWritten = false;
@@ -53,7 +53,7 @@ public class ProductLoader
 		f_sequenceNumber = 0;
 
 		f_fileOutputManager = p_manager;
-		f_currentProduct = p_factory.createWriter();
+		f_currentArchive = p_factory.createWriter();
 
 		f_buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
 	}
@@ -63,7 +63,7 @@ public class ProductLoader
 	 */
 	public void shutdown()
 	{
-		Logger.log(LogLevel.k_debug, "Product loader shutting down.");
+		Logger.log(LogLevel.k_debug, "Archive loader shutting down.");
 
 		// fileWritten indicates a file is written, but there is as least some space left
 		// if there is more space than the size of the end code, the end code is
@@ -77,10 +77,10 @@ public class ProductLoader
 			else
 				Logger.log(LogLevel.k_debug, "Failed to write end code.");
 
-			f_currentProduct.saveFile(f_fileOutputManager.getOutputFolder(), getSaveName());
+			f_currentArchive.saveFile(f_fileOutputManager.getOutputFolder(), getSaveName());
 		}
 		
-		Logger.log(LogLevel.k_debug, "Product loader is shut down.");
+		Logger.log(LogLevel.k_debug, "Archive loader is shut down.");
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class ProductLoader
 	 */
 	private boolean writeFull(byte[] p_bytes)
 	{
-		return f_currentProduct.write(p_bytes, 0, p_bytes.length) == p_bytes.length;
+		return f_currentArchive.write(p_bytes, 0, p_bytes.length) == p_bytes.length;
 	}
 
 	/**
@@ -100,36 +100,36 @@ public class ProductLoader
 	 */
 	private boolean writeFull(byte p_byte)
 	{
-		return f_currentProduct.write(p_byte);
+		return f_currentArchive.write(p_byte);
 	}
 
 	/**
 	 * @update_comment
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	private void resetToNextProduct() throws ProductIOException
+	private void resetToNextArchive() throws ArchiveIOException
 	{
-		f_currentProduct.newProduct();
+		f_currentArchive.newArchive();
 
-		// no file was written in this product yet
+		// no file was written in this archive yet
 		f_fileWritten = false;
 
-		// write product uuid
+		// write archive uuid
 		f_currentUUID = ByteConversion.concat(f_streamUUID,
 						ByteConversion.intToBytes(f_sequenceNumber++));
 
 		if (!writeFull(f_currentUUID))
-			throw new ProductIOException("Cannot write product uuid.");
+			throw new ArchiveIOException("Cannot write archive uuid.");
 
-		// set the uuid in case it is used internally by the product
-		f_currentProduct.setUUID(f_currentUUID);
+		// set the uuid in case it is used internally by the archive
+		f_currentArchive.setUUID(f_currentUUID);
 
 		//secure stream
-		f_currentProduct.secureStream();
+		f_currentArchive.secureStream();
 
-		// write the product header
-		if (!writeProductHeader())
-			throw new ProductIOException("Cannot write product header.");
+		// write the archive header
+		if (!writeArchiveHeader())
+			throw new ArchiveIOException("Cannot write archive header.");
 		
 		f_needsReset = false;
 	}
@@ -137,12 +137,12 @@ public class ProductLoader
 	/**
 	 * @update_comment
 	 * @return
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	private boolean writeProductHeader() throws ProductIOException
+	private boolean writeArchiveHeader() throws ArchiveIOException
 	{
 		// write version number
-		if (!writeFull(PRODUCT_VERSION_NUMBER))
+		if (!writeFull(ARCHIVE_VERSION_NUMBER))
 			return false;
 
 		return true;
@@ -154,7 +154,7 @@ public class ProductLoader
 	 */
 	private String getSaveName()
 	{
-		return FileSystemUtil.getProductName(ByteConversion.bytesToLong(f_streamUUID),
+		return FileSystemUtil.getArchiveName(ByteConversion.bytesToLong(f_streamUUID),
 						(f_sequenceNumber - 1));
 
 	}
@@ -170,17 +170,17 @@ public class ProductLoader
 		if (Settings.trackFileStatus())
 			JobStatus.setConversionJobFileStatus(p_fileMetadata.getFile(), ConversionJobFileState.WRITING);
 		
-		//resetting causes the product header to be written
+		//resetting causes the archive header to be written
 		//don't reset unless this loader actually writes a file
 		//needs reset should only be true after initialization
 		if (f_needsReset)
-			resetToNextProduct();
+			resetToNextArchive();
 		
 		f_dataLength = 0;
 		f_dataOffset = f_buffer.length;
 
 		Logger.log(LogLevel.k_info, "Loading file: " + p_fileMetadata.getFile().getPath()
-						+ " into product " + getSaveName());
+						+ " into archive " + getSaveName());
 		
 
 		//configure based on file type
@@ -199,38 +199,38 @@ public class ProductLoader
 		
 		long fragmentNumber = Constants.FIRST_FRAGMENT_CODE;
 
-		// save off the first product uuid where we're saving the file
+		// save off the first archive uuid where we're saving the file
 		// it might actually start in the next one if we're out of space in this
 		// one.
 		// easy enough to figure out later.
-		p_fileMetadata.setProductUUID(f_currentUUID);
+		p_fileMetadata.setArchiveUUID(f_currentUUID);
 
 
-		// write the file to one or multiple products
+		// write the file to one or multiple archives
 		do
 		{
 			// write file header
 			if (!writeFileHeader(p_fileMetadata, fragmentNumber, fileLengthRemaining))
 			{
 				// there wasn't enough space, reset
-				f_currentProduct.saveFile(f_fileOutputManager.getOutputFolder(), getSaveName());
-				resetToNextProduct();
+				f_currentArchive.saveFile(f_fileOutputManager.getOutputFolder(), getSaveName());
+				resetToNextArchive();
 
 				// writeFileHeaderSize(fileHeaderSize);
 
 				// try again
 				if (!writeFileHeader(p_fileMetadata, fragmentNumber, fileLengthRemaining))
 				{
-					// second failure indicates product is too small
-					throw new ProductIOException(
-									"Cannot write file header, product is too small");
+					// second failure indicates archive is too small
+					throw new ArchiveIOException(
+									"Cannot write file header, archive is too small");
 				}
 			}
 
 			// write data if there is any
 			if (fileLengthRemaining > 0)
 			{
-				// write as much as possible, if the product fills up, we get
+				// write as much as possible, if the archive fills up, we get
 				// back to here and start again where we left off
 				fileLengthRemaining = writeFileData(reader, fileLengthRemaining);
 			}
@@ -336,7 +336,7 @@ public class ProductLoader
 	{
 		do
 		{
-			int bytesWritten = f_currentProduct.write(f_buffer, f_dataOffset, f_dataLength);
+			int bytesWritten = f_currentArchive.write(f_buffer, f_dataOffset, f_dataLength);
 			
 			f_dataOffset += bytesWritten;
 			f_dataLength -= bytesWritten;
@@ -350,7 +350,7 @@ public class ProductLoader
 			}
 			else
 			{
-				// the product is full, some portion of the data was not written
+				// the archive is full, some portion of the data was not written
 				return p_fileLengthRemaining;
 			}
 

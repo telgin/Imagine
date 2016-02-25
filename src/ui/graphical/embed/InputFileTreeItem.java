@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import archive.ConversionJobFileState;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeCell;
-import product.ConversionJobFileState;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)

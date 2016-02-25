@@ -13,7 +13,7 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 
-import product.ConversionJob;
+import archive.ConversionJob;
 import system.Imagine;
 import system.SystemManager;
 import testing.Comparisons;

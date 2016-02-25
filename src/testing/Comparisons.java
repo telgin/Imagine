@@ -46,7 +46,7 @@ public class Comparisons
 			assertEquals(p_metadata1.getPermissions(), p_metadata2.getPermissions());
 			assertEquals(p_metadata1.getDateCreated(), p_metadata2.getDateCreated());
 			assertEquals(p_metadata1.getDateModified(), p_metadata2.getDateModified());
-			assertEquals(p_metadata1.getProductUUID(), p_metadata2.getProductUUID());
+			assertEquals(p_metadata1.getArchiveUUID(), p_metadata2.getArchiveUUID());
 			assertEquals(p_metadata1.getType(), p_metadata2.getType());
 		}
 	}

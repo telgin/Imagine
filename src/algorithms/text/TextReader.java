@@ -5,16 +5,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import algorithms.Algorithm;
+import archive.ArchiveReader;
+import archive.ArchiveIOException;
 import key.Key;
-import product.ProductIOException;
-import product.ProductReader;
 import util.ByteConversion;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class TextReader extends Text implements ProductReader{
+public class TextReader extends Text implements ArchiveReader{
 
 	/**
 	 * @update_comment
@@ -28,9 +28,9 @@ public class TextReader extends Text implements ProductReader{
 	/**
 	 * @update_comment
 	 * @return
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	private final byte read() throws ProductIOException
+	private final byte read() throws ArchiveIOException
 	{
 		byte xor = f_random.nextByte();
 		byte val = f_buffer[f_order.next()];
@@ -39,7 +39,7 @@ public class TextReader extends Text implements ProductReader{
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductReader#read(byte[], int, int)
+	 * @see archive.ArchiveReader#read(byte[], int, int)
 	 */
 	@Override
 	public int read(byte[] p_bytes, int p_offset, int p_length)
@@ -50,7 +50,7 @@ public class TextReader extends Text implements ProductReader{
 			{
 				p_bytes[x] = read();
 			}
-			catch (ProductIOException e)
+			catch (ArchiveIOException e)
 			{
 				return x;
 			}
@@ -60,7 +60,7 @@ public class TextReader extends Text implements ProductReader{
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductReader#loadFile(java.io.File)
+	 * @see archive.ArchiveReader#loadFile(java.io.File)
 	 */
 	@Override
 	public void loadFile(File p_file) throws IOException
@@ -76,7 +76,7 @@ public class TextReader extends Text implements ProductReader{
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductReader#skip(long)
+	 * @see archive.ArchiveReader#skip(long)
 	 */
 	@Override
 	public long skip(long p_bytes)
@@ -93,7 +93,7 @@ public class TextReader extends Text implements ProductReader{
 				++skipped;
 			}
 		}
-		catch (ProductIOException e)
+		catch (ArchiveIOException e)
 		{
 			// couldn't skip as many as requested,
 			// nothing to do

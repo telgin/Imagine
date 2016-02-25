@@ -34,7 +34,7 @@ public abstract class Report
 	public static void saveConversionRecord(Metadata p_fileMetadata)
 	{
 		String filePath = p_fileMetadata.getFile().getPath();
-		String f1uuid = FileSystemUtil.getProductName(p_fileMetadata.getProductUUID());
+		String f1uuid = FileSystemUtil.getArchiveName(p_fileMetadata.getArchiveUUID());
 		String fragmentCount = Long.toString(p_fileMetadata.getFragmentCount());
 		s_lines.add(filePath + Constants.FILE_DELIMITER + f1uuid + Constants.FILE_DELIMITER + fragmentCount);
 	}

@@ -1,11 +1,11 @@
 package algorithms.text;
 
 import algorithms.Algorithm;
+import archive.Archive;
 import config.Constants;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.Product;
 import util.ByteConversion;
 import util.algorithms.HashRandom;
 import util.algorithms.UniqueRandomRange;
@@ -14,7 +14,7 @@ import util.algorithms.UniqueRandomRange;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public abstract class Text implements Product
+public abstract class Text implements Archive
 {
 	protected Algorithm f_algorithm;
 	private Key f_key;
@@ -34,7 +34,7 @@ public abstract class Text implements Product
 		f_algorithm = p_algo;
 		f_key = p_key;
 		f_blockSize = Integer.parseInt(f_algorithm.getParameterValue(Definition.BLOCK_SIZE_PARAM));
-		Logger.log(LogLevel.k_debug, "Text Product Created");
+		Logger.log(LogLevel.k_debug, "Text Archive Created");
 	}
 
 	/**
@@ -48,7 +48,7 @@ public abstract class Text implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#getAlgorithmName()
+	 * @see archive.Archive#getAlgorithmName()
 	 */
 	@Override
 	public String getAlgorithmName()
@@ -57,7 +57,7 @@ public abstract class Text implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#getAlgorithmVersionNumber()
+	 * @see archive.Archive#getAlgorithmVersionNumber()
 	 */
 	@Override
 	public int getAlgorithmVersionNumber()
@@ -66,7 +66,7 @@ public abstract class Text implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#setUUID(byte[])
+	 * @see archive.Archive#setUUID(byte[])
 	 */
 	@Override
 	public void setUUID(byte[] p_uuid)
@@ -75,7 +75,7 @@ public abstract class Text implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#secureStream()
+	 * @see archive.Archive#secureStream()
 	 */
 	@Override
 	public void secureStream()
@@ -84,7 +84,7 @@ public abstract class Text implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#getUUID()
+	 * @see archive.Archive#getUUID()
 	 */
 	@Override
 	public byte[] getUUID()

@@ -9,14 +9,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import api.UsageException;
+import archive.ArchiveFactoryCreation;
+import archive.ArchiveReader;
+import archive.ArchiveReaderFactory;
+import archive.ArchiveWriter;
+import archive.ArchiveWriterFactory;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.ProductFactoryCreation;
-import product.ProductReader;
-import product.ProductReaderFactory;
-import product.ProductWriter;
-import product.ProductWriterFactory;
 import util.ConfigUtil;
 
 /**
@@ -29,7 +29,7 @@ public class Algorithm
 	private int f_versionNum;
 	private String f_description;
 	private Map<String, Parameter> f_parameters;
-	private ProductFactoryCreation f_productFactoryCreation;
+	private ArchiveFactoryCreation f_archiveFactoryCreation;
 	private String f_presetName;
 
 
@@ -76,7 +76,7 @@ public class Algorithm
 		for (Parameter param : f_parameters.values())
 			clone.addParameter(param.clone());
 		
-		clone.setProductFactoryCreation(f_productFactoryCreation);
+		clone.setArchiveFactoryCreation(f_archiveFactoryCreation);
 		
 		return clone;
 	}
@@ -85,9 +85,9 @@ public class Algorithm
 	 * @update_comment
 	 * @param p_creation
 	 */
-	public void setProductFactoryCreation(ProductFactoryCreation p_creation)
+	public void setArchiveFactoryCreation(ArchiveFactoryCreation p_creation)
 	{
-		f_productFactoryCreation = p_creation;
+		f_archiveFactoryCreation = p_creation;
 	}
 
 	/**
@@ -210,9 +210,9 @@ public class Algorithm
 	 * @param p_key
 	 * @return
 	 */
-	public ProductReaderFactory<? extends ProductReader> getProductReaderFactory(Key p_key)
+	public ArchiveReaderFactory<? extends ArchiveReader> getArchiveReaderFactory(Key p_key)
 	{
-		return f_productFactoryCreation.createReader(this, p_key);
+		return f_archiveFactoryCreation.createReader(this, p_key);
 	}
 
 	/**
@@ -220,9 +220,9 @@ public class Algorithm
 	 * @param p_key
 	 * @return
 	 */
-	public ProductWriterFactory<? extends ProductWriter> getProductWriterFactory(Key p_key)
+	public ArchiveWriterFactory<? extends ArchiveWriter> getArchiveWriterFactory(Key p_key)
 	{
-		return f_productFactoryCreation.createWriter(this, p_key);
+		return f_archiveFactoryCreation.createWriter(this, p_key);
 	}
 
 	/**

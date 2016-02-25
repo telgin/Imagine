@@ -9,6 +9,9 @@ import algorithms.Parameter;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
+import archive.ArchiveContents;
+import archive.ConversionJob;
+import archive.FileContents;
 import config.Constants;
 import config.Settings;
 import data.FileType;
@@ -18,9 +21,6 @@ import key.PasswordKey;
 import key.DefaultKey;
 import logging.LogLevel;
 import logging.Logger;
-import product.ConversionJob;
-import product.FileContents;
-import product.ProductContents;
 import report.JobStatus;
 import report.Report;
 import system.Imagine;
@@ -174,12 +174,12 @@ public class CmdUI extends UI
 			Algorithm algo = getAlgorithm();
 			Key key = getKey();
 			
-			ProductContents productContents = ConversionAPI.openArchive(algo, key, f_args.getInputFiles().get(0));
+			ArchiveContents archiveContents = ConversionAPI.openArchive(algo, key, f_args.getInputFiles().get(0));
 			
 			Menu contentsMenu = new Menu("File Contents");
 			contentsMenu.setSubtext("Select a file to extract it.");
 			
-			for (FileContents fileContents : productContents.getFileContents())
+			for (FileContents fileContents : archiveContents.getFileContents())
 			{
 				String folder =      "(folder)        ";
 				String file =        "(file)          ";
@@ -202,7 +202,7 @@ public class CmdUI extends UI
 			
 			int choice = contentsMenu.getChosenIndex();
 			
-			if (choice == 0 && productContents.getFileContents().get(0).getFragmentNumber() > 1)
+			if (choice == 0 && archiveContents.getFileContents().get(0).getFragmentNumber() > 1)
 			{
 				Logger.log(LogLevel.k_warning, "This fragment is not the first fragment. Only the first fragment may start an extraction chain.");
 				Logger.log(LogLevel.k_warning, "If you extract this fragment, your result will only contain a portion of the original data.");
@@ -290,7 +290,7 @@ public class CmdUI extends UI
 			while (!job.isFinished())
 			{
 				String currentStat = "Files Processed: " + JobStatus.getInputFilesProcessed() + 
-								", Products Created: " + JobStatus.getProductsCreated();
+								", Archives Created: " + JobStatus.getArchivesCreated();
 				if (!f_outputPaused && !previousStat.equals(currentStat))
 				{
 					Logger.log(LogLevel.k_info, currentStat);
@@ -429,16 +429,16 @@ public class CmdUI extends UI
 	 * @see ui.UI#promptEnclosingFolder(java.io.File, java.io.File, java.lang.String)
 	 */
 	@Override
-	public File promptEnclosingFolder(File p_curEnclosingFolder, File p_curProductFolder,
-					String p_productSearchName)
+	public File promptEnclosingFolder(File p_curEnclosingFolder, File p_curArchiveFolder,
+					String p_archiveSearchName)
 	{
 		f_outputPaused = true;
 		
-		p("The file, " + p_productSearchName + ", was not found after searching in ");
-		p("The current extraction file location: " + p_curProductFolder.getPath());
+		p("The file, " + p_archiveSearchName + ", was not found after searching in ");
+		p("The current extraction file location: " + p_curArchiveFolder.getPath());
 		
 		String path = null;
-		if (p_curEnclosingFolder.getAbsolutePath().equals(p_curProductFolder.getAbsolutePath()))
+		if (p_curEnclosingFolder.getAbsolutePath().equals(p_curArchiveFolder.getAbsolutePath()))
 		{
 			
 			p("Enter the name of the enclosing folder where this file may be found,");

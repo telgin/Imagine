@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import product.ConversionJobFileState;
+import archive.ConversionJobFileState;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)

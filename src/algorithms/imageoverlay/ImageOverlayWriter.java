@@ -10,13 +10,13 @@ import javax.imageio.ImageIO;
 import algorithms.Algorithm;
 import algorithms.Option;
 import api.UsageException;
+import archive.ArchiveWriter;
+import archive.ConversionJobFileState;
+import archive.ArchiveIOException;
 import config.Settings;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.ConversionJobFileState;
-import product.ProductIOException;
-import product.ProductWriter;
 import report.JobStatus;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
@@ -25,7 +25,7 @@ import util.algorithms.ImageUtil;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
+public class ImageOverlayWriter extends ImageOverlay implements ArchiveWriter
 {
 	private InputImageManager f_manager;
 	private File f_imgFile;
@@ -62,10 +62,10 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#newProduct()
+	 * @see archive.ArchiveWriter#newArchive()
 	 */
 	@Override
-	public void newProduct() throws ProductIOException
+	public void newArchive() throws ArchiveIOException
 	{
 		loadCleanFile();
 		reset();
@@ -73,9 +73,9 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 
 	/**
 	 * @update_comment
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	private void loadCleanFile() throws ProductIOException
+	private void loadCleanFile() throws ArchiveIOException
 	{		
 		//get the next image
 		f_imgFile = f_manager.nextImageFile();
@@ -83,7 +83,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		//ran out of images
 		if (f_imgFile == null)
 		{
-			throw new ProductIOException("No input images remain.");
+			throw new ArchiveIOException("No input images remain.");
 		}
 		else
 		{
@@ -116,7 +116,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		//ran out of images after trying some unsuccessfully
 		if (f_imgFile == null)
 		{
-			throw new ProductIOException("No input images remain.");
+			throw new ArchiveIOException("No input images remain.");
 		}
 	}
 	
@@ -137,7 +137,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#write(byte)
+	 * @see archive.ArchiveWriter#write(byte)
 	 */
 	@Override
 	public boolean write(byte p_byte)
@@ -156,7 +156,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 				steps16(secured);
 			}
 		}
-		catch (ProductIOException e)
+		catch (ArchiveIOException e)
 		{
 			//this happens naturally when the image file get's filled up
 			return false;
@@ -168,9 +168,9 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	/**
 	 * @update_comment
 	 * @param p_val
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	private final void steps4(int p_val) throws ProductIOException
+	private final void steps4(int p_val) throws ArchiveIOException
 	{
 		int div16 = p_val / 16;
 		int mod16 = p_val % 16;
@@ -196,9 +196,9 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	/**
 	 * @update_comment
 	 * @param p_val
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	private final void steps16(int p_val) throws ProductIOException
+	private final void steps16(int p_val) throws ArchiveIOException
 	{
 		f_split[0] = p_val / 16;
 		f_split[1] = p_val % 16;
@@ -240,7 +240,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#write(byte[], int, int)
+	 * @see archive.ArchiveWriter#write(byte[], int, int)
 	 */
 	@Override
 	public int write(byte[] p_bytes, int p_offset, int p_length)
@@ -255,23 +255,23 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#saveFile(java.io.File, java.lang.String)
+	 * @see archive.ArchiveWriter#saveFile(java.io.File, java.lang.String)
 	 */
 	@Override
-	public void saveFile(File p_productStagingFolder, String p_fileName)
+	public void saveFile(File p_archiveStagingFolder, String p_fileName)
 	{
-		File productFile = new File(p_productStagingFolder.getAbsolutePath(), p_fileName + ".png");
-		Logger.log(LogLevel.k_info, "Saving product file: " + productFile.getAbsolutePath());
+		File archiveFile = new File(p_archiveStagingFolder.getAbsolutePath(), p_fileName + ".png");
+		Logger.log(LogLevel.k_info, "Saving archive file: " + archiveFile.getAbsolutePath());
 		
 		try
 		{
-			if (!productFile.getParentFile().exists())
-				productFile.getParentFile().mkdirs();
+			if (!archiveFile.getParentFile().exists())
+				archiveFile.getParentFile().mkdirs();
 			
-			ImageIO.write(f_img, "png", productFile);
+			ImageIO.write(f_img, "png", archiveFile);
 
 			// update progress
-			JobStatus.incrementProductsCreated(1);
+			JobStatus.incrementArchivesCreated(1);
 
 			try
 			{
@@ -294,7 +294,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		catch (IOException e)
 		{
 			Logger.log(LogLevel.k_debug, e, false);
-			Logger.log(LogLevel.k_fatal, "Cannot save archive file: " + productFile.getAbsolutePath());
+			Logger.log(LogLevel.k_fatal, "Cannot save archive file: " + archiveFile.getAbsolutePath());
 		}
 	}
 }

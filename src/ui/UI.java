@@ -30,12 +30,12 @@ public abstract class UI
 	/**
 	 * @update_comment
 	 * @param enclosingFolder
-	 * @param p_curProductFolder
-	 * @param p_productSearchName
+	 * @param p_curArchiveFolder
+	 * @param p_archiveSearchName
 	 * @return
 	 */
-	public abstract File promptEnclosingFolder(File p_curEnclosingFolder, File p_curProductFolder,
-					String p_productSearchName);
+	public abstract File promptEnclosingFolder(File p_curEnclosingFolder, File p_curArchiveFolder,
+					String p_archiveSearchName);
 
 	/**
 	 * @update_comment

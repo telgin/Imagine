@@ -61,8 +61,8 @@ public class GUI extends UI
 	 * @see ui.UI#promptEnclosingFolder(java.io.File, java.io.File, java.lang.String)
 	 */
 	@Override
-	public File promptEnclosingFolder(File p_curEnclosingFolder, File p_curProductFolder,
-					String p_productSearchName)
+	public File promptEnclosingFolder(File p_curEnclosingFolder, File p_curArchiveFolder,
+					String p_archiveSearchName)
 	{
 		//TODO make this better, handle case where folder selected
 		//but file still wasn't found. (right now it just prompts again)

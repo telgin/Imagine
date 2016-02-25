@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.util.List;
 
 import algorithms.Algorithm;
+import archive.ArchiveContents;
+import archive.ConversionJob;
+import archive.ArchiveExtractor;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.ConversionJob;
-import product.ProductContents;
-import product.ProductExtractor;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -43,80 +43,80 @@ public abstract class ConversionAPI
 	 * @update_comment
 	 * @param p_algo
 	 * @param p_key
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 * @return
 	 * @throws IOException
 	 * @throws UsageException
 	 */
-	public static ProductContents openArchive(Algorithm p_algo, Key p_key, 
-		File p_productFile) throws IOException, UsageException
+	public static ArchiveContents openArchive(Algorithm p_algo, Key p_key, 
+		File p_archiveFile) throws IOException, UsageException
 	{
-		if (!p_productFile.exists())
-			throw new UsageException("The specified product file cannot be found.");
+		if (!p_archiveFile.exists())
+			throw new UsageException("The specified archive file cannot be found.");
 		
-		if (p_productFile.isDirectory())
+		if (p_archiveFile.isDirectory())
 			throw new UsageException("The specified file path must "
 				+ "name a file, not a directory.");
 		
-		ProductExtractor extractor = new ProductExtractor(p_algo, p_key,
-						p_productFile.getAbsoluteFile().getParentFile());
+		ArchiveExtractor extractor = new ArchiveExtractor(p_algo, p_key,
+						p_archiveFile.getAbsoluteFile().getParentFile());
 		
-		return extractor.viewAll(p_productFile);
+		return extractor.viewAll(p_archiveFile);
 	}
 	
 	/**
 	 * @update_comment
 	 * @param p_algo
 	 * @param p_key
-	 * @param p_productLocation
+	 * @param p_archiveLocation
 	 * @param p_extractionFolder
 	 * @throws IOException
 	 * @throws UsageException
 	 */
 	public static void extractAll(Algorithm p_algo, Key p_key,
-		File p_productLocation, File p_extractionFolder) throws IOException, UsageException
+		File p_archiveLocation, File p_extractionFolder) throws IOException, UsageException
 	{
-		if (!p_productLocation.exists())
-			throw new UsageException("The specified product location cannot be found.");
+		if (!p_archiveLocation.exists())
+			throw new UsageException("The specified archive location cannot be found.");
 		
 		//specifying a directory indicates it is also the enclosing folder
 		File enclosingFolder = null;
-		if (p_productLocation.isDirectory())
-			enclosingFolder = p_productLocation;
+		if (p_archiveLocation.isDirectory())
+			enclosingFolder = p_archiveLocation;
 		else
-			enclosingFolder = p_productLocation.getAbsoluteFile().getParentFile();
+			enclosingFolder = p_archiveLocation.getAbsoluteFile().getParentFile();
 		
-		ProductExtractor extractor = new ProductExtractor(p_algo, p_key, enclosingFolder);
+		ArchiveExtractor extractor = new ArchiveExtractor(p_algo, p_key, enclosingFolder);
 		
-		if (p_productLocation.isDirectory())
-			extractor.extractAllFromProductFolder(p_productLocation, p_extractionFolder);
+		if (p_archiveLocation.isDirectory())
+			extractor.extractAllFromArchiveFolder(p_archiveLocation, p_extractionFolder);
 		else
-			extractor.extractAllFromProduct(p_productLocation, p_extractionFolder);
+			extractor.extractAllFromArchive(p_archiveLocation, p_extractionFolder);
 	}
 	
 	/**
 	 * @update_comment
 	 * @param p_algo
 	 * @param p_key
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 * @param p_extractionFolder
 	 * @param p_index
 	 * @throws IOException
 	 * @throws UsageException
 	 */
-	public static void extractFile(Algorithm p_algo, Key p_key, File p_productFile,
+	public static void extractFile(Algorithm p_algo, Key p_key, File p_archiveFile,
 		File p_extractionFolder, int p_index) throws IOException, UsageException
 	{
-		if (!p_productFile.exists())
-			throw new UsageException("The specified product file cannot be found.");
+		if (!p_archiveFile.exists())
+			throw new UsageException("The specified archive file cannot be found.");
 		
-		if (p_productFile.isDirectory())
+		if (p_archiveFile.isDirectory())
 			throw new UsageException("The specified file path must "
 				+ "name a file, not a directory.");
 		
-		ProductExtractor extractor = new ProductExtractor(p_algo, p_key,
-						p_productFile.getAbsoluteFile().getParentFile());
+		ArchiveExtractor extractor = new ArchiveExtractor(p_algo, p_key,
+						p_archiveFile.getAbsoluteFile().getParentFile());
 		
-		extractor.extractFileByIndex(p_productFile, p_extractionFolder, p_index);
+		extractor.extractFileByIndex(p_archiveFile, p_extractionFolder, p_index);
 	}
 }

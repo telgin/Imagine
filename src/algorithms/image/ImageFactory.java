@@ -1,16 +1,16 @@
 package algorithms.image;
 
 import algorithms.Algorithm;
+import archive.ArchiveReaderFactory;
+import archive.ArchiveWriterFactory;
 import key.Key;
-import product.ProductReaderFactory;
-import product.ProductWriterFactory;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class ImageFactory implements ProductReaderFactory<ImageReader>,
-				ProductWriterFactory<ImageWriter>
+public class ImageFactory implements ArchiveReaderFactory<ImageReader>,
+				ArchiveWriterFactory<ImageWriter>
 {
 	private Key f_key;
 	private Algorithm f_algo;
@@ -27,7 +27,7 @@ public class ImageFactory implements ProductReaderFactory<ImageReader>,
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriterFactory#createWriter()
+	 * @see archive.ArchiveWriterFactory#createWriter()
 	 */
 	@Override
 	public ImageWriter createWriter()
@@ -36,7 +36,7 @@ public class ImageFactory implements ProductReaderFactory<ImageReader>,
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductReaderFactory#createReader()
+	 * @see archive.ArchiveReaderFactory#createReader()
 	 */
 	@Override
 	public ImageReader createReader()

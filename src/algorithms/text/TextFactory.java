@@ -1,16 +1,16 @@
 package algorithms.text;
 
 import algorithms.Algorithm;
+import archive.ArchiveReaderFactory;
+import archive.ArchiveWriterFactory;
 import key.Key;
-import product.ProductReaderFactory;
-import product.ProductWriterFactory;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class TextFactory implements ProductReaderFactory<TextReader>,
-	ProductWriterFactory<TextWriter>
+public class TextFactory implements ArchiveReaderFactory<TextReader>,
+	ArchiveWriterFactory<TextWriter>
 {
 	private Algorithm s_algo;
 	private Key s_key;
@@ -27,7 +27,7 @@ public class TextFactory implements ProductReaderFactory<TextReader>,
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriterFactory#createWriter()
+	 * @see archive.ArchiveWriterFactory#createWriter()
 	 */
 	@Override
 	public TextWriter createWriter()
@@ -36,7 +36,7 @@ public class TextFactory implements ProductReaderFactory<TextReader>,
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductReaderFactory#createReader()
+	 * @see archive.ArchiveReaderFactory#createReader()
 	 */
 	@Override
 	public TextReader createReader()

@@ -1,6 +1,6 @@
 package util.algorithms;
 
-import product.ProductIOException;
+import archive.ArchiveIOException;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -58,12 +58,12 @@ public class UniqueRandomRange
 	/**
 	 * @update_comment
 	 * @return
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	public int next() throws ProductIOException
+	public int next() throws ArchiveIOException
 	{
 		if (!hasRemainingNumbers())
-			throw new ProductIOException("URR ran out of numbers.");
+			throw new ArchiveIOException("URR ran out of numbers.");
 
 		try
 		{
@@ -78,7 +78,7 @@ public class UniqueRandomRange
 		}
 		catch (ArrayIndexOutOfBoundsException e)
 		{
-			throw new ProductIOException("URR ran out of numbers.");
+			throw new ArchiveIOException("URR ran out of numbers.");
 		}
 	}
 }

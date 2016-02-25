@@ -409,20 +409,20 @@ public class FileSystemUtil
 	 * @param p_sequenceNumber
 	 * @return
 	 */
-	public static String getProductName(long p_streamUUID, long p_sequenceNumber)
+	public static String getArchiveName(long p_streamUUID, long p_sequenceNumber)
 	{
 		return p_streamUUID + "_" + p_sequenceNumber;
 	}
 	
 	/**
 	 * @update_comment
-	 * @param p_productUUID
+	 * @param p_archiveUUID
 	 * @return
 	 */
-	public static String getProductName(byte[] p_productUUID)
+	public static String getArchiveName(byte[] p_archiveUUID)
 	{
-		return getProductName(ByteConversion.getStreamUUID(p_productUUID),
-			ByteConversion.getProductSequenceNumber(p_productUUID));
+		return getArchiveName(ByteConversion.getStreamUUID(p_archiveUUID),
+			ByteConversion.getArchiveSequenceNumber(p_archiveUUID));
 	}
 	
 	/**

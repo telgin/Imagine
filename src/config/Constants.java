@@ -31,7 +31,6 @@ public abstract class Constants
 					APPLICATION_NAME_SHORT.toLowerCase() + "_assembly";
 	
 	// misc system configuration
-	public static final String TEMP_RESERVED_GROUP_NAME = APPLICATION_NAME_SHORT.toLowerCase();
 	public static final int DEFAULT_THREAD_COUNT = 1;
 	public static final Charset CHARSET = StandardCharsets.UTF_8;
 	public static final long DEFAULT_SEED = 1337;
@@ -53,15 +52,13 @@ public abstract class Constants
 
 	// io data field lengths
 	public static final int STREAM_UUID_SIZE = 8;
-	public static final int PRODUCT_SEQUENCE_NUMBER_SIZE = 4;
-	public static final int PRODUCT_UUID_SIZE =
-					STREAM_UUID_SIZE + PRODUCT_SEQUENCE_NUMBER_SIZE;
-	public static final int PRODUCT_VERSION_NUMBER_SIZE = 1;
+	public static final int ARCHIVE_SEQUENCE_NUMBER_SIZE = 4;
+	public static final int ARCHIVE_UUID_SIZE =
+					STREAM_UUID_SIZE + ARCHIVE_SEQUENCE_NUMBER_SIZE;
+	public static final int ARCHIVE_VERSION_NUMBER_SIZE = 1;
 	public static final int FILE_HEADER_LENGTH_SIZE = 4;
 	public static final int ALGORITHM_NAME_LENGTH_SIZE = 2;
 	public static final int ALGORITHM_VERSION_NUMBER_SIZE = 1;
-	public static final int GROUP_NAME_LENGTH_SIZE = 2;
-	public static final int GROUP_KEY_NAME_LENGTH_SIZE = 2;
 	public static final int FRAGMENT_NUMBER_SIZE = 8;
 	public static final int FILE_NAME_LENGTH_SIZE = 2;
 	public static final int DATE_CREATED_SIZE = 8;

@@ -1,4 +1,4 @@
-package product;
+package archive;
 
 import java.io.File;
 
@@ -6,13 +6,13 @@ import java.io.File;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public interface ProductWriter extends Product
+public interface ArchiveWriter extends Archive
 {
 	/**
 	 * @update_comment
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	public void newProduct() throws ProductIOException;
+	public void newArchive() throws ArchiveIOException;
 
 	/**
 	 * @param p_byte
@@ -30,10 +30,10 @@ public interface ProductWriter extends Product
 
 	/**
 	 * @update_comment
-	 * @param p_productStagingFolder
+	 * @param p_archiveStagingFolder
 	 * @param p_fileName
 	 */
-	public void saveFile(File p_productStagingFolder, String p_fileName);
+	public void saveFile(File p_archiveStagingFolder, String p_fileName);
 
 	// should be able to take an input stream reader to make things more
 	// efficient.

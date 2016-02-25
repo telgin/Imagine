@@ -16,7 +16,7 @@ public class Metadata
 	private short f_permissions;
 	private FileType f_type;
 	private long f_fragmentCount;
-	private byte[] f_productUUID;
+	private byte[] f_archiveUUID;
 
 	/**
 	 * @update_comment
@@ -73,18 +73,18 @@ public class Metadata
 	 * @update_comment
 	 * @param p_uuid
 	 */
-	public void setProductUUID(byte[] p_uuid)
+	public void setArchiveUUID(byte[] p_uuid)
 	{
-		this.f_productUUID = p_uuid;
+		this.f_archiveUUID = p_uuid;
 	}
 
 	/**
 	 * @update_comment
 	 * @return
 	 */
-	public byte[] getProductUUID()
+	public byte[] getArchiveUUID()
 	{
-		return f_productUUID;
+		return f_archiveUUID;
 	}
 
 	/**

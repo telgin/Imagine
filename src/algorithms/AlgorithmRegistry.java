@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import archive.ArchiveReader;
+import archive.ArchiveReaderFactory;
+import archive.ArchiveWriter;
+import archive.ArchiveWriterFactory;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.ProductReader;
-import product.ProductReaderFactory;
-import product.ProductWriter;
-import product.ProductWriterFactory;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -78,13 +78,13 @@ public class AlgorithmRegistry
 	 * @param p_key
 	 * @return
 	 */
-	public static ProductReaderFactory<? extends ProductReader> 
-		getProductReaderFactory(Algorithm p_algo, Key p_key)
+	public static ArchiveReaderFactory<? extends ArchiveReader> 
+		getArchiveReaderFactory(Algorithm p_algo, Key p_key)
 	{
 		if (!s_definitions.containsKey(p_algo.getName()))
 			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + p_algo.getName());
 		
-		return s_definitions.get(p_algo.getName()).getProductFactoryCreation()
+		return s_definitions.get(p_algo.getName()).getArchiveFactoryCreation()
 			.createReader(p_algo, p_key);
 	}
 	
@@ -94,13 +94,13 @@ public class AlgorithmRegistry
 	 * @param p_key
 	 * @return
 	 */
-	public static ProductWriterFactory<? extends ProductWriter> 
-		getProductWriterFactory(Algorithm p_algo, Key p_key)
+	public static ArchiveWriterFactory<? extends ArchiveWriter> 
+		getArchiveWriterFactory(Algorithm p_algo, Key p_key)
 	{
 		if (!s_definitions.containsKey(p_algo.getName()))
 			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + p_algo.getName());
 		
-		return s_definitions.get(p_algo.getName()).getProductFactoryCreation()
+		return s_definitions.get(p_algo.getName()).getArchiveFactoryCreation()
 			.createWriter(p_algo, p_key);
 	}
 }

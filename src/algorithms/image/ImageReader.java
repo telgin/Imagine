@@ -6,11 +6,11 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import algorithms.Algorithm;
+import archive.ArchiveReader;
+import archive.ArchiveIOException;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.ProductIOException;
-import product.ProductReader;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
 
@@ -18,7 +18,7 @@ import util.algorithms.ImageUtil;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class ImageReader extends Image implements ProductReader
+public class ImageReader extends Image implements ArchiveReader
 {
 	/**
 	 * @update_comment
@@ -33,16 +33,16 @@ public class ImageReader extends Image implements ProductReader
 	/**
 	 * @update_comment
 	 * @return
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	private byte read() throws ProductIOException
+	private byte read() throws ArchiveIOException
 	{
 		byte secured = getImageByte(f_randOrder.next());
 		return ByteConversion.intToByte(secured ^ f_random.nextByte());
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductReader#read(byte[], int, int)
+	 * @see archive.ArchiveReader#read(byte[], int, int)
 	 */
 	@Override
 	public int read(byte[] p_bytes, int p_offset, int p_length)
@@ -53,7 +53,7 @@ public class ImageReader extends Image implements ProductReader
 			{
 				p_bytes[x] = read();
 			}
-			catch (ProductIOException e)
+			catch (ArchiveIOException e)
 			{
 				return x;
 			}
@@ -89,7 +89,7 @@ public class ImageReader extends Image implements ProductReader
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductReader#loadFile(java.io.File)
+	 * @see archive.ArchiveReader#loadFile(java.io.File)
 	 */
 	@Override
 	public void loadFile(File p_file) throws IOException
@@ -99,7 +99,7 @@ public class ImageReader extends Image implements ProductReader
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductReader#skip(long)
+	 * @see archive.ArchiveReader#skip(long)
 	 */
 	@Override
 	public long skip(long p_bytes)
@@ -114,7 +114,7 @@ public class ImageReader extends Image implements ProductReader
 				++skipped;
 			}
 		}
-		catch (ProductIOException e)
+		catch (ArchiveIOException e)
 		{
 			// couldn't skip as many as requested,
 			// nothing to do

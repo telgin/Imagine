@@ -1,16 +1,16 @@
 package algorithms.imageoverlay;
 
 import algorithms.Algorithm;
+import archive.ArchiveReaderFactory;
+import archive.ArchiveWriterFactory;
 import key.Key;
-import product.ProductReaderFactory;
-import product.ProductWriterFactory;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class ImageOverlayFactory implements ProductReaderFactory<ImageOverlayReader>,
-				ProductWriterFactory<ImageOverlayWriter>
+public class ImageOverlayFactory implements ArchiveReaderFactory<ImageOverlayReader>,
+				ArchiveWriterFactory<ImageOverlayWriter>
 {
 	private Key f_key;
 	private Algorithm f_algo;
@@ -27,7 +27,7 @@ public class ImageOverlayFactory implements ProductReaderFactory<ImageOverlayRea
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriterFactory#createWriter()
+	 * @see archive.ArchiveWriterFactory#createWriter()
 	 */
 	@Override
 	public ImageOverlayWriter createWriter()
@@ -36,7 +36,7 @@ public class ImageOverlayFactory implements ProductReaderFactory<ImageOverlayRea
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductReaderFactory#createReader()
+	 * @see archive.ArchiveReaderFactory#createReader()
 	 */
 	@Override
 	public ImageOverlayReader createReader()

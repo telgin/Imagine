@@ -8,13 +8,13 @@ import algorithms.Algorithm;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
+import archive.ArchiveContents;
 import key.FileKey;
 import key.Key;
 import key.PasswordKey;
 import key.DefaultKey;
 import logging.LogLevel;
 import logging.Logger;
-import product.ProductContents;
 import ui.UIContext;
 import ui.graphical.GUI;
 
@@ -53,11 +53,11 @@ public class OpenArchiveController
 	}
 
 	/**
-	 * @param selectedAlgorithm the selectedAlgorithm to set
+	 * @param p_selectedAlgorithm the selectedAlgorithm to set
 	 */
-	public void setSelectedAlgorithm(Algorithm selectedAlgorithm)
+	public void setSelectedAlgorithm(Algorithm p_selectedAlgorithm)
 	{
-		this.f_selectedAlgorithm = selectedAlgorithm;
+		f_selectedAlgorithm = p_selectedAlgorithm;
 	}
 	
 	/**
@@ -70,14 +70,14 @@ public class OpenArchiveController
 			f_view.setOpenButtonEnabled(false);
 			f_view.setAlgorithmSelectionEnabled(false);
 			
-			ProductContents productContents = ConversionAPI.openArchive(f_selectedAlgorithm, getKey(), getInputFile());
+			ArchiveContents archiveContents = ConversionAPI.openArchive(f_selectedAlgorithm, getKey(), getInputFile());
 			
-			if (!productContents.getFileContents().isEmpty())
-				f_nonInitialFragment = productContents.getFileContents().get(0).getFragmentNumber() > 1;
+			if (!archiveContents.getFileContents().isEmpty())
+				f_nonInitialFragment = archiveContents.getFileContents().get(0).getFragmentNumber() > 1;
 			else
 				f_nonInitialFragment = false;
 			
-			f_view.setTableData(productContents.getFileContents());
+			f_view.setTableData(archiveContents.getFileContents());
 			f_view.setExtractionButtonsEnabled(true);
 		}
 		catch (Exception e)

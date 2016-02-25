@@ -1,4 +1,4 @@
-package product;
+package archive;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,31 +46,31 @@ public class ExtractionManager
 	
 	/**
 	 * @update_comment
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 */
-	public void setExplored(File p_productFile)
+	public void setExplored(File p_archiveFile)
 	{
-		f_exploredFiles.add(p_productFile);
+		f_exploredFiles.add(p_archiveFile);
 	}
 	
 	/**
 	 * @update_comment
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 * @return
 	 */
-	public boolean isExplored(File p_productFile)
+	public boolean isExplored(File p_archiveFile)
 	{
-		return f_exploredFiles.contains(p_productFile);
+		return f_exploredFiles.contains(p_archiveFile);
 	}
 
 	/**
 	 * @update_comment
 	 * @param p_fileName
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 */
-	public void cacheHeaderLocation(String p_fileName, File p_productFile)
+	public void cacheHeaderLocation(String p_fileName, File p_archiveFile)
 	{
-		f_cachedFileNames.put(p_fileName, p_productFile);
+		f_cachedFileNames.put(p_fileName, p_archiveFile);
 	}
 	
 	/**
@@ -85,30 +85,30 @@ public class ExtractionManager
 
 	/**
 	 * @update_comment
-	 * @param p_productSearchName
-	 * @param p_curProductFolder
+	 * @param p_archiveSearchName
+	 * @param p_curArchiveFolder
 	 * @return
 	 */
-	public File findProductFile(String p_productSearchName, File p_curProductFolder)
+	public File findArchiveFile(String p_archiveSearchName, File p_curArchiveFolder)
 	{
 		//first see if it was cached already
-		if (f_cachedFileNames.containsKey(p_productSearchName))
-			return f_cachedFileNames.get(p_productSearchName);
+		if (f_cachedFileNames.containsKey(p_archiveSearchName))
+			return f_cachedFileNames.get(p_archiveSearchName);
 		
 		//search until the user provides the correct enclosing folder
 		//or the user gives up
 		while (true)
 		{
-			Logger.log(LogLevel.k_debug, "Looking for product file: " + p_productSearchName);
+			Logger.log(LogLevel.k_debug, "Looking for archive file: " + p_archiveSearchName);
 			
-			//the enclosing folder is the current product folder if it wasn't set
+			//the enclosing folder is the current archive folder if it wasn't set
 			if (f_enclosingFolder == null)
-				f_enclosingFolder = p_curProductFolder;
+				f_enclosingFolder = p_curArchiveFolder;
 			
-			//bfs through folders for product files
+			//bfs through folders for archive files
 			Queue<File> folders = new LinkedList<File>();
-			folders.add(p_curProductFolder);
-			if (!p_curProductFolder.getAbsoluteFile().equals(f_enclosingFolder.getAbsolutePath()))
+			folders.add(p_curArchiveFolder);
+			if (!p_curArchiveFolder.getAbsoluteFile().equals(f_enclosingFolder.getAbsolutePath()))
 			{
 				folders.add(f_enclosingFolder);
 			}
@@ -118,8 +118,8 @@ public class ExtractionManager
 				File folder = folders.poll();
 				for (File sub : folder.listFiles())
 				{
-					//check sub folders unless we're back at the current product folder
-					if (sub.isDirectory() && !sub.equals(p_curProductFolder))
+					//check sub folders unless we're back at the current archive folder
+					if (sub.isDirectory() && !sub.equals(p_curArchiveFolder))
 					{
 						folders.add(sub);
 					}
@@ -130,19 +130,19 @@ public class ExtractionManager
 						if (subName.contains("."))
 							subName = subName.substring(0, subName.indexOf("."));
 						
-						if (subName.equals(p_productSearchName))
+						if (subName.equals(p_archiveSearchName))
 						{
-							Logger.log(LogLevel.k_debug, "Found product file match: " + sub.getName());
+							Logger.log(LogLevel.k_debug, "Found archive file match: " + sub.getName());
 							return sub;
 						}
 					}
 				}
 			}
 			
-			Logger.log(LogLevel.k_debug, "Could not find next product file: " + p_productSearchName);
+			Logger.log(LogLevel.k_debug, "Could not find next archive file: " + p_archiveSearchName);
 			
 			File newEnclosingFolder = UIContext.getUI().promptEnclosingFolder(
-							f_enclosingFolder, p_curProductFolder, p_productSearchName);
+							f_enclosingFolder, p_curArchiveFolder, p_archiveSearchName);
 			
 			if (newEnclosingFolder == null)
 			{

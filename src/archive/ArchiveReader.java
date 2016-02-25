@@ -1,4 +1,4 @@
-package product;
+package archive;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.io.IOException;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public interface ProductReader extends Product
+public interface ArchiveReader extends Archive
 {
 	/**
 	 * @update_comment

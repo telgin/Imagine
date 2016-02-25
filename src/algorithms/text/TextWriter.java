@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import algorithms.Algorithm;
+import archive.ArchiveWriter;
+import archive.ArchiveIOException;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.ProductIOException;
-import product.ProductWriter;
 import report.JobStatus;
 import util.ByteConversion;
 
@@ -17,7 +17,7 @@ import util.ByteConversion;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class TextWriter extends Text implements ProductWriter
+public class TextWriter extends Text implements ArchiveWriter
 {
 	/**
 	 * @update_comment
@@ -30,17 +30,17 @@ public class TextWriter extends Text implements ProductWriter
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#newProduct()
+	 * @see archive.ArchiveWriter#newArchive()
 	 */
 	@Override
-	public void newProduct()
+	public void newArchive()
 	{
 		f_buffer = new byte[f_blockSize];
 		reset();
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#write(byte)
+	 * @see archive.ArchiveWriter#write(byte)
 	 */
 	@Override
 	public boolean write(byte p_byte)
@@ -51,14 +51,14 @@ public class TextWriter extends Text implements ProductWriter
 			f_buffer[f_order.next()] = val;
 			return true;
 		}
-		catch (ProductIOException e)
+		catch (ArchiveIOException e)
 		{
 			return false;
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#write(byte[], int, int)
+	 * @see archive.ArchiveWriter#write(byte[], int, int)
 	 */
 	@Override
 	public int write(byte[] p_bytes, int p_offset, int p_length)
@@ -73,19 +73,18 @@ public class TextWriter extends Text implements ProductWriter
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#saveFile(java.io.File, java.lang.String)
+	 * @see archive.ArchiveWriter#saveFile(java.io.File, java.lang.String)
 	 */
 	@Override
-	public void saveFile(File p_productStagingFolder, String p_filename)
+	public void saveFile(File p_archiveStagingFolder, String p_filename)
 	{
 		// write random bytes to fill up the buffer
 		fillToEnd();
 
 		try
 		{
-			File toSave = new File(p_productStagingFolder.getAbsolutePath(), p_filename + ".txt");
-			Logger.log(LogLevel.k_info,
-							"Saving product file: " + toSave.getAbsolutePath());
+			File toSave = new File(p_archiveStagingFolder.getAbsolutePath(), p_filename + ".txt");
+			Logger.log(LogLevel.k_info, "Saving archive file: " + toSave.getAbsolutePath());
 
 			PrintWriter writer = new PrintWriter(toSave);
 			if (f_algorithm.getParameter(Definition.ENCODING_PARAM).getValue().equals(Definition.BASE64_ENCODING))
@@ -96,7 +95,7 @@ public class TextWriter extends Text implements ProductWriter
 			writer.close();
 
 			// update progress
-			JobStatus.incrementProductsCreated(1);
+			JobStatus.incrementArchivesCreated(1);
 		}
 		catch (IOException e)
 		{

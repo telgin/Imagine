@@ -11,6 +11,7 @@ import algorithms.imageoverlay.Definition;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
+import archive.ConversionJob;
 import config.Settings;
 import javafx.application.Platform;
 import key.FileKey;
@@ -19,7 +20,6 @@ import key.PasswordKey;
 import key.DefaultKey;
 import logging.LogLevel;
 import logging.Logger;
-import product.ConversionJob;
 import report.FileStatus;
 import report.JobStatus;
 import system.ActiveComponent;
@@ -394,10 +394,10 @@ public class EmbedController implements ActiveComponent
 		//update things if they're different
 		
 		//files created
-		int currentFilesCreated = JobStatus.getProductsCreated();
+		int currentFilesCreated = JobStatus.getArchivesCreated();
 		if (currentFilesCreated != f_filesCreated)
 		{
-			f_filesCreated = JobStatus.getProductsCreated();
+			f_filesCreated = JobStatus.getArchivesCreated();
 			f_view.setFilesCreated(f_filesCreated);
 		}
 		

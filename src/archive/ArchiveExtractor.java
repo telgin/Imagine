@@ -1,4 +1,4 @@
-package product;
+package archive;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -20,13 +20,13 @@ import logging.Logger;
 import util.ByteConversion;
 import util.FileSystemUtil;
 
-public class ProductExtractor {
+public class ArchiveExtractor {
 	
-	private ProductReader f_product;
+	private ArchiveReader f_archive;
 	private long f_curFragmentNumber;
 	private byte[] f_buffer;
 	private File f_enclosingFolder;
-	private File f_curProductFile;
+	private File f_curArchiveFile;
 	private ExtractionManager f_manager;
 	private Algorithm f_algo;
 	private Key f_key;
@@ -38,7 +38,7 @@ public class ProductExtractor {
 	 * @param p_key
 	 * @param p_enclosingFolder
 	 */
-	public ProductExtractor(Algorithm p_algo, Key p_key, File p_enclosingFolder)
+	public ArchiveExtractor(Algorithm p_algo, Key p_key, File p_enclosingFolder)
 	{
 		this(p_algo, p_key, p_enclosingFolder, new ExtractionManager());
 		
@@ -52,10 +52,10 @@ public class ProductExtractor {
 	 * @param p_enclosingFolder
 	 * @param p_manager
 	 */
-	private ProductExtractor(Algorithm p_algo, Key p_key, File p_enclosingFolder, ExtractionManager p_manager)
+	private ArchiveExtractor(Algorithm p_algo, Key p_key, File p_enclosingFolder, ExtractionManager p_manager)
 	{
 		setEnclosingFolder(p_enclosingFolder);
-		f_product = AlgorithmRegistry.getProductReaderFactory(p_algo, p_key).createReader();
+		f_archive = AlgorithmRegistry.getArchiveReaderFactory(p_algo, p_key).createReader();
 		
 		f_buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
 		f_algo = p_algo;
@@ -67,9 +67,9 @@ public class ProductExtractor {
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
-	public ProductExtractor clone()
+	public ArchiveExtractor clone()
 	{
-		return new ProductExtractor(f_algo, f_key, f_enclosingFolder, f_manager);
+		return new ArchiveExtractor(f_algo, f_key, f_enclosingFolder, f_manager);
 	}
 	
 	/**
@@ -83,13 +83,13 @@ public class ProductExtractor {
 	
 	/**
 	 * @update_comment
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 * @return
 	 * @throws IOException
 	 */
-	public ProductContents viewAll(File p_productFile) throws IOException
+	public ArchiveContents viewAll(File p_archiveFile) throws IOException
 	{
-		ProductContents productContents = parseProductContents(p_productFile);
+		ArchiveContents archiveContents = parseArchiveContents(p_archiveFile);
 		
 		try
 		{
@@ -97,8 +97,8 @@ public class ProductExtractor {
 			FileContents fileContents = readNextFileHeader(true);
 			while (fileContents != null) //TODO change to true
 			{
-				//add header information to product contents
-				productContents.addFileContents(fileContents);
+				//add header information to archive contents
+				archiveContents.addFileContents(fileContents);
 				
 				//skip over the file data
 				boolean allDataSkipped = skipNextFileData(fileContents);
@@ -108,35 +108,35 @@ public class ProductExtractor {
 				fileContents = readNextFileHeader(true);
 			}
 		}
-		catch (ProductIOException e)
+		catch (ArchiveIOException e)
 		{
 			//this will happen whenever the next file cannot be read
-			//this is normal if we've reached the end of the product
+			//this is normal if we've reached the end of the archive
 			Logger.log(LogLevel.k_debug, "The next file header could not be read "
-							+ "(possibly because we're at the end of a product): " + e.getMessage());
+							+ "(possibly because we're at the end of an archive): " + e.getMessage());
 		}
 			
-		if (productContents.getFileContents().isEmpty())
+		if (archiveContents.getFileContents().isEmpty())
 		{
-			//There were no files beyond the product header. This shouldn't happen, so it's probably
-			//a corrupted header. Even though the product header got parsed into something, it's
+			//There were no files beyond the archive header. This shouldn't happen, so it's probably
+			//a corrupted header. Even though the archive header got parsed into something, it's
 			//probably not useful.
-			Logger.log(LogLevel.k_debug, "Failed to extract from " + p_productFile.getName());
+			Logger.log(LogLevel.k_debug, "Failed to extract from " + p_archiveFile.getName());
 			
-			throw new ProductIOException("There were no files recovered from " + p_productFile.getPath());
+			throw new ArchiveIOException("There were no files recovered from " + p_archiveFile.getPath());
 		}
 		
-		return productContents;
+		return archiveContents;
 	}
 	
 	/**
 	 * @update_comment
-	 * @param p_origProductContents
+	 * @param p_origArchiveContents
 	 * @param p_origFileContents
 	 * @param p_extractionFolder
 	 * @return
 	 */
-	private File assembleCurrentFileData(ProductContents p_origProductContents, FileContents p_origFileContents, File p_extractionFolder)
+	private File assembleCurrentFileData(ArchiveContents p_origArchiveContents, FileContents p_origFileContents, File p_extractionFolder)
 	{
 		//create temporary hidden assembly folder
 		File assemblyFolder = new File(p_extractionFolder, Constants.ASSEMBLY_FOLDER_NAME);
@@ -161,7 +161,7 @@ public class ProductExtractor {
 			outStream = new BufferedOutputStream(new FileOutputStream(assembling));
 			
 			FileContents curFileContents = p_origFileContents;
-			ProductContents curProductContents = p_origProductContents;//TODO this makes no sense
+			ArchiveContents curArchiveContents = p_origArchiveContents;//TODO this makes no sense
 			
 			//read the current file data
 			long bytesWritten = readNextFileData(curFileContents, outStream);
@@ -169,32 +169,32 @@ public class ProductExtractor {
 			//not finished unless all the bytes were read
 			boolean finished = bytesWritten == curFileContents.getRemainingData();
 			int increment = 1;
-			ProductExtractor curExtractor = this; 
+			ArchiveExtractor curExtractor = this; 
 			while (!finished)
 			{
 				//set the current extractor's manager's enclosing folder
 				curExtractor.f_manager.setEnclosingFolder(curExtractor.f_enclosingFolder);
 				
 				//there are other fragments that need to be added,
-				//find the next product file
-				String searchName = FileSystemUtil.getProductName(curProductContents.getStreamUUID(),
-												curProductContents.getProductSequenceNumber() + increment);
-				File nextProductFile = f_manager.findProductFile(searchName,
-								curExtractor.f_curProductFile.getAbsoluteFile().getParentFile());
+				//find the next archive file
+				String searchName = FileSystemUtil.getArchiveName(curArchiveContents.getStreamUUID(),
+												curArchiveContents.getArchiveSequenceNumber() + increment);
+				File nextArchiveFile = f_manager.findArchiveFile(searchName,
+								curExtractor.f_curArchiveFile.getAbsoluteFile().getParentFile());
 				
-				if (nextProductFile == null)
+				if (nextArchiveFile == null)
 				{
-					Logger.log(LogLevel.k_error, "Could not find referenced product file: " +
+					Logger.log(LogLevel.k_error, "Could not find referenced archive file: " +
 									searchName);
 					return null;
 				}
 				
-				//the fragment we're looking for will be the first file in the next product
+				//the fragment we're looking for will be the first file in the next archive
 				curExtractor = this.clone();
 
-				finished = curExtractor.extractFragmentData(nextProductFile, outStream);
+				finished = curExtractor.extractFragmentData(nextArchiveFile, outStream);
 				
-				//now looking for the next next product file...
+				//now looking for the next next archive file...
 				++increment;
 			}
 			
@@ -230,18 +230,18 @@ public class ProductExtractor {
 	/**
 	 * Pulls in the data from the first file only. It is assumed that this
 	 * will be a fragment from a previous file.
-	 * @param nextProductFile
+	 * @param p_archiveFile
 	 * @param p_outStream
 	 * @return True if this was the last fragment of that file, false 
 	 * if there's more data in a later file.
 	 * @throws IOException 
 	 */
-	private boolean extractFragmentData(File p_productFile,
+	private boolean extractFragmentData(File p_archiveFile,
 					BufferedOutputStream p_outStream) throws IOException
 	{
-		parseProductContents(p_productFile);
+		parseArchiveContents(p_archiveFile);
 		
-		//this product contents will be the fragment we're looking for
+		//this archive contents will be the fragment we're looking for
 		FileContents fileContents = readNextFileHeader(true);
 
 		if (fileContents.getMetadata().getType().equals(FileType.k_file))
@@ -255,37 +255,37 @@ public class ProductExtractor {
 				//this file must be fully explored if we're not finished
 				if (!finished)
 				{
-					f_manager.setExplored(p_productFile);
+					f_manager.setExplored(p_archiveFile);
 				}
 				
 				return finished;
 			}
 			catch (IOException e)
 			{
-				throw new ProductIOException("Failed to read first file data: " + 
+				throw new ArchiveIOException("Failed to read first file data: " + 
 								fileContents.getMetadata().getFile().getPath());
 			}	
 		}
 		else
 		{
-			//the first thing in this product wasn't a file, so something's wrong
-			throw new ProductIOException("The first file in this product "
-							+ "was not a k_file type: " + p_productFile.getAbsolutePath());
+			//the first thing in this archive wasn't a file, so something's wrong
+			throw new ArchiveIOException("The first file in this archive "
+							+ "was not a k_file type: " + p_archiveFile.getAbsolutePath());
 		}
 	}
 	
 	/**
 	 * @update_comment
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 */
-	public void mapHeaders(File p_productFile)
+	public void mapHeaders(File p_archiveFile)
 	{
 		Logger.log(LogLevel.k_info, "Indexing available file IDs...");
-		if (p_productFile.isDirectory())
+		if (p_archiveFile.isDirectory())
 		{
-			//bfs through folders for product files
+			//bfs through folders for archive files
 			Queue<File> folders = new LinkedList<File>();
-			folders.add(p_productFile);
+			folders.add(p_archiveFile);
 			
 			while (folders.size() > 0)
 			{
@@ -304,7 +304,7 @@ public class ProductExtractor {
 						}
 						catch (Exception e) //anything could happen!
 						{
-							//the file could be any file, so it might not even be a product file
+							//the file could be any file, so it might not even be an archive file
 							Logger.log(LogLevel.k_warning, "Could not map file: " + sub.getName());
 						}
 					}
@@ -315,38 +315,38 @@ public class ProductExtractor {
 		{
 			try
 			{
-				mapHeader(p_productFile);
+				mapHeader(p_archiveFile);
 			}
 			catch (IOException e)
 			{
-				Logger.log(LogLevel.k_warning, "Could not read product file: " + p_productFile.getName());
+				Logger.log(LogLevel.k_warning, "Could not read archive file: " + p_archiveFile.getName());
 			}
 		}
 	}
 	
 	/**
 	 * @update_comment
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 * @throws IOException
 	 */
-	private void mapHeader(File p_productFile) throws IOException
+	private void mapHeader(File p_archiveFile) throws IOException
 	{
-		ProductContents productContents = parseProductContents(p_productFile);
-		String fileName = FileSystemUtil.getProductName(productContents.getStreamUUID(),
-						productContents.getProductSequenceNumber());
-		f_manager.cacheHeaderLocation(fileName, p_productFile);
+		ArchiveContents archiveContents = parseArchiveContents(p_archiveFile);
+		String fileName = FileSystemUtil.getArchiveName(archiveContents.getStreamUUID(),
+						archiveContents.getArchiveSequenceNumber());
+		f_manager.cacheHeaderLocation(fileName, p_archiveFile);
 	}
 
 	/**
 	 * @update_comment
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 * @param p_extractionFolder
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean extractAllFromProduct(File p_productFile, File p_extractionFolder) throws IOException
+	public boolean extractAllFromArchive(File p_archiveFile, File p_extractionFolder) throws IOException
 	{
-		ProductContents productContents = parseProductContents(p_productFile);
+		ArchiveContents archiveContents = parseArchiveContents(p_archiveFile);
 		
 		//keep trying to read files until one can't be read
 		FileContents fileContents = readNextFileHeader(true);
@@ -368,8 +368,8 @@ public class ProductExtractor {
 				}
 				else
 				{
-					//assemble this file, if it has other fragments, follow the trail of products
-					File assembled = assembleCurrentFileData(productContents, fileContents, p_extractionFolder);
+					//assemble this file, if it has other fragments, follow the trail of archives
+					File assembled = assembleCurrentFileData(archiveContents, fileContents, p_extractionFolder);
 					
 					if (assembled != null)
 					{
@@ -393,7 +393,7 @@ public class ProductExtractor {
 		}
 		
 		//set this file explored since it's all been read
-		f_manager.setExplored(p_productFile);
+		f_manager.setExplored(p_archiveFile);
 
 		return true;
 	}
@@ -402,16 +402,16 @@ public class ProductExtractor {
 
 	/**
 	 * @update_comment
-	 * @param p_productFolder
+	 * @param p_archiveFolder
 	 * @param p_extractionFolder
 	 * @return
 	 */
-	public boolean extractAllFromProductFolder(File p_productFolder, File p_extractionFolder)
+	public boolean extractAllFromArchiveFolder(File p_archiveFolder, File p_extractionFolder)
 	{
-		if (!p_productFolder.isDirectory())
+		if (!p_archiveFolder.isDirectory())
 		{
-			Logger.log(LogLevel.k_error, "The product folder is a "
-							+ "file, use \"extractAll\": " + p_productFolder.getName());
+			Logger.log(LogLevel.k_error, "The archive folder is a "
+							+ "file, use \"extractAll\": " + p_archiveFolder.getName());
 			return false;
 		}
 		
@@ -420,9 +420,9 @@ public class ProductExtractor {
 		//reset explored files since this is a new run
 		f_manager.resetExploredFiles();
 		
-		//bfs through folders for product files
+		//bfs through folders for archive files
 		Queue<File> folders = new LinkedList<File>();
-		folders.add(p_productFolder);
+		folders.add(p_archiveFolder);
 		
 		while (folders.size() > 0)
 		{
@@ -471,7 +471,7 @@ public class ProductExtractor {
 					{
 						try
 						{
-							extractAllFromProduct(sub, p_extractionFolder);
+							extractAllFromArchive(sub, p_extractionFolder);
 						}
 						catch (Exception e)
 						{
@@ -489,15 +489,15 @@ public class ProductExtractor {
 	
 	/**
 	 * @update_comment
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 * @param p_extractionFolder
 	 * @param p_index
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean extractFileByIndex(File p_productFile, File p_extractionFolder, int p_index) throws IOException
+	public boolean extractFileByIndex(File p_archiveFile, File p_extractionFolder, int p_index) throws IOException
 	{
-		ProductContents productContents = parseProductContents(p_productFile);
+		ArchiveContents archiveContents = parseArchiveContents(p_archiveFile);
 		
 		int curIndex = 0;
 		
@@ -511,8 +511,8 @@ public class ProductExtractor {
 				if (fileContents.getMetadata().getType().equals(FileType.k_file))
 				{
 					
-					//assemble this file, if it has other fragments, follow the trail of products
-					File assembled = assembleCurrentFileData(productContents, fileContents, p_extractionFolder);
+					//assemble this file, if it has other fragments, follow the trail of archives
+					File assembled = assembleCurrentFileData(archiveContents, fileContents, p_extractionFolder);
 					
 					if (assembled != null)
 					{
@@ -549,52 +549,52 @@ public class ProductExtractor {
 	
 	/**
 	 * @update_comment
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 * @return
 	 * @throws IOException
 	 */
-	private ProductContents parseProductContents(File p_productFile) throws IOException
+	private ArchiveContents parseArchiveContents(File p_archiveFile) throws IOException
 	{
-		if (p_productFile.isDirectory())
+		if (p_archiveFile.isDirectory())
 		{
-			throw new ProductIOException( "The product file is a "
-							+ "folder, use \"extractAllRecursive\": " + p_productFile.getName());
+			throw new ArchiveIOException( "The archive file is a "
+							+ "folder, use \"extractAllRecursive\": " + p_archiveFile.getName());
 		}
 		
-		//try to load the product file
-		loadProduct(p_productFile);
+		//try to load the archive file
+		loadArchive(p_archiveFile);
 
-		//try to read the product header
-		ProductContents productContents = readProductHeader(true);
+		//try to read the archive header
+		ArchiveContents archiveContents = readArchiveHeader(true);
 		
-		if (productContents == null)
+		if (archiveContents == null)
 		{
-			//if the product header can't be read,
+			//if the archive header can't be read,
 			//it's assumed that nothing else can be read
-			throw new ProductIOException("The product header cannot be read: " + p_productFile.getName());
+			throw new ArchiveIOException("The archive header cannot be read: " + p_archiveFile.getName());
 		}
 		
-		return productContents;
+		return archiveContents;
 	}
 	
 	/**
 	 * @update_comment
-	 * @param p_productFile
+	 * @param p_archiveFile
 	 * @throws IOException
 	 */
-	private void loadProduct(File p_productFile) throws IOException
+	private void loadArchive(File p_archiveFile) throws IOException
 	{
-		f_curProductFile = p_productFile;
+		f_curArchiveFile = p_archiveFile;
 		
 		try
 		{
-			f_product.loadFile(p_productFile);
-			Logger.log(LogLevel.k_debug, "Loaded Product File for Reading: " + p_productFile.getName());
+			f_archive.loadFile(p_archiveFile);
+			Logger.log(LogLevel.k_debug, "Loaded Archive File for Reading: " + p_archiveFile.getName());
 		}
 		catch (IOException e)
 		{
-			f_curProductFile = null;
-			Logger.log(LogLevel.k_error, "Failed to load product file " + p_productFile.getName());
+			f_curArchiveFile = null;
+			Logger.log(LogLevel.k_error, "Failed to load archive file " + p_archiveFile.getName());
 			throw e;
 		}
 	}
@@ -606,7 +606,7 @@ public class ProductExtractor {
 	 */
 	private boolean readFull(int p_length)
 	{
-		return f_product.read(f_buffer, 0, p_length) == p_length;
+		return f_archive.read(f_buffer, 0, p_length) == p_length;
 	}
 	
 	/**
@@ -616,59 +616,59 @@ public class ProductExtractor {
 	 */
 	private boolean skipFull(long p_skip)
 	{
-		return f_product.skip(p_skip) == p_skip;
+		return f_archive.skip(p_skip) == p_skip;
 	}
 	
 	/**
 	 * @update_comment
 	 * @param p_parseData
 	 * @return
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	private ProductContents readProductHeader(boolean p_parseData) throws ProductIOException
+	private ArchiveContents readArchiveHeader(boolean p_parseData) throws ArchiveIOException
 	{
-		Logger.log(LogLevel.k_debug, "Reading product header");
+		Logger.log(LogLevel.k_debug, "Reading archive header");
 		try
 		{
 			//setup contents
-			ProductContents contents = null;
+			ArchiveContents contents = null;
 			if (p_parseData)
 			{
-				contents = new ProductContents();
+				contents = new ArchiveContents();
 			}
 			
-			//product uuid:
-			//always read this b/c the product may need it to de-secure stream
-			if (!readFull(Constants.PRODUCT_UUID_SIZE))
-				throw new ProductIOException("Could not read product uuid.");
+			//archive uuid:
+			//always read this b/c the archive may need it to de-secure stream
+			if (!readFull(Constants.ARCHIVE_UUID_SIZE))
+				throw new ArchiveIOException("Could not read archive uuid.");
 			
-			f_product.setUUID(ByteConversion.subArray(f_buffer, 0, Constants.PRODUCT_UUID_SIZE));
+			f_archive.setUUID(ByteConversion.subArray(f_buffer, 0, Constants.ARCHIVE_UUID_SIZE));
 			
 			if (p_parseData)
 			{
-				contents.setStreamUUID(ByteConversion.getStreamUUID(f_product.getUUID()));
-				contents.setProductSequenceNumber(ByteConversion.getProductSequenceNumber(f_product.getUUID()));
+				contents.setStreamUUID(ByteConversion.getStreamUUID(f_archive.getUUID()));
+				contents.setArchiveSequenceNumber(ByteConversion.getArchiveSequenceNumber(f_archive.getUUID()));
 			}
 				
-			f_product.secureStream();
+			f_archive.secureStream();
 
-			//product version
+			//archive version
 			if (p_parseData)
 			{
-				if (!readFull(Constants.PRODUCT_VERSION_NUMBER_SIZE))
-					throw new ProductIOException("Could not read product version number.");
+				if (!readFull(Constants.ARCHIVE_VERSION_NUMBER_SIZE))
+					throw new ArchiveIOException("Could not read archive version number.");
 				
-				contents.setProductVersionNumber(ByteConversion.byteToInt(f_buffer[0]));
+				contents.setArchiveVersionNumber(ByteConversion.byteToInt(f_buffer[0]));
 			}
 			else
 			{
-				if (!skipFull(Constants.PRODUCT_VERSION_NUMBER_SIZE))
-					throw new ProductIOException("Could not skip product version number.");
+				if (!skipFull(Constants.ARCHIVE_VERSION_NUMBER_SIZE))
+					throw new ArchiveIOException("Could not skip archive version number.");
 			}
 
 			return contents;
 		}
-		catch (ProductIOException e)
+		catch (ArchiveIOException e)
 		{
 			throw e;
 		}
@@ -677,8 +677,8 @@ public class ProductExtractor {
 			Logger.log(LogLevel.k_debug, e, false);
 			
 			//there are lots of bad things that can happen when parsing
-			//random data. A general product IO exception will suffice.
-			throw new ProductIOException("Failed to read product header.");
+			//random data. A general archive IO exception will suffice.
+			throw new ArchiveIOException("Failed to read archive header.");
 		}
 	}
 	
@@ -686,9 +686,9 @@ public class ProductExtractor {
 	 * @update_comment
 	 * @param p_parseData
 	 * @return
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	private FileContents readNextFileHeader(boolean p_parseData) throws ProductIOException
+	private FileContents readNextFileHeader(boolean p_parseData) throws ArchiveIOException
 	{
 		Logger.log(LogLevel.k_debug, "Reading file header");
 
@@ -700,7 +700,7 @@ public class ProductExtractor {
 			contents.setMetadata(new Metadata());
 		}
 		
-		try //TODO convert to throwing ProductIOExceptions like the other one
+		try //TODO convert to throwing ArchiveIOExceptions like the other one
 		{
 			//fragment number
 			if (!readFull(Constants.FRAGMENT_NUMBER_SIZE))
@@ -724,7 +724,7 @@ public class ProductExtractor {
 			int fileTypeNum = ByteConversion.byteToInt(f_buffer[0]);
 			FileType fileType = FileType.toFileType(fileTypeNum);
 			if (fileType == null)
-				throw new ProductIOException("Failed to read file type.");
+				throw new ArchiveIOException("Failed to read file type.");
 			
 			contents.getMetadata().setType(fileType);
 			
@@ -819,14 +819,14 @@ public class ProductExtractor {
 			return contents;
 
 		}
-		catch (ProductIOException e)
+		catch (ArchiveIOException e)
 		{
 			throw e;
 		}
 		catch (Exception e)
 		{
 			Logger.log(LogLevel.k_debug, e, false);
-			throw new ProductIOException("Failed to read file header: " + e.getMessage());
+			throw new ArchiveIOException("Failed to read file header: " + e.getMessage());
 		}
 	}
 	
@@ -841,8 +841,8 @@ public class ProductExtractor {
 		long fileLengthRemaining = p_fileContents.getRemainingData();
 		
 		//This might try to over-read because fileLengthRemaining could be more
-		//than what's left in the product if the file continues on in the next
-		//product. If it does, nothing bad should happen.
+		//than what's left in the archive if the file continues on in the next
+		//archive. If it does, nothing bad should happen.
 		return skipFull(fileLengthRemaining);
 	}
 	
@@ -860,14 +860,14 @@ public class ProductExtractor {
 
 		while (fileLengthRemaining > 0)
 		{
-			//read from product
+			//read from archive
 			int dataLength = (int) Math.min(f_buffer.length, fileLengthRemaining);
-			int bytesRead = f_product.read(f_buffer, 0, dataLength);
+			int bytesRead = f_archive.read(f_buffer, 0, dataLength);
 			totalBytesRead += bytesRead;
 			
 			if (bytesRead == 0)
 			{
-				//no more data can be read from the product
+				//no more data can be read from the archive
 				//this is a normal, it happens when there is
 				//an additional fragment after this one.
 				break;

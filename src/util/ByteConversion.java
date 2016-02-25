@@ -249,22 +249,22 @@ public class ByteConversion
 
 	/**
 	 * @update_comment
-	 * @param p_productUUID
+	 * @param p_archiveUUID
 	 * @return
 	 */
-	public static final long getStreamUUID(byte[] p_productUUID)
+	public static final long getStreamUUID(byte[] p_archiveUUID)
 	{
-		return ByteConversion.bytesToLong(p_productUUID, 0);
+		return ByteConversion.bytesToLong(p_archiveUUID, 0);
 	}
 
 	/**
 	 * @update_comment
-	 * @param p_productUUID
+	 * @param p_archiveUUID
 	 * @return
 	 */
-	public static final int getProductSequenceNumber(byte[] p_productUUID)
+	public static final int getArchiveSequenceNumber(byte[] p_archiveUUID)
 	{
-		return ByteConversion.bytesToInt(p_productUUID, Constants.STREAM_UUID_SIZE);
+		return ByteConversion.bytesToInt(p_archiveUUID, Constants.STREAM_UUID_SIZE);
 	}
 
 	/**

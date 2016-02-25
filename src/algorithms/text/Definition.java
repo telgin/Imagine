@@ -6,12 +6,12 @@ import java.util.List;
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
+import archive.ArchiveFactoryCreation;
+import archive.ArchiveReader;
+import archive.ArchiveReaderFactory;
+import archive.ArchiveWriter;
+import archive.ArchiveWriterFactory;
 import key.Key;
-import product.ProductFactoryCreation;
-import product.ProductReader;
-import product.ProductReaderFactory;
-import product.ProductWriter;
-import product.ProductWriterFactory;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -102,28 +102,28 @@ public class Definition implements algorithms.Definition
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see algorithms.Definition#getProductFactoryCreation()
+	 * @see algorithms.Definition#getArchiveFactoryCreation()
 	 */
 	@Override
-	public ProductFactoryCreation getProductFactoryCreation()
+	public ArchiveFactoryCreation getArchiveFactoryCreation()
 	{
-		return new ProductFactoryCreation()
+		return new ArchiveFactoryCreation()
 		{
 			/* (non-Javadoc)
-			 * @see product.ProductFactoryCreation#createReader(algorithms.Algorithm, key.Key)
+			 * @see archive.ArchiveFactoryCreation#createReader(algorithms.Algorithm, key.Key)
 			 */
 			@Override
-			public ProductReaderFactory<? extends ProductReader> createReader(
+			public ArchiveReaderFactory<? extends ArchiveReader> createReader(
 							Algorithm p_algo, Key p_key)
 			{
 				return new TextFactory(p_algo, p_key);
 			}
 
 			/* (non-Javadoc)
-			 * @see product.ProductFactoryCreation#createWriter(algorithms.Algorithm, key.Key)
+			 * @see archive.ArchiveFactoryCreation#createWriter(algorithms.Algorithm, key.Key)
 			 */
 			@Override
-			public ProductWriterFactory<? extends ProductWriter> createWriter(
+			public ArchiveWriterFactory<? extends ArchiveWriter> createWriter(
 							Algorithm p_algo, Key p_key)
 			{
 				return new TextFactory(p_algo, p_key);

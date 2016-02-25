@@ -6,10 +6,10 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 
 import algorithms.Algorithm;
+import archive.Archive;
+import archive.ArchiveIOException;
 import config.Constants;
 import key.Key;
-import product.Product;
-import product.ProductIOException;
 import util.ByteConversion;
 import util.algorithms.HashRandom;
 import util.algorithms.ImageUtil;
@@ -19,7 +19,7 @@ import util.algorithms.UniqueRandomRange;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class ImageOverlay implements Product
+public class ImageOverlay implements Archive
 {
 	protected Algorithm f_algorithm;
 	protected BufferedImage f_img;
@@ -97,12 +97,12 @@ public class ImageOverlay implements Product
 
 	/**
 	 * @update_comment
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	protected final void nextPair() throws ProductIOException
+	protected final void nextPair() throws ArchiveIOException
 	{
 		if (f_incrementFailed)
-			throw new ProductIOException("previous increment failed");
+			throw new ArchiveIOException("previous increment failed");
 		
 		incrementColor();
 		
@@ -120,9 +120,9 @@ public class ImageOverlay implements Product
 
 	/**
 	 * @update_comment
-	 * @throws ProductIOException
+	 * @throws ArchiveIOException
 	 */
-	private final void incrementVector() throws ProductIOException
+	private final void incrementVector() throws ArchiveIOException
 	{
 		f_incrementFailed = true;
 
@@ -134,7 +134,7 @@ public class ImageOverlay implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#getAlgorithmName()
+	 * @see archive.Archive#getAlgorithmName()
 	 */
 	@Override
 	public String getAlgorithmName()
@@ -143,7 +143,7 @@ public class ImageOverlay implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#getAlgorithmVersionNumber()
+	 * @see archive.Archive#getAlgorithmVersionNumber()
 	 */
 	@Override
 	public int getAlgorithmVersionNumber()
@@ -152,7 +152,7 @@ public class ImageOverlay implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#setUUID(byte[])
+	 * @see archive.Archive#setUUID(byte[])
 	 */
 	@Override
 	public void setUUID(byte[] uuid)
@@ -161,7 +161,7 @@ public class ImageOverlay implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#secureStream()
+	 * @see archive.Archive#secureStream()
 	 */
 	@Override
 	public void secureStream()
@@ -193,7 +193,7 @@ public class ImageOverlay implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#getUUID()
+	 * @see archive.Archive#getUUID()
 	 */
 	@Override
 	public byte[] getUUID()

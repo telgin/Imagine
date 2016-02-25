@@ -7,11 +7,11 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import algorithms.Algorithm;
+import archive.ArchiveWriter;
+import archive.ArchiveIOException;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
-import product.ProductIOException;
-import product.ProductWriter;
 import report.JobStatus;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
@@ -20,7 +20,7 @@ import util.algorithms.ImageUtil;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class ImageWriter extends Image implements ProductWriter
+public class ImageWriter extends Image implements ArchiveWriter
 {
 
 	/**
@@ -34,10 +34,10 @@ public class ImageWriter extends Image implements ProductWriter
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#newProduct()
+	 * @see archive.ArchiveWriter#newArchive()
 	 */
 	@Override
-	public void newProduct()
+	public void newArchive()
 	{
 		// should really use the rgb configuration parameter somehow
 		f_img = new BufferedImage(f_width, f_height, BufferedImage.TYPE_INT_RGB);
@@ -46,7 +46,7 @@ public class ImageWriter extends Image implements ProductWriter
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#write(byte)
+	 * @see archive.ArchiveWriter#write(byte)
 	 */
 	@Override
 	public boolean write(byte p_byte)
@@ -58,14 +58,14 @@ public class ImageWriter extends Image implements ProductWriter
 			setImageByte(index, toSet);
 			return true;
 		}
-		catch (ProductIOException e)
+		catch (ArchiveIOException e)
 		{
 			return false;
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#write(byte[], int, int)
+	 * @see archive.ArchiveWriter#write(byte[], int, int)
 	 */
 	@Override
 	public int write(byte[] p_bytes, int p_offset, int p_length)
@@ -80,22 +80,22 @@ public class ImageWriter extends Image implements ProductWriter
 	}
 
 	/* (non-Javadoc)
-	 * @see product.ProductWriter#saveFile(java.io.File, java.lang.String)
+	 * @see archive.ArchiveWriter#saveFile(java.io.File, java.lang.String)
 	 */
 	@Override
-	public void saveFile(File p_productStagingFolder, String p_fileName)
+	public void saveFile(File p_archiveStagingFolder, String p_fileName)
 	{
 		try
 		{
-			File imgFile = new File(p_productStagingFolder.getAbsolutePath(), p_fileName + ".png");
+			File imgFile = new File(p_archiveStagingFolder.getAbsolutePath(), p_fileName + ".png");
 			Logger.log(LogLevel.k_info,
-							"Saving product file: " + imgFile.getAbsolutePath());
+							"Saving archive file: " + imgFile.getAbsolutePath());
 			if (!imgFile.getParentFile().exists())
 				imgFile.getParentFile().mkdirs();
 			ImageIO.write(f_img, "PNG", imgFile);
 
 			// update progress
-			JobStatus.incrementProductsCreated(1);
+			JobStatus.incrementArchivesCreated(1);
 		}
 		catch (IOException e)
 		{

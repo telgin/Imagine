@@ -1,4 +1,4 @@
-package product;
+package archive;
 
 import java.io.File;
 import java.util.Arrays;
@@ -12,7 +12,7 @@ import algorithms.AlgorithmRegistry;
 import config.Settings;
 import data.IndexWorker;
 import data.Metadata;
-import data.ProductWorker;
+import data.ArchiveWorker;
 import key.Key;
 import logging.LogLevel;
 import logging.Logger;
@@ -29,46 +29,46 @@ public class ConversionJob implements Runnable
 	private int f_maxWaitingFiles;
 	private BlockingQueue<Metadata> f_queue;
 	private IndexWorker f_indexWorker;
-	private List<ProductWorker> f_productWorkers;
+	private List<ArchiveWorker> f_archiveWorkers;
 	private Thread[] f_workerThreads;
-	private int f_productWorkerCount;
+	private int f_archiveWorkerCount;
 	private List<File> f_inputFiles;
 	private FileOutputManager f_manager;
-	private ProductWriterFactory<? extends ProductWriter> f_factory;
+	private ArchiveWriterFactory<? extends ArchiveWriter> f_factory;
 
 	/**
 	 * @update_comment
 	 * @param p_inputFiles
 	 * @param p_algorithm
 	 * @param p_key
-	 * @param p_productWorkerCount
+	 * @param p_archiveWorkerCount
 	 */
-	public ConversionJob(List<File> p_inputFiles, Algorithm p_algorithm, Key p_key, int p_productWorkerCount)
+	public ConversionJob(List<File> p_inputFiles, Algorithm p_algorithm, Key p_key, int p_archiveWorkerCount)
 	{
 		f_inputFiles = p_inputFiles;
-		f_productWorkerCount = p_productWorkerCount;
-		f_factory = AlgorithmRegistry.getProductWriterFactory(p_algorithm, p_key);
+		f_archiveWorkerCount = p_archiveWorkerCount;
+		f_factory = AlgorithmRegistry.getArchiveWriterFactory(p_algorithm, p_key);
 		
 		// default for now
 		f_maxWaitingFiles = 500;
 
 		f_queue = new LinkedBlockingQueue<Metadata>();
-		f_productWorkers = new LinkedList<ProductWorker>();
-		f_workerThreads = new Thread[1 + p_productWorkerCount]; //+1 for index worker
+		f_archiveWorkers = new LinkedList<ArchiveWorker>();
+		f_workerThreads = new Thread[1 + p_archiveWorkerCount]; //+1 for index worker
 		f_manager = new FileOutputManager(Settings.getOutputFolder());
 
-		addProductWorkers();
+		addArchiveWorkers();
 	}
 
 	/**
 	 * @update_comment
 	 */
-	private void addProductWorkers()
+	private void addArchiveWorkers()
 	{
-		for (int i = 0; i < f_productWorkerCount; ++i)
+		for (int i = 0; i < f_archiveWorkerCount; ++i)
 		{
-			Logger.log(LogLevel.k_debug, "Adding new Product Worker");
-			f_productWorkers.add(new ProductWorker(f_queue, f_factory, f_manager));
+			Logger.log(LogLevel.k_debug, "Adding new Archive Worker");
+			f_archiveWorkers.add(new ArchiveWorker(f_queue, f_factory, f_manager));
 		}
 	}
 
@@ -91,10 +91,10 @@ public class ConversionJob implements Runnable
 		//setup index worker
 		f_indexWorker = new IndexWorker(f_queue, f_inputFiles);
 
-		//start product workers first
-		for (int i = 0; i < f_productWorkers.size(); ++i)
+		//start archive workers first
+		for (int i = 0; i < f_archiveWorkers.size(); ++i)
 		{
-			Thread thread = new Thread(f_productWorkers.get(i));
+			Thread thread = new Thread(f_archiveWorkers.get(i));
 			f_workerThreads[i] = thread;
 			thread.start();
 			try
@@ -106,7 +106,7 @@ public class ConversionJob implements Runnable
 
 		//start index worker
 		Thread thread = new Thread(f_indexWorker);
-		f_workerThreads[f_productWorkers.size()] = thread;
+		f_workerThreads[f_archiveWorkers.size()] = thread;
 		thread.start();
 	}
 
@@ -142,7 +142,7 @@ public class ConversionJob implements Runnable
 		
 		f_indexWorker.shutdown();
 
-		for (ProductWorker pw : f_productWorkers)
+		for (ArchiveWorker pw : f_archiveWorkers)
 		{
 			pw.shutdown();
 		}
@@ -170,16 +170,16 @@ public class ConversionJob implements Runnable
 	 */
 	private boolean allWorkersInactive()
 	{
-		return !f_indexWorker.isActive() && productWorkersInactive();
+		return !f_indexWorker.isActive() && archiveWorkersInactive();
 	}
 
 	/**
 	 * @update_comment
 	 * @return
 	 */
-	private boolean productWorkersInactive()
+	private boolean archiveWorkersInactive()
 	{
-		for (ProductWorker worker : f_productWorkers)
+		for (ArchiveWorker worker : f_archiveWorkers)
 			if (worker.isActive())
 				return false;
 
@@ -213,13 +213,13 @@ public class ConversionJob implements Runnable
 		return "ConversionJob [shuttingDown=" + f_shuttingDown + ", active=" + f_active
 			+ ", finished=" + f_finished + ", maxWaitingFiles="
 			+ f_maxWaitingFiles + ", queue=" + f_queue + ", indexWorker="
-			+ f_indexWorker + ", productWorkers=" + f_productWorkers
+			+ f_indexWorker + ", archiveWorkers=" + f_archiveWorkers
 			+ ", workerThreads=" + Arrays.toString(f_workerThreads)
-			+ ", productWorkerCount=" + f_productWorkerCount + ", inputFiles="
+			+ ", archiveWorkerCount=" + f_archiveWorkerCount + ", inputFiles="
 			+ f_inputFiles + ", manager=" + f_manager + ", factory=" + f_factory
 			+ "queue.size()=" + f_queue.size()
 			+ "indexWorker.isActive()=" + f_indexWorker.isActive()
-			+ "productWorkersActive()=" + !productWorkersInactive()
+			+ "archiveWorkersActive()=" + !archiveWorkersInactive()
 			+ "]";
 	}
 }

@@ -3,9 +3,9 @@ package algorithms.image;
 import java.awt.image.BufferedImage;
 
 import algorithms.Algorithm;
+import archive.Archive;
 import config.Constants;
 import key.Key;
-import product.Product;
 import util.ByteConversion;
 import util.algorithms.HashRandom;
 import util.algorithms.UniqueRandomRange;
@@ -14,7 +14,7 @@ import util.algorithms.UniqueRandomRange;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class Image implements Product
+public class Image implements Archive
 {
 	protected Algorithm f_algorithm;
 	protected BufferedImage f_img;
@@ -52,17 +52,17 @@ public class Image implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#secureStream()
+	 * @see archive.Archive#secureStream()
 	 */
 	@Override
 	public void secureStream()
 	{
-		// since this is a secure product, the uuid was already set and written
+		// since this is a secure archive, the uuid was already set and written
 		f_randOrder.reseed(ByteConversion.concat(f_key.getKeyHash(), f_uuid));
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#getAlgorithmName()
+	 * @see archive.Archive#getAlgorithmName()
 	 */
 	@Override
 	public String getAlgorithmName()
@@ -71,7 +71,7 @@ public class Image implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#getAlgorithmVersionNumber()
+	 * @see archive.Archive#getAlgorithmVersionNumber()
 	 */
 	@Override
 	public int getAlgorithmVersionNumber()
@@ -80,7 +80,7 @@ public class Image implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#setUUID(byte[])
+	 * @see archive.Archive#setUUID(byte[])
 	 */
 	@Override
 	public void setUUID(byte[] p_uuid)
@@ -89,7 +89,7 @@ public class Image implements Product
 	}
 
 	/* (non-Javadoc)
-	 * @see product.Product#getUUID()
+	 * @see archive.Archive#getUUID()
 	 */
 	@Override
 	public byte[] getUUID()

@@ -1,4 +1,4 @@
-package product;
+package archive;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)

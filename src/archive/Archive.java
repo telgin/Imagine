@@ -1,10 +1,10 @@
-package product;
+package archive;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public interface Product
+public interface Archive
 {
 	/**
 	 * @update_comment
