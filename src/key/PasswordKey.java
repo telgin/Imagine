@@ -3,37 +3,38 @@ package key;
 import ui.UIContext;
 import util.Hashing;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * This class stores the password hash when a user enters a password.
+ * The user is not prompted to enter a password until the hash is requested
+ * the first time.
+ */
 public class PasswordKey implements Key
 {
-	private byte[] keyHash;
-	private final String TYPE = "PasswordKey";
+	private byte[] f_keyHash;
 
+	/* (non-Javadoc)
+	 * @see key.Key#getKeyHash()
+	 */
 	@Override
 	public synchronized byte[] getKeyHash()
 	{
-		if (keyHash == null)
+		if (f_keyHash == null)
 		{
 			fetchKey();
 		}
 
-		return keyHash;
+		return f_keyHash;
 	}
 
+	/**
+	 * Prompts for the password from the user and hashes it.
+	 */
 	private void fetchKey()
 	{
-		if (keyHash == null)
+		if (f_keyHash == null)
 		{
-			keyHash = Hashing.hash(UIContext.getUI().promptKey().getBytes());
+			f_keyHash = Hashing.hash(UIContext.getUI().promptKey().getBytes());
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see data.Key#getType()
-	 */
-	@Override
-	public String getType()
-	{
-		return TYPE;
-	}
-
 }

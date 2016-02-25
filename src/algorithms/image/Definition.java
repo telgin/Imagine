@@ -22,17 +22,17 @@ public class Definition implements algorithms.Definition
 	private static final String NAME = "Image";
 	private static final int VERSION_NUMBER = 1;
 	private static final String DESCRIPTION = "Data is encoded in the pixels of an image file. "
-					+ "(Very large or small images may result in excessivly long conversion times. If the "
-					+ "image is not large enough to contain the file header, the conversion "
-					+ "will fail. If the image file is too large, a lot of space may be wasted depending "
-					+ "on how fully the embedded data fills the last output image.)";
-	private static Definition s_self;
-	
+		+ "(Very large or small images may result in excessivly long conversion times. If the "
+		+ "image is not large enough to contain the file header, the conversion "
+		+ "will fail. If the image file is too large, a lot of space may be wasted depending "
+		+ "on how fully the embedded data fills the last output image.)";
 	
 	public static final String IMAGE_TYPE_PARAM = "ImageType";
 	public static final String WIDTH_PARAM = "Width";
 	public static final String HEIGHT_PARAM = "Height";
 	public static final String COLORS_PARAM = "Colors";
+	
+	private static Definition s_self;
 
 	/**
 	 * @update_comment
@@ -129,18 +129,24 @@ public class Definition implements algorithms.Definition
 	{
 		return new ProductFactoryCreation()
 		{
+			/* (non-Javadoc)
+			 * @see product.ProductFactoryCreation#createReader(algorithms.Algorithm, key.Key)
+			 */
 			@Override
 			public ProductReaderFactory<? extends ProductReader> createReader(
-							Algorithm algo, Key key)
+							Algorithm p_algo, Key p_key)
 			{
-				return new ImageFactory(algo, key);
+				return new ImageFactory(p_algo, p_key);
 			}
 
+			/* (non-Javadoc)
+			 * @see product.ProductFactoryCreation#createWriter(algorithms.Algorithm, key.Key)
+			 */
 			@Override
 			public ProductWriterFactory<? extends ProductWriter> createWriter(
-							Algorithm algo, Key key)
+							Algorithm p_algo, Key p_key)
 			{
-				return new ImageFactory(algo, key);
+				return new ImageFactory(p_algo, p_key);
 			}
 		};
 	}

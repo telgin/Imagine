@@ -21,22 +21,31 @@ import report.JobStatus;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 {
-	private InputImageManager manager;
-	private File imgFile;
+	private InputImageManager f_manager;
+	private File f_imgFile;
 
-	public ImageOverlayWriter(Algorithm algo, Key key)
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 */
+	public ImageOverlayWriter(Algorithm p_algo, Key p_key)
 	{
-		super(algo, key);
-		File imageFolder = new File(algo.getParameterValue(Definition.IMAGE_FOLDER_PARAM));
+		super(p_algo, p_key);
+		File imageFolder = new File(p_algo.getParameterValue(Definition.IMAGE_FOLDER_PARAM));
 		
 		//prompt for the image folder if the one listed doesn't exist
 		if (!imageFolder.exists())
 		{
 			try
 			{
-				algo.setParameter(Definition.IMAGE_FOLDER_PARAM, Option.PROMPT_OPTION.getValue());
+				p_algo.setParameter(Definition.IMAGE_FOLDER_PARAM, Option.PROMPT_OPTION.getValue());
 			}
 			catch (UsageException e)
 			{
@@ -44,14 +53,17 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 				Logger.log(LogLevel.k_fatal, e.getMessage());
 			}
 			
-			imageFolder = new File(algo.getParameterValue(Definition.IMAGE_FOLDER_PARAM));
+			imageFolder = new File(p_algo.getParameterValue(Definition.IMAGE_FOLDER_PARAM));
 		}
 		
 		ConsumptionMode mode = ConsumptionMode.parseMode(
-						algo.getParameterValue(Definition.IMAGE_CONSUMPTION_MODE_PARAM));
-		manager = InputImageManager.getInstance(imageFolder, mode);
+			p_algo.getParameterValue(Definition.IMAGE_CONSUMPTION_MODE_PARAM));
+		f_manager = InputImageManager.getInstance(imageFolder, mode);
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductWriter#newProduct()
+	 */
 	@Override
 	public void newProduct() throws ProductIOException
 	{
@@ -59,13 +71,17 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		reset();
 	}
 
+	/**
+	 * @update_comment
+	 * @throws ProductIOException
+	 */
 	private void loadCleanFile() throws ProductIOException
 	{		
 		//get the next image
-		imgFile = manager.nextImageFile();
+		f_imgFile = f_manager.nextImageFile();
 		
 		//ran out of images
-		if (imgFile == null)
+		if (f_imgFile == null)
 		{
 			throw new ProductIOException("No input images remain.");
 		}
@@ -73,19 +89,19 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		{
 			//update status to show this new image file is about to be used
 			if (Settings.trackFileStatus())
-				JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileState.WRITING);
+				JobStatus.setConversionJobFileStatus(f_imgFile, ConversionJobFileState.WRITING);
 		}
 		
 		boolean foundFile = false;
-		while (imgFile != null && !foundFile)
+		while (f_imgFile != null && !foundFile)
 		{
 			try
 			{
-				img = ImageIO.read(imgFile);
+				f_img = ImageIO.read(f_imgFile);
 				
 				//using the faster rgb math operations requires
 				//a standard color model
-				if (img.getType() != BufferedImage.TYPE_INT_RGB)
+				if (f_img.getType() != BufferedImage.TYPE_INT_RGB)
 				{
 					reinterpretColorModel();
 				}
@@ -93,12 +109,12 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 			}
 			catch (IOException e)
 			{
-				Logger.log(LogLevel.k_warning, "Could not interpret input image file: " + imgFile.getName());
+				Logger.log(LogLevel.k_warning, "Could not interpret input image file: " + f_imgFile.getName());
 			}
 		}
 		
 		//ran out of images after trying some unsuccessfully
-		if (imgFile == null)
+		if (f_imgFile == null)
 		{
 			throw new ProductIOException("No input images remain.");
 		}
@@ -112,23 +128,26 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 	{
 		Logger.log(LogLevel.k_debug, "Changing input image color model to rgb.");
 		
-		BufferedImage copy = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage copy = new BufferedImage(f_img.getWidth(), f_img.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2d = copy.createGraphics();
-		g2d.drawImage(img, 0, 0, null);
+		g2d.drawImage(f_img, 0, 0, null);
 		g2d.dispose();
 		
-		img = copy;
+		f_img = copy;
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductWriter#write(byte)
+	 */
 	@Override
-	public boolean write(byte b)
+	public boolean write(byte p_byte)
 	{
 		try
 		{
 			int secured = ByteConversion
-							.byteToInt(ByteConversion.intToByte(b ^ random.nextByte()));
+				.byteToInt(ByteConversion.intToByte(p_byte ^ f_random.nextByte()));
 			
-			if (density.equals(InsertionDensity.k_25))
+			if (f_density == InsertionDensity.k_25)
 			{
 				steps4(secured);
 			}
@@ -146,80 +165,102 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 		return true;
 	}
 	
-	private final void steps4(int val) throws ProductIOException
+	/**
+	 * @update_comment
+	 * @param p_val
+	 * @throws ProductIOException
+	 */
+	private final void steps4(int p_val) throws ProductIOException
 	{
-		int div16 = val / 16;
-		int mod16 = val % 16;
+		int div16 = p_val / 16;
+		int mod16 = p_val % 16;
 
-		split[0] = div16 / 4;
-		split[1] = div16 % 4;
-		split[2] = mod16 / 4;
-		split[3] = mod16 % 4;
+		f_split[0] = div16 / 4;
+		f_split[1] = div16 % 4;
+		f_split[2] = mod16 / 4;
+		f_split[3] = mod16 % 4;
 
 		for (int i = 0; i < 4; ++i)
 		{
 			nextPair();
 
-			int c = ByteConversion.byteToInt(getColor(curPixelCoord[0], curPixelCoord[1]));
+			int c = ByteConversion.byteToInt(getColor(f_curPixelCoord[0], f_curPixelCoord[1]));
 
 			int step = (c / 4) * 4;
 
-			setColor(curPixelCoord[0], curPixelCoord[1], 
-							ByteConversion.intToByte(step + split[i]));
+			setColor(f_curPixelCoord[0], f_curPixelCoord[1], 
+							ByteConversion.intToByte(step + f_split[i]));
 		}
 	}
 	
-	private final void steps16(int val) throws ProductIOException
+	/**
+	 * @update_comment
+	 * @param p_val
+	 * @throws ProductIOException
+	 */
+	private final void steps16(int p_val) throws ProductIOException
 	{
-		split[0] = val / 16;
-		split[1] = val % 16;
+		f_split[0] = p_val / 16;
+		f_split[1] = p_val % 16;
 
 		for (int i = 0; i < 2; ++i)
 		{
 			nextPair();
 
-			int c = ByteConversion.byteToInt(getColor(curPixelCoord[0], curPixelCoord[1]));
+			int c = ByteConversion.byteToInt(getColor(f_curPixelCoord[0], f_curPixelCoord[1]));
 
 			int step = (c / 16) * 16;
 
-			setColor(curPixelCoord[0], curPixelCoord[1],
-							ByteConversion.intToByte(step + split[i]));
+			setColor(f_curPixelCoord[0], f_curPixelCoord[1],
+							ByteConversion.intToByte(step + f_split[i]));
 		}
 	}
 
-	private void setColor(int x, int y, byte data)
+	/**
+	 * @update_comment
+	 * @param p_x
+	 * @param p_y
+	 * @param p_data
+	 */
+	private void setColor(int p_x, int p_y, byte p_data)
 	{
-		if (colorIndex == 0)
+		if (f_colorIndex == 0)
 		{
-			img.setRGB(x, y, ImageUtil.setRed(img.getRGB(x, y), data));
+			f_img.setRGB(p_x, p_y, ImageUtil.setRed(f_img.getRGB(p_x, p_y), p_data));
 
 		}
-		else if (colorIndex == 1)
+		else if (f_colorIndex == 1)
 		{
-			img.setRGB(x, y, ImageUtil.setGreen(img.getRGB(x, y), data));
+			f_img.setRGB(p_x, p_y, ImageUtil.setGreen(f_img.getRGB(p_x, p_y), p_data));
 		}
 		else
 		{
-			img.setRGB(x, y, ImageUtil.setBlue(img.getRGB(x, y), data));
+			f_img.setRGB(p_x, p_y, ImageUtil.setBlue(f_img.getRGB(p_x, p_y), p_data));
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductWriter#write(byte[], int, int)
+	 */
 	@Override
-	public int write(byte[] bytes, int offset, int length)
+	public int write(byte[] p_bytes, int p_offset, int p_length)
 	{
-		for (int x = offset; x < offset + length; ++x)
+		for (int x = p_offset; x < p_offset + p_length; ++x)
 		{
-			if (!write(bytes[x]))
-				return x - offset;
+			if (!write(p_bytes[x]))
+				return x - p_offset;
 		}
 
-		return length;
+		return p_length;
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductWriter#saveFile(java.io.File, java.lang.String)
+	 */
 	@Override
-	public void saveFile(File productStagingFolder, String fileName)
+	public void saveFile(File p_productStagingFolder, String p_fileName)
 	{
-		File productFile = new File(productStagingFolder.getAbsolutePath(), fileName + ".png");
+		File productFile = new File(p_productStagingFolder.getAbsolutePath(), p_fileName + ".png");
 		Logger.log(LogLevel.k_info, "Saving product file: " + productFile.getAbsolutePath());
 		
 		try
@@ -227,7 +268,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 			if (!productFile.getParentFile().exists())
 				productFile.getParentFile().mkdirs();
 			
-			ImageIO.write(img, "png", productFile);
+			ImageIO.write(f_img, "png", productFile);
 
 			// update progress
 			JobStatus.incrementProductsCreated(1);
@@ -235,18 +276,18 @@ public class ImageOverlayWriter extends ImageOverlay implements ProductWriter
 			try
 			{
 				//update manager
-				manager.setFileUsed(imgFile);
+				f_manager.setFileUsed(f_imgFile);
 				
 				//update status to show previous image file was used
 				if (Settings.trackFileStatus())
-					JobStatus.setConversionJobFileStatus(imgFile, ConversionJobFileState.FINISHED);
+					JobStatus.setConversionJobFileStatus(f_imgFile, ConversionJobFileState.FINISHED);
 			}
 			catch (IOException e)
 			{
 				//probably the file doesn't exist anymore, that's ok
 				//otherwise it's a permissions problem
 				Logger.log(LogLevel.k_debug, "The target image file could not be 'set used'. "
-								+ "This may be ok. " + imgFile.getAbsolutePath());
+								+ "This may be ok. " + f_imgFile.getAbsolutePath());
 				Logger.log(LogLevel.k_debug, e, false);
 			}
 		}

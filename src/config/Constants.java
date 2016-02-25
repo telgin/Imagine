@@ -4,6 +4,12 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import logging.LogLevel;
+
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public abstract class Constants
 {
 	// program names
@@ -30,7 +36,11 @@ public abstract class Constants
 	public static final Charset CHARSET = StandardCharsets.UTF_8;
 	public static final long DEFAULT_SEED = 1337;
 	public static final String TEMP_KEY_NAME = "not specified";
-	public static final String FILE_DELIMITER = "/:"; //disallowed file characters in unix and windows
+	public static final String FILE_DELIMITER = "/:"; //combination is disallowed in unix and windows
+	public static final int MAX_STRUCTURED_OUTPUT_FILES_PER_INDEX = 1000;
+	public static final LogLevel DEFAULT_MESSAGE_LEVEL = LogLevel.k_debug;
+	public static final LogLevel DEFAULT_EXCEPTION_LEVEL = LogLevel.k_debug;
+	public static final int MAX_FILE_QUEUE_SIZE = 2000;
 	
 	// io system configuration
 	public static final int MAX_READ_BUFFER_SIZE = 50000000;

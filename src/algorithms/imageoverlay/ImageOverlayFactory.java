@@ -5,27 +5,42 @@ import key.Key;
 import product.ProductReaderFactory;
 import product.ProductWriterFactory;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class ImageOverlayFactory implements ProductReaderFactory<ImageOverlayReader>,
 				ProductWriterFactory<ImageOverlayWriter>
 {
-	private Key key;
-	private Algorithm algo;
+	private Key f_key;
+	private Algorithm f_algo;
 
-	public ImageOverlayFactory(Algorithm algo, Key key)
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 */
+	public ImageOverlayFactory(Algorithm p_algo, Key p_key)
 	{
-		this.key = key;
-		this.algo = algo;
+		f_key = p_key;
+		f_algo = p_algo;
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductWriterFactory#createWriter()
+	 */
 	@Override
 	public ImageOverlayWriter createWriter()
 	{
-		return new ImageOverlayWriter(algo, key);
+		return new ImageOverlayWriter(f_algo, f_key);
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductReaderFactory#createReader()
+	 */
 	@Override
 	public ImageOverlayReader createReader()
 	{
-		return new ImageOverlayReader(algo, key);
+		return new ImageOverlayReader(f_algo, f_key);
 	}
 }

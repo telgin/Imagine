@@ -83,9 +83,9 @@ public class Image implements Product
 	 * @see product.Product#setUUID(byte[])
 	 */
 	@Override
-	public void setUUID(byte[] uuid)
+	public void setUUID(byte[] p_uuid)
 	{
-		this.f_uuid = uuid;
+		f_uuid = p_uuid;
 	}
 
 	/* (non-Javadoc)

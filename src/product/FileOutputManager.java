@@ -2,6 +2,7 @@ package product;
 
 import java.io.File;
 
+import config.Constants;
 import config.Settings;
 import util.myUtilities;
 
@@ -11,30 +12,37 @@ import util.myUtilities;
  */
 public class FileOutputManager
 {
-	private File outputParentFolder;
-	private int fileCount;
-	private String startTime;
-	private final int maxFilesPerFolder = 1000;
+	private File f_outputParentFolder;
+	private int f_fileCount;
+	private String f_startTime;
 	
-	public FileOutputManager(File outputParentFolder)
+	/**
+	 * @update_comment
+	 * @param p_outputParentFolder
+	 */
+	public FileOutputManager(File p_outputParentFolder)
 	{
-		this.outputParentFolder = outputParentFolder;
-		this.startTime = myUtilities.formatDateTimeFileSafe(System.currentTimeMillis());
+		this.f_outputParentFolder = p_outputParentFolder;
+		this.f_startTime = myUtilities.formatDateTimeFileSafe(System.currentTimeMillis());
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public File getOutputFolder()
 	{
 		if (Settings.useStructuredOutput())
 		{
-			++fileCount;
-			File runFolder = new File(outputParentFolder, "output_" + startTime);
-			int indexNumber = (fileCount / maxFilesPerFolder) + 1;
+			++f_fileCount;
+			File runFolder = new File(f_outputParentFolder, "output_" + f_startTime);
+			int indexNumber = (f_fileCount / Constants.MAX_STRUCTURED_OUTPUT_FILES_PER_INDEX) + 1;
 			File indexFolder = new File(runFolder, "Index " + indexNumber);
 			return indexFolder;
 		}
 		else
 		{
-			return outputParentFolder;
+			return f_outputParentFolder;
 		}
 	}
 	

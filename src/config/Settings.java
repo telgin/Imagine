@@ -8,17 +8,20 @@ import java.io.File;
  */
 public class Settings
 {
-	private static File outputFolder;
-	private static boolean usesStructuredOutput;
-	private static boolean trackFileStatus;
-	private static boolean generateReport;
+	private static File s_outputFolder;
+	private static boolean s_usesStructuredOutput;
+	private static boolean s_trackFileStatus;
+	private static boolean s_generateReport;
 	
+	/**
+	 * @update_comment
+	 */
 	public static void reset()
 	{
-		outputFolder = new File(".");
-		usesStructuredOutput = false;
-		trackFileStatus = false;
-		generateReport = false;
+		s_outputFolder = new File(".");
+		s_usesStructuredOutput = false;
+		s_trackFileStatus = false;
+		s_generateReport = false;
 	}
 	
 	/**
@@ -27,12 +30,16 @@ public class Settings
 	 */
 	public static boolean useStructuredOutput()
 	{
-		return usesStructuredOutput;
+		return s_usesStructuredOutput;
 	}
 	
-	public static void setUsingStructuredOutput(boolean structured)
+	/**
+	 * @update_comment
+	 * @param p_structured
+	 */
+	public static void setUsingStructuredOutput(boolean p_structured)
 	{
-		usesStructuredOutput = structured;
+		s_usesStructuredOutput = p_structured;
 	}
 
 	/**
@@ -41,16 +48,16 @@ public class Settings
 	 */
 	public static File getOutputFolder()
 	{
-		return outputFolder;
+		return s_outputFolder;
 	}
 
 	/**
 	 * @update_comment
-	 * @param outputFolder
+	 * @param s_outputFolder
 	 */
-	public static void setOutputFolder(File folder)
+	public static void setOutputFolder(File p_folder)
 	{
-		outputFolder = folder;
+		s_outputFolder = p_folder;
 	}
 
 	/**
@@ -58,15 +65,15 @@ public class Settings
 	 */
 	public static boolean trackFileStatus()
 	{
-		return trackFileStatus;
+		return s_trackFileStatus;
 	}
 
 	/**
-	 * @param trackFileStatus the trackFileStatus to set
+	 * @param p_trackFileStatus the trackFileStatus to set
 	 */
-	public static void setTrackFileStatus(boolean trackFileStatus)
+	public static void setTrackFileStatus(boolean p_trackFileStatus)
 	{
-		Settings.trackFileStatus = trackFileStatus;
+		s_trackFileStatus = p_trackFileStatus;
 	}
 
 	/**
@@ -74,15 +81,15 @@ public class Settings
 	 */
 	public static boolean generateReport()
 	{
-		return generateReport;
+		return s_generateReport;
 	}
 
 	/**
-	 * @param generateReport the generateReport to set
+	 * @param p_generateReport the generateReport to set
 	 */
-	public static void setGenerateReport(boolean generateReport)
+	public static void setGenerateReport(boolean p_generateReport)
 	{
-		Settings.generateReport = generateReport;
+		s_generateReport = p_generateReport;
 	}
 
 }

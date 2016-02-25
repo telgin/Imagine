@@ -7,51 +7,59 @@ import logging.Logger;
 import ui.UIContext;
 import util.Hashing;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class FileKey implements Key
 {
-	private File keyLocation;
-	private byte[] keyHash;
-	private final String TYPE = "FileKey";
+	private File f_keyLocation;
+	private byte[] f_keyHash;
 
-	public FileKey(File keyLocation)
+	/**
+	 * @update_comment
+	 * @param p_keyLocation
+	 */
+	public FileKey(File p_keyLocation)
 	{
-		this.keyLocation = keyLocation;
+		f_keyLocation = p_keyLocation;
 	}
 
+	/* (non-Javadoc)
+	 * @see key.Key#getKeyHash()
+	 */
 	@Override
 	public byte[] getKeyHash()
 	{
-		if (keyHash == null)
+		if (f_keyHash == null)
 		{
 			fetchKey();
 		}
 
-		return keyHash;
+		return f_keyHash;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public File getKeyFile()
 	{
-		return keyLocation;
+		return f_keyLocation;
 	}
 
+	/**
+	 * @update_comment
+	 */
 	private void fetchKey()
 	{
-		if (keyLocation == null)
+		if (f_keyLocation == null)
 		{
-			keyLocation = UIContext.getUI().promptKeyFileLocation();
-			if (keyLocation == null)
+			f_keyLocation = UIContext.getUI().promptKeyFileLocation();
+			if (f_keyLocation == null)
 				Logger.log(LogLevel.k_fatal, "Key file location not set.");
 		}
 
-		keyHash = Hashing.hash(keyLocation);
-	}
-
-	/* (non-Javadoc)
-	 * @see data.Key#getType()
-	 */
-	@Override
-	public String getType()
-	{
-		return TYPE;
+		f_keyHash = Hashing.hash(f_keyLocation);
 	}
 }

@@ -12,28 +12,41 @@ public enum FileType
 	k_file(1),
 	k_folder(2);
 	
-	private int num;
-	private static Map<Integer, FileType> map;
+	private int f_num;
+	private static Map<Integer, FileType> s_map;
 	
 	static
 	{
-		map = new HashMap<Integer, FileType>();
-		map.put(1, FileType.k_file);
-		map.put(2, FileType.k_folder);
+		s_map = new HashMap<Integer, FileType>();
+		s_map.put(1, FileType.k_file);
+		s_map.put(2, FileType.k_folder);
 	}
 	
-	FileType(int num)
+	/**
+	 * @update_comment
+	 * @param p_num
+	 */
+	private FileType(int p_num)
 	{
-		this.num = num;
+		this.f_num = p_num;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public int toInt()
 	{
-		return num;
+		return f_num;
 	}
 	
-	public static FileType toFileType(int i)
+	/**
+	 * @update_comment
+	 * @param p_int
+	 * @return
+	 */
+	public static FileType toFileType(int p_int)
 	{
-		return map.get(i);
+		return s_map.get(p_int);
 	}
 }

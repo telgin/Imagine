@@ -10,56 +10,75 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class InputImageManager
 {
-	private File inputFolder;
-	private List<File> contents;
-	private int contentsIndex;
-	private ConsumptionMode mode;
-	private File doneFolder;
-	private static Map<File, InputImageManager> managers;
-	private static List<String> supportedImageTypes;
+	private File f_inputFolder;
+	private List<File> f_contents;
+	private int f_contentsIndex;
+	private ConsumptionMode f_mode;
+	private File f_doneFolder;
+	private static Map<File, InputImageManager> f_managers;
+	private static List<String> f_supportedImageTypes;
 	
 	static
 	{
-		managers = new HashMap<File, InputImageManager>();
+		f_managers = new HashMap<File, InputImageManager>();
 		
 		//standard imageio reader types:
 		//png, jpg, jpeg, gif, bmp, wbmp
-		supportedImageTypes = Arrays.asList(ImageIO.getReaderFormatNames());
+		f_supportedImageTypes = Arrays.asList(ImageIO.getReaderFormatNames());
 	}
 
-	private InputImageManager(File inputFolder, ConsumptionMode mode)
+	/**
+	 * @update_comment
+	 * @param p_inputFolder
+	 * @param p_mode
+	 */
+	private InputImageManager(File p_inputFolder, ConsumptionMode p_mode)
 	{
-		this.inputFolder = inputFolder;
-		contents = Arrays.asList(inputFolder.listFiles());
-		contentsIndex = -1;
+		this.f_inputFolder = p_inputFolder;
+		f_contents = Arrays.asList(p_inputFolder.listFiles());
+		f_contentsIndex = -1;
 		
-		this.mode = mode;
+		this.f_mode = p_mode;
 		
-		if (mode.equals(ConsumptionMode.k_move))
+		if (p_mode.equals(ConsumptionMode.k_move))
 		{
-			doneFolder = new File(inputFolder, "done");
-			if (!doneFolder.exists())
-				doneFolder.mkdir();
+			f_doneFolder = new File(p_inputFolder, "done");
+			if (!f_doneFolder.exists())
+				f_doneFolder.mkdir();
 		}
 		
 	}
 	
-	public static InputImageManager getInstance(File inputFolder, ConsumptionMode mode)
+	/**
+	 * @update_comment
+	 * @param p_inputFolder
+	 * @param p_mode
+	 * @return
+	 */
+	public static InputImageManager getInstance(File p_inputFolder, ConsumptionMode p_mode)
 	{
-		if (managers.containsKey(inputFolder.getAbsoluteFile()))
+		if (f_managers.containsKey(p_inputFolder.getAbsoluteFile()))
 		{
-			return managers.get(inputFolder.getAbsoluteFile());
+			return f_managers.get(p_inputFolder.getAbsoluteFile());
 		}
 		else
 		{
-			InputImageManager created = new InputImageManager(inputFolder.getAbsoluteFile(), mode);
-			managers.put(inputFolder.getAbsoluteFile(), created);
+			InputImageManager created = new InputImageManager(p_inputFolder.getAbsoluteFile(), p_mode);
+			f_managers.put(p_inputFolder.getAbsoluteFile(), created);
 			return created;
 		}
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public synchronized File nextImageFile()
 	{
 		File next = findNextImageFile();
@@ -68,8 +87,8 @@ public class InputImageManager
 		{
 			//couldn't find an image file, try resetting the state
 			//more files may have been added, or we're starting a new cycle
-			contents = Arrays.asList(inputFolder.listFiles());
-			contentsIndex = -1;
+			f_contents = Arrays.asList(f_inputFolder.listFiles());
+			f_contentsIndex = -1;
 
 			//maybe it worked this time?
 			//(someone could have since modified the file system)
@@ -81,18 +100,22 @@ public class InputImageManager
 		}
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private File findNextImageFile()
 	{
-		while (++contentsIndex < contents.size())
+		while (++f_contentsIndex < f_contents.size())
 		{
-			File next = contents.get(contentsIndex);
+			File next = f_contents.get(f_contentsIndex);
 			if (!next.isDirectory())
 			{
 				if (next.getName().contains("."))
 				{
 					String[] parts = next.getName().split("\\.");
 					String extension = parts[parts.length-1];
-					if (supportedImageTypes.contains(extension))
+					if (f_supportedImageTypes.contains(extension))
 						return next;
 				}
 			}
@@ -101,15 +124,20 @@ public class InputImageManager
 		return null;
 	}
 	
-	public synchronized void setFileUsed(File imageFile) throws IOException
+	/**
+	 * @update_comment
+	 * @param p_imageFile
+	 * @throws IOException
+	 */
+	public synchronized void setFileUsed(File p_imageFile) throws IOException
 	{
-		if (mode.equals(ConsumptionMode.k_move))
+		if (f_mode.equals(ConsumptionMode.k_move))
 		{
-			Files.move(imageFile.toPath(), new File(doneFolder, imageFile.getName()).toPath());
+			Files.move(p_imageFile.toPath(), new File(f_doneFolder, p_imageFile.getName()).toPath());
 		}
-		else if (mode.equals(ConsumptionMode.k_delete))
+		else if (f_mode.equals(ConsumptionMode.k_delete))
 		{
-			Files.delete(imageFile.toPath());
+			Files.delete(p_imageFile.toPath());
 		}
 		
 		//(k_cycle is implicitly handled)

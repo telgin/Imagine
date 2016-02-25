@@ -3,27 +3,37 @@ package product;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class ProductContents
 {
+	private int f_productVersionNumber;
+	private long f_streamUUID;
+	private int f_productSequenceNumber;
+	private String f_algorithmName;
+	private int f_algorithmVersionNumber;
+	private String f_groupName;
+	private String f_groupKeyName;
+	
+	private ArrayList<FileContents> f_files;
 
-	private int productVersionNumber;
-	private long streamUUID;
-	private int productSequenceNumber;
-	private String algorithmName;
-	private int algorithmVersionNumber;
-	private String groupName;
-	private String groupKeyName;
-
-	private ArrayList<FileContents> files;
-
+	/**
+	 * @update_comment
+	 */
 	public ProductContents()
 	{
-		files = new ArrayList<FileContents>();
+		f_files = new ArrayList<FileContents>();
 	}
 
-	public void addFileContents(FileContents contents)
+	/**
+	 * @update_comment
+	 * @param p_contents
+	 */
+	public void addFileContents(FileContents p_contents)
 	{
-		files.add(contents);
+		f_files.add(p_contents);
 	}
 
 	/**
@@ -31,16 +41,15 @@ public class ProductContents
 	 */
 	public int getProductVersionNumber()
 	{
-		return productVersionNumber;
+		return f_productVersionNumber;
 	}
 
 	/**
-	 * @param productVersionNumber
-	 *            the productVersionNumber to set
+	 * @param p_productVersionNumber the productVersionNumber to set
 	 */
-	public void setProductVersionNumber(int productVersionNumber)
+	public void setProductVersionNumber(int p_productVersionNumber)
 	{
-		this.productVersionNumber = productVersionNumber;
+		this.f_productVersionNumber = p_productVersionNumber;
 	}
 
 	/**
@@ -48,16 +57,15 @@ public class ProductContents
 	 */
 	public int getProductSequenceNumber()
 	{
-		return productSequenceNumber;
+		return f_productSequenceNumber;
 	}
 
 	/**
-	 * @param productSequenceNumber
-	 *            the productSequenceNumber to set
+	 * @param p_productSequenceNumber the productSequenceNumber to set
 	 */
-	public void setProductSequenceNumber(int productSequenceNumber)
+	public void setProductSequenceNumber(int p_productSequenceNumber)
 	{
-		this.productSequenceNumber = productSequenceNumber;
+		this.f_productSequenceNumber = p_productSequenceNumber;
 	}
 
 	/**
@@ -65,16 +73,15 @@ public class ProductContents
 	 */
 	public String getGroupName()
 	{
-		return groupName;
+		return f_groupName;
 	}
 
 	/**
-	 * @param groupName
-	 *            the groupName to set
+	 * @param p_groupName the groupName to set
 	 */
-	public void setGroupName(String groupName)
+	public void setGroupName(String p_groupName)
 	{
-		this.groupName = groupName;
+		this.f_groupName = p_groupName;
 	}
 
 	/**
@@ -82,38 +89,44 @@ public class ProductContents
 	 */
 	public long getStreamUUID()
 	{
-		return streamUUID;
+		return f_streamUUID;
 	}
 
 	/**
-	 * @param uuid
-	 *            the streamUUID to set
+	 * @param p_uuid the streamUUID to set
 	 */
-	public void setStreamUUID(long uuid)
+	public void setStreamUUID(long p_uuid)
 	{
-		this.streamUUID = uuid;
+		this.f_streamUUID = p_uuid;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString()
 	{
 		String text = "Product Contents:";
 
-		text += "\nProduct Version: " + productVersionNumber;
-		text += "\nStreamUUID: " + streamUUID;
-		text += "\nSequence Number: " + productSequenceNumber;
-		text += "\nAlgorithm Version: " + algorithmVersionNumber;
-		text += "\nAlgorithm Name: " + algorithmName;
-		text += "\nGroup Name: " + groupName;
-		text += "\nGroup Key Name: " + groupKeyName;
-		for (FileContents fc : files)
+		text += "\nProduct Version: " + f_productVersionNumber;
+		text += "\nStreamUUID: " + f_streamUUID;
+		text += "\nSequence Number: " + f_productSequenceNumber;
+		text += "\nAlgorithm Version: " + f_algorithmVersionNumber;
+		text += "\nAlgorithm Name: " + f_algorithmName;
+		text += "\nGroup Name: " + f_groupName;
+		text += "\nGroup Key Name: " + f_groupKeyName;
+		for (FileContents fc : f_files)
 			text += "\n" + fc.toString();
 
 		return text;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public List<FileContents> getFileContents()
 	{
-		return files;
+		return f_files;
 	}
 
 	/**
@@ -121,16 +134,15 @@ public class ProductContents
 	 */
 	public String getAlgorithmName()
 	{
-		return algorithmName;
+		return f_algorithmName;
 	}
 
 	/**
-	 * @param algorithmName
-	 *            the algorithmName to set
+	 * @param p_algorithmName the algorithmName to set
 	 */
-	public void setAlgorithmName(String algorithmName)
+	public void setAlgorithmName(String p_algorithmName)
 	{
-		this.algorithmName = algorithmName;
+		this.f_algorithmName = p_algorithmName;
 	}
 
 	/**
@@ -138,16 +150,15 @@ public class ProductContents
 	 */
 	public int getAlgorithmVersionNumber()
 	{
-		return algorithmVersionNumber;
+		return f_algorithmVersionNumber;
 	}
 
 	/**
-	 * @param algorithmVersionNumber
-	 *            the algorithmVersionNumber to set
+	 * @param p_algorithmVersionNumber the algorithmVersionNumber to set
 	 */
-	public void setAlgorithmVersionNumber(int algorithmVersionNumber)
+	public void setAlgorithmVersionNumber(int p_algorithmVersionNumber)
 	{
-		this.algorithmVersionNumber = algorithmVersionNumber;
+		this.f_algorithmVersionNumber = p_algorithmVersionNumber;
 	}
 
 	/**
@@ -155,15 +166,14 @@ public class ProductContents
 	 */
 	public String getGroupKeyName()
 	{
-		return groupKeyName;
+		return f_groupKeyName;
 	}
 
 	/**
-	 * @param groupKeyName
-	 *            the groupKeyName to set
+	 * @param p_groupKeyName the groupKeyName to set
 	 */
-	public void setGroupKeyName(String groupKeyName)
+	public void setGroupKeyName(String p_groupKeyName)
 	{
-		this.groupKeyName = groupKeyName;
+		this.f_groupKeyName = p_groupKeyName;
 	}
 }

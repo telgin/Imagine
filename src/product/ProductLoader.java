@@ -16,35 +16,51 @@ import util.ByteConversion;
 import util.Clock;
 import util.FileSystemUtil;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class ProductLoader
 {
-	private final byte PRODUCT_VERSION_NUMBER = ByteConversion.intToByte(0);
+	private static final byte PRODUCT_VERSION_NUMBER = ByteConversion.intToByte(0);
 
-	private byte[] streamUUID;
-	private int sequenceNumber;
-	private FileOutputManager fileOutputManager;
+	private byte[] f_streamUUID;
+	private byte[] f_currentUUID;
+	private byte[] f_buffer;
+	
+	private int f_sequenceNumber;
+	private int f_dataOffset;
+	private int f_dataLength;
+	
+	private boolean f_fileWritten;
+	private boolean f_needsReset;
+	
+	private FileOutputManager f_fileOutputManager;
 
-	private ProductWriter currentProduct;
-	private byte[] currentUUID;
-	private byte[] buffer;
-	private int dataOffset;
-	private int dataLength;
+	private ProductWriter f_currentProduct;
 
-	private boolean fileWritten = false;
-	private boolean needsReset = true;
-
-	public ProductLoader(ProductWriterFactory<? extends ProductWriter> factory,
-				FileOutputManager manager)
+	/**
+	 * @update_comment
+	 * @param p_factory
+	 * @param p_manager
+	 */
+	public ProductLoader(ProductWriterFactory<? extends ProductWriter> p_factory,
+				FileOutputManager p_manager)
 	{
-		streamUUID = ByteConversion.longToBytes(Clock.getUniqueTime());
-		sequenceNumber = 0;
+		f_fileWritten = false;
+		f_needsReset = true;
+		f_streamUUID = ByteConversion.longToBytes(Clock.getUniqueTime());
+		f_sequenceNumber = 0;
 
-		fileOutputManager = manager;
-		currentProduct = factory.createWriter();
+		f_fileOutputManager = p_manager;
+		f_currentProduct = p_factory.createWriter();
 
-		buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
+		f_buffer = new byte[Constants.MAX_READ_BUFFER_SIZE];
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public void shutdown()
 	{
 		Logger.log(LogLevel.k_debug, "Product loader shutting down.");
@@ -52,7 +68,7 @@ public class ProductLoader
 		// fileWritten indicates a file is written, but there is as least some space left
 		// if there is more space than the size of the end code, the end code is
 		// written to indicate no more reading should be done (there is no next file)
-		if (fileWritten)
+		if (f_fileWritten)
 		{
 			// if there's not enough space for the end code, the reader logic
 			// handles it the same as if it were written
@@ -61,49 +77,68 @@ public class ProductLoader
 			else
 				Logger.log(LogLevel.k_debug, "Failed to write end code.");
 
-			currentProduct.saveFile(fileOutputManager.getOutputFolder(), getSaveName());
+			f_currentProduct.saveFile(f_fileOutputManager.getOutputFolder(), getSaveName());
 		}
 		
 		Logger.log(LogLevel.k_debug, "Product loader is shut down.");
 	}
 
-	private boolean writeFull(byte[] bytes)
+	/**
+	 * @update_comment
+	 * @param p_bytes
+	 * @return
+	 */
+	private boolean writeFull(byte[] p_bytes)
 	{
-		return currentProduct.write(bytes, 0, bytes.length) == bytes.length;
+		return f_currentProduct.write(p_bytes, 0, p_bytes.length) == p_bytes.length;
 	}
 
-	private boolean writeFull(byte b)
+	/**
+	 * @update_comment
+	 * @param p_byte
+	 * @return
+	 */
+	private boolean writeFull(byte p_byte)
 	{
-		return currentProduct.write(b);
+		return f_currentProduct.write(p_byte);
 	}
 
+	/**
+	 * @update_comment
+	 * @throws ProductIOException
+	 */
 	private void resetToNextProduct() throws ProductIOException
 	{
-		currentProduct.newProduct();
+		f_currentProduct.newProduct();
 
 		// no file was written in this product yet
-		fileWritten = false;
+		f_fileWritten = false;
 
 		// write product uuid
-		currentUUID = ByteConversion.concat(streamUUID,
-						ByteConversion.intToBytes(sequenceNumber++));
+		f_currentUUID = ByteConversion.concat(f_streamUUID,
+						ByteConversion.intToBytes(f_sequenceNumber++));
 
-		if (!writeFull(currentUUID))
+		if (!writeFull(f_currentUUID))
 			throw new ProductIOException("Cannot write product uuid.");
 
 		// set the uuid in case it is used internally by the product
-		currentProduct.setUUID(currentUUID);
+		f_currentProduct.setUUID(f_currentUUID);
 
 		//secure stream
-		currentProduct.secureStream();
+		f_currentProduct.secureStream();
 
 		// write the product header
 		if (!writeProductHeader())
 			throw new ProductIOException("Cannot write product header.");
 		
-		needsReset = false;
+		f_needsReset = false;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 * @throws ProductIOException
+	 */
 	private boolean writeProductHeader() throws ProductIOException
 	{
 		// write version number
@@ -113,39 +148,48 @@ public class ProductLoader
 		return true;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private String getSaveName()
 	{
-		return FileSystemUtil.getProductName(ByteConversion.bytesToLong(streamUUID),
-						(sequenceNumber - 1));
+		return FileSystemUtil.getProductName(ByteConversion.bytesToLong(f_streamUUID),
+						(f_sequenceNumber - 1));
 
 	}
 
-	public void writeFile(Metadata fileMetadata) throws IOException
+	/**
+	 * @update_comment
+	 * @param p_fileMetadata
+	 * @throws IOException
+	 */
+	public void writeFile(Metadata p_fileMetadata) throws IOException
 	{
 		//update file status to indicate we're going to write the file
 		if (Settings.trackFileStatus())
-			JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileState.WRITING);
+			JobStatus.setConversionJobFileStatus(p_fileMetadata.getFile(), ConversionJobFileState.WRITING);
 		
 		//resetting causes the product header to be written
 		//don't reset unless this loader actually writes a file
 		//needs reset should only be true after initialization
-		if (needsReset)
+		if (f_needsReset)
 			resetToNextProduct();
 		
-		dataLength = 0;
-		dataOffset = buffer.length;
+		f_dataLength = 0;
+		f_dataOffset = f_buffer.length;
 
-		Logger.log(LogLevel.k_info, "Loading file: " + fileMetadata.getFile().getPath()
+		Logger.log(LogLevel.k_info, "Loading file: " + p_fileMetadata.getFile().getPath()
 						+ " into product " + getSaveName());
 		
 
 		//configure based on file type
 		long fileLengthRemaining;
 		DataInputStream reader;
-		if (fileMetadata.getType().equals(FileType.k_file))//k_file
+		if (p_fileMetadata.getType().equals(FileType.k_file))//k_file
 		{
-			fileLengthRemaining = fileMetadata.getFile().length();
-			reader = new DataInputStream(new FileInputStream(fileMetadata.getFile()));
+			fileLengthRemaining = p_fileMetadata.getFile().length();
+			reader = new DataInputStream(new FileInputStream(p_fileMetadata.getFile()));
 		}
 		else //k_folder
 		{
@@ -159,23 +203,23 @@ public class ProductLoader
 		// it might actually start in the next one if we're out of space in this
 		// one.
 		// easy enough to figure out later.
-		fileMetadata.setProductUUID(currentUUID);
+		p_fileMetadata.setProductUUID(f_currentUUID);
 
 
 		// write the file to one or multiple products
 		do
 		{
 			// write file header
-			if (!writeFileHeader(fileMetadata, fragmentNumber, fileLengthRemaining))
+			if (!writeFileHeader(p_fileMetadata, fragmentNumber, fileLengthRemaining))
 			{
 				// there wasn't enough space, reset
-				currentProduct.saveFile(fileOutputManager.getOutputFolder(), getSaveName());
+				f_currentProduct.saveFile(f_fileOutputManager.getOutputFolder(), getSaveName());
 				resetToNextProduct();
 
 				// writeFileHeaderSize(fileHeaderSize);
 
 				// try again
-				if (!writeFileHeader(fileMetadata, fragmentNumber, fileLengthRemaining))
+				if (!writeFileHeader(p_fileMetadata, fragmentNumber, fileLengthRemaining))
 				{
 					// second failure indicates product is too small
 					throw new ProductIOException(
@@ -195,7 +239,7 @@ public class ProductLoader
 			++fragmentNumber;
 			
 			//update file length remaining
-			JobStatus.setBytesLeft(fileMetadata.getFile(), fileLengthRemaining);
+			JobStatus.setBytesLeft(p_fileMetadata.getFile(), fileLengthRemaining);
 
 		}
 		while (fileLengthRemaining > 0);
@@ -204,56 +248,63 @@ public class ProductLoader
 			reader.close();
 
 		// update the database
-		fileMetadata.setFragmentCount(fragmentNumber-1);
+		p_fileMetadata.setFragmentCount(fragmentNumber-1);
 		if (Settings.generateReport())
-			Report.saveConversionRecord(fileMetadata);
+			Report.saveConversionRecord(p_fileMetadata);
 
-		fileWritten = true;
+		f_fileWritten = true;
 		
 		//update file status as finished
 		if (Settings.trackFileStatus())
-			JobStatus.setConversionJobFileStatus(fileMetadata.getFile(), ConversionJobFileState.FINISHED);
+			JobStatus.setConversionJobFileStatus(p_fileMetadata.getFile(), ConversionJobFileState.FINISHED);
 
 		// update progress
 		JobStatus.incrementInputFilesProcessed(1);
 	}
 
-	private boolean writeFileHeader(Metadata fileMetadata, long fragmentNumber,
-					long fileLengthRemaining)
+	/**
+	 * @update_comment
+	 * @param p_fileMetadata
+	 * @param p_fragmentNumber
+	 * @param p_fileLengthRemaining
+	 * @return
+	 */
+	private boolean writeFileHeader(Metadata p_fileMetadata, long p_fragmentNumber,
+					long p_fileLengthRemaining)
 	{
 		// fragment number
-		if (!writeFull(ByteConversion.longToBytes(fragmentNumber)))
+		if (!writeFull(ByteConversion.longToBytes(p_fragmentNumber)))
 			return false;
 		
 		//file type
-		if (!writeFull(ByteConversion.intToByte(fileMetadata.getType().toInt())))
+		if (!writeFull(ByteConversion.intToByte(p_fileMetadata.getType().toInt())))
 			return false;
 		
-		if (fileMetadata.getType().equals(FileType.k_file))
+		if (p_fileMetadata.getType().equals(FileType.k_file))
 		{
 			// file name length
 			if (!writeFull(ByteConversion
-							.shortToBytes((short) fileMetadata.getFile().getPath().length())))
+							.shortToBytes((short) p_fileMetadata.getFile().getPath().length())))
 				return false;
 	
 			// file name
-			if (!writeFull(fileMetadata.getFile().getPath().getBytes(Constants.CHARSET)))
+			if (!writeFull(p_fileMetadata.getFile().getPath().getBytes(Constants.CHARSET)))
 				return false;
 	
 			// date created
-			if (!writeFull(ByteConversion.longToBytes(fileMetadata.getDateCreated())))
+			if (!writeFull(ByteConversion.longToBytes(p_fileMetadata.getDateCreated())))
 				return false;
 	
 			// date modified
-			if (!writeFull(ByteConversion.longToBytes(fileMetadata.getDateModified())))
+			if (!writeFull(ByteConversion.longToBytes(p_fileMetadata.getDateModified())))
 				return false;
 	
 			// permissions
-			if (!writeFull(ByteConversion.shortToBytes(fileMetadata.getPermissions())))
+			if (!writeFull(ByteConversion.shortToBytes(p_fileMetadata.getPermissions())))
 				return false;
 	
 			// length of data that still needs to be written
-			if (!writeFull(ByteConversion.longToBytes(fileLengthRemaining)))
+			if (!writeFull(ByteConversion.longToBytes(p_fileLengthRemaining)))
 				return false;
 		}
 		else
@@ -262,45 +313,52 @@ public class ProductLoader
 			
 			// file name length
 			if (!writeFull(ByteConversion
-							.shortToBytes((short) fileMetadata.getFile().getPath().length())))
+							.shortToBytes((short) p_fileMetadata.getFile().getPath().length())))
 				return false;
 	
 			// file name
-			if (!writeFull(fileMetadata.getFile().getPath().getBytes(Constants.CHARSET)))
+			if (!writeFull(p_fileMetadata.getFile().getPath().getBytes(Constants.CHARSET)))
 				return false;
 		}
 
 		return true;
 	}
 
-	private long writeFileData(DataInputStream reader, long fileLengthRemaining)
+	/**
+	 * @update_comment
+	 * @param p_reader
+	 * @param p_fileLengthRemaining
+	 * @return
+	 * @throws IOException
+	 */
+	private long writeFileData(DataInputStream p_reader, long p_fileLengthRemaining)
 					throws IOException
 	{
 		do
 		{
-			int bytesWritten = currentProduct.write(buffer, dataOffset, dataLength);
+			int bytesWritten = f_currentProduct.write(f_buffer, f_dataOffset, f_dataLength);
 			
-			dataOffset += bytesWritten;
-			dataLength -= bytesWritten;
-			fileLengthRemaining -= bytesWritten;
+			f_dataOffset += bytesWritten;
+			f_dataLength -= bytesWritten;
+			p_fileLengthRemaining -= bytesWritten;
 
-			if (dataOffset == buffer.length)
+			if (f_dataOffset == f_buffer.length)
 			{
 				// the full thing was written, get more
-				dataOffset = 0;
-				dataLength = reader.read(buffer, dataOffset, buffer.length);
+				f_dataOffset = 0;
+				f_dataLength = p_reader.read(f_buffer, f_dataOffset, f_buffer.length);
 			}
 			else
 			{
 				// the product is full, some portion of the data was not written
-				return fileLengthRemaining;
+				return p_fileLengthRemaining;
 			}
 
 		}
-		while (dataLength > 0);
+		while (f_dataLength > 0);
 
-		assert(fileLengthRemaining == 0);
+		assert(p_fileLengthRemaining == 0);
 
-		return fileLengthRemaining;
+		return p_fileLengthRemaining;
 	}
 }

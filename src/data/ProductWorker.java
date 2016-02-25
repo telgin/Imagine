@@ -14,49 +14,60 @@ import product.ProductWriterFactory;
 import report.JobStatus;
 
 /**
- * Dequeues from the given queue and loads files to the ProductLoader Might not
+ * Dequeues from the given queue and loads files to the ProductLoader might not
  * need this class
  */
 public class ProductWorker implements Runnable
 {
+	private boolean f_stopping = false;
+	private BlockingQueue<Metadata> f_queue;
+	private ProductLoader f_loader;
 
-	private boolean stopping = false;
-	private BlockingQueue<Metadata> queue;
-	private ProductLoader loader;
-
-	public ProductWorker(BlockingQueue<Metadata> queue, 
-					ProductWriterFactory<? extends ProductWriter> factory,
-					FileOutputManager manager)
+	/**
+	 * @update_comment
+	 * @param p_queue
+	 * @param p_factory
+	 * @param p_manager
+	 */
+	public ProductWorker(BlockingQueue<Metadata> p_queue, 
+		ProductWriterFactory<? extends ProductWriter> p_factory, FileOutputManager p_manager)
 	{
-		this.queue = queue;
-		loader = new ProductLoader(factory, manager);
+		this.f_queue = p_queue;
+		f_loader = new ProductLoader(p_factory, p_manager);
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public boolean isActive()
 	{
-		return !queue.isEmpty() && !stopping;
+		return !f_queue.isEmpty() && !f_stopping;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
 	@Override
 	public void run()
 	{
 		int count = 0;
-		while (!stopping)
+		while (!f_stopping)
 		{
 			if (count % 20 == 0)
 				Logger.log(LogLevel.k_debug,
-								"Product worker waiting for queued metadata...");
+					"Product worker waiting for queued metadata...");
 
-			while (!queue.isEmpty() && !stopping)
+			while (!f_queue.isEmpty() && !f_stopping)
 			{
 				Metadata taken;
 				try
 				{
-					taken = queue.take();
+					taken = f_queue.take();
 					
 					try
 					{
-						loader.writeFile(taken);
+						f_loader.writeFile(taken);
 					}
 					catch (IOException e)
 					{
@@ -65,7 +76,7 @@ public class ProductWorker implements Runnable
 							JobStatus.setConversionJobFileStatus(taken.getFile(), ConversionJobFileState.ERRORED);
 						
 						Logger.log(LogLevel.k_error,
-										"A file could not be written: " + taken.getFile().getName());
+							"A file could not be written: " + taken.getFile().getName());
 						Logger.log(LogLevel.k_error, e.getMessage());
 						Logger.log(LogLevel.k_debug, e, false);
 					}
@@ -73,7 +84,7 @@ public class ProductWorker implements Runnable
 				catch (InterruptedException e)
 				{
 					Logger.log(LogLevel.k_error,
-									"Product worker failed to load a file from the queue.");
+						"Product worker failed to load a file from the queue.");
 					Logger.log(LogLevel.k_error, e.getMessage());
 					Logger.log(LogLevel.k_debug, e, false);
 				}
@@ -84,16 +95,18 @@ public class ProductWorker implements Runnable
 			}
 			catch (InterruptedException e){}
 			
-			count++;
+			++count;
 		}
-		loader.shutdown();
+		f_loader.shutdown();
 		
 		Logger.log(LogLevel.k_debug, "Product worker is shutdown.");
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public void shutdown()
 	{
-		stopping = true;
+		f_stopping = true;
 	}
-
 }

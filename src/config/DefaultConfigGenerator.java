@@ -11,20 +11,32 @@ import algorithms.AlgorithmRegistry;
 import system.Imagine;
 import util.ConfigUtil;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public abstract class DefaultConfigGenerator
 {
-	private static Document doc;
+	private static Document s_document;
 
-	public static void main(String[] args)
+	/**
+	 * @update_comment
+	 * @param p_args
+	 */
+	public static void main(String[] p_args)
 	{
 		//regenerate default config
 		Imagine.run(new String[]{"--install"});
 	}
 	
-	public static void create(File configFile)
+	/**
+	 * @update_comment
+	 * @param p_configFile
+	 */
+	public static void create(File p_configFile)
 	{
 		// save new default config to default location
-		ConfigUtil.saveConfig(makeBasicConfig(), configFile);
+		ConfigUtil.saveConfig(makeBasicConfig(), p_configFile);
 		
 		//reload the config
 		Configuration.reloadConfig();
@@ -42,10 +54,14 @@ public abstract class DefaultConfigGenerator
 		Configuration.saveConfig();
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private static Document makeBasicConfig()
 	{
 		// create new doc
-		doc = ConfigUtil.getNewDocument();
+		s_document = ConfigUtil.getNewDocument();
 
 		//setup basic nodes
 		Element root = mkElement("Configuration");
@@ -53,16 +69,25 @@ public abstract class DefaultConfigGenerator
 		root.appendChild(mkElement("AlgorithmPresets"));
 		root.appendChild(mkSystemNode());
 
-		doc.appendChild(root);
+		s_document.appendChild(root);
 
-		return doc;
+		return s_document;
 	}
 
-	private static Element mkElement(String tagName)
+	/**
+	 * @update_comment
+	 * @param p_tagName
+	 * @return
+	 */
+	private static Element mkElement(String p_tagName)
 	{
-		return doc.createElement(tagName);
+		return s_document.createElement(p_tagName);
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private static Element mkSystemNode()
 	{
 		Element system = mkElement("System");
@@ -70,21 +95,21 @@ public abstract class DefaultConfigGenerator
 		//folders
 		system.appendChild(mkPathNode("LogFolder", "logs"));
 		
-		//installation uuid
-		Element installationUUID = mkElement("InstallationUUID");
-		String uuid = Long.toString(System.currentTimeMillis());
-		installationUUID.setAttribute("value", uuid);
-		system.appendChild(installationUUID);
-		
 		return system;
 	}
 
-	private static Node mkPathNode(String name, String value)
+	/**
+	 * @update_comment
+	 * @param p_name
+	 * @param p_value
+	 * @return
+	 */
+	private static Node mkPathNode(String p_name, String p_value)
 	{
 		Element element = mkElement("Path");
-		if (name != null)
-			element.setAttribute("name", name);
-		element.setAttribute("value", value);
+		if (p_name != null)
+			element.setAttribute("name", p_name);
+		element.setAttribute("value", p_value);
 		return element;
 	}
 

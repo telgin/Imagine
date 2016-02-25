@@ -9,8 +9,7 @@ import util.Hashing;
  */
 public class DefaultKey implements Key
 {
-	private static final String TYPE = "StaticKey";
-	private static final String s_defaultSeed = "Cheese Machine";
+	private static final String DEFAULT_PASSWORD = "Cheese Machine";
 
 	/**
 	 * @update_comment
@@ -25,16 +24,6 @@ public class DefaultKey implements Key
 	@Override
 	public byte[] getKeyHash()
 	{
-		return Hashing.hash(s_defaultSeed.getBytes(Constants.CHARSET));
+		return Hashing.hash(DEFAULT_PASSWORD.getBytes(Constants.CHARSET));
 	}
-
-	/* (non-Javadoc)
-	 * @see data.Key#getType()
-	 */
-	@Override
-	public String getType()
-	{
-		return TYPE;
-	}
-
 }

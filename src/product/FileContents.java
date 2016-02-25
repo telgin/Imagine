@@ -2,19 +2,26 @@ package product;
 
 import data.Metadata;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class FileContents
 {
-	private long fragmentNumber;
-	private boolean isFragment = false;
-	private long remainingData;
-	private Metadata metadata;
+	private long f_fragmentNumber;
+	private boolean f_isFragment = false;
+	private long f_remainingData;
+	private Metadata f_metadata;
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString()
 	{
 		String text = "FileContents:";
-		text += "\nfragmentNumber " + fragmentNumber;
-		text += "\nremainingData " + remainingData;
-		text += "\nfilename " + metadata.toString();
+		text += "\nfragmentNumber " + f_fragmentNumber;
+		text += "\nremainingData " + f_remainingData;
+		text += "\nfilename " + f_metadata.toString();
 		return text;
 	}
 
@@ -23,22 +30,21 @@ public class FileContents
 	 */
 	public long getFragmentNumber()
 	{
-		return fragmentNumber;
+		return f_fragmentNumber;
 	}
 
 	/**
-	 * @param fragmentNumber
-	 *            the fragmentNumber to set
+	 * @param p_fragmentNumber the fragmentNumber to set
 	 */
-	public void setFragmentNumber(long fragmentNumber)
+	public void setFragmentNumber(long p_fragmentNumber)
 	{
-		this.fragmentNumber = fragmentNumber;
+		f_fragmentNumber = p_fragmentNumber;
 		
 		//a fragment number of 1 could be a fragment if it's the first fragment
 		//this information may not be known if the data isn't parsed
-		if (!isFragment)
+		if (!f_isFragment)
 		{
-			setFragment(this.fragmentNumber > 1);
+			setFragment(f_fragmentNumber > 1);
 		}
 	}
 
@@ -47,16 +53,15 @@ public class FileContents
 	 */
 	public long getRemainingData()
 	{
-		return remainingData;
+		return f_remainingData;
 	}
 
 	/**
-	 * @param remainingData
-	 *            the remainingData to set
+	 * @param p_remainingData the remainingData to set
 	 */
-	public void setRemainingData(long remainingData)
+	public void setRemainingData(long p_remainingData)
 	{
-		this.remainingData = remainingData;
+		f_remainingData = p_remainingData;
 	}
 
 	/**
@@ -64,32 +69,31 @@ public class FileContents
 	 */
 	public Metadata getMetadata()
 	{
-		return metadata;
+		return f_metadata;
 	}
 
 	/**
-	 * @param metadata
-	 *            the metadata to set
+	 * @param p_metadata the metadata to set
 	 */
-	public void setMetadata(Metadata metadata)
+	public void setMetadata(Metadata p_metadata)
 	{
-		this.metadata = metadata;
+		f_metadata = p_metadata;
 	}
 
 	/**
-	 * @return the isFragment
+	 * @return if the file is a fragment
 	 */
 	public boolean isFragment()
 	{
-		return isFragment;
+		return f_isFragment;
 	}
 
 	/**
-	 * @param isFragment the isFragment to set
+	 * @param p_isFragment if the file is a fragment
 	 */
-	public void setFragment(boolean isFragment)
+	public void setFragment(boolean p_isFragment)
 	{
-		this.isFragment = isFragment;
+		f_isFragment = p_isFragment;
 	}
 
 }

@@ -4,43 +4,37 @@ import java.io.File;
 
 import config.Constants;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class Metadata
 {
-	private long dateCreated;
-	private long dateModified;
-	private File file;
-	private byte[] productUUID;
-	private byte[] refProductUUID;
-	private long fragmentCount;
-	private short permissions;
-	private boolean emptyFolder;
-	private FileType type;
+	private File f_file;
+	private long f_dateCreated;
+	private long f_dateModified;
+	private short f_permissions;
+	private FileType f_type;
+	private long f_fragmentCount;
+	private byte[] f_productUUID;
 
+	/**
+	 * @update_comment
+	 */
 	public Metadata()
 	{
-		dateCreated = -1;
-		dateModified = -1;
-		permissions = -1;
-		fragmentCount = -1;
-		emptyFolder = false;
+		f_dateCreated = -1;
+		f_dateModified = -1;
+		f_permissions = -1;
+		f_fragmentCount = -1;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString()
 	{
-		return file.getName();
-	}
-
-	public int getTotalLength()
-	{
-		// TODO update this to be correct for a file header size
-		int totalLength = 0;
-
-		totalLength += file.getAbsolutePath().getBytes().length;
-		totalLength += Constants.DATE_CREATED_SIZE;
-		totalLength += Constants.DATE_MODIFIED_SIZE;
-		totalLength += Constants.PERMISSIONS_SIZE;
-
-		return totalLength;
+		return f_file.getName();
 	}
 
 	/**
@@ -48,16 +42,15 @@ public class Metadata
 	 */
 	public long getDateModified()
 	{
-		return dateModified;
+		return f_dateModified;
 	}
 
 	/**
-	 * @param dateModified
-	 *            the dateModified to set
+	 * @param p_dateModified the dateModified to set
 	 */
-	public void setDateModified(long dateModified)
+	public void setDateModified(long p_dateModified)
 	{
-		this.dateModified = dateModified;
+		this.f_dateModified = p_dateModified;
 	}
 
 	/**
@@ -65,42 +58,51 @@ public class Metadata
 	 */
 	public long getDateCreated()
 	{
-		return dateCreated;
+		return f_dateCreated;
 	}
 
 	/**
-	 * @param dateCreated
-	 *            the dateCreated to set
+	 * @param p_dateCreated the dateCreated to set
 	 */
-	public void setDateCreated(long dateCreated)
+	public void setDateCreated(long p_dateCreated)
 	{
-		this.dateCreated = dateCreated;
+		this.f_dateCreated = p_dateCreated;
 	}
 
-	public void setProductUUID(byte[] uuid)
+	/**
+	 * @update_comment
+	 * @param p_uuid
+	 */
+	public void setProductUUID(byte[] p_uuid)
 	{
-		this.productUUID = uuid;
+		this.f_productUUID = p_uuid;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public byte[] getProductUUID()
 	{
-		return productUUID;
+		return f_productUUID;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public File getFile()
 	{
-		return file;
+		return f_file;
 	}
 
-	public void setFile(File file)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 */
+	public void setFile(File p_file)
 	{
-		this.file = file;
-	}
-
-	public boolean isNewerThan(Metadata other)
-	{
-		return dateModified > other.getDateModified() || !(file.getAbsolutePath()
-						.equals(other.getFile().getAbsolutePath()));
+		this.f_file = p_file;
 	}
 
 	/**
@@ -108,16 +110,15 @@ public class Metadata
 	 */
 	public short getPermissions()
 	{
-		return permissions;
+		return f_permissions;
 	}
 
 	/**
-	 * @param permissions
-	 *            the permissions to set
+	 * @param p_permissions the permissions to set
 	 */
-	public void setPermissions(short permissions)
+	public void setPermissions(short p_permissions)
 	{
-		this.permissions = permissions;
+		this.f_permissions = p_permissions;
 	}
 
 	/**
@@ -125,31 +126,15 @@ public class Metadata
 	 */
 	public long getFragmentCount()
 	{
-		return fragmentCount;
+		return f_fragmentCount;
 	}
 
 	/**
-	 * @param fragmentCount the fragmentCount to set
+	 * @param p_fragmentCount the fragmentCount to set
 	 */
-	public void setFragmentCount(long fragmentCount)
+	public void setFragmentCount(long p_fragmentCount)
 	{
-		this.fragmentCount = fragmentCount;
-	}
-
-	/**
-	 * @return the emptyFolder
-	 */
-	public boolean isEmptyFolder()
-	{
-		return emptyFolder;
-	}
-
-	/**
-	 * @param emptyFolder the emptyFolder to set
-	 */
-	public void setEmptyFolder(boolean emptyFolder)
-	{
-		this.emptyFolder = emptyFolder;
+		this.f_fragmentCount = p_fragmentCount;
 	}
 
 	/**
@@ -157,31 +142,14 @@ public class Metadata
 	 */
 	public FileType getType()
 	{
-		return type;
+		return f_type;
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param p_type the type to set
 	 */
-	public void setType(FileType type)
+	public void setType(FileType p_type)
 	{
-		this.type = type;
+		this.f_type = p_type;
 	}
-
-	/**
-	 * @return the refProductUUID
-	 */
-	public byte[] getRefProductUUID()
-	{
-		return refProductUUID;
-	}
-
-	/**
-	 * @param refProductUUID the refProductUUID to set
-	 */
-	public void setRefProductUUID(byte[] refProductUUID)
-	{
-		this.refProductUUID = refProductUUID;
-	}
-
 }

@@ -13,20 +13,23 @@ import product.ProductReaderFactory;
 import product.ProductWriter;
 import product.ProductWriterFactory;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class Definition implements algorithms.Definition
 {
 	private static final String NAME = "Text";
 	private static final int VERSION_NUMBER = 1;
 	private static final String DESCRIPTION = "Data is encoded into text files such "
-						+ "that all characters are ascii.";
-	private static Definition self;
+		+ "that all characters are ascii.";
 	
 	public static final String ENCODING_PARAM = "encoding";
 	public static final String BLOCK_SIZE_PARAM = "blockSize";
-	
 	public static final String BASE64_ENCODING = "Base64";
 	public static final String HEX_ENCODING = "Hex";
 	
+	private static Definition s_self;
 
 	/**
 	 * @update_comment
@@ -41,10 +44,10 @@ public class Definition implements algorithms.Definition
 	 */
 	public static Definition getInstance()
 	{
-		if (self == null)
-			self = new Definition();
+		if (s_self == null)
+			s_self = new Definition();
 
-		return self;
+		return s_self;
 	}
 
 	/*
@@ -106,18 +109,24 @@ public class Definition implements algorithms.Definition
 	{
 		return new ProductFactoryCreation()
 		{
+			/* (non-Javadoc)
+			 * @see product.ProductFactoryCreation#createReader(algorithms.Algorithm, key.Key)
+			 */
 			@Override
 			public ProductReaderFactory<? extends ProductReader> createReader(
-							Algorithm algo, Key key)
+							Algorithm p_algo, Key p_key)
 			{
-				return new TextFactory(algo, key);
+				return new TextFactory(p_algo, p_key);
 			}
 
+			/* (non-Javadoc)
+			 * @see product.ProductFactoryCreation#createWriter(algorithms.Algorithm, key.Key)
+			 */
 			@Override
 			public ProductWriterFactory<? extends ProductWriter> createWriter(
-							Algorithm algo, Key key)
+							Algorithm p_algo, Key p_key)
 			{
-				return new TextFactory(algo, key);
+				return new TextFactory(p_algo, p_key);
 			}
 		};
 	}

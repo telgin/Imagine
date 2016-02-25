@@ -12,77 +12,94 @@ import logging.LogLevel;
 import logging.Logger;
 import util.ConfigUtil;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class Configuration {
-	private static Document doc;
-	private static Element root;
-	
-	private static File logFolder;
-	private static String installationUUID;
+	private static Document s_document;
+	private static Element s_root;
+	private static File s_logFolder;
 
 	static
 	{
 		reloadConfig();
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	public static void reloadConfig()
 	{
-		doc = ConfigUtil.loadConfig(Constants.CONFIG_FILE);
-		doc.getDocumentElement().normalize();
+		s_document = ConfigUtil.loadConfig(Constants.CONFIG_FILE);
+		s_document.getDocumentElement().normalize();
 		
-		root = doc.getDocumentElement();
+		s_root = s_document.getDocumentElement();
 		
 		//everything will be reloaded when needed
-		logFolder = null;
+		s_logFolder = null;
 	}
 	
-	public static void loadConfig(Document document)
+	/**
+	 * @update_comment
+	 * @param p_document
+	 */
+	public static void loadConfig(Document p_document)
 	{
-		doc = document;
-		root = doc.getDocumentElement();
+		s_document = p_document;
+		s_root = s_document.getDocumentElement();
 	}
 	
+	/**
+	 * @update_comment
+	 */
 	public static void saveConfig()
 	{
-		ConfigUtil.saveConfig(doc, Constants.CONFIG_FILE);
+		ConfigUtil.saveConfig(s_document, Constants.CONFIG_FILE);
 		Logger.log(LogLevel.k_info, "Configuration saved to file: " + Constants.CONFIG_FILE.getAbsolutePath());
 	}
 	
-	public static void deleteTrackingGroup(String groupName)
-	{
-		Element trackingGroupsNode = ConfigUtil.first(
-						ConfigUtil.children(root, "TrackingGroups"));
-		Element toRemove = getTrackingGroupElement(groupName);
-		trackingGroupsNode.removeChild(toRemove);
-	}
-	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public static File getLogFolder()
 	{
-		if (logFolder == null)
+		if (s_logFolder == null)
 		{
-			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(root, "System"));
+			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(s_root, "System"));
 			if (fileSystemNode != null)
 			{
 				Element logFoldNode = ConfigUtil.first(
 						ConfigUtil.filterByAttribute(ConfigUtil.children(fileSystemNode, "Path"),
 								"name", "LogFolder"));
 				
-				logFolder = new File(logFoldNode.getAttribute("value"));	
+				s_logFolder = new File(logFoldNode.getAttribute("value"));	
 			}
 		}
 
-		return logFolder;
+		return s_logFolder;
 	}
 	
-	public static Algorithm getAlgorithmPreset(String presetName)
+	/**
+	 * @update_comment
+	 * @param p_presetName
+	 * @return
+	 */
+	public static Algorithm getAlgorithmPreset(String p_presetName)
 	{
-		return new Algorithm(getAlgorithmPresetElement(presetName));
+		return new Algorithm(getAlgorithmPresetElement(p_presetName));
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public static List<String> getAlgorithmPresetNames()
 	{
 		List<String> presetNames = new LinkedList<String>();
 		Element algoPresetsNode = ConfigUtil.first(
-						ConfigUtil.children(root, "AlgorithmPresets"));
+						ConfigUtil.children(s_root, "AlgorithmPresets"));
 		for (Element algoPreset : ConfigUtil.children(algoPresetsNode, "Algorithm"))
 		{
 			String presetName = algoPreset.getAttribute("presetName");
@@ -97,72 +114,48 @@ public class Configuration {
 		return presetNames;
 	}
 	
-	private static Element getAlgorithmPresetElement(String presetName)
+	/**
+	 * @update_comment
+	 * @param p_presetName
+	 * @return
+	 */
+	private static Element getAlgorithmPresetElement(String p_presetName)
 	{
 		Element algoPresetsNode = ConfigUtil.first(
-						ConfigUtil.children(root, "AlgorithmPresets"));
+						ConfigUtil.children(s_root, "AlgorithmPresets"));
 		Element algoNode = ConfigUtil.first(
 				ConfigUtil.filterByAttribute(
-						ConfigUtil.children(algoPresetsNode, "Algorithm"), "presetName", presetName));
+						ConfigUtil.children(algoPresetsNode, "Algorithm"), "presetName", p_presetName));
 		
 		if (algoNode == null)
 		{
-			Logger.log(LogLevel.k_error, "Could not find algorithm: " + presetName);
+			Logger.log(LogLevel.k_error, "Could not find algorithm: " + p_presetName);
 			return null;
 		}
 		
 		return algoNode;
 	}
 	
-	private static Element getTrackingGroupElement(String groupName)
-	{
-		Element trackingGroupsNode = ConfigUtil.first(
-						ConfigUtil.children(root, "TrackingGroups"));
-		Element groupNode = ConfigUtil.first(
-				ConfigUtil.filterByAttribute(
-						ConfigUtil.children(trackingGroupsNode, "Group"), "name", groupName));
-		
-		if (groupNode == null)
-		{
-			Logger.log(LogLevel.k_error, "Could not find tracking group element: " + groupName);
-			return null;
-		}
-		
-		return groupNode;
-	}
-
 	/**
 	 * @update_comment
-	 * @return
+	 * @param p_algo
 	 */
-	public static String getInstallationUUID()
-	{
-		if (installationUUID == null)
-		{
-			Element systemNode = ConfigUtil.first(ConfigUtil.children(root, "System"));
-			if (systemNode != null)
-			{
-				Element uuidNode = ConfigUtil.first(ConfigUtil.children(systemNode, "InstallationUUID"));
-				
-				installationUUID = uuidNode.getAttribute("value");	
-			}
-		}
-
-		return installationUUID;
-	}
-	
-	public static void addAlgorithmPreset(Algorithm algo)
+	public static void addAlgorithmPreset(Algorithm p_algo)
 	{
 		Element algoPresetsNode = ConfigUtil.first(
-						ConfigUtil.children(root, "AlgorithmPresets"));
-		algoPresetsNode.appendChild(algo.toElement(doc));
+						ConfigUtil.children(s_root, "AlgorithmPresets"));
+		algoPresetsNode.appendChild(p_algo.toElement(s_document));
 	}
 	
-	public static void deleteAlgorithmPreset(String presetName)
+	/**
+	 * @update_comment
+	 * @param p_presetName
+	 */
+	public static void deleteAlgorithmPreset(String p_presetName)
 	{
 		Element algoPresetsNode = ConfigUtil.first(
-						ConfigUtil.children(root, "AlgorithmPresets"));
-		Element toRemove = getAlgorithmPresetElement(presetName);
+						ConfigUtil.children(s_root, "AlgorithmPresets"));
+		Element toRemove = getAlgorithmPresetElement(p_presetName);
 		algoPresetsNode.removeChild(toRemove);
 	}
 }

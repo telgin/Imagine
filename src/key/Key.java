@@ -1,12 +1,14 @@
 package key;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public interface Key
 {
-	public byte[] getKeyHash();
-
 	/**
 	 * @update_comment
 	 * @return
 	 */
-	public String getType();
+	public byte[] getKeyHash();
 }

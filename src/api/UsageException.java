@@ -6,15 +6,19 @@ package api;
  */
 public class UsageException extends Exception
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @update_comment
 	 */
-	private static final long serialVersionUID = 1L;
-
 	public UsageException(){}
 	
-	public UsageException(String message)
+	/**
+	 * @update_comment
+	 * @param p_message
+	 */
+	public UsageException(String p_message)
 	{
-		super(message);
+		super(p_message);
 	}
 }

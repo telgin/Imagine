@@ -238,7 +238,7 @@ public class Algorithm
 	 */
 	public void setPresetName(String p_presetName)
 	{
-		this.f_presetName = p_presetName;
+		f_presetName = p_presetName;
 	}
 
 	/**
@@ -254,6 +254,6 @@ public class Algorithm
 	 */
 	public void setDescription(String p_description)
 	{
-		this.f_description = p_description;
+		f_description = p_description;
 	}
 }

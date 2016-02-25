@@ -1,7 +1,12 @@
 package logging;
 
 import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public enum LogLevel
 {
 	k_fatal(0),
@@ -12,33 +17,48 @@ public enum LogLevel
 	k_debug(5),
 	k_all(6);
 
-	private int num;
-	private static HashMap<LogLevel, String> logHeaders;
+	private int f_num;
+	private static Map<LogLevel, String> s_logHeaders;
 
 	static
 	{
-		logHeaders = new HashMap<LogLevel, String>();
-		logHeaders.put(LogLevel.k_fatal, "[FATAL ERROR] : ");
-		logHeaders.put(LogLevel.k_error, "[ERROR] : ");
-		logHeaders.put(LogLevel.k_warning, "[WARNING] : ");
-		logHeaders.put(LogLevel.k_general, "");
-		logHeaders.put(LogLevel.k_info, "[INFO] : ");
-		logHeaders.put(LogLevel.k_debug, "[DEBUG] : ");
-		logHeaders.put(LogLevel.k_all, "[(Use Debug Level, not All)] : ");
+		s_logHeaders = new HashMap<LogLevel, String>();
+		s_logHeaders.put(LogLevel.k_fatal, "[FATAL ERROR] : ");
+		s_logHeaders.put(LogLevel.k_error, "[ERROR] : ");
+		s_logHeaders.put(LogLevel.k_warning, "[WARNING] : ");
+		s_logHeaders.put(LogLevel.k_general, "");
+		s_logHeaders.put(LogLevel.k_info, "[INFO] : ");
+		s_logHeaders.put(LogLevel.k_debug, "[DEBUG] : ");
+		
+		//all is used as a threshold, not as something you would output as
+		s_logHeaders.put(LogLevel.k_all, "[(Use Debug Level, not All)] : ");
 	}
 
-	LogLevel(int num)
+	/**
+	 * @update_comment
+	 * @param p_num
+	 */
+	LogLevel(int p_num)
 	{
-		this.num = num;
+		f_num = p_num;
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public int toInt()
 	{
-		return num;
+		return f_num;
 	}
 
-	public static String getLogHeader(LogLevel level)
+	/**
+	 * @update_comment
+	 * @param p_level
+	 * @return
+	 */
+	public static String getLogHeader(LogLevel p_level)
 	{
-		return logHeaders.get(level);
+		return s_logHeaders.get(p_level);
 	}
 }

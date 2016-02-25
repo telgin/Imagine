@@ -12,13 +12,26 @@ import product.ConversionJob;
 import product.ProductContents;
 import product.ProductExtractor;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public abstract class ConversionAPI
 {
-	public static ConversionJob runConversion(List<File> inputFiles, Algorithm algo, Key key, int threads)
+	/**
+	 * @update_comment
+	 * @param p_inputFiles
+	 * @param p_algo
+	 * @param p_key
+	 * @param p_threads
+	 * @return
+	 */
+	public static ConversionJob runConversion(List<File> p_inputFiles, Algorithm p_algo, 
+		Key p_key, int p_threads)
 	{
 		Logger.log(LogLevel.k_general, "Running conversion...");
 		
-		ConversionJob job = new ConversionJob(inputFiles, algo, key, threads);
+		ConversionJob job = new ConversionJob(p_inputFiles, p_algo, p_key, p_threads);
 		Thread jobThread = new Thread(job);
 
 		Logger.log(LogLevel.k_debug, "Starting job thread...");
@@ -26,51 +39,84 @@ public abstract class ConversionAPI
 		return job;
 	}
 	
-	public static ProductContents openArchive(Algorithm algo, Key key, File productFile) throws IOException, UsageException
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 * @param p_productFile
+	 * @return
+	 * @throws IOException
+	 * @throws UsageException
+	 */
+	public static ProductContents openArchive(Algorithm p_algo, Key p_key, 
+		File p_productFile) throws IOException, UsageException
 	{
-		if (!productFile.exists())
+		if (!p_productFile.exists())
 			throw new UsageException("The specified product file cannot be found.");
 		
-		if (productFile.isDirectory())
-			throw new UsageException("The specified file path must name a file, not a directory.");
+		if (p_productFile.isDirectory())
+			throw new UsageException("The specified file path must "
+				+ "name a file, not a directory.");
 		
-		ProductExtractor extractor = new ProductExtractor(algo, key,
-						productFile.getAbsoluteFile().getParentFile());
+		ProductExtractor extractor = new ProductExtractor(p_algo, p_key,
+						p_productFile.getAbsoluteFile().getParentFile());
 		
-		return extractor.viewAll(productFile);
+		return extractor.viewAll(p_productFile);
 	}
 	
-	public static void extractAll(Algorithm algo, Key key, File productLocation, File extractionFolder) throws IOException, UsageException
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 * @param p_productLocation
+	 * @param p_extractionFolder
+	 * @throws IOException
+	 * @throws UsageException
+	 */
+	public static void extractAll(Algorithm p_algo, Key p_key,
+		File p_productLocation, File p_extractionFolder) throws IOException, UsageException
 	{
-		if (!productLocation.exists())
+		if (!p_productLocation.exists())
 			throw new UsageException("The specified product location cannot be found.");
 		
 		//specifying a directory indicates it is also the enclosing folder
 		File enclosingFolder = null;
-		if (productLocation.isDirectory())
-			enclosingFolder = productLocation;
+		if (p_productLocation.isDirectory())
+			enclosingFolder = p_productLocation;
 		else
-			enclosingFolder = productLocation.getAbsoluteFile().getParentFile();
+			enclosingFolder = p_productLocation.getAbsoluteFile().getParentFile();
 		
-		ProductExtractor extractor = new ProductExtractor(algo, key, enclosingFolder);
+		ProductExtractor extractor = new ProductExtractor(p_algo, p_key, enclosingFolder);
 		
-		if (productLocation.isDirectory())
-			extractor.extractAllFromProductFolder(productLocation, extractionFolder);
+		if (p_productLocation.isDirectory())
+			extractor.extractAllFromProductFolder(p_productLocation, p_extractionFolder);
 		else
-			extractor.extractAllFromProduct(productLocation, extractionFolder);
+			extractor.extractAllFromProduct(p_productLocation, p_extractionFolder);
 	}
 	
-	public static void extractFile(Algorithm algo, Key key, File productFile, File extractionFolder, int index) throws IOException, UsageException
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 * @param p_productFile
+	 * @param p_extractionFolder
+	 * @param p_index
+	 * @throws IOException
+	 * @throws UsageException
+	 */
+	public static void extractFile(Algorithm p_algo, Key p_key, File p_productFile,
+		File p_extractionFolder, int p_index) throws IOException, UsageException
 	{
-		if (!productFile.exists())
+		if (!p_productFile.exists())
 			throw new UsageException("The specified product file cannot be found.");
 		
-		if (productFile.isDirectory())
-			throw new UsageException("The specified file path must name a file, not a directory.");
+		if (p_productFile.isDirectory())
+			throw new UsageException("The specified file path must "
+				+ "name a file, not a directory.");
 		
-		ProductExtractor extractor = new ProductExtractor(algo, key,
-						productFile.getAbsoluteFile().getParentFile());
+		ProductExtractor extractor = new ProductExtractor(p_algo, p_key,
+						p_productFile.getAbsoluteFile().getParentFile());
 		
-		extractor.extractFileByIndex(productFile, extractionFolder, index);
+		extractor.extractFileByIndex(p_productFile, p_extractionFolder, p_index);
 	}
 }

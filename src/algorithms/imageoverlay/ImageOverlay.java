@@ -15,167 +15,236 @@ import util.algorithms.HashRandom;
 import util.algorithms.ImageUtil;
 import util.algorithms.UniqueRandomRange;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class ImageOverlay implements Product
 {
-	protected Algorithm algorithm;
-	protected BufferedImage img;
-	protected UniqueRandomRange randOrder;
-	protected HashRandom random;
-	protected Key key;
-	protected boolean skippedAll = false;
-	protected byte[] uuid;
-	protected InsertionDensity density;;
-	protected int colorIndex = 0;
-	protected int[] split;
-	private int colorMod = 0;
-	protected int[] curPixelCoord;
-	private boolean incrementFailed = false;
+	protected Algorithm f_algorithm;
+	protected BufferedImage f_img;
+	protected UniqueRandomRange f_randOrder;
+	protected HashRandom f_random;
+	protected Key f_key;
+	protected boolean f_skippedAll;
+	protected byte[] f_uuid;
+	protected InsertionDensity f_density;
+	protected int f_colorIndex;
+	protected int[] f_split;
+	private int f_colorMod;
+	protected int[] f_curPixelCoord;
+	private boolean f_incrementFailed;
 
-	public ImageOverlay(Algorithm algo, Key key)
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 */
+	public ImageOverlay(Algorithm p_algo, Key p_key)
 	{
-		this.algorithm = algo;
-		this.key = key;
-		density = InsertionDensity.parseDensity(algo.getParameterValue("InsertionDensity"));
-		curPixelCoord = new int[2];
+		f_algorithm = p_algo;
+		f_key = p_key;
+		
+		f_skippedAll = false;
+		f_incrementFailed = false;
+		f_colorIndex = 0;
+		f_colorMod = 0;
+		
+		f_density = InsertionDensity.parseDensity(p_algo.getParameterValue("InsertionDensity"));
+		f_curPixelCoord = new int[2];
 		
 		//the split array is just a stationary array
 		//for efficiency in the byte splitting operations
-		if (density.equals(InsertionDensity.k_25))
+		if (f_density.equals(InsertionDensity.k_25))
 		{
-			split = new int[4];
+			f_split = new int[4];
 		}
 		else //k_50
 		{
-			split = new int[2];
+			f_split = new int[2];
 		}
 	}
 
 	/**
-	 * @credit http://stackoverflow.com/questions/3514158/how-do-you-clone-a-
-	 *         bufferedimage user 'Klark'
-	 * @param toCopy
+	 * @credit http://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
+	 * @param p_toCopy
 	 * @return
 	 */
-	protected static BufferedImage clone(BufferedImage toCopy)
+	protected static BufferedImage clone(BufferedImage p_toCopy)
 	{
-		ColorModel cm = toCopy.getColorModel();
+		ColorModel cm = p_toCopy.getColorModel();
 		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		WritableRaster raster = toCopy.copyData(null);
+		WritableRaster raster = p_toCopy.copyData(null);
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public void reset()
 	{
 		// use any constant seed to start
-		random = new HashRandom(Constants.DEFAULT_SEED);
+		f_random = new HashRandom(Constants.DEFAULT_SEED);
 
 		// obtain a random order
-		randOrder = new UniqueRandomRange(random, img.getWidth() * img.getHeight());
+		f_randOrder = new UniqueRandomRange(f_random, f_img.getWidth() * f_img.getHeight());
 
-		colorIndex = 0;
-		colorMod = 0;
+		f_colorIndex = 0;
+		f_colorMod = 0;
 
-		incrementFailed = false;
+		f_incrementFailed = false;
 	}
 
+	/**
+	 * @update_comment
+	 * @throws ProductIOException
+	 */
 	protected final void nextPair() throws ProductIOException
 	{
-		if (incrementFailed)
+		if (f_incrementFailed)
 			throw new ProductIOException("previous increment failed");
 		
 		incrementColor();
 		
-		if (colorIndex == 0)
+		if (f_colorIndex == 0)
 			incrementVector();
 	}
 
+	/**
+	 * @update_comment
+	 */
 	private final void incrementColor()
 	{
-		colorIndex = colorMod++ % 3;
+		f_colorIndex = f_colorMod++ % 3;
 	}
 
+	/**
+	 * @update_comment
+	 * @throws ProductIOException
+	 */
 	private final void incrementVector() throws ProductIOException
 	{
-		incrementFailed = true;
+		f_incrementFailed = true;
 
-		int pixel = randOrder.next();
-		curPixelCoord[1] = pixel / img.getWidth();//y
-		curPixelCoord[0] = pixel % img.getWidth();//x
+		int pixel = f_randOrder.next();
+		f_curPixelCoord[1] = pixel / f_img.getWidth();//y
+		f_curPixelCoord[0] = pixel % f_img.getWidth();//x
 
-		incrementFailed = false;
+		f_incrementFailed = false;
 	}
 
+	/* (non-Javadoc)
+	 * @see product.Product#getAlgorithmName()
+	 */
 	@Override
 	public String getAlgorithmName()
 	{
-		return algorithm.getName();
+		return f_algorithm.getName();
 	}
 
+	/* (non-Javadoc)
+	 * @see product.Product#getAlgorithmVersionNumber()
+	 */
 	@Override
 	public int getAlgorithmVersionNumber()
 	{
-		return algorithm.getVersion();
+		return f_algorithm.getVersion();
 	}
 
+	/* (non-Javadoc)
+	 * @see product.Product#setUUID(byte[])
+	 */
 	@Override
 	public void setUUID(byte[] uuid)
 	{
-		this.uuid = uuid;
+		this.f_uuid = uuid;
 	}
 
+	/* (non-Javadoc)
+	 * @see product.Product#secureStream()
+	 */
 	@Override
 	public void secureStream()
 	{
 		// uuid should be set prior to this
-		randOrder.reseed(ByteConversion.concat(key.getKeyHash(), uuid));
+		f_randOrder.reseed(ByteConversion.concat(f_key.getKeyHash(), f_uuid));
 	}
 
-	protected byte getColor(int x, int y)
+	/**
+	 * @update_comment
+	 * @param p_x
+	 * @param p_y
+	 * @return
+	 */
+	protected byte getColor(int p_x, int p_y)
 	{
-		if (colorIndex == 0)
+		if (f_colorIndex == 0)
 		{
-			return ImageUtil.getRed(img.getRGB(x, y));
+			return ImageUtil.getRed(f_img.getRGB(p_x, p_y));
 		}
-		else if (colorIndex == 1)
+		else if (f_colorIndex == 1)
 		{
-			return ImageUtil.getGreen(img.getRGB(x, y));
+			return ImageUtil.getGreen(f_img.getRGB(p_x, p_y));
 		}
 		else
 		{
-			return ImageUtil.getBlue(img.getRGB(x, y));
+			return ImageUtil.getBlue(f_img.getRGB(p_x, p_y));
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see product.Product#getUUID()
+	 */
 	@Override
 	public byte[] getUUID()
 	{
-		return uuid;
+		return f_uuid;
 	}
 	
-	public String formatPoint(int x, int y)
+	/**
+	 * @update_comment
+	 * @param p_x
+	 * @param p_y
+	 * @return
+	 */
+	public String formatPoint(int p_x, int p_y)
 	{
-		return "(" + x + ", " + y + ")";
+		return "(" + p_x + ", " + p_y + ")";
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public String formatPV()
 	{
-		return "Fill point: " + formatPoint(curPixelCoord[0], curPixelCoord[1]) + " | Ref 1: " + 
-						formatPoint(curPixelCoord[2], curPixelCoord[3]) + " | Ref 2: " + 
-						formatPoint(curPixelCoord[4], curPixelCoord[5]);
+		return "Fill point: " + formatPoint(f_curPixelCoord[0], f_curPixelCoord[1]) + " | Ref 1: " + 
+			formatPoint(f_curPixelCoord[2], f_curPixelCoord[3]) + " | Ref 2: " + 
+			formatPoint(f_curPixelCoord[4], f_curPixelCoord[5]);
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public String formatPVColors()
 	{
-		return "Fill point: " + formatColor(curPixelCoord[0], curPixelCoord[1]) + " | Ref 1: " + 
-						formatColor(curPixelCoord[2], curPixelCoord[3]) + " | Ref 2: " + 
-						formatColor(curPixelCoord[4], curPixelCoord[5]);
+		return "Fill point: " + formatColor(f_curPixelCoord[0], f_curPixelCoord[1]) + " | Ref 1: " + 
+			formatColor(f_curPixelCoord[2], f_curPixelCoord[3]) + " | Ref 2: " + 
+			formatColor(f_curPixelCoord[4], f_curPixelCoord[5]);
 	}
 	
-	public String formatColor(int x, int y)
+	/**
+	 * @update_comment
+	 * @param p_x
+	 * @param p_y
+	 * @return
+	 */
+	public String formatColor(int p_x, int p_y)
 	{
-		Color c = new Color(img.getRGB(x, y));
+		Color c = new Color(f_img.getRGB(p_x, p_y));
 		
 		return "(r:" + c.getRed() + ", g:" + c.getGreen() + 
-						", b:" + c.getBlue() + ", a: " + c.getAlpha() + ")";
+			", b:" + c.getBlue() + ", a: " + c.getAlpha() + ")";
 	}
 }

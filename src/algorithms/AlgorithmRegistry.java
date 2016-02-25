@@ -26,13 +26,13 @@ public class AlgorithmRegistry
 		s_definitions = new HashMap<String, Definition>();
 		
 		s_definitions.put(algorithms.text.Definition.getInstance().getName(),
-				algorithms.text.Definition.getInstance());
+			algorithms.text.Definition.getInstance());
 		
 		s_definitions.put(algorithms.image.Definition.getInstance().getName(),
-				algorithms.image.Definition.getInstance());
+			algorithms.image.Definition.getInstance());
 		
 		s_definitions.put(algorithms.imageoverlay.Definition.getInstance().getName(),
-				algorithms.imageoverlay.Definition.getInstance());
+			algorithms.imageoverlay.Definition.getInstance());
 	}
 	
 	/**
@@ -85,7 +85,7 @@ public class AlgorithmRegistry
 			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + p_algo.getName());
 		
 		return s_definitions.get(p_algo.getName()).getProductFactoryCreation()
-				.createReader(p_algo, p_key);
+			.createReader(p_algo, p_key);
 	}
 	
 	/**
@@ -101,6 +101,6 @@ public class AlgorithmRegistry
 			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + p_algo.getName());
 		
 		return s_definitions.get(p_algo.getName()).getProductFactoryCreation()
-				.createWriter(p_algo, p_key);
+			.createWriter(p_algo, p_key);
 	}
 }

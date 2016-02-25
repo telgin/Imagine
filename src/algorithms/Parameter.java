@@ -137,7 +137,7 @@ public class Parameter
 	 */
 	public void setName(String p_name)
 	{
-		this.f_name = p_name;
+		f_name = p_name;
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class Parameter
 		boolean success = validate(p_value);
 		
 		if (success)
-			this.f_value = p_value;
+			f_value = p_value;
 		
 		return success;
 	}
@@ -184,7 +184,7 @@ public class Parameter
 	 */
 	public void setOptional(boolean p_optional)
 	{
-		this.f_optional = p_optional;
+		f_optional = p_optional;
 	}
 
 	/**
@@ -227,7 +227,7 @@ public class Parameter
 	 */
 	public void setType(String p_type)
 	{
-		this.f_type = p_type.toLowerCase();
+		f_type = p_type.toLowerCase();
 	}
 
 	/**
@@ -292,10 +292,10 @@ public class Parameter
 	}
 
 	/**
-	 * @param description the description to set
+	 * @param p_description the description to set
 	 */
-	public void setDescription(String description)
+	public void setDescription(String p_description)
 	{
-		this.f_description = description;
+		f_description = p_description;
 	}
 }

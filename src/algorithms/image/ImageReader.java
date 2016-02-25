@@ -14,27 +14,44 @@ import product.ProductReader;
 import util.ByteConversion;
 import util.algorithms.ImageUtil;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class ImageReader extends Image implements ProductReader
 {
-	public ImageReader(Algorithm algo, Key key)
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 */
+	public ImageReader(Algorithm p_algo, Key p_key)
 	{
-		super(algo, key);
+		super(p_algo, p_key);
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 * @throws ProductIOException
+	 */
 	private byte read() throws ProductIOException
 	{
 		byte secured = getImageByte(f_randOrder.next());
 		return ByteConversion.intToByte(secured ^ f_random.nextByte());
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductReader#read(byte[], int, int)
+	 */
 	@Override
-	public int read(byte[] bytes, int offset, int length)
+	public int read(byte[] p_bytes, int p_offset, int p_length)
 	{
-		for (int x = offset; x < offset + length; ++x)
+		for (int x = p_offset; x < p_offset + p_length; ++x)
 		{
 			try
 			{
-				bytes[x] = read();
+				p_bytes[x] = read();
 			}
 			catch (ProductIOException e)
 			{
@@ -42,13 +59,18 @@ public class ImageReader extends Image implements ProductReader
 			}
 		}
 
-		return offset + length;
+		return p_offset + p_length;
 	}
 
-	private byte getImageByte(int index)
+	/**
+	 * @update_comment
+	 * @param p_index
+	 * @return
+	 */
+	private byte getImageByte(int p_index)
 	{
-		int color = index % 3;
-		int pixel = index / 3;
+		int color = p_index % 3;
+		int pixel = p_index / 3;
 		int y = pixel / f_img.getWidth();
 		int x = pixel % f_img.getWidth();
 
@@ -66,20 +88,26 @@ public class ImageReader extends Image implements ProductReader
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductReader#loadFile(java.io.File)
+	 */
 	@Override
-	public void loadFile(File f) throws IOException
+	public void loadFile(File p_file) throws IOException
 	{
-		f_img = ImageIO.read(f);
+		f_img = ImageIO.read(p_file);
 		reset();
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductReader#skip(long)
+	 */
 	@Override
-	public long skip(long bytes)
+	public long skip(long p_bytes)
 	{
 		long skipped = 0;
 		try
 		{
-			for (long l = 0; l < bytes; ++l)
+			for (long l = 0; l < p_bytes; ++l)
 			{
 				f_randOrder.next();
 				f_random.nextByte();
@@ -92,8 +120,8 @@ public class ImageReader extends Image implements ProductReader
 			// nothing to do
 		}
 
-		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes was requested and "
-						+ skipped + " were skipped.");
+		Logger.log(LogLevel.k_debug, "Skipping " + p_bytes + " bytes was requested and "
+			+ skipped + " were skipped.");
 
 		return skipped;
 	}

@@ -4,47 +4,62 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import config.Constants;
 import logging.LogLevel;
 import logging.Logger;
 import util.FileSystemUtil;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class IndexWorker implements Runnable
 {
-	private BlockingQueue<Metadata> queue;
-	private final int MAX_QUEUE_SIZE = 2000;
-	private boolean shuttingDown;
-	private boolean active;
-	private List<File> inputFiles;
+	private BlockingQueue<Metadata> f_queue;
+	private boolean f_shuttingDown;
+	private boolean f_active;
+	private List<File> f_inputFiles;
 
-	public IndexWorker(BlockingQueue<Metadata> queue, List<File> inputFiles)
+	/**
+	 * @update_comment
+	 * @param p_queue
+	 * @param p_inputFiles
+	 */
+	public IndexWorker(BlockingQueue<Metadata> p_queue, List<File> p_inputFiles)
 	{
-		this.queue = queue;
-		this.inputFiles = inputFiles;
-		shuttingDown = false;
-		active = true;
+		f_queue = p_queue;
+		f_inputFiles = p_inputFiles;
+		f_shuttingDown = false;
+		f_active = true;
 	}
 
+	/**
+	 * @update_comment
+	 */
 	public void shutdown()
 	{
-		shuttingDown = true;
+		f_shuttingDown = true;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
 	@Override
 	public void run()
 	{
-		active = true;
+		f_active = true;
 
 		Logger.log(LogLevel.k_debug, "Index worker running, " + 
-			inputFiles.size() + " initial files/folders");
+			f_inputFiles.size() + " initial files/folders");
 
 		// index all top level folders
-		for (File inputFile : inputFiles)
+		for (File inputFile : f_inputFiles)
 		{
-			if (!shuttingDown)
+			if (!f_shuttingDown)
 				crawl(inputFile);
 		}
 
-		active = false;
+		f_active = false;
 		
 		Logger.log(LogLevel.k_debug, "Index worker is shutdown.");
 	}
@@ -54,10 +69,10 @@ public class IndexWorker implements Runnable
 	 * @param topLevel
 	 * @param attribute
 	 */
-	private void crawl(File currentFile)
+	private void crawl(File p_currentFile)
 	{
 		//wait if the queue is too full
-		while (!shuttingDown && queue.size() >= MAX_QUEUE_SIZE)
+		while (!f_shuttingDown && f_queue.size() >= Constants.MAX_FILE_QUEUE_SIZE)
 		{
 			try
 			{
@@ -66,26 +81,25 @@ public class IndexWorker implements Runnable
 			catch (InterruptedException e){}
 		}
 		
-		if (!shuttingDown)
+		if (!f_shuttingDown)
 		{
-			if (currentFile.isDirectory())
+			if (p_currentFile.isDirectory())
 			{
-				if (currentFile.listFiles().length == 0)
+				if (p_currentFile.listFiles().length == 0)
 				{
 					//add this folder
 					Metadata folderMetadata = new Metadata();
-					folderMetadata.setEmptyFolder(true);
-					folderMetadata.setPermissions(FileSystemUtil.getNumericFilePermissions(currentFile));
-					folderMetadata.setFile(currentFile);
+					folderMetadata.setPermissions(FileSystemUtil.getNumericFilePermissions(p_currentFile));
+					folderMetadata.setFile(p_currentFile);
 					folderMetadata.setType(FileType.k_folder);
 					
 					Logger.log(LogLevel.k_debug, "Queueing metadata for folder: " + folderMetadata.getFile().getAbsolutePath());
-					queue.add(folderMetadata);
+					f_queue.add(folderMetadata);
 				}
 				else
 				{
 					//recurse through the folder contents
-					for (File child : currentFile.listFiles())
+					for (File child : p_currentFile.listFiles())
 					{
 						crawl(child);
 					}
@@ -94,18 +108,22 @@ public class IndexWorker implements Runnable
 			else
 			{
 				//create metadata from the file element
-				Metadata fileMetadata = FileSystemUtil.loadMetadataFromFile(currentFile);
+				Metadata fileMetadata = FileSystemUtil.loadMetadataFromFile(p_currentFile);
 					
 				//new file, so add to queue
 				Logger.log(LogLevel.k_debug, "Queueing metadata for file: " + 
 					fileMetadata.getFile().getAbsolutePath());
-				queue.add(fileMetadata);
+				f_queue.add(fileMetadata);
 			}
 		}
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public boolean isActive()
 	{
-		return active;
+		return f_active;
 	}
 }

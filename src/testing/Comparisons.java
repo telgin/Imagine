@@ -260,7 +260,7 @@ public class Comparisons
 		}
 		else
 		{
-			assertEquals(p_key1.getType(), p_key2.getType());
+			assertEquals(p_key1.getClass(), p_key2.getClass());
 			assertArrayEquals(p_key1.getKeyHash(), p_key2.getKeyHash());
 		}
 	}

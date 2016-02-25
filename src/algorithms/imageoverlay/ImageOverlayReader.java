@@ -13,19 +13,32 @@ import product.ProductIOException;
 import product.ProductReader;
 import util.ByteConversion;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * @update_comment
+ */
 public class ImageOverlayReader extends ImageOverlay implements ProductReader
 {
-
-	public ImageOverlayReader(Algorithm algo, Key key)
+	/**
+	 * @update_comment
+	 * @param p_algo
+	 * @param p_key
+	 */
+	public ImageOverlayReader(Algorithm p_algo, Key p_key)
 	{
-		super(algo, key);
+		super(p_algo, p_key);
 	}
 
+	/**
+	 * @update_comment
+	 * @return
+	 * @throws ProductIOException
+	 */
 	private byte read() throws ProductIOException
 	{
-		byte xor = random.nextByte();
+		byte xor = f_random.nextByte();
 
-		if (density.equals(InsertionDensity.k_25))
+		if (f_density.equals(InsertionDensity.k_25))
 		{
 			return ByteConversion.intToByte(ByteConversion.intToByte(steps4()) ^ xor);
 		}
@@ -35,48 +48,61 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 		}
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 * @throws ProductIOException
+	 */
 	private final int steps4() throws ProductIOException
 	{
 		for (int i = 0; i < 4; ++i)
 		{
 			nextPair();
 
-			int c = ByteConversion.byteToInt(getColor(curPixelCoord[0], curPixelCoord[1]));
+			int c = ByteConversion.byteToInt(getColor(f_curPixelCoord[0], f_curPixelCoord[1]));
 
-			split[i] = c % 4;
+			f_split[i] = c % 4;
 		}
 
-		int val = (((split[0] * 4) + split[1]) * 16)
-						+ ((split[2] * 4) + split[3]);
+		int val = (((f_split[0] * 4) + f_split[1]) * 16)
+						+ ((f_split[2] * 4) + f_split[3]);
 		
 		return val;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 * @throws ProductIOException
+	 */
 	private final int steps16() throws ProductIOException
 	{
 		for (int i = 0; i < 2; ++i)
 		{
 			nextPair();
 
-			int c = ByteConversion.byteToInt(getColor(curPixelCoord[0], curPixelCoord[1]));
+			int c = ByteConversion.byteToInt(getColor(f_curPixelCoord[0], f_curPixelCoord[1]));
 
-			split[i] = c % 16;
+			f_split[i] = c % 16;
 		}
 
-		int val = (split[0] * 16) + split[1];
+		int val = (f_split[0] * 16) + f_split[1];
 		
 		return val;
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductReader#read(byte[], int, int)
+	 */
 	@Override
-	public int read(byte[] bytes, int offset, int length)
+	public int read(byte[] p_bytes, int p_offset, int p_length)
 	{
 		//Logger.log(LogLevel.k_debug, "Reading " + length + " bytes.");
-		for (int x = offset; x < offset + length; ++x)
+		for (int x = p_offset; x < p_offset + p_length; ++x)
 		{
 			try
 			{
-				bytes[x] = read();
+				p_bytes[x] = read();
 			}
 			catch (ProductIOException e)
 			{
@@ -84,29 +110,35 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 			}
 		}
 
-		return offset + length;
+		return p_offset + p_length;
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductReader#loadFile(java.io.File)
+	 */
 	@Override
-	public void loadFile(File f) throws IOException
+	public void loadFile(File p_file) throws IOException
 	{
-		img = ImageIO.read(f);
+		f_img = ImageIO.read(p_file);
 		reset();
 	}
 
+	/* (non-Javadoc)
+	 * @see product.ProductReader#skip(long)
+	 */
 	@Override
-	public long skip(long bytes)
+	public long skip(long p_bytes)
 	{
-		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes.");
+		Logger.log(LogLevel.k_debug, "Skipping " + p_bytes + " bytes.");
 
 		long skipped = 0;
 		try
 		{
-			for (long l = 0; l < bytes; ++l)
+			for (long l = 0; l < p_bytes; ++l)
 			{
-				random.nextByte();
+				f_random.nextByte();
 				
-				if (density.equals(InsertionDensity.k_25))
+				if (f_density.equals(InsertionDensity.k_25))
 				{
 					nextPair();
 					nextPair();
@@ -128,8 +160,8 @@ public class ImageOverlayReader extends ImageOverlay implements ProductReader
 			// nothing to do
 		}
 
-		Logger.log(LogLevel.k_debug, "Skipping " + bytes + " bytes was requested and "
-						+ skipped + " were skipped.");
+//		Logger.log(LogLevel.k_debug, "Skipping " + p_bytes + " bytes was requested and "
+//			+ skipped + " were skipped.");
 
 		return skipped;
 
