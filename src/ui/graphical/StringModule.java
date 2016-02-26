@@ -8,7 +8,8 @@ import javafx.scene.layout.VBox;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A convenient pairing of commonly used gui elements. Simplifies gui code significantly.
+ * Specifically, this is a label and a text field.
  */
 public class StringModule extends GUIModule
 {
@@ -16,8 +17,8 @@ public class StringModule extends GUIModule
 	private TextField f_field;
 	
 	/**
-	 * @update_comment
-	 * @param p_name
+	 * Creates a string module
+	 * @param p_name The name used as the label
 	 */
 	public StringModule(String p_name)
 	{
@@ -37,8 +38,8 @@ public class StringModule extends GUIModule
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_text
+	 * Sets the text of the text field
+	 * @param p_text The text to set
 	 */
 	public void setText(String p_text)
 	{
@@ -46,8 +47,8 @@ public class StringModule extends GUIModule
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the text in the text field
+	 * @return The contents of the text field
 	 */
 	public String getText()
 	{
@@ -71,8 +72,8 @@ public class StringModule extends GUIModule
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_callback
+	 * Sets the callback function for when the text field is edited (textProperty listener)
+	 * @param p_callback The callback function
 	 */
 	public void setEditedCallback(Consumer<String> p_callback)
 	{

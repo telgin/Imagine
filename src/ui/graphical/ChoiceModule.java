@@ -11,7 +11,8 @@ import javafx.scene.layout.VBox;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A convenient pairing of commonly used gui elements. Simplifies gui code significantly.
+ * Specifically, this is a label and a choice box.
  */
 public class ChoiceModule extends GUIModule
 {
@@ -21,10 +22,10 @@ public class ChoiceModule extends GUIModule
 	private Consumer<Integer> f_callback;
 	
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @param p_choices
-	 * @param p_callback
+	 * Creates a choice module
+	 * @param p_name The name used as the label
+	 * @param p_choices The list of choices
+	 * @param p_callback The callback function to call when a selection changes
 	 */
 	public ChoiceModule(String p_name, List<String> p_choices, Consumer<Integer> p_callback)
 	{
@@ -35,8 +36,8 @@ public class ChoiceModule extends GUIModule
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_choices
+	 * Sets the list of choices 
+	 * @param p_choices The list of choices to set
 	 */
 	public void setChoices(List<String> p_choices)
 	{
@@ -44,8 +45,8 @@ public class ChoiceModule extends GUIModule
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of choices
+	 * @return The list of choices
 	 */
 	public List<String> getChoices()
 	{
@@ -53,8 +54,8 @@ public class ChoiceModule extends GUIModule
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_choice
+	 * Sets the selected choice
+	 * @param p_choice The text of the choice to select
 	 */
 	public void setSelectedChoice(String p_choice)
 	{

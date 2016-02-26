@@ -3,20 +3,22 @@ package util.algorithms;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 
 import util.ByteConversion;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Standard image operations.
  */
 public class ImageUtil
 {
 
 	/**
-	 * @update_comment
-	 * @param p_rgb
-	 * @return
+	 * Gets the red byte from an rgb int
+	 * @param p_rgb The rgb int
+	 * @return The red value
 	 */
 	public static byte getRed(int p_rgb)
 	{
@@ -24,10 +26,10 @@ public class ImageUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_rgb
-	 * @param p_red
-	 * @return
+	 * Creates an rgb int which is the given rgb int with the red set to the given value.
+	 * @param p_rgb The rgb int
+	 * @param p_red The red value to set
+	 * @return The new rgb
 	 */
 	public static int setRed(int p_rgb, byte p_red)
 	{
@@ -37,9 +39,9 @@ public class ImageUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_rgb
-	 * @return
+	 * Gets the green byte from an rgb int
+	 * @param p_rgb The rgb int
+	 * @return The green value
 	 */
 	public static byte getGreen(int p_rgb)
 	{
@@ -47,10 +49,10 @@ public class ImageUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_rgb
-	 * @param p_green
-	 * @return
+	 * Creates an rgb int which is the given rgb int with the green set to the given value.
+	 * @param p_rgb The rgb int
+	 * @param p_green The green value to set
+	 * @return The new rgb
 	 */
 	public static int setGreen(int p_rgb, byte p_green)
 	{
@@ -59,9 +61,9 @@ public class ImageUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_rgb
-	 * @return
+	 * Gets the blue byte from an rgb int
+	 * @param p_rgb The rgb int
+	 * @return The blue value
 	 */
 	public static byte getBlue(int p_rgb)
 	{
@@ -69,10 +71,10 @@ public class ImageUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_rgb
-	 * @param p_blue
-	 * @return
+	 * Creates an rgb int which is the given rgb int with the blue set to the given value.
+	 * @param p_rgb The rgb int
+	 * @param p_blue The blue value to set
+	 * @return The new rgb
 	 */
 	public static int setBlue(int p_rgb, byte p_blue)
 	{
@@ -81,9 +83,9 @@ public class ImageUtil
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_img1
-	 * @param p_img2
+	 * Compares images to see if each pixel has the same colors. Used for testing purposes only.
+	 * @param p_img1 The first image
+	 * @param p_img2 The second image
 	 */
 	public static void compareImages(BufferedImage p_img1, BufferedImage p_img2)
 	{
@@ -126,7 +128,7 @@ public class ImageUtil
 	 * Color increases from black to green from right to left. Square 
 	 * size increases from top to bottom. This image is intended to show
 	 * how compression works with similar but different color values.
-	 * @return
+	 * @return The image
 	 */
 	public static BufferedImage constructTestWebImage1()
 	{
@@ -165,7 +167,7 @@ public class ImageUtil
 	 * Construct a black and white image where pixels of white are surrounded
 	 * by pixels of black. This is used to show how compression works when colors
 	 * are very different but close together.
-	 * @return
+	 * @return The image
 	 */
 	public static BufferedImage constructTestWebImage2()
 	{
@@ -189,9 +191,11 @@ public class ImageUtil
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_num
-	 * @return
+	 * Helper function which gets consecutive sums. This is defined as
+	 * the sum of the input number and every integer less than it down to zero.
+	 * Bad recursive function. Will explode stack if input is too large.
+	 * @param p_num The input number
+	 * @return The sum
 	 */
 	private static int consecSum(int p_num)
 	{
@@ -201,4 +205,17 @@ public class ImageUtil
 			return p_num + consecSum(p_num-1);
 	}
 
+	/**
+	 * @credit http://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
+	 * Clones a buffered image
+	 * @param p_toCopy the buffered image to clone
+	 * @return The cloned buffered image
+	 */
+	public static BufferedImage clone(BufferedImage p_toCopy)
+	{
+		ColorModel cm = p_toCopy.getColorModel();
+		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		WritableRaster raster = p_toCopy.copyData(null);
+		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+	}
 }

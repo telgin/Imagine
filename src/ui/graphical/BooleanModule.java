@@ -11,7 +11,8 @@ import javafx.scene.layout.VBox;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A convenient pairing of commonly used gui elements. Simplifies gui code significantly.
+ * Specifically, this is a label and a check box.
  */
 public class BooleanModule extends GUIModule
 {
@@ -21,9 +22,9 @@ public class BooleanModule extends GUIModule
 	private HBox f_propertyRow;
 	
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @param p_callback
+	 * Creates a boolean module
+	 * @param p_name The name used as the label
+	 * @param p_callback The callback for when the checkbox's state changes
 	 */
 	public BooleanModule(String p_name, Consumer<Boolean> p_callback)
 	{
@@ -74,8 +75,8 @@ public class BooleanModule extends GUIModule
 	}
 
 	/**
-	 * @update_comment
-	 * @param enabled
+	 * Sets the checked state of the checkbox
+	 * @param p_checked The checked state to set
 	 */
 	public void setChecked(boolean p_checked)
 	{
@@ -95,8 +96,8 @@ public class BooleanModule extends GUIModule
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_insets
+	 * Sets the padding on this group of elements as if it were one element
+	 * @param p_insets The insets to use as padding
 	 */
 	public void setPadding(Insets p_insets)
 	{

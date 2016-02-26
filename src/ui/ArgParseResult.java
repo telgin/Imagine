@@ -8,7 +8,8 @@ import system.CmdAction;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A class to hold the meaning of command line arguments passed into the program.
+ * Used so the parsing code can all be in one place.
  */
 public class ArgParseResult
 {
@@ -23,7 +24,7 @@ public class ArgParseResult
 	private CmdAction f_action;
 	
 	/**
-	 * @update_comment
+	 * Constructs a blank result
 	 */
 	public ArgParseResult()
 	{
@@ -167,8 +168,9 @@ public class ArgParseResult
 	}
 	
 	/**
-	 * @update_comment
-	 * @param file
+	 * Adds an input file to the list of input files. The file does not need to 
+	 * exist; it is just whatever got parsed.
+	 * @param file The input file.
 	 */
 	public void addInputFile(File file)
 	{
@@ -176,8 +178,8 @@ public class ArgParseResult
 	}
 	
 	/**
-	 * @update_comment
-	 * @param nameValuePair
+	 * Adds a parsed parameter [name,value] pair to the list of pairs.
+	 * @param nameValuePair The string pair in the form String[]{name, value}
 	 */
 	public void addParameter(String[] nameValuePair)
 	{

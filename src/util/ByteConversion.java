@@ -8,16 +8,15 @@ import config.Constants;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
- *
+ * Utility class for byte conversion between common primitives.
  */
 public class ByteConversion
 {
 
 	/**
-	 * @update_comment
-	 * @param p_long
-	 * @return
+	 * Converts a long to an 8 byte array.
+	 * @param p_long The long to convert
+	 * @return The long as an 8 byte array.
 	 */
 	public static final byte[] longToBytes(long p_long)
 	{
@@ -27,9 +26,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_bytes
-	 * @return
+	 * Converts an 8 byte array to a long
+	 * @param p_bytes The 8 byte array
+	 * @return The long value
 	 */
 	public static final long bytesToLong(byte[] p_bytes)
 	{
@@ -41,10 +40,10 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_bytes
-	 * @param p_offset
-	 * @return
+	 * Converts an 8 bytes to a long
+	 * @param p_bytes The byte array
+	 * @param p_offset The index to start from
+	 * @return The long value
 	 */
 	public static final long bytesToLong(byte[] p_bytes, int p_offset)
 	{
@@ -55,9 +54,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_byte
-	 * @return
+	 * Converts one byte to its integer value
+	 * @param p_byte The input byte
+	 * @return The int value
 	 */
 	public static final int byteToInt(byte p_byte)
 	{
@@ -65,9 +64,10 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_int
-	 * @return
+	 * Converts an int to a byte value. Assumes the integer is
+	 * in the range [0, 255]
+	 * @param p_int The input int
+	 * @return The int as a byte
 	 */
 	public static final byte intToByte(int p_int)
 	{
@@ -76,9 +76,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_int
-	 * @return
+	 * Converts an int to its 4 byte representation
+	 * @param p_int The input int
+	 * @return A 4 byte array representing the int
 	 */
 	public static final byte[] intToBytes(int p_int)
 	{
@@ -89,9 +89,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_bytes
-	 * @return
+	 * Converts a 4 byte array to an int
+	 * @param p_bytes A 4 byte array
+	 * @return The int value
 	 */
 	public static final int bytesToInt(byte[] p_bytes)
 	{
@@ -103,10 +103,10 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_bytes
-	 * @param p_offset
-	 * @return
+	 * Parses an int from a byte array
+	 * @param p_bytes The byte array
+	 * @param p_offset The index to start at. Must leave at least 4 bytes to parse.
+	 * @return The int value
 	 */
 	public static final int bytesToInt(byte[] p_bytes, int p_offset)
 	{
@@ -117,12 +117,12 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_a
-	 * @param p_b
-	 * @param p_c
-	 * @param p_d
-	 * @return
+	 * Converts 4 bytes to an int
+	 * @param p_a The first byte
+	 * @param p_b The second byte
+	 * @param p_c The third byte
+	 * @param p_d The fourth byte
+	 * @return The int value
 	 */
 	public static final int bytesToInt(byte p_a, byte p_b, byte p_c, byte p_d)
 	{
@@ -130,9 +130,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_short
-	 * @return
+	 * Converts a short to a two byte array
+	 * @param p_short The short value
+	 * @return A two byte array of the short
 	 */
 	public static final byte[] shortToBytes(short p_short)
 	{
@@ -142,9 +142,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_bytes
-	 * @return
+	 * Converts a 2 byte array to a short
+	 * @param p_bytes The byte array
+	 * @return The short value
 	 */
 	public static final short bytesToShort(byte[] p_bytes)
 	{
@@ -156,10 +156,10 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_bytes
-	 * @param p_offset
-	 * @return
+	 * Parses a short from a byte array
+	 * @param p_bytes The byte array
+	 * @param p_offset The index to start at. Must leave at least two bytes.
+	 * @return The short value
 	 */
 	public static final short bytesToShort(byte[] p_bytes, int p_offset)
 	{
@@ -170,10 +170,10 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_a
-	 * @param p_b
-	 * @return
+	 * Concatenates two byte arrays into one
+	 * @param p_a The first byte array
+	 * @param p_b The second byte array
+	 * @return The concatenated byte array
 	 */
 	public static final byte[] concat(byte[] p_a, byte[] p_b)
 	{
@@ -186,9 +186,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_orig
-	 * @return
+	 * Copies the values in an array of bytes to another array
+	 * @param p_orig The array of bytes
+	 * @return The copy array of bytes.
 	 */
 	public static final byte[] deepcopy(byte[] p_orig)
 	{
@@ -198,9 +198,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_bytes
-	 * @return
+	 * Converts a byte array to a hex string
+	 * @param p_bytes The byte array
+	 * @return The hex encoded string
 	 */
 	public static final String bytesToHex(byte[] p_bytes)
 	{
@@ -208,9 +208,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_string
-	 * @return
+	 * Converts a hex encoded string to a byte array
+	 * @param p_string The hex encoded string
+	 * @return The byte array
 	 */
 	public static final byte[] hexToBytes(String p_string)
 	{
@@ -218,9 +218,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_bytes
-	 * @return
+	 * Converts a byte array to a base64 encoded string
+	 * @param p_bytes The byte array
+	 * @return The base64 encoded string
 	 */
 	public static final String bytesToBase64(byte[] p_bytes)
 	{
@@ -228,9 +228,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_string
-	 * @return
+	 * Converts a base64 encoded string to a byte array
+	 * @param p_string The base64 encoded string
+	 * @return The byte array
 	 */
 	public static final byte[] base64ToBytes(String p_string)
 	{
@@ -238,9 +238,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_boolean
-	 * @return
+	 * Converts a boolean to a byte
+	 * @param p_boolean The boolean value
+	 * @return The byte representation
 	 */
 	public static final byte booleanToByte(boolean p_boolean)
 	{
@@ -248,9 +248,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_archiveUUID
-	 * @return
+	 * Standard function to parse the stream uuid from an archive uuid
+	 * @param p_archiveUUID The archive uuid
+	 * @return The stream uuid
 	 */
 	public static final long getStreamUUID(byte[] p_archiveUUID)
 	{
@@ -258,9 +258,9 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_archiveUUID
-	 * @return
+	 * Standard function to parse the archive sequence number from an archive uuid
+	 * @param p_archiveUUID The archive uuid
+	 * @return The sequence number
 	 */
 	public static final int getArchiveSequenceNumber(byte[] p_archiveUUID)
 	{
@@ -268,11 +268,11 @@ public class ByteConversion
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_data
-	 * @param p_offset
-	 * @param p_length
-	 * @return
+	 * Creates a subarray from a given array of bytes
+	 * @param p_data The byte array
+	 * @param p_offset The index to start copying from
+	 * @param p_length The length of bytes to copy
+	 * @return The new subarray
 	 */
 	public static final byte[] subArray(byte[] p_data, int p_offset, int p_length)
 	{

@@ -10,7 +10,7 @@ import util.Hashing;
 public class DefaultKey implements Key
 {
 	private static final String DEFAULT_PASSWORD = 
-		"Sass mich wieder Junge , und ich werde Sie schneiden."
+		"Sass mich wieder Junge, und ich werde Sie schneiden."
 		+ "ساس لي مرة أخرى صبي و أنا سوف تخفض لك."
 		+ "מציק לי שוב ילד ואני אחתוך לך."
 		+ "Sass mig aftur strák og ég sker þig."
@@ -18,7 +18,7 @@ public class DefaultKey implements Key
 		+ "다시 소년 을 내게 말대꾸 나는 당신 을 잘라 것입니다."
 		+ "Нахален мене повторно момче и јас ќе ви се намали."
 		+ "Sass me de novo garoto e eu vou cortá-lo."
-		+ "Sass меня снова мальчик , и я отрежу тебе."
+		+ "Sass меня снова мальчик, и я отрежу тебе."
 		+ "Me Sass nuevo chico y yo voy a cortar."
 		+ "Sass ฉันอีกครั้ง เด็ก และฉันจะ ตัดคุณ"
 		+ "Sass mig igen pojke och jag ska skära dig."

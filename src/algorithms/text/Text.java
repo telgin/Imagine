@@ -12,7 +12,7 @@ import util.algorithms.UniqueRandomRange;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The main class which handles reading and writing in the text format.
  */
 public abstract class Text implements Archive
 {
@@ -25,9 +25,10 @@ public abstract class Text implements Archive
 	protected UniqueRandomRange f_order;
 
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Creates a text archive interpreter instance
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to read or write archives
 	 */
 	public Text(Algorithm p_algo, Key p_key)
 	{
@@ -38,7 +39,7 @@ public abstract class Text implements Archive
 	}
 
 	/**
-	 * @update_comment
+	 * Resets the archive state
 	 */
 	protected void reset()
 	{

@@ -19,7 +19,7 @@ import system.SystemManager;
 import testing.Comparisons;
 import testing.TestFileTrees;
 import util.FileSystemUtil;
-import util.myUtilities;
+import util.StandardUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -150,7 +150,7 @@ public class CmdUITest
 		assertTrue(REPORT_FILE.exists());
 		
 		int expectedLines = FileSystemUtil.countEligableFiles(inputFolder);
-		int actualLines = myUtilities.readListFromFile(REPORT_FILE).size();
+		int actualLines = StandardUtil.readListFromFile(REPORT_FILE).size();
 		
 		assertEquals(expectedLines, actualLines);
 	}

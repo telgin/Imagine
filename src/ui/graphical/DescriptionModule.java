@@ -7,7 +7,8 @@ import javafx.scene.layout.VBox;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A convenient pairing of commonly used gui elements. Simplifies gui code significantly.
+ * Specifically, this is a label and a text area.
  */
 public class DescriptionModule extends GUIModule
 {
@@ -15,8 +16,8 @@ public class DescriptionModule extends GUIModule
 	private TextArea f_area;
 	
 	/**
-	 * @update_comment
-	 * @param p_name
+	 * Creates a description module
+	 * @param p_name The name used as the label
 	 */
 	public DescriptionModule(String p_name)
 	{
@@ -38,8 +39,8 @@ public class DescriptionModule extends GUIModule
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_text
+	 * Sets the text of the description text area
+	 * @param p_text The text to set
 	 */
 	public void setText(String p_text)
 	{
@@ -47,8 +48,8 @@ public class DescriptionModule extends GUIModule
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the text in the text area
+	 * @return The contents of the text area
 	 */
 	public String getText()
 	{
@@ -103,7 +104,8 @@ public class DescriptionModule extends GUIModule
 	
 	
 	/**
-	 * @update_comment
+	 * Sets the padding on this as if it were one element. Splits it between the label and
+	 * the text area.
 	 * @param p_insets
 	 */
 	public void setPadding(Insets p_insets)

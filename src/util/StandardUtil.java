@@ -18,21 +18,22 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import config.Constants;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Misc. utilities for convenience. Mostly IO or formatting related.
  */
-public abstract class myUtilities
+public abstract class StandardUtil
 {
 	/**
-	 * @update_comment
-	 * @param p_out
-	 * @param p_list
-	 * @return
+	 * Writes a list of strings to a file with one string per line
+	 * @param p_out The output file
+	 * @param p_list The list of lines
+	 * @return The success status
 	 */
 	public static boolean writeListToFile(File p_out, List<String> p_list)
 	{
@@ -58,10 +59,10 @@ public abstract class myUtilities
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_out
-	 * @param p_str
-	 * @return
+	 * Writes a string to a file
+	 * @param p_out The output file
+	 * @param p_str The string to write
+	 * @return The success status
 	 */
 	public static boolean writeStringToFile(File p_out, String p_str)
 	{
@@ -84,13 +85,13 @@ public abstract class myUtilities
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_in
-	 * @return
+	 * Reads a text file and gives a list of its lines
+	 * @param p_in The input file
+	 * @return The list of lines
 	 */
-	public static ArrayList<String> readListFromFile(File p_in)
+	public static List<String> readListFromFile(File p_in)
 	{
-		ArrayList<String> text = new ArrayList<String>();
+		List<String> text = new LinkedList<String>();
 		try
 		{
 			InputStreamReader fisr = new InputStreamReader(new FileInputStream(p_in));
@@ -113,9 +114,9 @@ public abstract class myUtilities
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_in
-	 * @return
+	 * Reads a file in as a single string
+	 * @param p_in The input file
+	 * @return The string of the file
 	 */
 	public static String readStringFromFile(File p_in)
 	{
@@ -131,14 +132,13 @@ public abstract class myUtilities
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_url
-	 * @return
+	 * Reads a list of lines from a url
+	 * @param p_url The input url
+	 * @return The list of string lines
 	 */
-	public static ArrayList<String> readListFromURL(URL p_url)
+	public static List<String> readListFromURL(URL p_url)
 	{
-
-		ArrayList<String> text = new ArrayList<String>();
+		List<String> text = new LinkedList<String>();
 		try
 		{
 			URLConnection urlc = p_url.openConnection();
@@ -157,17 +157,15 @@ public abstract class myUtilities
 			return null;
 		}
 		return text;
-
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_url
-	 * @return
+	 * Reads in the contents of a url as a single string
+	 * @param p_url The input url
+	 * @return The content of the url as a string
 	 */
 	public static String readStringFromURL(URL p_url)
 	{
-
 		String text = "";
 		try
 		{
@@ -191,9 +189,9 @@ public abstract class myUtilities
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_inFile
-	 * @return
+	 * Reads in a serialized object from a file
+	 * @param p_inFile The input file
+	 * @return The object
 	 */
 	public static Object readObject(File p_inFile)
 	{
@@ -220,10 +218,10 @@ public abstract class myUtilities
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_object
-	 * @param p_outFile
-	 * @return
+	 * Writes an object to a file using object serialization.
+	 * @param p_object The object to write. (must support serialization)
+	 * @param p_outFile The file to write to
+	 * @return The success status
 	 */
 	public static boolean writeObject(Object p_object, File p_outFile)
 	{
@@ -246,22 +244,24 @@ public abstract class myUtilities
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_d
-	 * @param p_decimals
-	 * @return
+	 * Formats a percent as a string in a standard way
+	 * @param p_double The double to be interpreted as a percent
+	 * @param p_decimals The number of decimals to use
+	 * @return The formatted string
 	 */
-	public static String formatPercent(double p_d, int p_decimals)
+	public static String formatPercent(double p_double, int p_decimals)
 	{
 		NumberFormat format = NumberFormat.getPercentInstance();
 		format.setMinimumFractionDigits(p_decimals);
-		return format.format(p_d);
+		return format.format(p_double);
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_millis
-	 * @return
+	 * Formats an epoch date and time in a standard way: yyyy-MM-dd_HH.mm.ss.SSS
+	 * Specifically, this way is more file safe because it contains no colon characters,
+	 * which are disallowed in some file systems.
+	 * @param p_millis The epoch date/time
+	 * @return The formatted string
 	 */
 	public static String formatDateTimeFileSafe(long p_millis)
 	{
@@ -271,9 +271,9 @@ public abstract class myUtilities
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_millis
-	 * @return
+	 * Formats an epoch date and time in a standard way: MM/dd/yyyy HH:mm:ss.SSS
+	 * @param p_millis The epoch date/time
+	 * @return The formatted string
 	 */
 	public static String formatDateTime(long p_millis)
 	{
@@ -283,9 +283,9 @@ public abstract class myUtilities
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_millis
-	 * @return
+	 * Formats an epoch date in a standard way: MM/dd/yyyy
+	 * @param p_millis The epoch date/time
+	 * @return The formatted string
 	 */
 	public static String formatDate(long p_millis)
 	{

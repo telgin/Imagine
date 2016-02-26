@@ -4,7 +4,7 @@ import java.io.File;
 
 import data.FileType;
 import javafx.beans.property.SimpleStringProperty;
-import util.myUtilities;
+import util.StandardUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -49,8 +49,8 @@ public class FileContentsTableRecord
 		f_fragmentNumber = p_fragmentNumber;
 		f_type = new SimpleStringProperty(displayType);
 		f_name = new SimpleStringProperty(p_file.getName());
-		f_dateCreated = new SimpleStringProperty(myUtilities.formatDate(p_dateCreated));
-		f_dateModified = new SimpleStringProperty(myUtilities.formatDate(p_dateModified));
+		f_dateCreated = new SimpleStringProperty(StandardUtil.formatDate(p_dateCreated));
+		f_dateModified = new SimpleStringProperty(StandardUtil.formatDate(p_dateModified));
 	}
 
 	/**

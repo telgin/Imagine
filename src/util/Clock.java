@@ -5,11 +5,10 @@ import logging.Logger;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Wrapper for System.currentTimeMillis() so that every time given is unique.
  */
 public class Clock
 {
-
 	/**
 	 * Gets a unique ms time near the time of the function call.
 	 * @return

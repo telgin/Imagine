@@ -11,7 +11,8 @@ import ui.graphical.top.TopView;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This is the actual "application" required by javafx. It allows for the
+ * creation of the primary window frame in gui mode.
  */
 public class ApplicationWindow extends Application
 {

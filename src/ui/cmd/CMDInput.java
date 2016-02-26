@@ -8,7 +8,7 @@ import java.util.Queue;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Testing class which simulates user command line input.
  */
 public abstract class CMDInput
 {
@@ -16,8 +16,8 @@ public abstract class CMDInput
 	private static BufferedReader s_cin = new BufferedReader(new InputStreamReader(System.in));
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets a line of input which may or may not be simulated
+	 * @return The input line
 	 */
 	public static String getLine()
 	{
@@ -41,8 +41,8 @@ public abstract class CMDInput
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_line
+	 * Simulates a line of input. These will stack up until they are all requested.
+	 * @param p_line The line of user input to simulate
 	 */
 	public static void simulateLine(String p_line)
 	{

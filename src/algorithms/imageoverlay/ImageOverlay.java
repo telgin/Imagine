@@ -17,7 +17,7 @@ import util.algorithms.UniqueRandomRange;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The main class which handles reading and writing in the image overlay format.
  */
 public class ImageOverlay implements Archive
 {
@@ -36,9 +36,10 @@ public class ImageOverlay implements Archive
 	private boolean f_incrementFailed;
 
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Creates an image overlay archive interpreter instance
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to read or write archives
 	 */
 	public ImageOverlay(Algorithm p_algo, Key p_key)
 	{
@@ -66,20 +67,7 @@ public class ImageOverlay implements Archive
 	}
 
 	/**
-	 * @credit http://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
-	 * @param p_toCopy
-	 * @return
-	 */
-	protected static BufferedImage clone(BufferedImage p_toCopy)
-	{
-		ColorModel cm = p_toCopy.getColorModel();
-		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		WritableRaster raster = p_toCopy.copyData(null);
-		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-	}
-
-	/**
-	 * @update_comment
+	 * Resets the archive state
 	 */
 	public void reset()
 	{

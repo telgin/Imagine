@@ -12,7 +12,7 @@ import util.algorithms.UniqueRandomRange;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The main class which handles reading and writing in the image format.
  */
 public class Image implements Archive
 {
@@ -28,9 +28,10 @@ public class Image implements Archive
 	protected int f_height;
 
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Creates an image archive interpreter instance
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to read or write archives
 	 */
 	public Image(Algorithm p_algo, Key p_key)
 	{
@@ -42,7 +43,7 @@ public class Image implements Archive
 	}
 
 	/**
-	 * @update_comment
+	 * Resets the archive state
 	 */
 	protected void reset()
 	{

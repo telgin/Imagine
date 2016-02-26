@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,14 +23,14 @@ import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A class to hold XML configuration utilities
  */
 public abstract class ConfigUtil
 {
 	/**
-	 * @update_comment
-	 * @param p_inFile
-	 * @return
+	 * Loads an xml document from the given file
+	 * @param p_inFile The xml file
+	 * @return The xml document
 	 */
 	public static Document loadConfig(File p_inFile)
 	{
@@ -46,8 +47,8 @@ public abstract class ConfigUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates a new xml document
+	 * @return The xml document
 	 */
 	public static Document getNewDocument()
 	{
@@ -63,10 +64,11 @@ public abstract class ConfigUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_config
-	 * @param p_outFile
-	 * @return
+	 * Saves an xml document in the specified file. This function allows for
+	 * consistent styling parameters.
+	 * @param p_config The xml document
+	 * @param p_outFile The file to save to
+	 * @return Success status
 	 */
 	public static boolean saveConfig(Document p_config, File p_outFile)
 	{
@@ -91,11 +93,11 @@ public abstract class ConfigUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_elements
-	 * @return
+	 * Gets the first element in a list of elements
+	 * @param p_elements The list of elements
+	 * @return The first element, or null if the list is empty
 	 */
-	public static Element first(ArrayList<Element> p_elements)
+	public static Element first(List<Element> p_elements)
 	{
 		if (p_elements.isEmpty())
 			return null;
@@ -103,16 +105,16 @@ public abstract class ConfigUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_elements
-	 * @param p_name
-	 * @param p_value
-	 * @return
+	 * Filters a list of elements by elements which have a given attribute name and value
+	 * @param p_elements The list of elements
+	 * @param p_name The attribute name
+	 * @param p_value The attribute value
+	 * @return The filtered list of elements
 	 */
-	public static ArrayList<Element> filterByAttribute(ArrayList<Element> p_elements,
+	public static List<Element> filterByAttribute(List<Element> p_elements,
 					String p_name, String p_value)
 	{
-		ArrayList<Element> filtered = new ArrayList<Element>();
+		List<Element> filtered = new ArrayList<Element>();
 		for (Element e : p_elements)
 			if (e.hasAttribute(p_name) && e.getAttribute(p_name).equals(p_value))
 				filtered.add(e);
@@ -122,14 +124,14 @@ public abstract class ConfigUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_parent
-	 * @param p_tag
-	 * @return
+	 * Gets a list of the children of an element filtered by a given tag
+	 * @param p_parent The parent element
+	 * @param p_tag The search tag
+	 * @return The list of children
 	 */
-	public static ArrayList<Element> children(Element p_parent, String p_tag)
+	public static List<Element> children(Element p_parent, String p_tag)
 	{
-		ArrayList<Element> elements = new ArrayList<Element>();
+		List<Element> elements = new ArrayList<Element>();
 		NodeList nodes = p_parent.getElementsByTagName(p_tag);
 
 		for (int i = 0; i < nodes.getLength(); ++i)

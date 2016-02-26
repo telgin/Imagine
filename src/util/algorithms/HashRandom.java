@@ -3,13 +3,16 @@ package util.algorithms;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import config.Constants;
+import logging.LogLevel;
+import logging.Logger;
 import testing.CodeTimer;
 import util.ByteConversion;
 
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A form of secure random number generation based on SHA-512
  */
 public class HashRandom
 {
@@ -19,37 +22,10 @@ public class HashRandom
 	private final int STOP = ((512 / 8) / 2); // half way
 	
 	/**
-	 * @update_comment
-	 * @param p_seed
+	 * Constructs a new hash random with a given seed
+	 * @param p_seed The seed as an array of bytes. Can be of any length.
 	 */
 	public HashRandom(byte[] p_seed)
-	{
-		init(p_seed);
-	}
-
-	/**
-	 * @update_comment
-	 * @param p_seed
-	 */
-	public HashRandom(String p_seed)
-	{
-		init(p_seed.getBytes());
-	}
-
-	/**
-	 * @update_comment
-	 * @param p_seed
-	 */
-	public HashRandom(Long p_seed)
-	{
-		init(ByteConversion.longToBytes(p_seed));
-	}
-
-	/**
-	 * @update_comment
-	 * @param p_seed
-	 */
-	private void init(byte[] p_seed)
 	{
 		try
 		{
@@ -57,17 +33,35 @@ public class HashRandom
 		}
 		catch (NoSuchAlgorithmException e)
 		{
-			e.printStackTrace();
-			System.exit(1);
+			Logger.log(LogLevel.k_debug, e, false);
+			Logger.log(LogLevel.k_fatal, "The random number generator failed to initialize.");
 		}
 
 		f_curHash = f_digest.digest(p_seed);
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_to
-	 * @return
+	 * Constructs a new hash random with a given seed.
+	 * @param p_seed The seed as a string. Can be of any length.
+	 */
+	public HashRandom(String p_seed)
+	{
+		this(p_seed.getBytes(Constants.CHARSET));
+	}
+
+	/**
+	 * Constructs a new hash random with a given seed
+	 * @param p_seed The seed as a long
+	 */
+	public HashRandom(long p_seed)
+	{
+		this(ByteConversion.longToBytes(p_seed));
+	}
+
+	/**
+	 * Gets a random short
+	 * @param p_to The max value of the short (non inclusive)
+	 * @return A random short value
 	 */
 	public short nextShort(short p_to)
 	{
@@ -80,17 +74,19 @@ public class HashRandom
 	}
 
 	/**
-	 * @update_comment
+	 * Refreshes the buffer of random bytes
 	 */
 	private void refresh()
 	{
+		//because of the half way stop, the last half of the hash was 
+		//maintained as unknown entropy for the refresh
 		f_index = 0;
 		f_curHash = f_digest.digest(f_curHash);
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets a random byte
+	 * @return a random byte
 	 */
 	public byte nextByte()
 	{
@@ -101,9 +97,9 @@ public class HashRandom
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_to
-	 * @return
+	 * Gets a random int
+	 * @param p_to The max value of the int (non inclusive)
+	 * @return A random int value
 	 */
 	public int nextInt(int p_to)
 	{
@@ -120,8 +116,7 @@ public class HashRandom
 	}
 
 	/**
-	 * @update_comment
-	 * @param args
+	 * Bonus profiling entry point
 	 */
 	public static void main(String p_args[])
 	{
@@ -130,7 +125,7 @@ public class HashRandom
 	}
 
 	/**
-	 * @update_comment
+	 * Bonus profiling function
 	 */
 	private static void profileIntIterative()
 	{
@@ -160,7 +155,7 @@ public class HashRandom
 	}
 
 	/**
-	 * @update_comment
+	 * Bonus profiling function
 	 */
 	private static void profileIntPreGeneration()
 	{

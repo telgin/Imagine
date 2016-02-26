@@ -35,7 +35,7 @@ public abstract class Constants
 	public static final Charset CHARSET = StandardCharsets.UTF_8;
 	public static final long DEFAULT_SEED = 1337;
 	public static final String TEMP_KEY_NAME = "not specified";
-	public static final String FILE_DELIMITER = "/:"; //combination is disallowed in unix and windows
+	public static final String FILE_DELIMITER = "/:"; //combination is disallowed in all file systems
 	public static final int MAX_STRUCTURED_OUTPUT_FILES_PER_INDEX = 1000;
 	public static final LogLevel DEFAULT_MESSAGE_LEVEL = LogLevel.k_debug;
 	public static final LogLevel DEFAULT_EXCEPTION_LEVEL = LogLevel.k_debug;

@@ -5,7 +5,9 @@ import java.util.Map;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A simple enum for whether a File is a file or a folder. This is needed
+ * because it would otherwise become unclear what a file is when you're reading
+ * it from an archive. Also, this defines standard codes for each type.
  */
 public enum FileType
 {
@@ -23,8 +25,8 @@ public enum FileType
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_num
+	 * Creates a file type enum with a code
+	 * @param p_num The code
 	 */
 	private FileType(int p_num)
 	{
@@ -32,8 +34,8 @@ public enum FileType
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the int code of this enum
+	 * @return The int code
 	 */
 	public int toInt()
 	{
@@ -41,9 +43,9 @@ public enum FileType
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_int
-	 * @return
+	 * Gets the file type enum associated with the given code
+	 * @param p_int The file type enum code
+	 * @return The associated file type enum
 	 */
 	public static FileType toFileType(int p_int)
 	{

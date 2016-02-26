@@ -31,7 +31,7 @@ import ui.UI;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The class which handles the execution path when Imagine is called in command line mode.
  */
 public class CmdUI extends UI
 {
@@ -39,8 +39,8 @@ public class CmdUI extends UI
 	private ArgParseResult f_args;
 
 	/**
-	 * @update_comment
-	 * @param p_args
+	 * Creates the cmd ui instance
+	 * @param p_args The parsed args
 	 */
 	public CmdUI(ArgParseResult p_args)
 	{
@@ -105,7 +105,7 @@ public class CmdUI extends UI
 	}
 
 	/**
-	 * @update_comment
+	 * Displays the help section
 	 */
 	private void helpSection()
 	{
@@ -146,9 +146,10 @@ public class CmdUI extends UI
 	}
 
 	/**
-	 * @update_comment
-	 * @return
-	 * @throws UsageException
+	 * Gets the algorithm object based on the arguments
+	 * @return The algorithm
+	 * @throws UsageException If an algorithm cannot be created. (probably because
+	 * of bad arguments)
 	 */
 	private Algorithm getAlgorithm() throws UsageException
 	{
@@ -166,7 +167,7 @@ public class CmdUI extends UI
 	}
 
 	/**
-	 * @update_comment
+	 * Allows the user to view an archive's contents
 	 */
 	private void openArchive()
 	{
@@ -232,8 +233,8 @@ public class CmdUI extends UI
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the key based on the current arguments
+	 * @return The key object
 	 */
 	private Key getKey()
 	{
@@ -256,7 +257,7 @@ public class CmdUI extends UI
 	}
 
 	/**
-	 * @update_comment
+	 * Creates archives for the input files specified
 	 */
 	private void embed()
 	{
@@ -319,7 +320,7 @@ public class CmdUI extends UI
 	}
 
 	/**
-	 * @update_comment
+	 * Extracts all files from a input file (single extract) or input folder (bulk extract)
 	 */
 	private void extract()
 	{
@@ -358,9 +359,9 @@ public class CmdUI extends UI
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_prompt
-	 * @return
+	 * Prompts for user input with some prompt text
+	 * @param p_prompt The prompt text
+	 * @return The user input
 	 */
 	private static String promptInput(String p_prompt)
 	{

@@ -10,7 +10,8 @@ import javafx.scene.layout.VBox;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A convenient pairing of commonly used gui elements. Simplifies gui code significantly.
+ * Specifically, this is a label and a text field with a browse button.
  */
 public class FileModule extends GUIModule
 {
@@ -20,9 +21,9 @@ public class FileModule extends GUIModule
 	private Consumer<Void> f_browseCallback;
 	
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @param p_browseCallback
+	 * Creates a file module
+	 * @param p_name The name used as the label
+	 * @param p_browseCallback The callback for when the browse button is clicked
 	 */
 	public FileModule(String p_name, Consumer<Void> p_browseCallback)
 	{
@@ -32,8 +33,8 @@ public class FileModule extends GUIModule
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_path
+	 * Sets the path in the text area
+	 * @param p_path The path string
 	 */
 	public void setPath(String p_path)
 	{
@@ -41,8 +42,8 @@ public class FileModule extends GUIModule
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the path, which is whatever is set in the text field
+	 * @return The contents of the text field
 	 */
 	public String getPath()
 	{

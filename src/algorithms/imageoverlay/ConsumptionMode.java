@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * How to consume input files
  */
 public enum ConsumptionMode
 {
@@ -24,9 +24,9 @@ public enum ConsumptionMode
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_str
-	 * @return
+	 * Gets the enum associated with the display string
+	 * @param p_str The display string associated with the enum
+	 * @return The enum
 	 */
 	public static ConsumptionMode parseMode(String p_str)
 	{

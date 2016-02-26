@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Creates a menu with callbacks for each item
  */
 public class CallbackMenu extends Menu
 {
@@ -14,8 +14,8 @@ public class CallbackMenu extends Menu
 	private Map<Integer, Menu> f_menus;
 	
 	/**
-	 * @update_comment
-	 * @param p_title
+	 * Constructs a callback menu
+	 * @param p_title The menu title
 	 */
 	public CallbackMenu(String p_title)
 	{
@@ -25,9 +25,9 @@ public class CallbackMenu extends Menu
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_option
-	 * @param p_callback
+	 * Adds a menu option
+	 * @param p_option The option text
+	 * @param p_callback The callback for when this option is chosen
 	 */
 	public void addOption(String p_option, Consumer<Void> p_callback)
 	{
@@ -36,9 +36,9 @@ public class CallbackMenu extends Menu
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_option
-	 * @param p_linkedMenu
+	 * Adds an option which links to another menu
+	 * @param p_option The option text
+	 * @param p_linkedMenu The menu to go to when this option is chosen
 	 */
 	public void addOption(String p_option, Menu p_linkedMenu)
 	{

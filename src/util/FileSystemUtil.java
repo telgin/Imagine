@@ -25,14 +25,14 @@ import logging.Logger;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A collection of common file system related operations
  */
 public class FileSystemUtil
 {
 	/**
-	 * @update_comment
-	 * @param p_metadata
-	 * @param p_file
+	 * Loads a metadata object from a file, filling in any missing elements
+	 * @param p_metadata A partially constructed metadata object
+	 * @param p_file The file to get the metadata from
 	 */
 	public static void loadMetadataFromFile(Metadata p_metadata, File p_file)
 	{
@@ -54,9 +54,9 @@ public class FileSystemUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @return
+	 * Gets the posix numeric file permissions
+	 * @param p_file The file to get the permissions of
+	 * @return The posix file permissions, or 444 if it could not be retrieved
 	 */
 	public static short getNumericFilePermissions(File p_file)
 	{
@@ -74,9 +74,9 @@ public class FileSystemUtil
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @param p_permissions
+	 * Sets the permissions of a file with a short representing the posix numeric file permissions
+	 * @param p_file The file to set the permissions of
+	 * @param p_permissions The permissions to set
 	 */
 	public static void setNumericFilePermissions(File p_file, short p_permissions)
 	{
@@ -93,13 +93,9 @@ public class FileSystemUtil
 
 	/**
 	 * @credit https://github.com/gradle/gradle
-	 * @param p_mode
-	 * @return
-	 */
-	/**
-	 * @update_comment
-	 * @param p_mode
-	 * @return
+	 * Parses posix file permissions from an integer
+	 * @param p_mode The numeric file permissions
+	 * @return The set of permissions represented by the mode
 	 */
 	public static Set<PosixFilePermission> intToPermissions(int p_mode)
 	{
@@ -137,9 +133,10 @@ public class FileSystemUtil
 
 	/**
 	 * @credit https://github.com/gradle/gradle
-	 * @param p_mode
-	 * @param p_testbit
-	 * @return
+	 * Tells if a given bit is set, within the context of permissions
+	 * @param p_mode The numeric file permissions
+	 * @param p_testbit The bit to test
+	 * @return If the bit is set
 	 */
 	private static boolean isSet(int p_mode, int p_testbit)
 	{
@@ -148,8 +145,9 @@ public class FileSystemUtil
 
 	/**
 	 * @credit https://github.com/gradle/gradle
-	 * @param p_permissions
-	 * @return
+	 * Converts a set of posix permissions to an integer
+	 * @param p_permissions The set of permissions
+	 * @return The integer representation
 	 */
 	public static int permissionsToInt(Set<PosixFilePermission> p_permissions)
 	{
@@ -186,9 +184,9 @@ public class FileSystemUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @return
+	 * Gets the date created from a file
+	 * @param p_file The file
+	 * @return The date created in epoch time
 	 */
 	public static long getDateCreated(File p_file)
 	{
@@ -206,9 +204,9 @@ public class FileSystemUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @return
+	 * Gets the date modified from a file
+	 * @param p_file The file
+	 * @return The date modified in epoch time
 	 */
 	public static long getDateModified(File p_file)
 	{
@@ -226,16 +224,15 @@ public class FileSystemUtil
 	}
 	
 	/**
-	 * @update_comment
+	 * Attempts to set a file's creation, modification, and access dates in the file system
 	 * @credit http://stackoverflow.com/questions/9198184/setting-file-creation-timestamp-in-java
-	 * @param p_file
-	 * @param p_dateModified
-	 * @param p_dateAccessed
-	 * @param p_dateCreated
-	 * @throws IOException
+	 * @param p_file The file
+	 * @param p_dateModified The date modified in epoch time
+	 * @param p_dateAccessed The date accessed in epoch time
+	 * @param p_dateCreated The date created in epoch time
 	 */
 	public static void setFileDates(File p_file, long p_dateCreated, long p_dateModified,
-					long p_dateAccessed)
+		long p_dateAccessed)
 	{
 
         BasicFileAttributeView attributes = Files.getFileAttributeView(
@@ -254,10 +251,10 @@ public class FileSystemUtil
     }
 	
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @param p_dateCreated
-	 * @param p_dateModified
+	 * Tries to set the date created and date modified for a file
+	 * @param p_file The file
+	 * @param p_dateCreated The date created in epoch time
+	 * @param p_dateModified The date modified in epoch time
 	 */
 	public static void setFileDates(File p_file, long p_dateCreated, long p_dateModified)
 	{
@@ -265,9 +262,9 @@ public class FileSystemUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @return
+	 * Loads a metadata object from a file
+	 * @param p_file The file
+	 * @return The file metadata
 	 */
 	public static Metadata loadMetadataFromFile(File p_file)
 	{
@@ -277,57 +274,9 @@ public class FileSystemUtil
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @param p_fileSet
-	 * @return
-	 */
-	public static boolean trackedBy(File p_file, Set<File> p_fileSet)
-	{
-		if (p_fileSet.contains(p_file))
-		{
-			// the file or folder is specifically listed in the file set
-			return true;
-		}
-		else
-		{
-			// get all parent files
-			ArrayList<File> parents = new ArrayList<File>();
-
-			File parent = null;
-			try
-			{
-				parent = p_file.getCanonicalFile().getParentFile();
-			}
-			catch (IOException e)
-			{
-				Logger.log(LogLevel.k_error, "Cannot get canonical file for: " + p_file.getPath());
-			}
-
-			while (parent != null)
-			{
-				parents.add(parent);
-				parent = parent.getParentFile();
-			}
-
-			// the file can only be tracked if one its parents is specifically
-			// listed
-			for (File file : parents)
-			{
-				if (p_fileSet.contains(file))
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
-	}
-
-	/**
-	 * @credit Jeff Learman
 	 * @credit http://stackoverflow.com/questions/20281835/how-to-delete-a-folder-with-files-using-java
-	 * @param p_file
+	 * Deletes a directory and its contents
+	 * @param p_file The directory file
 	 */
 	public static void deleteDir(File p_file)
 	{
@@ -344,9 +293,10 @@ public class FileSystemUtil
 
 	/**
 	 * @credit http://www.mkyong.com/java/how-to-copy-directory-in-java/
-	 * @param p_src
-	 * @param p_dest
-	 * @throws IOException
+	 * Copies a directory and its contents to a new directory
+	 * @param p_src The source directory
+	 * @param p_dest The destination directory
+	 * @throws IOException If the copy process fails
 	 */
 	public static void copyDir2(File p_src, File p_dest) throws IOException
 	{
@@ -370,9 +320,9 @@ public class FileSystemUtil
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_input
-	 * @return
+	 * Relativizes a file by the working directory ("." as an absolute path)
+	 * @param p_input The file to relativize
+	 * @return The relativized file
 	 */
 	public static File relativizeByCurrentLocation(File p_input)
 	{
@@ -381,8 +331,8 @@ public class FileSystemUtil
 	
 	/**
 	 * @credit http://stackoverflow.com/questions/7883542/getting-the-computer-name-in-java
-	 * @update_comment
-	 * @return
+	 * Attempts to get this PC's host name
+	 * @return The host name as a string, or null if networking is not set up
 	 */
 	public static String getHostName()
 	{
@@ -397,10 +347,11 @@ public class FileSystemUtil
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_streamUUID
-	 * @param p_sequenceNumber
-	 * @return
+	 * Generates a file name in a standard way based on a stream uuid and archive sequence number: 
+	 * streamUUID_sequenceNumber
+	 * @param p_streamUUID The stream uuid
+	 * @param p_sequenceNumber The archive sequence number
+	 * @return A standard file name.
 	 */
 	public static String getArchiveName(long p_streamUUID, long p_sequenceNumber)
 	{
@@ -408,9 +359,9 @@ public class FileSystemUtil
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_archiveUUID
-	 * @return
+	 * Generates a file name in a standard way based on an archive uuid
+	 * @param p_archiveUUID The archive uuid
+	 * @return The archive name string
 	 */
 	public static String getArchiveName(byte[] p_archiveUUID)
 	{
@@ -420,8 +371,7 @@ public class FileSystemUtil
 	
 	/**
 	 * @credit http://www.java2s.com/Code/Java/2D-Graphics-GUI/ListAllreaderandwriterformatssupportedbyImageIO.htm
-	 * @update_comment
-	 * @return
+	 * Lists the file types supported by default in ImageIO
 	 */
 	public static void getSupportedImageIOTypes()
 	{
@@ -441,9 +391,9 @@ public class FileSystemUtil
 	 * Counts the number of files which could be added to an archive. Specifically,
 	 * this would be any files and empty folders. If the input file a leaf, this function
 	 * will return 1.
-	 * @param p_file
-	 * @return
-	 * @throws IOException 
+	 * @param p_file The file or folder to start at.
+	 * @return The number of eligible files
+	 * @throws IOException if files cannot be viewed
 	 */
 	public static int countEligableFiles(File p_file) throws IOException
 	{
@@ -471,9 +421,10 @@ public class FileSystemUtil
 	
 	/**
 	 * @credit http://stackoverflow.com/questions/5930087/how-to-check-if-a-directory-is-empty-in-java
-	 * @update_comment
-	 * @param p_folder
-	 * @return
+	 * A function which checks if a directory is empty. Meant to be more efficient than listing the full
+	 * contents and checking if the list is empty.
+	 * @param p_folder The folder to check
+	 * @return True if the directory is empty or it doesn't exist.
 	 */
 	public static boolean directoryEmpty(File p_folder)
 	{
@@ -488,6 +439,7 @@ public class FileSystemUtil
 		{
 			//this is kind of bad, but logically, with the way this will be used, 
 			//a directory which doesn't exist doesn't have files in it.
+			//TODO this works now, but handle this situation outside here
 			return true;
 		}
 	}

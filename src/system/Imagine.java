@@ -11,7 +11,7 @@ import ui.ArgParseResult;
 import ui.UIContext;
 import ui.cmd.CmdUI;
 import ui.graphical.GUI;
-import util.myUtilities;
+import util.StandardUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -124,7 +124,7 @@ public class Imagine
 			//input files specified in a input list
 			if (p_args.contains("-I"))
 			{
-				for (String path : myUtilities.readListFromFile(new File(p_args.get(p_args.indexOf("-I")+1))))
+				for (String path : StandardUtil.readListFromFile(new File(p_args.get(p_args.indexOf("-I")+1))))
 				{
 					path = path.trim();
 					if (path.length() > 0)

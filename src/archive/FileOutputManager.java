@@ -4,7 +4,7 @@ import java.io.File;
 
 import config.Constants;
 import config.Settings;
-import util.myUtilities;
+import util.StandardUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -23,7 +23,7 @@ public class FileOutputManager
 	public FileOutputManager(File p_outputParentFolder)
 	{
 		this.f_outputParentFolder = p_outputParentFolder;
-		this.f_startTime = myUtilities.formatDateTimeFileSafe(System.currentTimeMillis());
+		this.f_startTime = StandardUtil.formatDateTimeFileSafe(System.currentTimeMillis());
 	}
 
 	/**

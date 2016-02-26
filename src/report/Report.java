@@ -9,7 +9,7 @@ import data.Metadata;
 import logging.LogLevel;
 import logging.Logger;
 import util.FileSystemUtil;
-import util.myUtilities;
+import util.StandardUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -45,7 +45,7 @@ public abstract class Report
 	 */
 	public static void writeReport(File p_reportFile)
 	{
-		myUtilities.writeListToFile(p_reportFile, s_lines);
+		StandardUtil.writeListToFile(p_reportFile, s_lines);
 		
 		Logger.log(LogLevel.k_general, "Generated Archive Contents Report: " + p_reportFile.getAbsolutePath());
 	}

@@ -18,7 +18,7 @@ import logging.Logger;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The definition of the image overlay algorithm, which defines defaults, parameters, and descriptions.
  */
 public class Definition implements algorithms.Definition
 {
@@ -35,15 +35,15 @@ public class Definition implements algorithms.Definition
 	private static Definition s_self;
 
 	/**
-	 * @update_comment
+	 * Create a definition instance
 	 */
 	private Definition()
 	{
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets an instance of this definition
+	 * @return The definition instance
 	 */
 	public static Definition getInstance()
 	{

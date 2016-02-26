@@ -13,14 +13,14 @@ import logging.Logger;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Standard hashing functions
  */
 public class Hashing
 {
 	/**
-	 * @update_comment
-	 * @param bytes
-	 * @return
+	 * Hashes a byte array
+	 * @param bytes The array of bytes
+	 * @return The hash as a byte array
 	 */
 	public static byte[] hash(byte[] bytes)
 	{
@@ -28,9 +28,9 @@ public class Hashing
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @return
+	 * Hashes a file
+	 * @param p_file The file
+	 * @return The hash as a byte array
 	 */
 	public static byte[] hash(File p_file)
 	{
@@ -60,8 +60,9 @@ public class Hashing
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the message digest in a standard way for all hashing operations. Hashing
+	 * algorithm is SHA-512.
+	 * @return The message digest.
 	 */
 	private static MessageDigest getMessageDigest()
 	{
