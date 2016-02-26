@@ -23,6 +23,7 @@ import logging.LogLevel;
 import logging.Logger;
 import report.JobStatus;
 import report.Report;
+import system.CmdAction;
 import system.Imagine;
 import system.SystemManager;
 import ui.ArgParseResult;
@@ -53,11 +54,11 @@ public class CmdUI extends UI
 	@Override
 	public void init()
 	{
-		if (f_args.getPresetName() == null)
+		if (f_args.getAction() != CmdAction.k_install && f_args.getPresetName() == null)
 		{
 			Logger.log(LogLevel.k_fatal, "An algorithm preset name must be specified.");
 		}
-		else if (f_args.getInputFiles().isEmpty())
+		else if (f_args.getAction() != CmdAction.k_install && f_args.getInputFiles().isEmpty())
 		{
 			Logger.log(LogLevel.k_fatal, "Input files must be specified.");
 		}

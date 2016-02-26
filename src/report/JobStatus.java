@@ -23,7 +23,6 @@ public abstract class JobStatus
 		inputFilesProcessed = 0;
 		
 		fileStati = new HashMap<File, FileStatus>();
-		
 	}
 	
 	public static FileStatus getFileStatus(File file)

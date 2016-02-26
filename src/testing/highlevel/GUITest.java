@@ -15,8 +15,7 @@ public class GUITest
 	{
 		String[] args = new String[]
 		{
-			"--gui", "--open", "-i",
-			"testing/scratch/gui_archives/1455838594412_0.png"
+			
 		};
 		
 		Imagine.run(args);

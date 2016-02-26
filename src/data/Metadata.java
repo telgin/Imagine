@@ -2,8 +2,6 @@ package data;
 
 import java.io.File;
 
-import config.Constants;
-
 /**
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment

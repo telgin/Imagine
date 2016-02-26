@@ -144,7 +144,7 @@ public class EmbedController implements ActiveComponent
 				{
 					f_view.setTargetSectionEnabled(true);
 					
-					//reflect the set target folder if it exists
+					//reflect the algorithm's target folder if the parameter is set and it exists
 					if (imageFolder.getValue() != null && !imageFolder.getValue().equals(Option.PROMPT_OPTION.getValue()))
 					{
 						f_view.setTarget(new File(imageFolder.getValue()));
@@ -152,6 +152,7 @@ public class EmbedController implements ActiveComponent
 				}
 				else
 				{
+					//this algorithm doesn't require a target folder
 					f_view.setTargetSectionEnabled(false);
 				}
 			}
@@ -315,6 +316,7 @@ public class EmbedController implements ActiveComponent
 			}
 			else
 			{
+				//collect the input files
 				List<File> inputFiles = f_view.getInputFileList();
 				f_totalFilesThisRun = 0;
 				try
@@ -327,11 +329,27 @@ public class EmbedController implements ActiveComponent
 					Logger.log(LogLevel.k_debug, "Could not count files for an entry.");
 					f_totalFilesThisRun = 0;
 				}
+				
+				//update the target folder param, make sure it's still the one selected
+				Parameter imageFolder = f_selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
+				if (imageFolder != null)
+				{
+					//set the current algorithm's image folder to the selected one
+					//this change should not be saved
+					imageFolder.setValue(f_selectedTargetFolder.getAbsolutePath());
+				}
 			
+				//reset the components so file status doesn't carry over from last run.
 				SystemManager.reset();
+				
+				//set system wide settings
 				Settings.setOutputFolder(f_view.getOutputFolder());
 				Settings.setUsingStructuredOutput(f_structuredOutput);
+				
+				//report creation not supported in GUI currently
 				Settings.setGenerateReport(false);
+				
+				//status tracking required in GUI to update progress bars
 				Settings.setTrackFileStatus(true);
 
 				ConversionJob job = ConversionAPI.runConversion(inputFiles, f_selectedAlgorithm, getKey(), 1);
@@ -473,14 +491,6 @@ public class EmbedController implements ActiveComponent
 		{
 			f_view.setTarget(folder);
 			f_selectedTargetFolder = folder;
-			
-			Parameter imageFolder = f_selectedAlgorithm.getParameter(Definition.IMAGE_FOLDER_PARAM);
-			if (imageFolder != null)
-			{
-				//set the current algorithm's image folder to the selected one
-				//this change should not be saved
-				imageFolder.setValue(folder.getAbsolutePath());
-			}
 		}
 	}
 	

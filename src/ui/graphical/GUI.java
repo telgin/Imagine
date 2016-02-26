@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import algorithms.Parameter;
+import system.SystemManager;
 import ui.ArgParseResult;
 import ui.UI;
 import ui.graphical.top.TopView;
@@ -35,7 +36,7 @@ public class GUI extends UI
 	@Override
 	public File promptKeyFileLocation()
 	{
-		// TODO Auto-generated method stub
+		// the gui sends this, no need to prompt
 		return null;
 	}
 
@@ -54,6 +55,9 @@ public class GUI extends UI
 	@Override
 	public void init()
 	{
+		//reset static components
+		SystemManager.reset();
+		
 		ApplicationWindow.launch(ApplicationWindow.class);
 	}
 

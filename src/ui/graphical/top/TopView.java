@@ -82,16 +82,16 @@ public class TopView extends View
 				f_tabPane.getSelectionModel().select(2);
 				break;
 				
-			case k_embed:
-				f_tabPane.getSelectionModel().select(0);
+			case k_open:
+			case k_extract:
+				f_tabPane.getSelectionModel().select(1);
 				break;
 				
-			case k_open:
-			case k_extract:		
+			case k_embed:
 			case k_install:
 			case k_help:
 			default:
-				f_tabPane.getSelectionModel().select(1);
+				f_tabPane.getSelectionModel().select(0);
 		}
 		
 		return borderPane;

@@ -68,11 +68,11 @@ public class Hashing
 		MessageDigest md = null;
 		try
 		{
-			md = MessageDigest.getInstance("SHA-256");
+			md = MessageDigest.getInstance("SHA-512");
 		}
 		catch (NoSuchAlgorithmException e)
 		{
-			e.printStackTrace();
+			Logger.log(LogLevel.k_debug, e, false);
 		}
 
 		return md;

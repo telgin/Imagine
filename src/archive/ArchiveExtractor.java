@@ -159,15 +159,12 @@ public class ArchiveExtractor {
 		try
 		{
 			outStream = new BufferedOutputStream(new FileOutputStream(assembling));
-			
-			FileContents curFileContents = p_origFileContents;
-			ArchiveContents curArchiveContents = p_origArchiveContents;//TODO this makes no sense
-			
+
 			//read the current file data
-			long bytesWritten = readNextFileData(curFileContents, outStream);
+			long bytesWritten = readNextFileData(p_origFileContents, outStream);
 			
 			//not finished unless all the bytes were read
-			boolean finished = bytesWritten == curFileContents.getRemainingData();
+			boolean finished = bytesWritten == p_origFileContents.getRemainingData();
 			int increment = 1;
 			ArchiveExtractor curExtractor = this; 
 			while (!finished)
@@ -177,10 +174,10 @@ public class ArchiveExtractor {
 				
 				//there are other fragments that need to be added,
 				//find the next archive file
-				String searchName = FileSystemUtil.getArchiveName(curArchiveContents.getStreamUUID(),
-												curArchiveContents.getArchiveSequenceNumber() + increment);
+				String searchName = FileSystemUtil.getArchiveName(p_origArchiveContents.getStreamUUID(),
+					p_origArchiveContents.getArchiveSequenceNumber() + increment);
 				File nextArchiveFile = f_manager.findArchiveFile(searchName,
-								curExtractor.f_curArchiveFile.getAbsoluteFile().getParentFile());
+					curExtractor.f_curArchiveFile.getAbsoluteFile().getParentFile());
 				
 				if (nextArchiveFile == null)
 				{

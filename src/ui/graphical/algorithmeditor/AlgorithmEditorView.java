@@ -68,7 +68,7 @@ public class AlgorithmEditorView extends View
 	@Override
 	public String getPassword()
 	{
-		// TODO Auto-generated method stub
+		//passwords no longer a part of the algorithm
 		return null;
 	}
 
@@ -375,7 +375,7 @@ public class AlgorithmEditorView extends View
 	@Override
 	public File getEnclosingFolder()
 	{
-		// TODO Auto-generated method stub
+		// this shouldn't happen in the algorithm configuration
 		return null;
 	}
 
