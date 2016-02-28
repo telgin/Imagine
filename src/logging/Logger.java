@@ -11,7 +11,8 @@ import ui.UIContext;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A standard logging class which has different levels of output for exceptions and 
+ * general messages. Logs are written to a file each run.
  */
 public class Logger
 {

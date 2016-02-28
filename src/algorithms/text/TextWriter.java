@@ -15,14 +15,15 @@ import util.ByteConversion;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Handles the writing of a text archive
  */
 public class TextWriter extends Text implements ArchiveWriter
 {
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Constructs a text writer
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to write archives
 	 */
 	public TextWriter(Algorithm p_algo, Key p_key)
 	{
@@ -104,7 +105,7 @@ public class TextWriter extends Text implements ArchiveWriter
 	}
 
 	/**
-	 * @update_comment
+	 * Fills up the rest of the buffer with random bytes
 	 */
 	private void fillToEnd()
 	{

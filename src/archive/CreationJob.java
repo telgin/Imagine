@@ -21,7 +21,7 @@ import logging.Logger;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public class ConversionJob implements Runnable
+public class CreationJob implements Runnable
 {
 	private boolean f_shuttingDown = false;
 	private boolean f_active = true;
@@ -43,7 +43,7 @@ public class ConversionJob implements Runnable
 	 * @param p_key
 	 * @param p_archiveWorkerCount
 	 */
-	public ConversionJob(List<File> p_inputFiles, Algorithm p_algorithm, Key p_key, int p_archiveWorkerCount)
+	public CreationJob(List<File> p_inputFiles, Algorithm p_algorithm, Key p_key, int p_archiveWorkerCount)
 	{
 		f_inputFiles = p_inputFiles;
 		f_archiveWorkerCount = p_archiveWorkerCount;
@@ -161,7 +161,7 @@ public class ConversionJob implements Runnable
 		
 		f_finished = true;
 		
-		Logger.log(LogLevel.k_debug, "Conversion job is shutdown.");
+		Logger.log(LogLevel.k_debug, "Creation job is shutdown.");
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class ConversionJob implements Runnable
 	@Override
 	public String toString()
 	{
-		return "ConversionJob [shuttingDown=" + f_shuttingDown + ", active=" + f_active
+		return "CreationJob [shuttingDown=" + f_shuttingDown + ", active=" + f_active
 			+ ", finished=" + f_finished + ", maxWaitingFiles="
 			+ f_maxWaitingFiles + ", queue=" + f_queue + ", indexWorker="
 			+ f_indexWorker + ", archiveWorkers=" + f_archiveWorkers

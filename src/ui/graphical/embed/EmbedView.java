@@ -48,7 +48,7 @@ import ui.graphical.archiveviewer.FileContentsTableRecord;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This is the view for the archive creator tab.
  */
 public class EmbedView extends View
 {
@@ -63,7 +63,7 @@ public class EmbedView extends View
 	private PasswordField f_passwordField;
 	private TextField f_keyFilePath;
 	private Button f_keyFileBrowseButton, f_inputAddFileButton, f_inputAddFolderButton,
-		f_inputRemoveButton, f_targetSelectFolderButton, f_runConversionButton;
+		f_inputRemoveButton, f_targetSelectFolderButton, f_createArchivesButton;
 	private ToggleGroup f_keySelectionButtons;
 	private RadioButton f_noKeyToggle, f_keyFileToggle, f_passwordToggle;
 	private TableView<FileContentsTableRecord> f_table;
@@ -72,7 +72,7 @@ public class EmbedView extends View
 	private FileModule f_outputFolder;
 	private BooleanModule f_structuredOutput;
 	private TreeView<String> f_inputFiles, f_targetFiles;
-	private ProgressBar f_conversionProgress;
+	private ProgressBar f_creationProgress;
 	private InputFileTreeItem f_inputFileRoot;
 	private TargetFileTreeItem f_targetFileRoot;
 	
@@ -83,6 +83,11 @@ public class EmbedView extends View
 	private Map<TreeCell<String>, TargetFileTreeItem> f_activeTargetItems;
 	boolean f_updatingCells = false;
 
+	/**
+	 * Constructs the archive creator tab
+	 * @param p_window The javafx window
+	 * @param p_args The command line arguments
+	 */
 	public EmbedView(Stage p_window, ArgParseResult p_args)
 	{
 		super(p_window);
@@ -93,9 +98,8 @@ public class EmbedView extends View
 		f_activeTargetItems = new HashMap<TreeCell<String>, TargetFileTreeItem>();
 	}
 
-	/**
-	 * @update_comment
-	 * @return
+	/* (non-Javadoc)
+	 * @see ui.graphical.View#setupPane()
 	 */
 	@Override
 	public Pane setupPane()
@@ -109,7 +113,7 @@ public class EmbedView extends View
 		f_keySelectionButtons.selectToggle(f_noKeyToggle);
 		setInputSectionEnabled(false);
 		setTargetSectionEnabled(false);
-		setRunConversionEnabled(false);
+		setCreateArchivesEnabled(false);
 		
 		//setup stuff specified in args
 		if (f_args.getAction() == CmdAction.k_embed)
@@ -150,8 +154,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the progress section
+	 * @return The progress section
 	 */
 	private Node setupProgressSection()
 	{
@@ -161,9 +165,9 @@ public class EmbedView extends View
 		hbox.setAlignment(Pos.CENTER);
 		
 		//progress bar
-		f_conversionProgress = new ProgressBar(0);
-		f_conversionProgress.setPrefWidth(230);
-		hbox.getChildren().add(f_conversionProgress);
+		f_creationProgress = new ProgressBar(0);
+		f_creationProgress.setPrefWidth(230);
+		hbox.getChildren().add(f_creationProgress);
 
 		//files created label
 		f_filesCreatedLabel = new Label("");
@@ -175,8 +179,8 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the input file section
+	 * @return The input file section
 	 */
 	private Node setupInputFileSection()
 	{
@@ -249,8 +253,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_cell
+	 * Updates the input cell style according to its associated item.
+	 * @param p_cell The cell to update
 	 */
 	public void updateInputCellStyle(TreeCell<String> p_cell)
 	{
@@ -268,8 +272,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_cell
+	 * Updates the target cell style according to its associated item.
+	 * @param p_cell The cell to update
 	 */
 	public void updateTargetCellStyle(TreeCell<String> p_cell)
 	{
@@ -287,7 +291,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
+	 * Updates the css of all cells in the input or target section which are
+	 * visible/active. The cells which fall under this category are determined by javafx.
 	 */
 	public void updateAllActiveCells()
 	{
@@ -310,8 +315,8 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the target section
+	 * @return The target section node
 	 */
 	private Node setupTargetFileSection()
 	{
@@ -396,8 +401,8 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the algorithm configuration section
+	 * @return The configuration section node
 	 */
 	private Node setupConfigSelection()
 	{
@@ -488,13 +493,13 @@ public class EmbedView extends View
 		keyFilePathRow.getChildren().add(f_keyFileBrowseButton);
 		configSelection.getChildren().add(keyFilePathRow);
 		
-		//run conversion
+		//run creation
 		HBox hbox = new HBox();
 		hbox.setAlignment(Pos.CENTER);
 		
-		f_runConversionButton = new Button("Run Conversion");
-		f_runConversionButton.setOnAction(e -> f_controller.runConversionPressed());
-		hbox.getChildren().add(f_runConversionButton);
+		f_createArchivesButton = new Button("Create Archives");
+		f_createArchivesButton.setOnAction(e -> f_controller.createArchivesPressed());
+		hbox.getChildren().add(f_createArchivesButton);
 		configSelection.getChildren().add(hbox);
 
 		return configSelection;
@@ -648,7 +653,7 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
+	 * Clears the text of the password field
 	 */
 	public void clearPasswordSection()
 	{
@@ -691,18 +696,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
-	 */
-	public String getAlgorithmSelection()
-	{
-		return (String) f_algorithmSelect.getValue();
-	}
-	
-	
-	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the algorithm selection section
+	 * @param p_enabled The state to set
 	 */
 	public void setAlgorithmSelectionEnabled(boolean p_enabled)
 	{
@@ -719,17 +714,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_prompt
-	 */
-	public void setPasswordPrompt(String p_prompt)
-	{
-		f_passwordField.setPromptText(p_prompt);
-	}
-	
-	/**
-	 * @update_comment
-	 * @param p_inputFile
+	 * Adds an input file or folder
+	 * @param p_inputFile The input file or folder
 	 */
 	public void addInput(File p_inputFile)
 	{
@@ -740,8 +726,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_targetFolder
+	 * Sets the target folder and updates the tree
+	 * @param p_targetFolder The target folder to set
 	 */
 	public void setTarget(File p_targetFolder)
 	{
@@ -752,8 +738,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the target section
+	 * @param p_enabled The state to set
 	 */
 	public void setTargetSectionEnabled(boolean p_enabled)
 	{
@@ -771,8 +757,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets enabled state of the input section
+	 * @param p_enabled The state to set
 	 */
 	public void setInputSectionEnabled(boolean p_enabled)
 	{
@@ -792,24 +778,16 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the create archives button
+	 * @param p_enabled The state to set
 	 */
-	public void setRunConversionEnabled(boolean p_enabled)
+	public void setCreateArchivesEnabled(boolean p_enabled)
 	{
-		f_runConversionButton.disableProperty().set(!p_enabled);
+		f_createArchivesButton.disableProperty().set(!p_enabled);
 	}
-	
+
 	/**
-	 * @update_comment
-	 */
-	public void clearPasswordPrompt()
-	{
-		f_passwordField.setPromptText("");
-	}
-	
-	/**
-	 * @update_comment
+	 * Selects the key file section toggle
 	 */
 	public void toggleKeySection()
 	{
@@ -817,7 +795,7 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
+	 * Selects the password section toggle
 	 */
 	public void togglePasswordSection()
 	{
@@ -825,8 +803,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_path
+	 * Sets the key file path
+	 * @param p_path The path to set
 	 */
 	public void setKeyFilePath(String p_path)
 	{
@@ -834,8 +812,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if the key file section is enabled
+	 * @return True if it is enabled
 	 */
 	public boolean keyFileEnabled()
 	{
@@ -843,8 +821,8 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if the password section is enabled
+	 * @return True if it is enabled
 	 */
 	public boolean passwordEnabled()
 	{
@@ -899,9 +877,9 @@ public class EmbedView extends View
 	 * @update_comment
 	 * @param progress
 	 */
-	public void setConversionProgress(double progress)
+	public void setCreationProgress(double progress)
 	{
-		Platform.runLater(() -> f_conversionProgress.setProgress(progress));
+		Platform.runLater(() -> f_creationProgress.setProgress(progress));
 	}
 
 	/**

@@ -9,20 +9,19 @@ import algorithms.Algorithm;
 import archive.ArchiveReader;
 import archive.ArchiveIOException;
 import key.Key;
-import logging.LogLevel;
-import logging.Logger;
 import util.ByteConversion;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Handles the reading of an image overlay archive
  */
 public class ImageOverlayReader extends ImageOverlay implements ArchiveReader
 {
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Constructs an image overlay reader
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to read archives
 	 */
 	public ImageOverlayReader(Algorithm p_algo, Key p_key)
 	{
@@ -30,9 +29,9 @@ public class ImageOverlayReader extends ImageOverlay implements ArchiveReader
 	}
 
 	/**
-	 * @update_comment
-	 * @return
-	 * @throws ArchiveIOException
+	 * Reads a byte of data from the archive
+	 * @return The byte that was read
+	 * @throws ArchiveIOException if there are no more bytes to read
 	 */
 	private byte read() throws ArchiveIOException
 	{
@@ -49,17 +48,17 @@ public class ImageOverlayReader extends ImageOverlay implements ArchiveReader
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
-	 * @throws ArchiveIOException
+	 * Reads two bits of file data per color
+	 * @return The file data byte as an int
+	 * @throws ArchiveIOException If there are no bytes left to read
 	 */
 	private final int steps4() throws ArchiveIOException
 	{
 		for (int i = 0; i < 4; ++i)
 		{
-			nextPair();
+			nextColor();
 
-			int c = ByteConversion.byteToInt(getColor(f_curPixelCoord[0], f_curPixelCoord[1]));
+			int c = ByteConversion.byteToInt(getColor());
 
 			f_split[i] = c % 4;
 		}
@@ -71,17 +70,17 @@ public class ImageOverlayReader extends ImageOverlay implements ArchiveReader
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
-	 * @throws ArchiveIOException
+	 * Reads four bits of file data per color
+	 * @return The file data byte as an int
+	 * @throws ArchiveIOException If there are no bytes left to read
 	 */
 	private final int steps16() throws ArchiveIOException
 	{
 		for (int i = 0; i < 2; ++i)
 		{
-			nextPair();
+			nextColor();
 
-			int c = ByteConversion.byteToInt(getColor(f_curPixelCoord[0], f_curPixelCoord[1]));
+			int c = ByteConversion.byteToInt(getColor());
 
 			f_split[i] = c % 16;
 		}
@@ -97,7 +96,6 @@ public class ImageOverlayReader extends ImageOverlay implements ArchiveReader
 	@Override
 	public int read(byte[] p_bytes, int p_offset, int p_length)
 	{
-		//Logger.log(LogLevel.k_debug, "Reading " + length + " bytes.");
 		for (int x = p_offset; x < p_offset + p_length; ++x)
 		{
 			try
@@ -129,8 +127,6 @@ public class ImageOverlayReader extends ImageOverlay implements ArchiveReader
 	@Override
 	public long skip(long p_bytes)
 	{
-		Logger.log(LogLevel.k_debug, "Skipping " + p_bytes + " bytes.");
-
 		long skipped = 0;
 		try
 		{
@@ -140,15 +136,15 @@ public class ImageOverlayReader extends ImageOverlay implements ArchiveReader
 				
 				if (f_density.equals(InsertionDensity.k_25))
 				{
-					nextPair();
-					nextPair();
-					nextPair();
-					nextPair();
+					nextColor();
+					nextColor();
+					nextColor();
+					nextColor();
 				}
 				else //k_50
 				{
-					nextPair();
-					nextPair();
+					nextColor();
+					nextColor();
 				}
 
 				++skipped;
@@ -159,9 +155,6 @@ public class ImageOverlayReader extends ImageOverlay implements ArchiveReader
 			// couldn't skip as many as requested,
 			// nothing to do
 		}
-
-//		Logger.log(LogLevel.k_debug, "Skipping " + p_bytes + " bytes was requested and "
-//			+ skipped + " were skipped.");
 
 		return skipped;
 

@@ -12,23 +12,25 @@ import util.ByteConversion;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Handles the reading of a text archive
  */
 public class TextReader extends Text implements ArchiveReader{
 
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Constructs a text reader
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to read archives
 	 */
-	public TextReader(Algorithm p_algo, Key p_key) {
+	public TextReader(Algorithm p_algo, Key p_key)
+	{
 		super(p_algo, p_key);
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
-	 * @throws ArchiveIOException
+	 * Reads a byte of data from the archive
+	 * @return The byte that was read
+	 * @throws ArchiveIOException if there are no more bytes to read
 	 */
 	private final byte read() throws ArchiveIOException
 	{

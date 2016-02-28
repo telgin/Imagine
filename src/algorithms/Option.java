@@ -8,7 +8,7 @@ import logging.Logger;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A class which represents an option for a parameter value
  */
 public class Option
 {
@@ -19,8 +19,8 @@ public class Option
 	public static final Option PROMPT_OPTION = new Option("Prompt For Value");
 
 	/**
-	 * @update_comment
-	 * @param p_value
+	 * Creates an option which represents choosing the specified value.
+	 * @param p_value The value text
 	 */
 	public Option(String p_value)
 	{
@@ -28,9 +28,9 @@ public class Option
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_startRange
-	 * @param p_endRange
+	 * Creates an option which represents a range of values to choose from [start,end]
+	 * @param p_startRange The start of the range (inclusive)
+	 * @param p_endRange The end of the range (inclusive)
 	 */
 	public Option(String p_startRange, String p_endRange)
 	{
@@ -39,8 +39,8 @@ public class Option
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_optionNode
+	 * Creates an option object from an xml element
+	 * @param p_optionNode The xml element of an option
 	 */
 	public Option(Element p_optionNode)
 	{
@@ -106,9 +106,9 @@ public class Option
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_doc
-	 * @return
+	 * Creates an xml element from this option object
+	 * @param p_doc The current xml document
+	 * @return The xml element representing this option
 	 */
 	public Element toElement(Document p_doc)
 	{
@@ -128,10 +128,11 @@ public class Option
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_value
-	 * @param p_type
-	 * @return
+	 * Validates user input against this option.
+	 * @param p_value The user input
+	 * @param p_type The type of parameter value this option is for
+	 * @return True if the value would be equivalent to choosing this option,
+	 * false otherwise.
 	 */
 	public boolean validate(String p_value, String p_type)
 	{

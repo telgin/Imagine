@@ -5,7 +5,10 @@ import java.util.Map;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The "insertion density" to use in an image overlay. These are
+ * percents of bits per byte to use for file data. So, at 25%, two bits
+ * are file data and six are image data. At 50%, four bits are file data and
+ * four bits are image data.
  */
 public enum InsertionDensity
 {
@@ -22,9 +25,9 @@ public enum InsertionDensity
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_string
-	 * @return
+	 * Gets the associated enum from a percent string
+	 * @param p_string The display string representation of the enum
+	 * @return The enum
 	 */
 	public static InsertionDensity parseDensity(String p_string)
 	{

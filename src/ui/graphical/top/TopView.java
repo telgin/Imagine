@@ -18,7 +18,7 @@ import ui.graphical.embed.EmbedView;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The view which contains the tabs
  */
 public class TopView extends View
 {
@@ -27,9 +27,9 @@ public class TopView extends View
 	private TabPane f_tabPane;
 	
 	/**
-	 * @update_comment
-	 * @param p_window
-	 * @param p_args
+	 * Constructs a top view to hold the tabs
+	 * @param p_window The javafx window
+	 * @param p_args The command line arguments
 	 */
 	public TopView(Stage p_window, ArgParseResult p_args)
 	{

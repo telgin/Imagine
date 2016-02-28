@@ -7,7 +7,7 @@ import key.Key;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Creates the readers and writers for the image overlay algorithm
  */
 public class ImageOverlayFactory implements ArchiveReaderFactory<ImageOverlayReader>,
 				ArchiveWriterFactory<ImageOverlayWriter>
@@ -16,9 +16,10 @@ public class ImageOverlayFactory implements ArchiveReaderFactory<ImageOverlayRea
 	private Algorithm f_algo;
 
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Constructs an image overlay factory
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to read or write archives
 	 */
 	public ImageOverlayFactory(Algorithm p_algo, Key p_key)
 	{

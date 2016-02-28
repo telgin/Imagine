@@ -13,10 +13,12 @@ import util.ConfigUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This class represents an algorithm parameter. Parameters have options, and their
+ * values are set by first checking against these options.
  */
 public class Parameter
 {
+	//types of parameters
 	public static final String STRING_TYPE = "string";
 	public static final String INT_TYPE = "int";
 	public static final String LONG_TYPE = "long";
@@ -24,6 +26,7 @@ public class Parameter
 	public static final String DECIMAL_TYPE = "decimal";
 	public static final String FILE_TYPE = "file";
 	
+	//parameter components
 	private List<Option> f_options;
 	private String f_name;
 	private String f_type;
@@ -33,11 +36,11 @@ public class Parameter
 	private boolean f_enabled;
 
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @param p_type
-	 * @param p_optional
-	 * @param p_enabled
+	 * Constructs an algorithm parameter
+	 * @param p_name The name of the parameter
+	 * @param p_type The type of parameter (which influences how values are validated)
+	 * @param p_optional If this parameter is optional for the algorithm
+	 * @param p_enabled If this parameter is enabled
 	 */
 	public Parameter(String p_name, String p_type, boolean p_optional, boolean p_enabled)
 	{
@@ -67,8 +70,8 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_paramElement
+	 * Constructs a parameter from an xml element
+	 * @param p_paramElement The parameter xml element
 	 */
 	public Parameter(Element p_paramElement)
 	{
@@ -89,8 +92,8 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_opt
+	 * Adds an option to this parameter
+	 * @param p_opt The option to add
 	 */
 	public void addOption(Option p_opt)
 	{
@@ -98,8 +101,8 @@ public class Parameter
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of options for this parameter.
+	 * @return The list of this parameter's options
 	 */
 	public List<Option> getOptions()
 	{
@@ -107,8 +110,8 @@ public class Parameter
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of the display strings for each option of this parameter
+	 * @return The list of option display strings
 	 */
 	public List<String> getOptionDisplayValues()
 	{
@@ -123,8 +126,8 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the name of this parameter
+	 * @return The parameter name
 	 */
 	public String getName()
 	{
@@ -132,8 +135,8 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_name
+	 * Sets the name of this parameter
+	 * @param p_name The name to set
 	 */
 	public void setName(String p_name)
 	{
@@ -141,8 +144,9 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the parameter's value. This may result in prompting the ui for the value if
+	 * that option is the current value.
+	 * @return The value of this parameter
 	 */
 	public String getValue()
 	{
@@ -155,9 +159,10 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_value
-	 * @return
+	 * Attempts to set the value of this parameter. The value will be validated
+	 * and the success status returned.
+	 * @param p_value The value to set
+	 * @return The success status of this operation.
 	 */
 	public boolean setValue(String p_value)
 	{
@@ -170,8 +175,8 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if this parameter is optional
+	 * @return If this parameter is optional
 	 */
 	public boolean isOptional()
 	{
@@ -179,8 +184,8 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_optional
+	 * Sets the optional state of this parameter
+	 * @param p_optional The optional state
 	 */
 	public void setOptional(boolean p_optional)
 	{
@@ -188,8 +193,8 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if this parameter is enabled
+	 * @return The enabled state
 	 */
 	public boolean isEnabled()
 	{
@@ -197,15 +202,15 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of this parameter
+	 * @param p_enabled The enabled state
 	 */
 	public void setEnabled(boolean p_enabled)
 	{
 		if (!p_enabled && !f_optional)
 		{
-			Logger.log(LogLevel.k_error,
-							"Cannot disable the required parameter: " + f_name);
+			Logger.log(LogLevel.k_error, "Cannot disable the "
+				+ "required parameter: " + f_name);
 			this.f_enabled = true;
 		}
 		else
@@ -231,9 +236,9 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_doc
-	 * @return
+	 * Creates an xml element representing this parameter
+	 * @param p_doc The xml document
+	 * @return The xml element for this parameter
 	 */
 	public Element toElement(Document p_doc)
 	{
@@ -252,9 +257,10 @@ public class Parameter
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_value
-	 * @return
+	 * Validates if the given string could be a valid parameter value selection. It is
+	 * valid if it is valid for at least one option.
+	 * @param p_value The parameter value to validate
+	 * @return True if valid, false otherwise
 	 */
 	private boolean validate(String p_value)
 	{

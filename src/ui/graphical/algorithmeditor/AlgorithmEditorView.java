@@ -31,7 +31,7 @@ import ui.graphical.View;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This is the view for the algorithm editor tab.
  */
 public class AlgorithmEditorView extends View
 {
@@ -50,9 +50,9 @@ public class AlgorithmEditorView extends View
 
 
 	/**
-	 * @update_comment
-	 * @param p_window
-	 * @param p_args
+	 * Constructs the algorithm editor tab
+	 * @param p_window The javafx window
+	 * @param p_args The command line arguments
 	 */
 	public AlgorithmEditorView(Stage p_window, ArgParseResult p_args)
 	{
@@ -106,8 +106,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the title section
+	 * @return The title section
 	 */
 	private Node setupTitleSection()
 	{
@@ -124,8 +124,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the algorithm section
+	 * @return The algorithm section
 	 */
 	private Node setupAlgorithmSection()
 	{
@@ -146,8 +146,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the parameter section
+	 * @return The parameter section
 	 */
 	private Node setupParameterSection()
 	{
@@ -168,8 +168,8 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the button section (create/save)
+	 * @return The button section
 	 */
 	private Node setupButtonSection()
 	{
@@ -194,8 +194,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the preset selection section
+	 * @return The preset selection section
 	 */
 	private Node setupPresetSelectionSection()
 	{
@@ -222,8 +222,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the edit attributes section
+	 * @return The edit attributes section
 	 */
 	private Node setupEditAttributesSection()
 	{
@@ -252,8 +252,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_choice
+	 * Sets the selected algorithm
+	 * @param p_choice The string to be selected
 	 */
 	public void setSelectedAlgorithm(String p_choice)
 	{
@@ -262,8 +262,8 @@ public class AlgorithmEditorView extends View
 
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the text from the preset name field
+	 * @return The preset name entered
 	 */
 	public String getPresetName()
 	{
@@ -271,8 +271,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_name
+	 * sets the preset name field
+	 * @param p_name The text to set
 	 */
 	public void setPresetName(String p_name)
 	{
@@ -280,8 +280,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_text
+	 * Sets the algorithm description text area
+	 * @param p_text The text to set
 	 */
 	public void setAlgorithmDescription(String p_text)
 	{
@@ -289,8 +289,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_text
+	 * Sets the parameter description text area
+	 * @param p_text The text to set
 	 */
 	public void setParameterDescription(String p_text)
 	{
@@ -298,8 +298,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_parameterNames
+	 * Sets the list of parameter names
+	 * @param p_parameterNames The list of parameter names
 	 */
 	public void setParameterNames(List<String> p_parameterNames)
 	{
@@ -307,8 +307,8 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the parameter selection section
+	 * @return The parameter selection section
 	 */
 	private Node setupParameterSelectionSection()
 	{
@@ -335,8 +335,8 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the parameter editing section
+	 * @return The parameter editing section
 	 */
 	private Node setupEditParameterSection()
 	{
@@ -361,8 +361,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_allow
+	 * Sets the enabled state of the parameter enabled checkbox
+	 * @param p_allow The enabled state
 	 */
 	public void allowParameterEnabledChange(boolean p_allow)
 	{
@@ -407,8 +407,8 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_parameter
+	 * Displays the specific gui elements associated with the given parameter
+	 * @param p_parameter The parameter to show the options of
 	 */
 	public void displayParameterOptions(Parameter p_parameter)
 	{
@@ -469,8 +469,8 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_error
+	 * Sets the error state of the visible parameter option
+	 * @param p_error The error state
 	 */
 	public void setOptionSelectionErrorState(boolean p_error)
 	{
@@ -481,8 +481,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the option selection section
+	 * @param p_enabled The enabled state
 	 */
 	public void setOptionSelectionEnabled(boolean p_enabled)
 	{
@@ -493,7 +493,7 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
+	 * Selects a folder to be set for the visible folder selection option.
 	 */
 	public void selectOptionFolder()
 	{
@@ -503,7 +503,8 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
+	 * Returns the gui back to the original state where no algorithm is selected. The
+	 * other sections will reflect that change also.
 	 */
 	public void reset()
 	{
@@ -527,8 +528,8 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_checked
+	 * Sets the checked state of the parameter enabled checkbox
+	 * @param p_checked The checked state
 	 */
 	public void setParameterEnabled(boolean p_checked)
 	{
@@ -536,8 +537,8 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_algorithmDefinitionNames
+	 * Sets the list of algorithm names
+	 * @param p_algorithmDefinitionNames The list of algorithm definition names
 	 */
 	public void setAlgorithmNames(List<String> p_algorithmDefinitionNames)
 	{
@@ -545,8 +546,8 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of all sections which allow for edits to the algorithm
+	 * @param p_enabled The enabled state
 	 */
 	public void setEditsEnabled(boolean p_enabled)
 	{
@@ -558,8 +559,8 @@ public class AlgorithmEditorView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the parameter list
+	 * @param p_enabled The enabled state
 	 */
 	public void setParameterListEnabled(boolean p_enabled)
 	{

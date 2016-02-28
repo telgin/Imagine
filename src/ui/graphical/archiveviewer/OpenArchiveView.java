@@ -40,7 +40,7 @@ import ui.graphical.View;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This is the view for the archive viewer tab.
  */
 public class OpenArchiveView extends View
 {
@@ -65,9 +65,9 @@ public class OpenArchiveView extends View
 	private ArgParseResult f_args;
 
 	/**
-	 * @update_comment
-	 * @param p_window
-	 * @param p_args
+	 * Constructs the archive viewer tab
+	 * @param p_window The javafx window
+	 * @param p_args The command line arguments
 	 */
 	public OpenArchiveView(Stage p_window, ArgParseResult p_args)
 	{

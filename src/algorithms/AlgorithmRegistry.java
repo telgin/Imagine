@@ -15,7 +15,7 @@ import logging.Logger;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This class maintains a central place where all algorithm definitions can be found.
  */
 public class AlgorithmRegistry
 {
@@ -41,8 +41,8 @@ public class AlgorithmRegistry
 	private AlgorithmRegistry(){}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of algorithm definition names
+	 * @return The list of names
 	 */
 	public static List<String> getAlgorithmNames()
 	{
@@ -53,9 +53,9 @@ public class AlgorithmRegistry
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @return
+	 * Gets the default algorithm by the algorithm definition name specified
+	 * @param p_name The algorithm definition name
+	 * @return The default algorithm
 	 */
 	public static Algorithm getDefaultAlgorithm(String p_name)
 	{
@@ -63,9 +63,9 @@ public class AlgorithmRegistry
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @return
+	 * Gets the default presets defined by the algorithm definition
+	 * @param p_name The algorithm definition name
+	 * @return A list of all default presets
 	 */
 	public static List<Algorithm> getAlgorithmPresets(String p_name)
 	{
@@ -73,10 +73,10 @@ public class AlgorithmRegistry
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
-	 * @return
+	 * Creates an archive reader factory for the given algorithm / key
+	 * @param p_algo The algorithm to use
+	 * @param p_key The key to use
+	 * @return The archive reader factory for this algorithm
 	 */
 	public static ArchiveReaderFactory<? extends ArchiveReader> 
 		getArchiveReaderFactory(Algorithm p_algo, Key p_key)
@@ -84,15 +84,15 @@ public class AlgorithmRegistry
 		if (!s_definitions.containsKey(p_algo.getName()))
 			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + p_algo.getName());
 		
-		return s_definitions.get(p_algo.getName()).getArchiveFactoryCreation()
+		return s_definitions.get(p_algo.getName()).getArchiveFactoryCreator()
 			.createReader(p_algo, p_key);
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
-	 * @return
+	 * Creates an archive writer factory for the given algorithm / key
+	 * @param p_algo The algorithm to use
+	 * @param p_key The key to use
+	 * @return The archive writer factory for this algorithm
 	 */
 	public static ArchiveWriterFactory<? extends ArchiveWriter> 
 		getArchiveWriterFactory(Algorithm p_algo, Key p_key)
@@ -100,7 +100,7 @@ public class AlgorithmRegistry
 		if (!s_definitions.containsKey(p_algo.getName()))
 			Logger.log(LogLevel.k_fatal, "There is no factory by the name of: " + p_algo.getName());
 		
-		return s_definitions.get(p_algo.getName()).getArchiveFactoryCreation()
+		return s_definitions.get(p_algo.getName()).getArchiveFactoryCreator()
 			.createWriter(p_algo, p_key);
 	}
 }

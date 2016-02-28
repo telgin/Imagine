@@ -5,7 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 import archive.ArchiveWriter;
 import archive.ArchiveWriterFactory;
-import archive.ConversionJobFileState;
+import archive.CreationJobFileState;
 import archive.FileOutputManager;
 import archive.ArchiveLoader;
 import config.Settings;
@@ -73,7 +73,7 @@ public class ArchiveWorker implements Runnable
 					{
 						//update status to show failure
 						if (Settings.trackFileStatus())
-							JobStatus.setConversionJobFileStatus(taken.getFile(), ConversionJobFileState.ERRORED);
+							JobStatus.setCreationJobFileStatus(taken.getFile(), CreationJobFileState.ERRORED);
 						
 						Logger.log(LogLevel.k_error,
 							"A file could not be written: " + taken.getFile().getName());

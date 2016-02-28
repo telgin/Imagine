@@ -7,7 +7,7 @@ import key.Key;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public interface ArchiveFactoryCreation
+public interface ArchiveFactoryCreator
 {
 	/**
 	 * @update_comment

@@ -6,7 +6,7 @@ import java.util.List;
 import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
-import archive.ArchiveFactoryCreation;
+import archive.ArchiveFactoryCreator;
 import archive.ArchiveReader;
 import archive.ArchiveReaderFactory;
 import archive.ArchiveWriter;
@@ -102,15 +102,15 @@ public class Definition implements algorithms.Definition
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see algorithms.Definition#getArchiveFactoryCreation()
+	 * @see algorithms.Definition#getArchiveFactoryCreator()
 	 */
 	@Override
-	public ArchiveFactoryCreation getArchiveFactoryCreation()
+	public ArchiveFactoryCreator getArchiveFactoryCreator()
 	{
-		return new ArchiveFactoryCreation()
+		return new ArchiveFactoryCreator()
 		{
 			/* (non-Javadoc)
-			 * @see archive.ArchiveFactoryCreation#createReader(algorithms.Algorithm, key.Key)
+			 * @see archive.ArchiveFactoryCreator#createReader(algorithms.Algorithm, key.Key)
 			 */
 			@Override
 			public ArchiveReaderFactory<? extends ArchiveReader> createReader(
@@ -120,7 +120,7 @@ public class Definition implements algorithms.Definition
 			}
 
 			/* (non-Javadoc)
-			 * @see archive.ArchiveFactoryCreation#createWriter(algorithms.Algorithm, key.Key)
+			 * @see archive.ArchiveFactoryCreator#createWriter(algorithms.Algorithm, key.Key)
 			 */
 			@Override
 			public ArchiveWriterFactory<? extends ArchiveWriter> createWriter(

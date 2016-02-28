@@ -12,7 +12,6 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.PosixFilePermission;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -376,14 +375,12 @@ public class FileSystemUtil
 	public static void getSupportedImageIOTypes()
 	{
 		String names[] = ImageIO.getReaderFormatNames();
-	    for (int i = 0; i < names.length; ++i) {
+	    for (int i = 0; i < names.length; ++i)
 	      System.out.println("reader " + names[i]);
-	    }
 
 	    names = ImageIO.getWriterFormatNames();
-	    for (int i = 0; i < names.length; ++i) {
+	    for (int i = 0; i < names.length; ++i)
 	      System.out.println("writer " + names[i]);
-	    }
 	}
 	
 	

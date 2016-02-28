@@ -7,7 +7,7 @@ import key.Key;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Creates the readers and writers for the text algorithm
  */
 public class TextFactory implements ArchiveReaderFactory<TextReader>,
 	ArchiveWriterFactory<TextWriter>
@@ -16,9 +16,10 @@ public class TextFactory implements ArchiveReaderFactory<TextReader>,
 	private Key s_key;
 
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Constructs a text factory
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to read or write archives
 	 */
 	public TextFactory(Algorithm p_algo, Key p_key)
 	{

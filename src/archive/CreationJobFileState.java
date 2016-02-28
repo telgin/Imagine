@@ -4,7 +4,7 @@ package archive;
  * @author Thomas Elgin (https://github.com/telgin)
  * @update_comment
  */
-public enum ConversionJobFileState
+public enum CreationJobFileState
 {
 	NOT_STARTED,
 	WRITING,

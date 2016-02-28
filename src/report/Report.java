@@ -31,7 +31,7 @@ public abstract class Report
 	 * @update_comment
 	 * @param p_fileMetadata
 	 */
-	public static void saveConversionRecord(Metadata p_fileMetadata)
+	public static void saveCreationRecord(Metadata p_fileMetadata)
 	{
 		String filePath = p_fileMetadata.getFile().getPath();
 		String f1uuid = FileSystemUtil.getArchiveName(p_fileMetadata.getArchiveUUID());

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import archive.ConversionJobFileState;
+import archive.CreationJobFileState;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeCell;
@@ -19,26 +19,26 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 {
 	private double f_progress;
 	private File f_file;
-	private ConversionJobFileState f_status;
+	private CreationJobFileState f_status;
 	private boolean f_focused;
 	
 	private static final InputFileTreeItem s_tempExpandableChildItem =
 		new InputFileTreeItem("Loading...");
-	private static final Map<ConversionJobFileState, String> s_fxStatusColors = 
-		new HashMap<ConversionJobFileState, String>();
+	private static final Map<CreationJobFileState, String> s_fxStatusColors = 
+		new HashMap<CreationJobFileState, String>();
 	private static final String s_textFillColor = "-fx-text-fill: black; ";
 	
 	static
 	{
-		s_fxStatusColors.put(ConversionJobFileState.NOT_STARTED,
+		s_fxStatusColors.put(CreationJobFileState.NOT_STARTED,
 			"-fx-accent: rgba(200, 200, 200, 1); ");
-		s_fxStatusColors.put(ConversionJobFileState.WRITING,
+		s_fxStatusColors.put(CreationJobFileState.WRITING,
 			"-fx-background-color: rgba(11, 156, 0, .5); ");
-		s_fxStatusColors.put(ConversionJobFileState.PAUSED,
+		s_fxStatusColors.put(CreationJobFileState.PAUSED,
 			"-fx-background-color: rgba(156, 146, 0, .5); ");
-		s_fxStatusColors.put(ConversionJobFileState.FINISHED,
+		s_fxStatusColors.put(CreationJobFileState.FINISHED,
 			"-fx-background-color: rgba(11, 156, 0, .7); ");
-		s_fxStatusColors.put(ConversionJobFileState.ERRORED,
+		s_fxStatusColors.put(CreationJobFileState.ERRORED,
 			"-fx-background-color: rgba(244, 20, 0, .75); ");
 	}
 	
@@ -50,7 +50,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	{
 		super(p_file.getName());
 		this.f_file = p_file;
-		f_status = ConversionJobFileState.NOT_STARTED;
+		f_status = CreationJobFileState.NOT_STARTED;
 		
 		if (p_file.isDirectory() && p_file.listFiles().length > 0)
 		{
@@ -107,7 +107,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	/**
 	 * @return the status
 	 */
-	public ConversionJobFileState getStatus()
+	public CreationJobFileState getStatus()
 	{
 		return f_status;
 	}
@@ -115,7 +115,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	/**
 	 * @param p_status the status to set
 	 */
-	public void setStatus(ConversionJobFileState p_status)
+	public void setStatus(CreationJobFileState p_status)
 	{
 		this.f_status = p_status;
 	}
@@ -159,8 +159,8 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 		//create a progress bar out of the background color by setting the insets
 		//according to the progress of the item
 		String bar = "";
-		if ((f_status.equals(ConversionJobFileState.WRITING) || 
-						f_status.equals(ConversionJobFileState.PAUSED)))
+		if ((f_status.equals(CreationJobFileState.WRITING) || 
+						f_status.equals(CreationJobFileState.PAUSED)))
 		{
 			bar = " -fx-background-insets: 0 " + rightInset + " 0 0";
 		}

@@ -12,7 +12,8 @@ import javax.imageio.ImageIO;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Manages input images for the image overlay. Decides which image to be given as
+ * input to the algorithm.
  */
 public class InputImageManager
 {
@@ -34,9 +35,9 @@ public class InputImageManager
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_inputFolder
-	 * @param p_mode
+	 * Constructs an input image manager
+	 * @param p_inputFolder The folder containing input images
+	 * @param p_mode The way to handle used input images
 	 */
 	private InputImageManager(File p_inputFolder, ConsumptionMode p_mode)
 	{
@@ -56,28 +57,32 @@ public class InputImageManager
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_inputFolder
-	 * @param p_mode
-	 * @return
+	 * Gets a manager for the given input folder with the specified mode. Only one manager may
+	 * exist per input folder. If there already exists a manager for the folder but it has a
+	 * different mode, it will be replaced with a new manager with the specified mode.
+	 * @param p_inputFolder The folder of input images
+	 * @param p_mode The consumption mode
+	 * @return The input image manager for this folder
 	 */
 	public static InputImageManager getInstance(File p_inputFolder, ConsumptionMode p_mode)
 	{
 		if (f_managers.containsKey(p_inputFolder.getAbsoluteFile()))
 		{
-			return f_managers.get(p_inputFolder.getAbsoluteFile());
+			InputImageManager found = f_managers.get(p_inputFolder.getAbsoluteFile());
+			if (found.f_mode == p_mode)
+			{
+				return found;
+			}
 		}
-		else
-		{
-			InputImageManager created = new InputImageManager(p_inputFolder.getAbsoluteFile(), p_mode);
-			f_managers.put(p_inputFolder.getAbsoluteFile(), created);
-			return created;
-		}
+
+		InputImageManager created = new InputImageManager(p_inputFolder.getAbsoluteFile(), p_mode);
+		f_managers.put(p_inputFolder.getAbsoluteFile(), created);
+		return created;
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the next input image file
+	 * @return The next image file
 	 */
 	public synchronized File nextImageFile()
 	{
@@ -101,8 +106,8 @@ public class InputImageManager
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Finds the next image file in the input folder
+	 * @return The next image file, or null if none remain
 	 */
 	private File findNextImageFile()
 	{
@@ -125,9 +130,11 @@ public class InputImageManager
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_imageFile
-	 * @throws IOException
+	 * Sets an image file as used, which will be handled differently depending on the
+	 * consumption mode of this manager
+	 * @param p_imageFile The file to set as used
+	 * @throws IOException If the file cannot be moved or deleted when that is attempted.
+	 * (usually because of permissions or if it no longer exists.)
 	 */
 	public synchronized void setFileUsed(File p_imageFile) throws IOException
 	{

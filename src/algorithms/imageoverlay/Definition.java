@@ -7,7 +7,7 @@ import algorithms.Algorithm;
 import algorithms.Option;
 import algorithms.Parameter;
 import api.UsageException;
-import archive.ArchiveFactoryCreation;
+import archive.ArchiveFactoryCreator;
 import archive.ArchiveReader;
 import archive.ArchiveReaderFactory;
 import archive.ArchiveWriter;
@@ -75,7 +75,9 @@ public class Definition implements algorithms.Definition
 			Parameter param = new Parameter(INSERTION_DENSITY_PARAM, Parameter.STRING_TYPE, false, true);
 			param.setDescription("The percentage of data in the input image to be overwritten with embedded data. At "
 				+ "25%, the visual difference with be unnoticeable for most images. At 50%, some artifacts "
-				+ "will be noticeable in smaller images or when looking at an image zoomed in.");
+				+ "will be noticeable in smaller images or when looking at an image zoomed in. Specifically, these "
+				+ "are percents of bits per byte to use for file data. So, at 25%, two bits are file data and six are "
+				+ "image data. At 50%, four bits are file data and four bits are image data.");
 
 			param.addOption(new Option("25%"));
 			param.addOption(new Option("50%"));
@@ -133,15 +135,15 @@ public class Definition implements algorithms.Definition
 	}
 
 	/* (non-Javadoc)
-	 * @see algorithms.Definition#getArchiveFactoryCreation()
+	 * @see algorithms.Definition#getArchiveFactoryCreator()
 	 */
 	@Override
-	public ArchiveFactoryCreation getArchiveFactoryCreation()
+	public ArchiveFactoryCreator getArchiveFactoryCreator()
 	{
-		return new ArchiveFactoryCreation()
+		return new ArchiveFactoryCreator()
 		{
 			/* (non-Javadoc)
-			 * @see archive.ArchiveFactoryCreation#createReader(algorithms.Algorithm, key.Key)
+			 * @see archive.ArchiveFactoryCreator#createReader(algorithms.Algorithm, key.Key)
 			 */
 			@Override
 			public ArchiveReaderFactory<? extends ArchiveReader> createReader(
@@ -151,7 +153,7 @@ public class Definition implements algorithms.Definition
 			}
 
 			/* (non-Javadoc)
-			 * @see archive.ArchiveFactoryCreation#createWriter(algorithms.Algorithm, key.Key)
+			 * @see archive.ArchiveFactoryCreator#createWriter(algorithms.Algorithm, key.Key)
 			 */
 			@Override
 			public ArchiveWriterFactory<? extends ArchiveWriter> createWriter(

@@ -9,7 +9,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import api.UsageException;
-import archive.ArchiveFactoryCreation;
+import archive.ArchiveFactoryCreator;
 import archive.ArchiveReader;
 import archive.ArchiveReaderFactory;
 import archive.ArchiveWriter;
@@ -21,7 +21,9 @@ import util.ConfigUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The algorithm class holds information about a configured algorithm with
+ * various parameters. Essentially, it's the container for a preset.
+ * This class will create the reader and writer factories.
  */
 public class Algorithm
 {
@@ -29,15 +31,14 @@ public class Algorithm
 	private int f_versionNum;
 	private String f_description;
 	private Map<String, Parameter> f_parameters;
-	private ArchiveFactoryCreation f_archiveFactoryCreation;
+	private ArchiveFactoryCreator f_archiveFactoryCreator;
 	private String f_presetName;
 
-
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @param p_versionNum
-	 * @param p_description
+	 * Constructs a blank algorithm of the type p_name
+	 * @param p_name The algorithm definition name (not the preset name)
+	 * @param p_versionNum The algorithm version number
+	 * @param p_description The algorithm description text
 	 */
 	public Algorithm(String p_name, int p_versionNum, String p_description)
 	{
@@ -48,8 +49,8 @@ public class Algorithm
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_algoNode
+	 * Constructs an algorithm from a xml element
+	 * @param p_algoNode The xml element to parse
 	 */
 	public Algorithm(Element p_algoNode)
 	{
@@ -76,23 +77,23 @@ public class Algorithm
 		for (Parameter param : f_parameters.values())
 			clone.addParameter(param.clone());
 		
-		clone.setArchiveFactoryCreation(f_archiveFactoryCreation);
+		clone.setArchiveFactoryCreator(f_archiveFactoryCreator);
 		
 		return clone;
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_creation
+	 * Sets the archive factory creator
+	 * @param p_creator The creator to set
 	 */
-	public void setArchiveFactoryCreation(ArchiveFactoryCreation p_creation)
+	public void setArchiveFactoryCreator(ArchiveFactoryCreator p_creator)
 	{
-		f_archiveFactoryCreation = p_creation;
+		f_archiveFactoryCreator = p_creator;
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of parameters
+	 * @return The list of parameters
 	 */
 	public List<Parameter> getParameters()
 	{
@@ -100,10 +101,10 @@ public class Algorithm
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @param p_value
-	 * @throws UsageException 
+	 * Sets a parameter of the given name to the given value
+	 * @param p_name The name of the parameter to set the value of
+	 * @param p_value The value to set
+	 * @throws UsageException If the value cannot be set
 	 */
 	public void setParameter(String p_name, String p_value) throws UsageException
 	{
@@ -116,9 +117,9 @@ public class Algorithm
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @param p_enabled
+	 * Sets a parameter's enabled state
+	 * @param p_name The name of the parameter
+	 * @param p_enabled The new enabled state
 	 */
 	public void setParameterEnabled(String p_name, boolean p_enabled)
 	{
@@ -131,8 +132,8 @@ public class Algorithm
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_param
+	 * Adds a parameter to this algorithm
+	 * @param p_param The parameter to add
 	 */
 	public void addParameter(Parameter p_param)
 	{
@@ -140,9 +141,9 @@ public class Algorithm
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @return
+	 * Gets the parameter by the given name
+	 * @param p_name The parameter name to search for
+	 * @return The parameter with the given name, or null if none exists
 	 */
 	public Parameter getParameter(String p_name)
 	{
@@ -150,8 +151,9 @@ public class Algorithm
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the name of this algorithm (The algorithm definition name, not
+	 * the preset name. Ex. 'image')
+	 * @return The algorithm name
 	 */
 	public String getName()
 	{
@@ -159,8 +161,8 @@ public class Algorithm
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the version number of this algorithm
+	 * @return The version number
 	 */
 	public int getVersion()
 	{
@@ -168,9 +170,9 @@ public class Algorithm
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @return
+	 * Searches for a parameter with the given name and returns its value
+	 * @param p_name The name to search for
+	 * @return The parameter value, or null if no such parameter exists.
 	 */
 	public String getParameterValue(String p_name)
 	{
@@ -186,9 +188,9 @@ public class Algorithm
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_doc
-	 * @return
+	 * Creates an xml element to represent this algorithm
+	 * @param p_doc The current xml document
+	 * @return The xml element for this algorithm
 	 */
 	public Element toElement(Document p_doc)
 	{
@@ -206,23 +208,23 @@ public class Algorithm
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_key
-	 * @return
+	 * Creates an archive reader factory
+	 * @param p_key The key to be used
+	 * @return The archive reader factory
 	 */
 	public ArchiveReaderFactory<? extends ArchiveReader> getArchiveReaderFactory(Key p_key)
 	{
-		return f_archiveFactoryCreation.createReader(this, p_key);
+		return f_archiveFactoryCreator.createReader(this, p_key);
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_key
-	 * @return
+	 * Creates an archive writer factory
+	 * @param p_key The key to be used
+	 * @return The archive writer factory
 	 */
 	public ArchiveWriterFactory<? extends ArchiveWriter> getArchiveWriterFactory(Key p_key)
 	{
-		return f_archiveFactoryCreation.createWriter(this, p_key);
+		return f_archiveFactoryCreator.createWriter(this, p_key);
 	}
 
 	/**

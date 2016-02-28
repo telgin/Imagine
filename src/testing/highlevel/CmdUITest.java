@@ -13,7 +13,7 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 
-import archive.ConversionJob;
+import archive.CreationJob;
 import system.Imagine;
 import system.SystemManager;
 import testing.Comparisons;
@@ -23,7 +23,7 @@ import util.StandardUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Tests various command line inputs
  */
 public class CmdUITest
 {
@@ -35,7 +35,7 @@ public class CmdUITest
 	private static final File REPORT_FOLDER = new File("testing/reports/");
 	private static final File REPORT_FILE = new File(REPORT_FOLDER, "report.txt");
 	private static final File BIG_TREE_FILE_LIST = new File("testing/file_lists/bigTree.txt");
-	private static ArrayList<ConversionJob> s_jobs = new ArrayList<ConversionJob>();
+	private static ArrayList<CreationJob> s_jobs = new ArrayList<CreationJob>();
 	
 	private static final String EMPTY_FOLDER = "emptyFolder";
 	private static final String SMALL_FILE = "smallFile";
@@ -55,10 +55,10 @@ public class CmdUITest
 	/**
 	 * Simple test without key
 	 */
-	public void image_1(String testFileName)
+	public void image_1(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -98,10 +98,10 @@ public class CmdUITest
 	/**
 	 * Simple test with key file
 	 */
-	public void image_2(String testFileName)
+	public void image_2(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -133,10 +133,10 @@ public class CmdUITest
 	 * Test for report output
 	 * @throws IOException 
 	 */
-	public void image_3(String testFileName) throws IOException
+	public void image_3(String p_testFileName) throws IOException
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -161,10 +161,10 @@ public class CmdUITest
 	/**
 	 * Input file list
 	 */
-	public void image_4(String testFileName, File fileList)
+	public void image_4(String p_testFileName, File fileList)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -193,10 +193,10 @@ public class CmdUITest
 	 * Parameter test (image size)
 	 * @throws IOException 
 	 */
-	public void image_5(String testFileName) throws IOException
+	public void image_5(String p_testFileName) throws IOException
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -277,10 +277,10 @@ public class CmdUITest
 	/**
 	 * Wrong key file
 	 */
-	public void image_7(String testFileName)
+	public void image_7(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -311,10 +311,10 @@ public class CmdUITest
 	/**
 	 * Simple test without key (25)
 	 */
-	public void image_overlay_1(String testFileName)
+	public void image_overlay_1(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -356,10 +356,10 @@ public class CmdUITest
 	/**
 	 * Simple test with key file (25)
 	 */
-	public void image_overlay_2(String testFileName)
+	public void image_overlay_2(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -392,10 +392,10 @@ public class CmdUITest
 	/**
 	 * Simple test with key file (50)
 	 */
-	public void image_overlay_3(String testFileName)
+	public void image_overlay_3(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -428,10 +428,10 @@ public class CmdUITest
 	/**
 	 * quotes on parameters
 	 */
-	public void image_overlay_4(String testFileName)
+	public void image_overlay_4(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -459,10 +459,10 @@ public class CmdUITest
 	/**
 	 * no input images available
 	 */
-	public void image_overlay_5(String testFileName)
+	public void image_overlay_5(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//remove images
 		clearFolder(IMAGE_FOLDER);
@@ -485,10 +485,10 @@ public class CmdUITest
 	/**
 	 * image folder move mode
 	 */
-	public void image_overlay_6(String testFileName)
+	public void image_overlay_6(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -496,8 +496,7 @@ public class CmdUITest
 						"-a", IMAGE_OVERALY_25_PRESET,
 						"-o", OUTPUT_FOLDER.getPath(),
 						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_CONSUMPTION_MODE_PARAM + "=" + 
-										"move"};
+						"-P", algorithms.imageoverlay.Definition.IMAGE_CONSUMPTION_MODE_PARAM + "=" + "move"};
 		Imagine.run(embed);
 		
 		//extract
@@ -524,10 +523,10 @@ public class CmdUITest
 	/**
 	 * image folder delete mode
 	 */
-	public void image_overlay_7(String testFileName)
+	public void image_overlay_7(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -535,8 +534,7 @@ public class CmdUITest
 						"-a", IMAGE_OVERALY_25_PRESET,
 						"-o", OUTPUT_FOLDER.getPath(),
 						"-P", algorithms.imageoverlay.Definition.IMAGE_FOLDER_PARAM + "=" + IMAGE_FOLDER.getPath(),
-						"-P", algorithms.imageoverlay.Definition.IMAGE_CONSUMPTION_MODE_PARAM + "=" + 
-										"delete"};
+						"-P", algorithms.imageoverlay.Definition.IMAGE_CONSUMPTION_MODE_PARAM + "=" +  "delete"};
 		Imagine.run(embed);
 		
 		//extract
@@ -563,10 +561,10 @@ public class CmdUITest
 	/**
 	 * Simple test without key
 	 */
-	public void text_1(String testFileName)
+	public void text_1(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -606,10 +604,10 @@ public class CmdUITest
 	/**
 	 * Simple test with key file
 	 */
-	public void text_2(String testFileName)
+	public void text_2(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -645,10 +643,10 @@ public class CmdUITest
 	/**
 	 * manual password
 	 */
-	public void text_3(String testFileName)
+	public void text_3(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -676,10 +674,10 @@ public class CmdUITest
 	/**
 	 * manual image folder (50)
 	 */
-	public void image_overlay_8(String testFileName)
+	public void image_overlay_8(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -707,10 +705,10 @@ public class CmdUITest
 	/**
 	 * manual open
 	 */
-	public void image_6(String testFileName)
+	public void image_6(String p_testFileName)
 	{
 		//setup
-		File inputFolder = setup(testFileName);
+		File inputFolder = setup(p_testFileName);
 		
 		//embed
 		String[] embed = new String[]{"--embed",
@@ -734,15 +732,15 @@ public class CmdUITest
 	//Support Functions (end test cases)
 	//----------------------------------------
 	
-	private static File setup(String treeName)
+	private static File setup(String p_treeName)
 	{
 		//shutdown from previous run
 		if (!SystemManager.isShutdown())
 			shutdown();
 
 		// setup
-		File inputFolder = TestFileTrees.getRoot(HOME_FOLDER, treeName);
-		reset(treeName);
+		File inputFolder = TestFileTrees.getRoot(HOME_FOLDER, p_treeName);
+		reset(p_treeName);
 		
 		setupInputImages();
 		
@@ -770,9 +768,9 @@ public class CmdUITest
 	private static void shutdown()
 	{
 		SystemManager.shutdown();
-		for (ConversionJob job : s_jobs)
+		for (CreationJob job : s_jobs)
 			job.shutdown();
-		s_jobs = new ArrayList<ConversionJob>();
+		s_jobs = new ArrayList<CreationJob>();
 		
 		while (!SystemManager.isShutdown())
 		{
@@ -785,21 +783,21 @@ public class CmdUITest
 		
 		SystemManager.reset();
 	}
-	private static void reset(String treeName)
+	private static void reset(String p_treeName)
 	{
 		clearFolder(OUTPUT_FOLDER);
 		clearFolder(EXTRACTION_FOLDER);
 		clearFolder(IMAGE_FOLDER);
 		clearFolder(REPORT_FOLDER);
-		TestFileTrees.reset(HOME_FOLDER, treeName);
+		TestFileTrees.reset(HOME_FOLDER, p_treeName);
 	}
 
-	private static void clearFolder(File folder)
+	private static void clearFolder(File p_folder)
 	{
-		if (folder != null)
+		if (p_folder != null)
 		{
-			FileSystemUtil.deleteDir(folder);
-			folder.mkdir();
+			FileSystemUtil.deleteDir(p_folder);
+			p_folder.mkdir();
 		}
 	}
 }

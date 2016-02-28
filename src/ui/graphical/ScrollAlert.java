@@ -8,13 +8,14 @@ import javafx.scene.text.Text;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A modified alert window. This is the standard alert window but with
+ * the text body wrapped in a scroll pane.
  */
 public class ScrollAlert extends Alert
 {
 	/**
-	 * @update_comment
-	 * @param p_alertType
+	 * Constructs a scroll alert window
+	 * @param p_alertType The javafx alert type for this popup
 	 */
 	public ScrollAlert(AlertType p_alertType)
 	{
@@ -23,8 +24,8 @@ public class ScrollAlert extends Alert
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_text
+	 * Sets the text body of the scroll alert given a string
+	 * @param p_text The alert text
 	 */
 	public void setScrollText(String p_text)
 	{
@@ -32,13 +33,13 @@ public class ScrollAlert extends Alert
 		Text content = new Text(p_text);
 		scroll.setContent(content);
 		scroll.setPrefSize(700, 120);
-		scroll.setStyle("-fx-focus-color: transparent;"); //remove focus highlight
+		scroll.setStyle("-fx-focus-color: transparent;"); //this removes focus highlight
 		getDialogPane().setContent(scroll);
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_lines
+	 * Sets the text body of the scroll alert given a list of lines
+	 * @param p_lines The list of alert text lines
 	 */
 	public void setScrollText(List<String> p_lines)
 	{

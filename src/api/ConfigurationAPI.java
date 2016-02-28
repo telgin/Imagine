@@ -10,12 +10,12 @@ import config.DefaultConfigGenerator;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Contains functions which allow for a standard means to change the configuration.
  */
 public abstract class ConfigurationAPI
 {
 	/**
-	 * @update_comment
+	 * Installs the software. Currently, just generates a default configuration.
 	 */
 	public static void install()
 	{
@@ -24,9 +24,9 @@ public abstract class ConfigurationAPI
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @throws UsageException
+	 * Adds a new algorithm preset to the configuration
+	 * @param p_algo The algorithm preset
+	 * @throws UsageException If the algorithm could not be added
 	 */
 	public static void addNewAlgorithmPreset(Algorithm p_algo) throws UsageException
 	{
@@ -44,9 +44,9 @@ public abstract class ConfigurationAPI
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_presetName
-	 * @throws UsageException
+	 * Deletes an algorithm preset from the configuration
+	 * @param p_presetName The preset name to delete
+	 * @throws UsageException If the algorithm could not be deleted
 	 */
 	public static void deleteAlgorithmPreset(String p_presetName) throws UsageException
 	{	
@@ -63,10 +63,10 @@ public abstract class ConfigurationAPI
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_presetName
-	 * @return
-	 * @throws UsageException
+	 * Gets the algorithm preset by the specified preset name.
+	 * @param p_presetName The preset name to search for
+	 * @return The algorithm preset
+	 * @throws UsageException If the algorithm could not be found
 	 */
 	public static Algorithm getAlgorithmPreset(String p_presetName) throws UsageException
 	{
@@ -81,8 +81,8 @@ public abstract class ConfigurationAPI
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of preset names from the configuration
+	 * @return The list of preset names
 	 */
 	public static List<String> getAlgorithmPresetNames()
 	{
@@ -90,8 +90,8 @@ public abstract class ConfigurationAPI
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of algorithm definition names.
+	 * @return The list of algorithm definition names
 	 */
 	public static List<String> getAlgorithmDefinitionNames()
 	{
@@ -99,10 +99,10 @@ public abstract class ConfigurationAPI
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_algoDefName
-	 * @return
-	 * @throws UsageException
+	 * Gets the defined default algorithm, which is like a preset with all default values.
+	 * @param p_algoDefName The algorithm definition name
+	 * @return The default algorithm
+	 * @throws UsageException If the default algorithm could not be found
 	 */
 	public static Algorithm getDefaultAlgorithm(String p_algoDefName) throws UsageException
 	{

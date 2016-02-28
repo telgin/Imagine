@@ -5,7 +5,9 @@ import util.Hashing;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The default key is the key which gets put into algorithms when
+ * no user password/key file is used. It is the same as if you
+ * had typed in this default password manually.
  */
 public class DefaultKey implements Key
 {

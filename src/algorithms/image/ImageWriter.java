@@ -18,15 +18,16 @@ import util.algorithms.ImageUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Handles the writing of an image archive
  */
 public class ImageWriter extends Image implements ArchiveWriter
 {
 
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Constructs an image writer
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to write archives
 	 */
 	public ImageWriter(Algorithm p_algo, Key p_key)
 	{
@@ -104,9 +105,9 @@ public class ImageWriter extends Image implements ArchiveWriter
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_index
-	 * @param p_data
+	 * Sets the byte of data in the image at the given index
+	 * @param p_index The image index
+	 * @param p_data The byte to set
 	 */
 	private void setImageByte(int p_index, byte p_data)
 	{

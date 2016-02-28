@@ -4,36 +4,44 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import archive.ConversionJobFileState;
+import archive.CreationJobFileState;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Allows archive creation jobs to report on their status
  */
 public abstract class JobStatus
 {
-	private static int archivesCreated;
-	private static int inputFilesProcessed;
-	
-	private static Map<File, FileStatus> fileStati;
+	private static int s_archivesCreated;
+	private static int s_inputFilesProcessed;
+	private static Map<File, FileStatus> s_fileStatuses;
 
+	/**
+	 * Resets the job stats and clears the file statuses
+	 */
 	public static void reset()
 	{
-		archivesCreated = 0;
-		inputFilesProcessed = 0;
+		s_archivesCreated = 0;
+		s_inputFilesProcessed = 0;
 		
-		fileStati = new HashMap<File, FileStatus>();
+		s_fileStatuses = new HashMap<File, FileStatus>();
 	}
 	
-	public static FileStatus getFileStatus(File file)
+	/**
+	 * Gets the file status object for a particular file. One will be created
+	 * if it doesn't yet exist.
+	 * @param p_file The file to get the status of
+	 * @return The file status object for this file
+	 */
+	public static FileStatus getFileStatus(File p_file)
 	{
-		FileStatus fileStatus = fileStati.get(file);
+		FileStatus fileStatus = s_fileStatuses.get(p_file);
 		
 		if (fileStatus == null)
 		{
-			fileStatus = new FileStatus(file);
-			fileStatus.setState(ConversionJobFileState.NOT_STARTED);
-			fileStati.put(file, fileStatus);
+			fileStatus = new FileStatus(p_file);
+			fileStatus.setState(CreationJobFileState.NOT_STARTED);
+			s_fileStatuses.put(p_file, fileStatus);
 		}
 		
 		return fileStatus;
@@ -44,15 +52,15 @@ public abstract class JobStatus
 	 */
 	public static int getArchivesCreated()
 	{
-		return archivesCreated;
+		return s_archivesCreated;
 	}
 
 	/**
-	 * @param archivesCreated the archivesCreated to set
+	 * @param s_archivesCreated the archivesCreated to set
 	 */
-	public static void incrementArchivesCreated(int increment)
+	public static void incrementArchivesCreated(int p_increment)
 	{
-		archivesCreated += increment;
+		s_archivesCreated += p_increment;
 	}
 
 	/**
@@ -60,42 +68,52 @@ public abstract class JobStatus
 	 */
 	public static int getInputFilesProcessed()
 	{
-		return inputFilesProcessed;
+		return s_inputFilesProcessed;
 	}
 
 	/**
-	 * @param inputFilesProcessed the inputFilesProcessed to set
+	 * @param s_inputFilesProcessed the inputFilesProcessed to set
 	 */
-	public static void incrementInputFilesProcessed(int increment)
+	public static void incrementInputFilesProcessed(int p_increment)
 	{
-		inputFilesProcessed += increment;
+		s_inputFilesProcessed += p_increment;
 	}
 	
-	public static void setBytesLeft(File file, long bytesLeft)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 * @param p_bytesLeft
+	 */
+	public static void setBytesLeft(File p_file, long p_bytesLeft)
 	{
-		if (fileStati.containsKey(file))
+		if (s_fileStatuses.containsKey(p_file))
 		{
-			fileStati.get(file).setBytesLeft(bytesLeft);
+			s_fileStatuses.get(p_file).setBytesLeft(p_bytesLeft);
 		}
 		else
 		{
-			FileStatus fileStatus = new FileStatus(file);
-			fileStatus.setBytesLeft(bytesLeft);
-			fileStati.put(file, fileStatus);
+			FileStatus fileStatus = new FileStatus(p_file);
+			fileStatus.setBytesLeft(p_bytesLeft);
+			s_fileStatuses.put(p_file, fileStatus);
 		}
 	}
 	
-	public static void setConversionJobFileStatus(File file, ConversionJobFileState status)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 * @param p_status
+	 */
+	public static void setCreationJobFileStatus(File p_file, CreationJobFileState p_status)
 	{
-		if (fileStati.containsKey(file))
+		if (s_fileStatuses.containsKey(p_file))
 		{
-			fileStati.get(file).setState(status);
+			s_fileStatuses.get(p_file).setState(p_status);
 		}
 		else
 		{
-			FileStatus fileStatus = new FileStatus(file);
-			fileStatus.setState(status);
-			fileStati.put(file, fileStatus);
+			FileStatus fileStatus = new FileStatus(p_file);
+			fileStatus.setState(p_status);
+			s_fileStatuses.put(p_file, fileStatus);
 		}
 	}
 }

@@ -10,7 +10,7 @@ import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
 import archive.ArchiveContents;
-import archive.ConversionJob;
+import archive.CreationJob;
 import archive.FileContents;
 import config.Constants;
 import config.Settings;
@@ -286,7 +286,7 @@ public class CmdUI extends UI
 			Settings.setTrackFileStatus(false);
 
 			//run the job thread
-			ConversionJob job = ConversionAPI.runConversion(f_args.getInputFiles(), algo, key, Constants.DEFAULT_THREAD_COUNT);
+			CreationJob job = ConversionAPI.createArchives(f_args.getInputFiles(), algo, key, Constants.DEFAULT_THREAD_COUNT);
 			
 			String previousStat = "";
 			while (!job.isFinished())
@@ -314,7 +314,7 @@ public class CmdUI extends UI
 		}
 		catch (Exception e)
 		{
-			Imagine.usage("A failure occurred during conversion.");
+			Imagine.usage("A failure occurred during archive creation.");
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 	}

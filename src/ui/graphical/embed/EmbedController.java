@@ -11,7 +11,7 @@ import algorithms.imageoverlay.Definition;
 import api.ConfigurationAPI;
 import api.ConversionAPI;
 import api.UsageException;
-import archive.ConversionJob;
+import archive.CreationJob;
 import config.Settings;
 import javafx.application.Platform;
 import key.FileKey;
@@ -45,7 +45,7 @@ public class EmbedController implements ActiveComponent
 	private boolean f_shuttingDown = false;
 	private int f_totalFilesThisRun = 0;
 	private int f_filesCreated = 0;
-	private double f_conversionProgress = 0;
+	private double f_creationProgress = 0;
 	private Thread f_guiUpdateDaemon;
 		
 	/**
@@ -124,7 +124,7 @@ public class EmbedController implements ActiveComponent
 			f_view.setKeySectionEnabled(false);
 			f_view.setInputSectionEnabled(false);
 			f_view.setTargetSectionEnabled(false);
-			f_view.setRunConversionEnabled(false);
+			f_view.setCreateArchivesEnabled(false);
 			f_selectedAlgorithm = null;
 		}
 		//else if the selected algorithm is a new selection...
@@ -135,7 +135,7 @@ public class EmbedController implements ActiveComponent
 				f_selectedAlgorithm = ConfigurationAPI.getAlgorithmPreset(f_presetNames.get(p_index));
 				f_view.setKeySectionEnabled(true);
 				f_view.setInputSectionEnabled(true);
-				f_view.setRunConversionEnabled(true);
+				f_view.setCreateArchivesEnabled(true);
 				
 				//Enable the target section if the algorithm uses it
 				//TODO create a better way to handle this (or update it once more algos exist)
@@ -299,7 +299,7 @@ public class EmbedController implements ActiveComponent
 	 * @update_comment
 	 * @return
 	 */
-	public void runConversionPressed()
+	public void createArchivesPressed()
 	{
 		try
 		{
@@ -352,7 +352,7 @@ public class EmbedController implements ActiveComponent
 				//status tracking required in GUI to update progress bars
 				Settings.setTrackFileStatus(true);
 
-				ConversionJob job = ConversionAPI.runConversion(inputFiles, f_selectedAlgorithm, getKey(), 1);
+				CreationJob job = ConversionAPI.createArchives(inputFiles, f_selectedAlgorithm, getKey(), 1);
 	
 				if (f_guiUpdateDaemon == null || !f_guiUpdateDaemon.isAlive())
 				{
@@ -364,13 +364,13 @@ public class EmbedController implements ActiveComponent
 		}
 		catch (Exception e)
 		{
-			Logger.log(LogLevel.k_error, "The conversion job failed to run.");
+			Logger.log(LogLevel.k_error, "The creation job failed to run.");
 			Logger.log(LogLevel.k_debug, e, false);
 		}
 		
 		if (f_gui.hasErrors())
 		{
-			f_view.showErrors(f_gui.getErrors(), "conversion");
+			f_view.showErrors(f_gui.getErrors(), "creation");
 			f_gui.clearErrors();
 		}
 	}
@@ -379,7 +379,7 @@ public class EmbedController implements ActiveComponent
 	 * @update_comment
 	 * @param p_job
 	 */
-	public void updateCSS(ConversionJob p_job)
+	public void updateCSS(CreationJob p_job)
 	{
 		int run = 0;
 		while (!f_shuttingDown && !p_job.isFinished())
@@ -397,7 +397,7 @@ public class EmbedController implements ActiveComponent
 		{
 			Platform.runLater(() -> 
 			{
-				f_view.showErrors(f_gui.getErrors(), "conversion");
+				f_view.showErrors(f_gui.getErrors(), "creation");
 				f_gui.clearErrors();
 			});
 		}
@@ -419,12 +419,12 @@ public class EmbedController implements ActiveComponent
 			f_view.setFilesCreated(f_filesCreated);
 		}
 		
-		//conversion progress
-		double currentConversionProgress = (double) JobStatus.getInputFilesProcessed() / f_totalFilesThisRun;
-		if (f_conversionProgress != currentConversionProgress)
+		//creation progress
+		double currentCreationProgress = (double) JobStatus.getInputFilesProcessed() / f_totalFilesThisRun;
+		if (f_creationProgress != currentCreationProgress)
 		{
-			f_conversionProgress = currentConversionProgress;
-			f_view.setConversionProgress(f_conversionProgress);
+			f_creationProgress = currentCreationProgress;
+			f_view.setCreationProgress(f_creationProgress);
 		}
 		
 		//update input file item status/progress for visible/loaded cells

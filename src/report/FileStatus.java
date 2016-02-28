@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import archive.ConversionJobFileState;
+import archive.CreationJobFileState;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -18,22 +18,28 @@ public class FileStatus
 {
 	private static final long MIN_PROGRESS_UPDATE_WAIT = 100;
 	private static final long MIN_STATE_UPDATE_WAIT = 100;
-	private File file;
-	private long bytesLeft;
-	private ConversionJobFileState state;
-	private double progress;
-	private Set<FileStatus> children;
-	private Integer childrenCount;
-	private long lastProgressUpdate = 0;
-	private long lastStateUpdate = 0;
-
+	private File f_file;
+	private long f_bytesLeft;
+	private CreationJobFileState f_state;
+	private double f_progress;
+	private Set<FileStatus> f_children;
+	private Integer f_childrenCount;
+	private long f_lastProgressUpdate;
+	private long f_lastStateUpdate;
 	
-	public FileStatus(File file)
+	/**
+	 * @update_comment
+	 * @param p_file
+	 */
+	public FileStatus(File p_file)
 	{
-		this.file = file;
-		state = ConversionJobFileState.NOT_STARTED;
+		f_file = p_file;
+		f_state = CreationJobFileState.NOT_STARTED;
 		
-		File parent = file.getParentFile();
+		f_lastProgressUpdate = 0;
+		f_lastStateUpdate = 0;
+		
+		File parent = p_file.getParentFile();
 		if (parent != null)
 		{
 			JobStatus.getFileStatus(parent).addChild(this);
@@ -45,7 +51,7 @@ public class FileStatus
 	 */
 	public File getFile()
 	{
-		return file;
+		return f_file;
 	}
 
 	/**
@@ -53,144 +59,164 @@ public class FileStatus
 	 */
 	public long getBytesLeft()
 	{
-		return bytesLeft;
+		return f_bytesLeft;
 	}
 
 	/**
-	 * @param bytesLeft the bytesLeft to set
+	 * @param p_bytesLeft the bytesLeft to set
 	 */
-	public void setBytesLeft(long bytesLeft)
+	public void setBytesLeft(long p_bytesLeft)
 	{
-		this.bytesLeft = bytesLeft;
+		f_bytesLeft = p_bytesLeft;
 	}
 
 	/**
 	 * @return the status
 	 */
-	public synchronized ConversionJobFileState getState()
+	public synchronized CreationJobFileState getState()
 	{
 		if (!stateUpdateNeeded())
-			return state;
+			return f_state;
 		
-		if (children != null)
+		if (f_children != null)
 		{
-			state = null;
+			f_state = null;
 			boolean allNotStarted = true;
 			boolean allFinished = true;
-			List<FileStatus> currentChildren = new LinkedList<FileStatus>(children);
+			List<FileStatus> currentChildren = new LinkedList<FileStatus>(f_children);
 			for (FileStatus childStatus : currentChildren)
 			{
-				ConversionJobFileState childState = childStatus.getState();
-				if (childState == ConversionJobFileState.ERRORED)
+				CreationJobFileState childState = childStatus.getState();
+				if (childState == CreationJobFileState.ERRORED)
 				{
-					state = ConversionJobFileState.ERRORED;
+					f_state = CreationJobFileState.ERRORED;
 					break;
 				}
-				else if (childState == ConversionJobFileState.WRITING)
+				else if (childState == CreationJobFileState.WRITING)
 				{
-					state = ConversionJobFileState.WRITING;
+					f_state = CreationJobFileState.WRITING;
 					break;
 				}
-				else if (childState == ConversionJobFileState.PAUSED)
+				else if (childState == CreationJobFileState.PAUSED)
 				{
-					state = ConversionJobFileState.PAUSED;
+					f_state = CreationJobFileState.PAUSED;
 					break;
 				}
-				else if (childState != ConversionJobFileState.NOT_STARTED)
+				else if (childState != CreationJobFileState.NOT_STARTED)
 				{
 					allNotStarted = false;
 				}
-				else if (childState != ConversionJobFileState.FINISHED)
+				else if (childState != CreationJobFileState.FINISHED)
 				{
 					allFinished = false;
 				}
 			}
 			
-			if (state == null)
+			if (f_state == null)
 			{
 				if (allFinished && !allNotStarted)
-					state = ConversionJobFileState.FINISHED;
+					f_state = CreationJobFileState.FINISHED;
 				else if (allNotStarted && !allFinished)
-					state = ConversionJobFileState.NOT_STARTED;
+					f_state = CreationJobFileState.NOT_STARTED;
 				else
-					state = ConversionJobFileState.WRITING;
+					f_state = CreationJobFileState.WRITING;
 			}
 		}
 		
-		lastStateUpdate = System.currentTimeMillis();
+		f_lastStateUpdate = System.currentTimeMillis();
 		
-		return state;
+		return f_state;
 	}
 
 	/**
 	 * @param status the status to set
 	 */
-	public void setState(ConversionJobFileState state)
+	public void setState(CreationJobFileState p_state)
 	{
-		this.state = state;
+		f_state = p_state;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public synchronized double getProgress()
 	{
 		if (!progressUpdateNeeded())
-			return progress;
+			return f_progress;
 
 		//no children, or none added yet
-		if (children == null)
+		if (f_children == null)
 		{
-			if (file.isDirectory())
+			if (f_file.isDirectory())
 			{
-				progress = 0;
+				f_progress = 0;
 			}
-			else if (file.length() == 0)
+			else if (f_file.length() == 0)
 			{
-				progress = 1;
+				f_progress = 1;
 			}
 			else
 			{
-				BigDecimal bytesWritten = BigDecimal.valueOf(file.length() - bytesLeft);
-				progress = Math.max(progress, bytesWritten.divide(BigDecimal.valueOf(file.length()), 
+				BigDecimal bytesWritten = BigDecimal.valueOf(f_file.length() - f_bytesLeft);
+				f_progress = Math.max(f_progress, bytesWritten.divide(BigDecimal.valueOf(f_file.length()), 
 								6, RoundingMode.HALF_UP).doubleValue());
 			}
 		}
 		else // children, so calculate based on average of child progress
 		{
 			double progressSum = 0;
-			List<FileStatus> currentChildren = new LinkedList<FileStatus>(children);
+			List<FileStatus> currentChildren = new LinkedList<FileStatus>(f_children);
 			for (FileStatus childStatus : currentChildren)
 				progressSum += childStatus.getProgress();
 			
-			progress = Math.max(progress, progressSum / childrenCount);
+			f_progress = Math.max(f_progress, progressSum / f_childrenCount);
 		}
 		
-		lastProgressUpdate = System.currentTimeMillis();
+		f_lastProgressUpdate = System.currentTimeMillis();
 		
-		return progress;
+		return f_progress;
 	}
 	
-	public void addChild(FileStatus child)
+	/**
+	 * @update_comment
+	 * @param p_child
+	 */
+	public void addChild(FileStatus p_child)
 	{
-		if (childrenCount == null)
-			childrenCount = file.list().length;
+		if (f_childrenCount == null)
+			f_childrenCount = f_file.list().length;
 		
-		if (children == null)
-			children = new HashSet<FileStatus>();
+		if (f_children == null)
+			f_children = new HashSet<FileStatus>();
 		
-		children.add(child);
+		f_children.add(p_child);
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	public boolean hasChildren()
 	{
-		return childrenCount != null;
+		return f_childrenCount != null;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private boolean progressUpdateNeeded()
 	{
-		return System.currentTimeMillis() - lastProgressUpdate >= MIN_PROGRESS_UPDATE_WAIT;
+		return System.currentTimeMillis() - f_lastProgressUpdate >= MIN_PROGRESS_UPDATE_WAIT;
 	}
 	
+	/**
+	 * @update_comment
+	 * @return
+	 */
 	private boolean stateUpdateNeeded()
 	{
-		return System.currentTimeMillis() - lastStateUpdate >= MIN_STATE_UPDATE_WAIT;
+		return System.currentTimeMillis() - f_lastStateUpdate >= MIN_STATE_UPDATE_WAIT;
 	}
 }

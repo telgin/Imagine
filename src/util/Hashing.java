@@ -44,7 +44,7 @@ public class Hashing
 			DigestInputStream dis = new DigestInputStream(is, md);
 
 			// just hashing
-			while (dis.read(buffer) != -1) {} 
+			while (dis.read(buffer) != -1){} 
 
 			digest = md.digest();
 			dis.close();

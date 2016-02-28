@@ -2,9 +2,6 @@ package algorithms.imageoverlay;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
-
 import algorithms.Algorithm;
 import archive.Archive;
 import archive.ArchiveIOException;
@@ -31,8 +28,8 @@ public class ImageOverlay implements Archive
 	protected InsertionDensity f_density;
 	protected int f_colorIndex;
 	protected int[] f_split;
-	private int f_colorMod;
 	protected int[] f_curPixelCoord;
+	private int f_colorMod;
 	private boolean f_incrementFailed;
 
 	/**
@@ -84,33 +81,26 @@ public class ImageOverlay implements Archive
 	}
 
 	/**
-	 * @update_comment
-	 * @throws ArchiveIOException
+	 * Moves the archive interpreter to the next color location. (Possibly by incrementing
+	 * the pixel location as well.)
+	 * @throws ArchiveIOException If the
 	 */
-	protected final void nextPair() throws ArchiveIOException
+	protected final void nextColor() throws ArchiveIOException
 	{
 		if (f_incrementFailed)
-			throw new ArchiveIOException("previous increment failed");
+			throw new ArchiveIOException("The previous increment failed, so this one will too.");
 		
-		incrementColor();
+		f_colorIndex = f_colorMod++ % 3;
 		
 		if (f_colorIndex == 0)
-			incrementVector();
+			nextPixel();
 	}
 
 	/**
-	 * @update_comment
+	 * Moves the archive interpreter to the next pixel location.
+	 * @throws ArchiveIOException If the archive runs out of colors
 	 */
-	private final void incrementColor()
-	{
-		f_colorIndex = f_colorMod++ % 3;
-	}
-
-	/**
-	 * @update_comment
-	 * @throws ArchiveIOException
-	 */
-	private final void incrementVector() throws ArchiveIOException
+	private final void nextPixel() throws ArchiveIOException
 	{
 		f_incrementFailed = true;
 
@@ -159,24 +149,22 @@ public class ImageOverlay implements Archive
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_x
-	 * @param p_y
-	 * @return
+	 * Gets the current color value
+	 * @return The current color byte
 	 */
-	protected byte getColor(int p_x, int p_y)
+	protected byte getColor()
 	{
 		if (f_colorIndex == 0)
 		{
-			return ImageUtil.getRed(f_img.getRGB(p_x, p_y));
+			return ImageUtil.getRed(f_img.getRGB(f_curPixelCoord[0], f_curPixelCoord[1]));
 		}
 		else if (f_colorIndex == 1)
 		{
-			return ImageUtil.getGreen(f_img.getRGB(p_x, p_y));
+			return ImageUtil.getGreen(f_img.getRGB(f_curPixelCoord[0], f_curPixelCoord[1]));
 		}
 		else
 		{
-			return ImageUtil.getBlue(f_img.getRGB(p_x, p_y));
+			return ImageUtil.getBlue(f_img.getRGB(f_curPixelCoord[0], f_curPixelCoord[1]));
 		}
 	}
 
@@ -190,10 +178,10 @@ public class ImageOverlay implements Archive
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_x
-	 * @param p_y
-	 * @return
+	 * Creates a formatted string of the given coordinate. Used for testing purposes.
+	 * @param p_x The x coord
+	 * @param p_y The y coord
+	 * @return The formatted string
 	 */
 	public String formatPoint(int p_x, int p_y)
 	{
@@ -201,32 +189,10 @@ public class ImageOverlay implements Archive
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
-	 */
-	public String formatPV()
-	{
-		return "Fill point: " + formatPoint(f_curPixelCoord[0], f_curPixelCoord[1]) + " | Ref 1: " + 
-			formatPoint(f_curPixelCoord[2], f_curPixelCoord[3]) + " | Ref 2: " + 
-			formatPoint(f_curPixelCoord[4], f_curPixelCoord[5]);
-	}
-	
-	/**
-	 * @update_comment
-	 * @return
-	 */
-	public String formatPVColors()
-	{
-		return "Fill point: " + formatColor(f_curPixelCoord[0], f_curPixelCoord[1]) + " | Ref 1: " + 
-			formatColor(f_curPixelCoord[2], f_curPixelCoord[3]) + " | Ref 2: " + 
-			formatColor(f_curPixelCoord[4], f_curPixelCoord[5]);
-	}
-	
-	/**
-	 * @update_comment
-	 * @param p_x
-	 * @param p_y
-	 * @return
+	 * Creates a formatted string of the color at position x,y. Used for testing purposes.
+	 * @param p_x The x coord
+	 * @param p_y The y coord
+	 * @return The formatted string
 	 */
 	public String formatColor(int p_x, int p_y)
 	{

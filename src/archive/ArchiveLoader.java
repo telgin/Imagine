@@ -168,7 +168,7 @@ public class ArchiveLoader
 	{
 		//update file status to indicate we're going to write the file
 		if (Settings.trackFileStatus())
-			JobStatus.setConversionJobFileStatus(p_fileMetadata.getFile(), ConversionJobFileState.WRITING);
+			JobStatus.setCreationJobFileStatus(p_fileMetadata.getFile(), CreationJobFileState.WRITING);
 		
 		//resetting causes the archive header to be written
 		//don't reset unless this loader actually writes a file
@@ -250,13 +250,13 @@ public class ArchiveLoader
 		// update the database
 		p_fileMetadata.setFragmentCount(fragmentNumber-1);
 		if (Settings.generateReport())
-			Report.saveConversionRecord(p_fileMetadata);
+			Report.saveCreationRecord(p_fileMetadata);
 
 		f_fileWritten = true;
 		
 		//update file status as finished
 		if (Settings.trackFileStatus())
-			JobStatus.setConversionJobFileStatus(p_fileMetadata.getFile(), ConversionJobFileState.FINISHED);
+			JobStatus.setCreationJobFileStatus(p_fileMetadata.getFile(), CreationJobFileState.FINISHED);
 
 		// update progress
 		JobStatus.incrementInputFilesProcessed(1);

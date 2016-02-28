@@ -16,14 +16,15 @@ import util.algorithms.ImageUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Handles the reading of an image archive
  */
 public class ImageReader extends Image implements ArchiveReader
 {
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Constructs an image reader
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to read archives
 	 */
 	public ImageReader(Algorithm p_algo, Key p_key)
 	{
@@ -31,9 +32,9 @@ public class ImageReader extends Image implements ArchiveReader
 	}
 
 	/**
-	 * @update_comment
-	 * @return
-	 * @throws ArchiveIOException
+	 * Reads a byte of data from the archive
+	 * @return The byte that was read
+	 * @throws ArchiveIOException if there are no more bytes to read
 	 */
 	private byte read() throws ArchiveIOException
 	{
@@ -63,9 +64,9 @@ public class ImageReader extends Image implements ArchiveReader
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_index
-	 * @return
+	 * Gets the byte of the image associated with the given index
+	 * @param p_index The image index
+	 * @return The byte at this index
 	 */
 	private byte getImageByte(int p_index)
 	{

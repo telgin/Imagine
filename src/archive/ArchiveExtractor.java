@@ -341,7 +341,7 @@ public class ArchiveExtractor {
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean extractAllFromArchive(File p_archiveFile, File p_extractionFolder) throws IOException
+	public boolean extractAllFromArchiveFile(File p_archiveFile, File p_extractionFolder) throws IOException
 	{
 		ArchiveContents archiveContents = parseArchiveContents(p_archiveFile);
 		
@@ -405,13 +405,6 @@ public class ArchiveExtractor {
 	 */
 	public boolean extractAllFromArchiveFolder(File p_archiveFolder, File p_extractionFolder)
 	{
-		if (!p_archiveFolder.isDirectory())
-		{
-			Logger.log(LogLevel.k_error, "The archive folder is a "
-							+ "file, use \"extractAll\": " + p_archiveFolder.getName());
-			return false;
-		}
-		
 		boolean success = true;
 		
 		//reset explored files since this is a new run
@@ -468,7 +461,7 @@ public class ArchiveExtractor {
 					{
 						try
 						{
-							extractAllFromArchive(sub, p_extractionFolder);
+							extractAllFromArchiveFile(sub, p_extractionFolder);
 						}
 						catch (Exception e)
 						{

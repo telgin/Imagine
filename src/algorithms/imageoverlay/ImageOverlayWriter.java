@@ -11,7 +11,7 @@ import algorithms.Algorithm;
 import algorithms.Option;
 import api.UsageException;
 import archive.ArchiveWriter;
-import archive.ConversionJobFileState;
+import archive.CreationJobFileState;
 import archive.ArchiveIOException;
 import config.Settings;
 import key.Key;
@@ -23,7 +23,7 @@ import util.algorithms.ImageUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Handles the writing of an image overlay archive
  */
 public class ImageOverlayWriter extends ImageOverlay implements ArchiveWriter
 {
@@ -31,9 +31,10 @@ public class ImageOverlayWriter extends ImageOverlay implements ArchiveWriter
 	private File f_imgFile;
 
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
+	 * Constructs an image overlay writer
+	 * @param p_algo The associated algorithm which contains required
+	 * parameters among other things.
+	 * @param p_key The key which will be used to write archives
 	 */
 	public ImageOverlayWriter(Algorithm p_algo, Key p_key)
 	{
@@ -72,8 +73,8 @@ public class ImageOverlayWriter extends ImageOverlay implements ArchiveWriter
 	}
 
 	/**
-	 * @update_comment
-	 * @throws ArchiveIOException
+	 * Loads a new input image
+	 * @throws ArchiveIOException If no input images are available
 	 */
 	private void loadCleanFile() throws ArchiveIOException
 	{		
@@ -89,7 +90,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ArchiveWriter
 		{
 			//update status to show this new image file is about to be used
 			if (Settings.trackFileStatus())
-				JobStatus.setConversionJobFileStatus(f_imgFile, ConversionJobFileState.WRITING);
+				JobStatus.setCreationJobFileStatus(f_imgFile, CreationJobFileState.WRITING);
 		}
 		
 		boolean foundFile = false;
@@ -122,18 +123,18 @@ public class ImageOverlayWriter extends ImageOverlay implements ArchiveWriter
 	
 	/**
 	 * @credit http://stackoverflow.com/questions/26918675/removing-transparency-in-png-bufferedimage
-	 * @update_comment
+	 * Changes the color model of the current image to rgb.
 	 */
 	private void reinterpretColorModel()
 	{
-		Logger.log(LogLevel.k_debug, "Changing input image color model to rgb.");
-		
 		BufferedImage copy = new BufferedImage(f_img.getWidth(), f_img.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2d = copy.createGraphics();
 		g2d.drawImage(f_img, 0, 0, null);
 		g2d.dispose();
 		
 		f_img = copy;
+		
+		Logger.log(LogLevel.k_debug, "Color model changed to rgb.");
 	}
 
 	/* (non-Javadoc)
@@ -166,9 +167,9 @@ public class ImageOverlayWriter extends ImageOverlay implements ArchiveWriter
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_val
-	 * @throws ArchiveIOException
+	 * Writes a byte of data with two bits per color
+	 * @param p_val The byte of data to write stored as an int [0, 255]
+	 * @throws ArchiveIOException If no more data is available
 	 */
 	private final void steps4(int p_val) throws ArchiveIOException
 	{
@@ -182,21 +183,20 @@ public class ImageOverlayWriter extends ImageOverlay implements ArchiveWriter
 
 		for (int i = 0; i < 4; ++i)
 		{
-			nextPair();
+			nextColor();
 
-			int c = ByteConversion.byteToInt(getColor(f_curPixelCoord[0], f_curPixelCoord[1]));
+			int color = ByteConversion.byteToInt(getColor());
 
-			int step = (c / 4) * 4;
+			int step = (color / 4) * 4;
 
-			setColor(f_curPixelCoord[0], f_curPixelCoord[1], 
-							ByteConversion.intToByte(step + f_split[i]));
+			setColor(ByteConversion.intToByte(step + f_split[i]));
 		}
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_val
-	 * @throws ArchiveIOException
+	 * Writes a byte of data with four bits per color
+	 * @param p_val The byte of data to write stored as an int [0, 255]
+	 * @throws ArchiveIOException If no more data is available
 	 */
 	private final void steps16(int p_val) throws ArchiveIOException
 	{
@@ -205,37 +205,37 @@ public class ImageOverlayWriter extends ImageOverlay implements ArchiveWriter
 
 		for (int i = 0; i < 2; ++i)
 		{
-			nextPair();
+			nextColor();
 
-			int c = ByteConversion.byteToInt(getColor(f_curPixelCoord[0], f_curPixelCoord[1]));
+			int color = ByteConversion.byteToInt(getColor());
 
-			int step = (c / 16) * 16;
+			int step = (color / 16) * 16;
 
-			setColor(f_curPixelCoord[0], f_curPixelCoord[1],
-							ByteConversion.intToByte(step + f_split[i]));
+			setColor(ByteConversion.intToByte(step + f_split[i]));
 		}
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_x
-	 * @param p_y
-	 * @param p_data
+	 * Sets the color at the current position to the specified value
+	 * @param p_data The color value to set
 	 */
-	private void setColor(int p_x, int p_y, byte p_data)
+	private void setColor(byte p_data)
 	{
 		if (f_colorIndex == 0)
 		{
-			f_img.setRGB(p_x, p_y, ImageUtil.setRed(f_img.getRGB(p_x, p_y), p_data));
+			f_img.setRGB(f_curPixelCoord[0], f_curPixelCoord[1], 
+				ImageUtil.setRed(f_img.getRGB(f_curPixelCoord[0], f_curPixelCoord[1]), p_data));
 
 		}
 		else if (f_colorIndex == 1)
 		{
-			f_img.setRGB(p_x, p_y, ImageUtil.setGreen(f_img.getRGB(p_x, p_y), p_data));
+			f_img.setRGB(f_curPixelCoord[0], f_curPixelCoord[1], 
+				ImageUtil.setGreen(f_img.getRGB(f_curPixelCoord[0], f_curPixelCoord[1]), p_data));
 		}
 		else
 		{
-			f_img.setRGB(p_x, p_y, ImageUtil.setBlue(f_img.getRGB(p_x, p_y), p_data));
+			f_img.setRGB(f_curPixelCoord[0], f_curPixelCoord[1], 
+				ImageUtil.setBlue(f_img.getRGB(f_curPixelCoord[0], f_curPixelCoord[1]), p_data));
 		}
 	}
 
@@ -280,7 +280,7 @@ public class ImageOverlayWriter extends ImageOverlay implements ArchiveWriter
 				
 				//update status to show previous image file was used
 				if (Settings.trackFileStatus())
-					JobStatus.setConversionJobFileStatus(f_imgFile, ConversionJobFileState.FINISHED);
+					JobStatus.setCreationJobFileStatus(f_imgFile, CreationJobFileState.FINISHED);
 			}
 			catch (IOException e)
 			{
