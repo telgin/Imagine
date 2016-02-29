@@ -4,7 +4,8 @@ import java.io.File;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Holds the metadata of a file so that it can be written to
+ * archive files along with the actual file data.
  */
 public class Metadata
 {
@@ -17,7 +18,7 @@ public class Metadata
 	private byte[] f_archiveUUID;
 
 	/**
-	 * @update_comment
+	 * Creates a blank metadata object
 	 */
 	public Metadata()
 	{
@@ -68,8 +69,8 @@ public class Metadata
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_uuid
+	 * Sets the archive uuid that this file was added to
+	 * @param p_uuid The archive uuid
 	 */
 	public void setArchiveUUID(byte[] p_uuid)
 	{
@@ -77,8 +78,8 @@ public class Metadata
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the archive uuid that this file was added to.
+	 * @return The archive uuid
 	 */
 	public byte[] getArchiveUUID()
 	{
@@ -86,8 +87,10 @@ public class Metadata
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the file this metadata is about. This file should exist
+	 * if archives are being written, but it may not exist if archives
+	 * are being read.
+	 * @return The file this metadata is about.
 	 */
 	public File getFile()
 	{
@@ -95,8 +98,8 @@ public class Metadata
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_file
+	 * Sets the file this metadata is about
+	 * @param p_file The file to set
 	 */
 	public void setFile(File p_file)
 	{

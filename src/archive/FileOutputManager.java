@@ -8,7 +8,9 @@ import util.StandardUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Manages where archive files are output to. This could be just simply
+ * the output folder or a specific index folder if structured output is
+ * being used.
  */
 public class FileOutputManager
 {
@@ -17,8 +19,8 @@ public class FileOutputManager
 	private String f_startTime;
 	
 	/**
-	 * @update_comment
-	 * @param p_outputParentFolder
+	 * Creates a file output manager
+	 * @param p_outputParentFolder The set output folder
 	 */
 	public FileOutputManager(File p_outputParentFolder)
 	{
@@ -27,8 +29,10 @@ public class FileOutputManager
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the actual output folder to save the archive file in. This may be
+	 * different from the output folder specified in the settings if structured
+	 * output is being used.
+	 * @return The output folder location
 	 */
 	public File getOutputFolder()
 	{

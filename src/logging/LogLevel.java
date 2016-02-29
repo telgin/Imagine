@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The level of log messages and exceptions
  */
 public enum LogLevel
 {
@@ -35,8 +35,8 @@ public enum LogLevel
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_num
+	 * Constructs a log level enum
+	 * @param p_num The level number
 	 */
 	LogLevel(int p_num)
 	{
@@ -44,8 +44,8 @@ public enum LogLevel
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the level number
+	 * @return The level number
 	 */
 	public int toInt()
 	{
@@ -53,9 +53,9 @@ public enum LogLevel
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_level
-	 * @return
+	 * Gets the log header for a log level
+	 * @param p_level The log level
+	 * @return The log header
 	 */
 	public static String getLogHeader(LogLevel p_level)
 	{

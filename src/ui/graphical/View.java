@@ -12,15 +12,15 @@ import javafx.stage.Stage;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The view superclass for javafx gui views
  */
 public abstract class View
 {
 	private Stage f_window;
 	
 	/**
-	 * @update_comment
-	 * @param p_window
+	 * Creates a view object
+	 * @param p_window The javafx stage
 	 */
 	public View(Stage p_window)
 	{
@@ -28,43 +28,46 @@ public abstract class View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the password from the user
+	 * @return The password
 	 */
 	public abstract String getPassword();
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Initializes the main pane of this view
+	 * @return The created pane
 	 */
 	public abstract Pane setupPane();
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the archive enclosing folder from the user
+	 * @return The enclosing folder
 	 */
 	public abstract File getEnclosingFolder();
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the name of the tab to display
+	 * @return The tab name
 	 */
 	public abstract String getTabName();
 	
 	/**
-	 * @update_comment
-	 * @param p_parameter
-	 * @return
+	 * NOT IMPLEMENTED YET (TODO)
+	 * Prompts the user for a parameter value
+	 * @param p_parameter The parameter that needs a value
+	 * @return The value returned by the user
 	 */
 	public String promptParameterValue(Parameter p_parameter)
 	{
+		//not implemented in gui yet
 		return null;
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_errors
-	 * @param p_process
+	 * Shows the list of errors in an alert popup
+	 * @param p_errors The list of error messages
+	 * @param p_process The name of the process/goal that was interrupted
+	 * when these errors occurred.
 	 */
 	public void showErrors(List<String> p_errors, String p_process)
 	{
@@ -78,8 +81,8 @@ public abstract class View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Opens the os specific prompt to choose a file
+	 * @return The file chosen
 	 */
 	public File chooseFile()
 	{
@@ -88,8 +91,8 @@ public abstract class View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Opens the os specific prompt to choose a directory
+	 * @return The directory chosen
 	 */
 	public File chooseFolder()
 	{

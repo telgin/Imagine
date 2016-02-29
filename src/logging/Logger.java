@@ -41,8 +41,8 @@ public class Logger
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_logLevel
+	 * Sets the message level which is the maximum level to log
+	 * @param p_logLevel The log level
 	 */
 	public static void setMessageLogLevel(LogLevel p_logLevel)
 	{
@@ -50,8 +50,8 @@ public class Logger
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_logLevel
+	 * Sets the exception level which is the maximum level to log
+	 * @param p_logLevel The log level
 	 */
 	public static void setExceptionLogLevel(LogLevel p_logLevel)
 	{
@@ -59,9 +59,9 @@ public class Logger
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_level
-	 * @param p_message
+	 * Logs a message with the specified log level
+	 * @param p_level The level of this message
+	 * @param p_message The message text
 	 */
 	public static void log(LogLevel p_level, String p_message)
 	{
@@ -92,10 +92,10 @@ public class Logger
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_level
-	 * @param p_exception
-	 * @param p_shutdown
+	 * Logs an exception with the specified level
+	 * @param p_level The level of the exception
+	 * @param p_exception The exception
+	 * @param p_shutdown If this should cause the system to shut down
 	 */
 	public static void log(LogLevel p_level, Exception p_exception, boolean p_shutdown)
 	{
@@ -118,7 +118,7 @@ public class Logger
 	}
 
 	/**
-	 * @update_comment
+	 * Shuts the logger down, which saves the log file
 	 */
 	public static void shutdown()
 	{
@@ -126,7 +126,7 @@ public class Logger
 	}
 
 	/**
-	 * @update_comment
+	 * Saves the log file
 	 */
 	private static void saveFile()
 	{

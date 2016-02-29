@@ -18,7 +18,9 @@ import util.FileSystemUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The archive loader handles writing files. This handles writing
+ * file data and metadata into archives using the high level protocol 
+ * used by all archives.
  */
 public class ArchiveLoader
 {
@@ -40,9 +42,9 @@ public class ArchiveLoader
 	private ArchiveWriter f_currentArchive;
 
 	/**
-	 * @update_comment
-	 * @param p_factory
-	 * @param p_manager
+	 * Creates an archive loader
+	 * @param p_factory The archive writer factory
+	 * @param p_manager The file output manager which tells where to save archive files
 	 */
 	public ArchiveLoader(ArchiveWriterFactory<? extends ArchiveWriter> p_factory,
 				FileOutputManager p_manager)
@@ -59,7 +61,9 @@ public class ArchiveLoader
 	}
 
 	/**
-	 * @update_comment
+	 * Shuts the loader down. It will save the current archive file if
+	 * files were written. This function should not be called unless all
+	 * write calls have returned.
 	 */
 	public void shutdown()
 	{
@@ -84,9 +88,9 @@ public class ArchiveLoader
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_bytes
-	 * @return
+	 * Writes the full contents of the array to the archive
+	 * @param p_bytes The array to write
+	 * @return If all bytes were written
 	 */
 	private boolean writeFull(byte[] p_bytes)
 	{
@@ -94,9 +98,9 @@ public class ArchiveLoader
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_byte
-	 * @return
+	 * Writes the byte to the archive
+	 * @param p_byte The byte to write
+	 * @return If the byte was written successfully
 	 */
 	private boolean writeFull(byte p_byte)
 	{
@@ -104,8 +108,10 @@ public class ArchiveLoader
 	}
 
 	/**
-	 * @update_comment
-	 * @throws ArchiveIOException
+	 * Resets the loader to the next archive, resetting the uuid and
+	 * writing the archive header.
+	 * @throws ArchiveIOException If data could not be written or a new archive
+	 * could not be created
 	 */
 	private void resetToNextArchive() throws ArchiveIOException
 	{
@@ -128,29 +134,26 @@ public class ArchiveLoader
 		f_currentArchive.secureStream();
 
 		// write the archive header
-		if (!writeArchiveHeader())
-			throw new ArchiveIOException("Cannot write archive header.");
+		writeArchiveHeader();
 		
 		f_needsReset = false;
 	}
 
 	/**
-	 * @update_comment
-	 * @return
-	 * @throws ArchiveIOException
+	 * Writes the archive header
+	 * @return True if the archive header was written, false otherwise
+	 * @throws ArchiveIOException If the archive header cannot be written.
 	 */
-	private boolean writeArchiveHeader() throws ArchiveIOException
+	private void writeArchiveHeader() throws ArchiveIOException
 	{
 		// write version number
 		if (!writeFull(ARCHIVE_VERSION_NUMBER))
-			return false;
-
-		return true;
+			throw new ArchiveIOException("Cannot write archive header.");
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the name to save this archive under
+	 * @return The file name, minus the extension which is determined by the algorithm
 	 */
 	private String getSaveName()
 	{
@@ -160,9 +163,9 @@ public class ArchiveLoader
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_fileMetadata
-	 * @throws IOException
+	 * Writes a file to the archive
+	 * @param p_fileMetadata The metadata object for the file to write
+	 * @throws IOException If the file could not be written
 	 */
 	public void writeFile(Metadata p_fileMetadata) throws IOException
 	{
@@ -263,11 +266,11 @@ public class ArchiveLoader
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_fileMetadata
-	 * @param p_fragmentNumber
-	 * @param p_fileLengthRemaining
-	 * @return
+	 * Writes a file header to the archive, which is the file's metadata
+	 * @param p_fileMetadata The metadata for the file about to be written
+	 * @param p_fragmentNumber The fragment number of the file
+	 * @param p_fileLengthRemaining The length of file data that still needs to be written.
+	 * @return If writing the file header was successful
 	 */
 	private boolean writeFileHeader(Metadata p_fileMetadata, long p_fragmentNumber,
 					long p_fileLengthRemaining)
@@ -325,11 +328,12 @@ public class ArchiveLoader
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_reader
-	 * @param p_fileLengthRemaining
-	 * @return
-	 * @throws IOException
+	 * Writes a file's data to the archive
+	 * @param p_reader The input stream for the file data
+	 * @param p_fileLengthRemaining The length of data that still needs to be written
+	 * @return The length of data that still needs to be written after writing as much
+	 * as possible to this archive
+	 * @throws IOException If the data input stream could not be read
 	 */
 	private long writeFileData(DataInputStream p_reader, long p_fileLengthRemaining)
 					throws IOException

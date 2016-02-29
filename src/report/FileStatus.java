@@ -12,7 +12,8 @@ import archive.CreationJobFileState;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The file status class stores information about the progress and state
+ * of an input file as it is written to an archive file.
  */
 public class FileStatus
 {
@@ -28,8 +29,8 @@ public class FileStatus
 	private long f_lastStateUpdate;
 	
 	/**
-	 * @update_comment
-	 * @param p_file
+	 * Creates a file status object
+	 * @param p_file The file this file status is for
 	 */
 	public FileStatus(File p_file)
 	{
@@ -71,7 +72,11 @@ public class FileStatus
 	}
 
 	/**
-	 * @return the status
+	 * Gets the file state of this file which may be partially determined based on the
+	 * states of children to this file status. This calculation is only redone if it
+	 * has been long enough since the last time the calculation ran. The recursion is
+	 * only one level deep.
+	 * @return the state
 	 */
 	public synchronized CreationJobFileState getState()
 	{
@@ -129,7 +134,7 @@ public class FileStatus
 	}
 
 	/**
-	 * @param status the status to set
+	 * @param p_state the state to set
 	 */
 	public void setState(CreationJobFileState p_state)
 	{
@@ -137,8 +142,13 @@ public class FileStatus
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the progress of a file, which is how many bytes have been written
+	 * divided by the total number of bytes. If the file status represents
+	 * a directory, the progress will be the average progress of all files
+	 * or folders in the folder. The recursion for this calculation does
+	 * not go beyond one level. Also, the calculation will only be done if
+	 * it has been significantly long since the last time the calculation ran.
+	 * @return The progress value for this file/folder
 	 */
 	public synchronized double getProgress()
 	{
@@ -179,8 +189,10 @@ public class FileStatus
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_child
+	 * Adds a child file status to this file status. A child file status
+	 * means a file or folder that is part of the creation job and is contained
+	 * within the folder represented by this file status.
+	 * @param p_child The child file status
 	 */
 	public void addChild(FileStatus p_child)
 	{
@@ -194,8 +206,8 @@ public class FileStatus
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if this file status has children file status's.
+	 * @return If this file status has children
 	 */
 	public boolean hasChildren()
 	{
@@ -203,8 +215,9 @@ public class FileStatus
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Determines if a progress update is needed based on whether or not
+	 * it has been long enough since the last progress update.
+	 * @return If a progress update is needed
 	 */
 	private boolean progressUpdateNeeded()
 	{
@@ -212,8 +225,9 @@ public class FileStatus
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Determines if a state update is needed based on whether or not
+	 * it has been long enough since the last state update.
+	 * @return If a state update is needed
 	 */
 	private boolean stateUpdateNeeded()
 	{

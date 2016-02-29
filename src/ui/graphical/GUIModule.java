@@ -8,35 +8,36 @@ import javafx.scene.layout.VBox;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A convenience class for representing commonly paired gui elements. For instance,
+ * the grouping of labels to input fields. 
  */
 public abstract class GUIModule
 {
 	private Label f_label;
 	
 	/**
-	 * @update_comment
-	 * @param p_container
+	 * Sets up the module in a vbox
+	 * @param p_container The vbox container to add this module to
 	 */
 	public abstract void setup(VBox p_container);
 	
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of this module
+	 * @param p_enabled The enabled state
 	 */
 	public abstract void setEnabled(boolean p_enabled);
 	
 	/**
-	 * @update_comment
-	 * @param p_error
+	 * Sets the error state of this module
+	 * @param p_error The error state
 	 */
 	public abstract void setErrorState(boolean p_error);
 	
 	/**
-	 * @update_comment
-	 * @param p_indent
-	 * @param p_element
-	 * @return
+	 * Indents an element by wrapping it in a hbox off center
+	 * @param p_indent The indentation to use
+	 * @param p_element The element to indent
+	 * @return The hbox containing the indented element
 	 */
 	protected HBox indentElement(int p_indent, Node p_element)
 	{

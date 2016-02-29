@@ -49,8 +49,8 @@ public class EmbedController implements ActiveComponent
 	private Thread f_guiUpdateDaemon;
 		
 	/**
-	 * @update_comment
-	 * @param file
+	 * Constructs an embed controller object for the given view
+	 * @param p_view The embed view
 	 */
 	public EmbedController(EmbedView p_view)
 	{
@@ -77,10 +77,9 @@ public class EmbedController implements ActiveComponent
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Allows the user to choose a key file and displays the path they chose.
 	 */
-	void chooseKeyFile()
+	public void chooseKeyFile()
 	{
 		File chosen = f_view.chooseFile();
 		if (chosen != null)
@@ -90,8 +89,8 @@ public class EmbedController implements ActiveComponent
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates a key object based on the user's input
+	 * @return The key object created
 	 */
 	private Key getKey()
 	{
@@ -492,15 +491,6 @@ public class EmbedController implements ActiveComponent
 			f_view.setTarget(folder);
 			f_selectedTargetFolder = folder;
 		}
-	}
-	
-	/**
-	 * @update_comment
-	 * @return
-	 */
-	public int getTotalFilesThisRun()
-	{
-		return f_totalFilesThisRun;
 	}
 
 	/* (non-Javadoc)

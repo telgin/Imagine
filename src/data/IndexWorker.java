@@ -11,7 +11,8 @@ import util.FileSystemUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Moves through every input file or folder recursively and loads
+ * its metadata so it can be added to queue for writing.
  */
 public class IndexWorker implements Runnable
 {
@@ -21,9 +22,9 @@ public class IndexWorker implements Runnable
 	private List<File> f_inputFiles;
 
 	/**
-	 * @update_comment
-	 * @param p_queue
-	 * @param p_inputFiles
+	 * Constructs an index worker
+	 * @param p_queue The queue to load input file metadata into
+	 * @param p_inputFiles The list of input files and folders to be added to archives.
 	 */
 	public IndexWorker(BlockingQueue<Metadata> p_queue, List<File> p_inputFiles)
 	{
@@ -34,7 +35,7 @@ public class IndexWorker implements Runnable
 	}
 
 	/**
-	 * @update_comment
+	 * Shuts this worker down. This is done to stop a job.
 	 */
 	public void shutdown()
 	{
@@ -65,9 +66,10 @@ public class IndexWorker implements Runnable
 	}
 
 	/**
-	 * @update_comment
-	 * @param topLevel
-	 * @param attribute
+	 * Crawls through a file or folder, adding every file and empty folder
+	 * found to the queue. Recursive.
+	 * @param p_currentFile The file to crawl through. If it is a file or an empty folder,
+	 * it will simply be added to the queue, if it is a folder, it will be recursed through.
 	 */
 	private void crawl(File p_currentFile)
 	{
@@ -119,8 +121,9 @@ public class IndexWorker implements Runnable
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if this index worker is still in the process of adding files
+	 * to the queue.
+	 * @return If this index worker is active
 	 */
 	public boolean isActive()
 	{

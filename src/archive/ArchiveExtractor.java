@@ -20,6 +20,12 @@ import logging.Logger;
 import util.ByteConversion;
 import util.FileSystemUtil;
 
+/**
+ * @author Thomas Elgin (https://github.com/telgin)
+ * The archive extractor class handles reading archives and writing
+ * the files contained within them back out into their original form.
+ * This may include 'chain reading' when a file spans multiple archives.
+ */
 public class ArchiveExtractor {
 	
 	private ArchiveReader f_archive;
@@ -31,12 +37,11 @@ public class ArchiveExtractor {
 	private Algorithm f_algo;
 	private Key f_key;
 	
-	
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
-	 * @param p_enclosingFolder
+	 * Constructs an archive extractor
+	 * @param p_algo The algorithm to use
+	 * @param p_key The key to use
+	 * @param p_enclosingFolder The folder where the archives are found
 	 */
 	public ArchiveExtractor(Algorithm p_algo, Key p_key, File p_enclosingFolder)
 	{
@@ -46,11 +51,12 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_algo
-	 * @param p_key
-	 * @param p_enclosingFolder
-	 * @param p_manager
+	 * Constructs an archive extractor with a new extraction manager
+	 * @param p_algo The algorithm to use
+	 * @param p_key The key to use
+	 * @param p_enclosingFolder The folder where the archives are found
+	 * @param p_manager The extraction manager which handles creating the actual files and
+	 * making extraction more efficient.
 	 */
 	private ArchiveExtractor(Algorithm p_algo, Key p_key, File p_enclosingFolder, ExtractionManager p_manager)
 	{
@@ -73,8 +79,8 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_folder
+	 * Sets the enclosing folder where archives are found
+	 * @param p_folder The enclosing folder
 	 */
 	public void setEnclosingFolder(File p_folder)
 	{
@@ -82,10 +88,11 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_archiveFile
-	 * @return
-	 * @throws IOException
+	 * Constructs an archive contents object for the given archive file
+	 * which will contain information about all the files loaded in this archive.
+	 * @param p_archiveFile The archive file
+	 * @return The archive contents
+	 * @throws IOException If the archive file cannot be parsed or read
 	 */
 	public ArchiveContents viewAll(File p_archiveFile) throws IOException
 	{
@@ -130,13 +137,17 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_origArchiveContents
-	 * @param p_origFileContents
-	 * @param p_extractionFolder
-	 * @return
+	 * Assembles the current file data into a file. If the file is the first of multiple 
+	 * fragments, an extraction chain will start here.
+	 * @param p_origArchiveContents The archive contents associated with the first
+	 * fragment of this file
+	 * @param p_origFileContents The file contents associated with the first fragment
+	 * of this file
+	 * @param p_extractionFolder The folder where the file will be extracted to
+	 * @return The file which was extracted, or null if something went wrong during extraction
 	 */
-	private File assembleCurrentFileData(ArchiveContents p_origArchiveContents, FileContents p_origFileContents, File p_extractionFolder)
+	private File assembleCurrentFileData(ArchiveContents p_origArchiveContents, 
+		FileContents p_origFileContents, File p_extractionFolder)
 	{
 		//create temporary hidden assembly folder
 		File assemblyFolder = new File(p_extractionFolder, Constants.ASSEMBLY_FOLDER_NAME);
@@ -153,7 +164,6 @@ public class ArchiveExtractor {
 			}
 			catch (IOException e){}
 		}
-		
 		
 		BufferedOutputStream outStream = null;
 		try
@@ -221,8 +231,6 @@ public class ArchiveExtractor {
 			return null;
 		}
 	}
-	
-	
 
 	/**
 	 * Pulls in the data from the first file only. It is assumed that this
@@ -231,7 +239,7 @@ public class ArchiveExtractor {
 	 * @param p_outStream
 	 * @return True if this was the last fragment of that file, false 
 	 * if there's more data in a later file.
-	 * @throws IOException 
+	 * @throws IOException If the archive file could not be read
 	 */
 	private boolean extractFragmentData(File p_archiveFile,
 					BufferedOutputStream p_outStream) throws IOException
@@ -272,8 +280,11 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_archiveFile
+	 * Maps the headers of all archives in the current file or folder. This allows 
+	 * for less searching around every time we need to find a specific archive. It is 
+	 * also allows archive files to be renamed without any hit to performance when 
+	 * searching for them.
+	 * @param p_archiveFile The archive file or folder to map the header(s) of.
 	 */
 	public void mapHeaders(File p_archiveFile)
 	{
@@ -322,9 +333,11 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_archiveFile
-	 * @throws IOException
+	 * Caches the header of an archive file. This allows for less searching around
+	 * every time we need to find a specific archive. It is also allows archive files
+	 * to be renamed without any hit to performance when searching for them.
+	 * @param p_archiveFile The archive file
+	 * @throws IOException If the archive file could not be read
 	 */
 	private void mapHeader(File p_archiveFile) throws IOException
 	{
@@ -335,11 +348,14 @@ public class ArchiveExtractor {
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_archiveFile
-	 * @param p_extractionFolder
-	 * @return
-	 * @throws IOException
+	 * Extracts all files from an archive file. If a fragment is read and it is the first
+	 * fragment, this will start an extraction chain where we will attempt to load more archives
+	 * in order to extract the full file. However, if the fragment is not the first fragment, it will
+	 * be ignored.
+	 * @param p_archiveFile The archive file to extract all contents from
+	 * @param p_extractionFolder The folder to move all extracted files to
+	 * @return If the extraction was successful for all files
+	 * @throws IOException If the file could not be parsed or read
 	 */
 	public boolean extractAllFromArchiveFile(File p_archiveFile, File p_extractionFolder) throws IOException
 	{
@@ -377,8 +393,7 @@ public class ArchiveExtractor {
 						Logger.log(LogLevel.k_error, "Failed to extract file: " +
 										fileContents.getMetadata().getFile().getPath());
 					}
-				}
-					
+				}	
 			}
 			else
 			{
@@ -395,13 +410,11 @@ public class ArchiveExtractor {
 		return true;
 	}
 
-	
-
 	/**
-	 * @update_comment
-	 * @param p_archiveFolder
-	 * @param p_extractionFolder
-	 * @return
+	 * Extracts all files in all archives in the specified folder
+	 * @param p_archiveFolder The folder containing archives
+	 * @param p_extractionFolder The folder to extract files from archives into
+	 * @return If all files were extracted successfully
 	 */
 	public boolean extractAllFromArchiveFolder(File p_archiveFolder, File p_extractionFolder)
 	{
@@ -478,11 +491,11 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_archiveFile
-	 * @param p_extractionFolder
-	 * @param p_index
-	 * @return
+	 * Extracts a file within an archive given the index of the file in the archive
+	 * @param p_archiveFile The archive file
+	 * @param p_extractionFolder The extraction folder where files will be output to
+	 * @param p_index The index of the file to extract
+	 * @return If the extraction was successful
 	 * @throws IOException
 	 */
 	public boolean extractFileByIndex(File p_archiveFile, File p_extractionFolder, int p_index) throws IOException
@@ -538,17 +551,17 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_archiveFile
-	 * @return
-	 * @throws IOException
+	 * Parses an archive into an archive contents
+	 * @param p_archiveFile The archive file
+	 * @return The archive contents
+	 * @throws IOException If the file cannot be read
 	 */
 	private ArchiveContents parseArchiveContents(File p_archiveFile) throws IOException
 	{
 		if (p_archiveFile.isDirectory())
 		{
 			throw new ArchiveIOException( "The archive file is a "
-							+ "folder, use \"extractAllRecursive\": " + p_archiveFile.getName());
+				+ "folder, use \"extractAllRecursive\": " + p_archiveFile.getName());
 		}
 		
 		//try to load the archive file
@@ -568,9 +581,9 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_archiveFile
-	 * @throws IOException
+	 * Loads the archive data from an archive file
+	 * @param p_archiveFile The archive file
+	 * @throws IOException If the file cannot be read
 	 */
 	private void loadArchive(File p_archiveFile) throws IOException
 	{
@@ -590,9 +603,9 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_length
-	 * @return
+	 * Reads the requested length of file data into the buffer
+	 * @param p_length The length of bytes to read
+	 * @return If all bytes were read successfully
 	 */
 	private boolean readFull(int p_length)
 	{
@@ -600,9 +613,9 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_skip
-	 * @return
+	 * Skips the length of data requested
+	 * @param p_skip The number of bytes to skip
+	 * @return If all bytes were skipped
 	 */
 	private boolean skipFull(long p_skip)
 	{
@@ -610,10 +623,11 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_parseData
-	 * @return
-	 * @throws ArchiveIOException
+	 * Reads the archive header and parses the data into an archive contents
+	 * @param p_parseData If data should be parsed and loaded into the file contents
+	 * or skipped
+	 * @return The archive contents
+	 * @throws ArchiveIOException If the archive cannot be parsed or read
 	 */
 	private ArchiveContents readArchiveHeader(boolean p_parseData) throws ArchiveIOException
 	{
@@ -673,10 +687,11 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_parseData
-	 * @return
-	 * @throws ArchiveIOException
+	 * Reads the next file header starting from the current location.
+	 * @param p_parseData If data should be parsed and loaded into the file contents
+	 * or skipped
+	 * @return The file contents obtained from the file header
+	 * @throws ArchiveIOException If the header cannot be parsed or read
 	 */
 	private FileContents readNextFileHeader(boolean p_parseData) throws ArchiveIOException
 	{
@@ -822,9 +837,10 @@ public class ArchiveExtractor {
 	
 	
 	/**
-	 * @update_comment
-	 * @param p_fileContents
-	 * @return
+	 * Skips over the current file data
+	 * @param p_fileContents The file contents which describes how much
+	 * data should be skipped
+	 * @return If all the data could be skipped.
 	 */
 	private boolean skipNextFileData(FileContents p_fileContents)
 	{
@@ -837,11 +853,11 @@ public class ArchiveExtractor {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_fileContents
-	 * @param p_output
-	 * @return
-	 * @throws IOException
+	 * Reads the next file data in the archive
+	 * @param p_fileContents The file contents associated with the file data
+	 * @param p_output The output stream to write the file data to
+	 * @return The length of data read
+	 * @throws IOException If the archive file could not be read
 	 */
 	private long readNextFileData(FileContents p_fileContents, BufferedOutputStream p_output) throws IOException
 	{

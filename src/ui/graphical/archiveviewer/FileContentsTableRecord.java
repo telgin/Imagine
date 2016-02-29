@@ -8,7 +8,7 @@ import util.StandardUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This class represents a file contents object in the table view.
  */
 public class FileContentsTableRecord
 {
@@ -20,13 +20,13 @@ public class FileContentsTableRecord
 	private final long f_fragmentNumber;
 	
 	/**
-	 * @update_comment
-	 * @param p_index
-	 * @param p_type
-	 * @param f_name
-	 * @param p_dateCreated
-	 * @param p_dateModified
-	 * @param p_fragmentNumber
+	 * Constructs a file contents table record
+	 * @param p_index The file contents index in the archive
+	 * @param p_type The record's FileType
+	 * @param f_name The name of the file
+	 * @param p_dateCreated The date the file was created
+	 * @param p_dateModified The date the file was modified
+	 * @param p_fragmentNumber The fragment number of the file
 	 */
 	public FileContentsTableRecord(int p_index, FileType p_type, long p_fragmentNumber,
 					boolean p_isFragment, File p_file, long p_dateCreated, long p_dateModified)

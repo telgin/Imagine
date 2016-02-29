@@ -2,7 +2,8 @@ package testing;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This is a simple class which times code execution. It is used in testing,
+ * not in the actual program.
  */
 public class CodeTimer
 {
@@ -10,14 +11,7 @@ public class CodeTimer
 	private long f_endMillis = 0;
 
 	/**
-	 * @update_comment
-	 */
-	public CodeTimer()
-	{
-	}
-
-	/**
-	 * @update_comment
+	 * Sets the start time to now.
 	 */
 	public void start()
 	{
@@ -25,7 +19,7 @@ public class CodeTimer
 	}
 
 	/**
-	 * @update_comment
+	 * Sets the end time to now
 	 */
 	public void end()
 	{
@@ -33,8 +27,8 @@ public class CodeTimer
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the elapsed time in ms (end - start)
+	 * @return The length between the start and end times
 	 */
 	public long getElapsedTime()
 	{

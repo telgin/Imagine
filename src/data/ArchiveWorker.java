@@ -24,10 +24,11 @@ public class ArchiveWorker implements Runnable
 	private ArchiveLoader f_loader;
 
 	/**
-	 * @update_comment
-	 * @param p_queue
-	 * @param p_factory
-	 * @param p_manager
+	 * Constructs an archive worker
+	 * @param p_queue The queue to get file metadata from
+	 * @param p_factory The writer factory which can create archive writers
+	 * @param p_manager The file output manager which tells where files should
+	 * be written to.
 	 */
 	public ArchiveWorker(BlockingQueue<Metadata> p_queue, 
 		ArchiveWriterFactory<? extends ArchiveWriter> p_factory, FileOutputManager p_manager)
@@ -37,8 +38,8 @@ public class ArchiveWorker implements Runnable
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if this archive worker is actively writing archive files
+	 * @return If this worker is active
 	 */
 	public boolean isActive()
 	{
@@ -103,7 +104,8 @@ public class ArchiveWorker implements Runnable
 	}
 
 	/**
-	 * @update_comment
+	 * Shuts this archive worker down. This is used to stop a job
+	 * that is in progress.
 	 */
 	public void shutdown()
 	{

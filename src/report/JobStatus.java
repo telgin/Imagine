@@ -80,9 +80,9 @@ public abstract class JobStatus
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @param p_bytesLeft
+	 * Sets the number of bytes remaining for a file that is being written
+	 * @param p_file The file being written
+	 * @param p_bytesLeft The number of bytes left to be written
 	 */
 	public static void setBytesLeft(File p_file, long p_bytesLeft)
 	{
@@ -99,9 +99,9 @@ public abstract class JobStatus
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @param p_status
+	 * Sets the files status for a file being written
+	 * @param p_file The file
+	 * @param p_status The file status
 	 */
 	public static void setCreationJobFileStatus(File p_file, CreationJobFileState p_status)
 	{

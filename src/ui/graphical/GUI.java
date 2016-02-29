@@ -92,8 +92,8 @@ public class GUI extends UI
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of error messages
+	 * @return The list of error messages
 	 */
 	public List<String> getErrors()
 	{
@@ -101,8 +101,8 @@ public class GUI extends UI
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if there are outstanding errors
+	 * @return If there are outstanding errors
 	 */
 	public boolean hasErrors()
 	{
@@ -110,7 +110,7 @@ public class GUI extends UI
 	}
 	
 	/**
-	 * @update_comment
+	 * Clears the list of error messages
 	 */
 	public void clearErrors()
 	{
@@ -129,8 +129,8 @@ public class GUI extends UI
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the top view of the gui
+	 * @return The top view
 	 */
 	public View getTopView()
 	{
@@ -138,8 +138,8 @@ public class GUI extends UI
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_topView
+	 * Sets the top view of the gui
+	 * @param p_topView The top view to set
 	 */
 	public void setTopView(TopView p_topView)
 	{

@@ -4,20 +4,20 @@ import java.io.IOException;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * An exception used when something goes wrong with reading or writing an archive.
  */
 public class ArchiveIOException extends IOException
 {
 	private static final long serialVersionUID = -2058437202993005146L;
 
 	/**
-	 * @update_comment
+	 * Constructs an archive io exception
 	 */
 	public ArchiveIOException(){}
 	
 	/**
-	 * @update_comment
-	 * @param p_message
+	 * Constructs an archive io exception
+	 * @param p_message The message text
 	 */
 	public ArchiveIOException(String p_message)
 	{

@@ -11,7 +11,8 @@ import report.Report;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Handles resetting components in the system between runs and shutting down
+ * the system.
  */
 public class SystemManager
 {
@@ -24,7 +25,7 @@ public class SystemManager
 	}
 	
 	/**
-	 * @update_comment
+	 * Resets the static components and clears the list of active components.
 	 */
 	public static void reset()
 	{
@@ -38,8 +39,9 @@ public class SystemManager
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_component
+	 * Adds an active component to the list of components which will
+	 * be told to shut down when the system shuts down.
+	 * @param p_component The active component to register
 	 */
 	public static void registerActiveComponent(ActiveComponent p_component)
 	{
@@ -47,7 +49,7 @@ public class SystemManager
 	}
 
 	/**
-	 * @update_comment
+	 * Shuts down all registered active components
 	 */
 	public static void shutdown()
 	{
@@ -68,14 +70,11 @@ public class SystemManager
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if all active components are shut down
+	 * @return If all active components are shut down
 	 */
 	public static boolean isShutdown()
 	{
-		if (s_components.isEmpty())
-			return true;
-		
 		for (ActiveComponent component : s_components)
 		{
 			if (!component.isShutdown())

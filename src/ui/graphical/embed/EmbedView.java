@@ -66,7 +66,6 @@ public class EmbedView extends View
 		f_inputRemoveButton, f_targetSelectFolderButton, f_createArchivesButton;
 	private ToggleGroup f_keySelectionButtons;
 	private RadioButton f_noKeyToggle, f_keyFileToggle, f_passwordToggle;
-	private TableView<FileContentsTableRecord> f_table;
 	private Label f_passwordLabel, f_keyFileLabel, f_keySelectionLabel, f_algorithmLabel,
 		f_inputFilesLabel, f_targetFilesLabel, f_filesCreatedLabel;
 	private FileModule f_outputFolder;
@@ -597,14 +596,6 @@ public class EmbedView extends View
 			setKeyFileSectionEnabled(true);
 		}
 	}
-	
-	/**
-	 * @update_comment
-	 */
-	void clearTable()
-	{
-		f_table.setItems(null);
-	}
 
 	/**
 	 * @update_comment
@@ -661,7 +652,7 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
+	 * Clears the key file section of input
 	 */
 	public void clearKeyFileSection()
 	{
@@ -669,7 +660,7 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
+	 * Clears the key file and password fields of input
 	 */
 	void clearKeySection()
 	{
@@ -880,25 +871,6 @@ public class EmbedView extends View
 	public void setCreationProgress(double progress)
 	{
 		Platform.runLater(() -> f_creationProgress.setProgress(progress));
-	}
-
-	/**
-	 * @update_comment
-	 * @return
-	 */
-	@SuppressWarnings("rawtypes")
-	public List<Integer> getSelectedRows()
-	{
-		List<Integer> indices = new LinkedList<Integer>();
-		
-		ObservableList<TablePosition> selectedRows = f_table.getSelectionModel().getSelectedCells();
-		for (int x = 0; x < selectedRows.size(); ++x)
-		{
-			TablePosition position = (TablePosition) selectedRows.get(x);
-			indices.add(position.getRow());
-		}
-		
-		return indices;
 	}
 
 	/* (non-Javadoc)

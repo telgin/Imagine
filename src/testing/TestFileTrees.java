@@ -10,7 +10,7 @@ import util.FileSystemUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Defines/creates the file trees to be used during testing
  */
 public class TestFileTrees
 {
@@ -30,9 +30,9 @@ public class TestFileTrees
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_parent
-	 * @param p_name
+	 * Clears root of the file tree in the parent folder
+	 * @param p_parent The parent folder
+	 * @param p_name The name of the tree
 	 */
 	public static void clear(File p_parent, String p_name)
 	{
@@ -40,14 +40,13 @@ public class TestFileTrees
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the empty folder tree
+	 * @return The empty folder tree
 	 */
 	private static FileTree getEmptyFolderTree()
 	{
 		FileTree tree = new FileTree()
 		{
-
 			@Override
 			public File getRoot(File parent)
 			{
@@ -58,21 +57,19 @@ public class TestFileTrees
 			public void create(File parent)
 			{
 			}
-
 		};
 
 		return tree;
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the small file tree
+	 * @return The small file tree
 	 */
 	private static FileTree getSmallFileTree()
 	{
 		FileTree tree = new FileTree()
 		{
-
 			@Override
 			public File getRoot(File parent)
 			{
@@ -84,21 +81,19 @@ public class TestFileTrees
 			{
 				addFile(new File(s_bank, "message.txt"), getRoot(parent));
 			}
-
 		};
 
 		return tree;
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the small tree tree
+	 * @return The small tree tree
 	 */
 	private static FileTree getSmallTree()
 	{
 		FileTree tree = new FileTree()
 		{
-
 			@Override
 			public File getRoot(File parent)
 			{
@@ -111,21 +106,19 @@ public class TestFileTrees
 				addFile(new File(s_bank, "tracked_topfolder_r/"),
 								getRoot(parent));
 			}
-
 		};
 
 		return tree;
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the big file tree
+	 * @return The big file tree
 	 */
 	private static FileTree getBigFileTree()
 	{
 		FileTree tree = new FileTree()
 		{
-
 			@Override
 			public File getRoot(File parent)
 			{
@@ -137,21 +130,19 @@ public class TestFileTrees
 			{
 				addFile(new File(s_bank, "Computer Art.zip"), getRoot(parent));
 			}
-
 		};
 
 		return tree;
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the big tree tree
+	 * @return The big tree tree
 	 */
 	private static FileTree getBigTree()
 	{
 		FileTree tree = new FileTree()
 		{
-
 			@Override
 			public File getRoot(File parent)
 			{
@@ -163,22 +154,19 @@ public class TestFileTrees
 			{
 				addFile(new File(s_bank, "eclipse-installer/"), getRoot(parent));
 			}
-
 		};
 
 		return tree;
 	}
 	
-	
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates the input images tree
+	 * @return The input images tree
 	 */
 	private static FileTree getInputImages()
 	{
 		FileTree tree = new FileTree()
 		{
-
 			@Override
 			public File getRoot(File parent)
 			{
@@ -190,16 +178,15 @@ public class TestFileTrees
 			{
 				addFile(new File(s_bank, "input_images/"), getRoot(parent));
 			}
-
 		};
 
 		return tree;
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_parent
-	 * @param p_name
+	 * Resets the tree in the given parent folder
+	 * @param p_parent The parent folder
+	 * @param p_name The tree name
 	 */
 	public static void reset(File p_parent, String p_name)
 	{
@@ -208,9 +195,9 @@ public class TestFileTrees
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_parent
-	 * @param p_name
+	 * Creates a file tree in the specified parent folder
+	 * @param p_parent The folder to copy to
+	 * @param p_name The name of the file tree
 	 */
 	public static void create(File p_parent, String p_name)
 	{
@@ -218,8 +205,8 @@ public class TestFileTrees
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_folder
+	 * Clears the existing folder of all files
+	 * @param p_folder The folder to clear
 	 */
 	private static void clearFolder(File p_folder)
 	{
@@ -228,10 +215,10 @@ public class TestFileTrees
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_parent
-	 * @param p_name
-	 * @return
+	 * Gets the root of a file tree in a specified location
+	 * @param p_parent The name of the folder to have the file copied to
+	 * @param p_name The file tree name
+	 * @return The new file tree root
 	 */
 	public static File getRoot(File p_parent, String p_name)
 	{
@@ -239,9 +226,9 @@ public class TestFileTrees
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_target
-	 * @param p_newParent
+	 * Copies a file or folder to a new parent directory
+	 * @param p_target The file/folder to be copied
+	 * @param p_newParent The new folder to copy the file/folder to
 	 */
 	private static void addFile(File p_target, File p_newParent)
 	{

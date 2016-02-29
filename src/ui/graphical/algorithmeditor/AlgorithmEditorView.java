@@ -389,8 +389,8 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_index
+	 * Sets the selected parameter
+	 * @param p_index The index of the parameter to select
 	 */
 	public void setSelectedParameter(int p_index)
 	{
@@ -398,7 +398,7 @@ public class AlgorithmEditorView extends View
 	}
 
 	/**
-	 * @update_comment
+	 * Removes all visible parameter options
 	 */
 	public void removeParameterOptions()
 	{

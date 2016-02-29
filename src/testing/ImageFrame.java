@@ -19,8 +19,8 @@ public class ImageFrame extends JFrame implements WindowListener
 {
 
 	/**
-	 * @update_comment
-	 * @param p_img
+	 * Constructs an image frame for an image
+	 * @param p_img The image
 	 */
 	public ImageFrame(BufferedImage p_img)
 	{
@@ -31,7 +31,7 @@ public class ImageFrame extends JFrame implements WindowListener
 	}
 
 	/**
-	 * @update_comment
+	 * Sets the frame visible
 	 */
 	public void display()
 	{
@@ -39,7 +39,7 @@ public class ImageFrame extends JFrame implements WindowListener
 	}
 
 	/**
-	 * @update_comment
+	 * Disposes this frame
 	 */
 	public void destroy()
 	{

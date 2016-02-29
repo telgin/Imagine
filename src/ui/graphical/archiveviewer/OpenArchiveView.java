@@ -77,9 +77,8 @@ public class OpenArchiveView extends View
 		f_controller = new OpenArchiveController(this);
 	}
 
-	/**
-	 * @update_comment
-	 * @return
+	/* (non-Javadoc)
+	 * @see ui.graphical.View#setupPane()
 	 */
 	@Override
 	public Pane setupPane()
@@ -139,8 +138,8 @@ public class OpenArchiveView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Sets up the archive contents section
+	 * @return The archive contents section
 	 */
 	private Node setupContentsSection()
 	{
@@ -218,8 +217,8 @@ public class OpenArchiveView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Sets up the configuration selection section
+	 * @return The configuration selection section
 	 */
 	private Node setupConfigSelection()
 	{
@@ -322,10 +321,11 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_indent
-	 * @param p_element
-	 * @return
+	 * Utility method which makes gives the constant indent to elements in the
+	 * configuration section
+	 * @param p_indent The size of the indent
+	 * @param p_element The node to indent
+	 * @return An hbox containing the indented node
 	 */
 	private HBox indentElement(int p_indent, Node p_element)//TODO replace with modules
 	{
@@ -339,8 +339,8 @@ public class OpenArchiveView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the key section
+	 * @param p_enabled The enabled state
 	 */
 	void setKeySectionEnabled(boolean p_enabled)
 	{
@@ -449,7 +449,7 @@ public class OpenArchiveView extends View
 
 	/**
 	 * @update_comment
-	 * @param p_enabled
+	 * @param p_enabled The enabled state
 	 */
 	private void setKeyFileSectionEnabled(boolean p_enabled)
 	{
@@ -474,7 +474,7 @@ public class OpenArchiveView extends View
 
 	/**
 	 * @update_comment
-	 * @param b
+	 * @param p_enabled The enabled state
 	 */
 	private void setPasswordSectionEnabled(boolean p_enabled)
 	{
@@ -491,15 +491,6 @@ public class OpenArchiveView extends View
 			f_passwordField.setStyle("-fx-opacity: 1");
 			f_passwordLabel.setStyle("-fx-opacity: 1");
 		}
-	}
-	
-	/**
-	 * @update_comment
-	 * @param p_enabled
-	 */
-	public void setOpenSectionEnabled(boolean p_enabled)
-	{
-		f_openButton.disableProperty().set(!p_enabled);
 	}
 	
 	/**
@@ -529,7 +520,7 @@ public class OpenArchiveView extends View
 
 	/**
 	 * @update_comment
-	 * @param p_enabled
+	 * @param p_enabled The enabled state
 	 */
 	public void setOpenButtonEnabled(boolean p_enabled)
 	{
@@ -546,8 +537,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the extraction buttons section
+	 * @param p_enabled The enabled state
 	 */
 	public void setExtractionButtonsEnabled(boolean p_enabled)
 	{
@@ -594,8 +585,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the algorithm selection section
+	 * @param p_enabled The enabled state
 	 */
 	public void setAlgorithmSelectionEnabled(boolean p_enabled)
 	{
@@ -612,24 +603,7 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_prompt
-	 */
-	public void setPasswordPrompt(String p_prompt)
-	{
-		f_passwordField.setPromptText(p_prompt);
-	}
-	
-	/**
-	 * @update_comment
-	 */
-	public void clearPasswordPrompt()
-	{
-		f_passwordField.setPromptText("");
-	}
-	
-	/**
-	 * @update_comment
+	 * Selects the key file toggle
 	 */
 	public void toggleKeySection()
 	{
@@ -637,7 +611,7 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
+	 * Selects the password toggle
 	 */
 	public void togglePasswordSection()
 	{
@@ -645,8 +619,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_path
+	 * Sets the input file path
+	 * @param p_path The path text to set
 	 */
 	public void setInputFilePath(String p_path)
 	{
@@ -654,8 +628,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_path
+	 * Sets the output folder path
+	 * @param p_path The path text to set
 	 */
 	public void setOutputFolderPath(String p_path)
 	{
@@ -663,8 +637,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the input file path
+	 * @return The input file path
 	 */
 	public String getInputFilePath()
 	{
@@ -681,8 +655,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_path
+	 * Sets the path displaying for the key file
+	 * @param p_path The path to display
 	 */
 	public void setKeyFilePath(String p_path)
 	{
@@ -690,8 +664,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if the key file section is enabled
+	 * @return The enabled state of the key file
 	 */
 	public boolean keyFileEnabled()
 	{
@@ -699,8 +673,8 @@ public class OpenArchiveView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if the password section is enabled
+	 * @return The enabled state of the password section
 	 */
 	public boolean passwordEnabled()
 	{
@@ -708,8 +682,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the file key path
+	 * @return The file key path that is displayed
 	 */
 	public String getKeyFilePath()
 	{
@@ -726,8 +700,8 @@ public class OpenArchiveView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of indices selected in the table of file contents
+	 * @return A list of selected indices
 	 */
 	@SuppressWarnings("rawtypes")
 	public List<Integer> getSelectedRows()

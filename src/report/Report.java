@@ -13,14 +13,14 @@ import util.StandardUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Handles reporting of which files went into which archives.
  */
 public abstract class Report
 {
 	private static List<String> s_lines;
 	
 	/**
-	 * @update_comment
+	 * Clears the list of report records
 	 */
 	public static void reset()
 	{
@@ -28,8 +28,8 @@ public abstract class Report
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_fileMetadata
+	 * Adds a creation record to the report
+	 * @param p_fileMetadata The metadata for a file which was added to an archive
 	 */
 	public static void saveCreationRecord(Metadata p_fileMetadata)
 	{
@@ -40,8 +40,8 @@ public abstract class Report
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_reportFile
+	 * Writes the report to a file
+	 * @param p_reportFile The file to write the report to
 	 */
 	public static void writeReport(File p_reportFile)
 	{

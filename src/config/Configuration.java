@@ -14,7 +14,8 @@ import util.ConfigUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Handles reading and writing to the configuration file which mainly holds
+ * information about algorithm presets.
  */
 public class Configuration {
 	private static Document s_document;
@@ -27,7 +28,7 @@ public class Configuration {
 	}
 	
 	/**
-	 * @update_comment
+	 * Reloads the xml document from the config file
 	 */
 	public static void reloadConfig()
 	{
@@ -41,8 +42,8 @@ public class Configuration {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_document
+	 * Loads the specified xml document
+	 * @param p_document The xml document to load
 	 */
 	public static void loadConfig(Document p_document)
 	{
@@ -51,7 +52,7 @@ public class Configuration {
 	}
 	
 	/**
-	 * @update_comment
+	 * Saves the xml document to the config file
 	 */
 	public static void saveConfig()
 	{
@@ -60,8 +61,8 @@ public class Configuration {
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the log folder location from the configuration
+	 * @return The log folder location
 	 */
 	public static File getLogFolder()
 	{
@@ -82,9 +83,9 @@ public class Configuration {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_presetName
-	 * @return
+	 * Gets the algorithm preset with the given name
+	 * @param p_presetName The preset name to look up
+	 * @return The algorithm preset of the given name
 	 */
 	public static Algorithm getAlgorithmPreset(String p_presetName)
 	{
@@ -92,8 +93,8 @@ public class Configuration {
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of algorithm preset names stored in the configuration
+	 * @return The list of preset names
 	 */
 	public static List<String> getAlgorithmPresetNames()
 	{
@@ -115,9 +116,9 @@ public class Configuration {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_presetName
-	 * @return
+	 * Gets the algorithm preset element associated with the given name
+	 * @param p_presetName The preset name to search for
+	 * @return The algorithm element
 	 */
 	private static Element getAlgorithmPresetElement(String p_presetName)
 	{
@@ -137,8 +138,9 @@ public class Configuration {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_algo
+	 * Adds an algorithm preset to the configuration. Changes will not be saved unless
+	 * saving is explicitly called.
+	 * @param p_algo The algorithm to add
 	 */
 	public static void addAlgorithmPreset(Algorithm p_algo)
 	{
@@ -148,8 +150,9 @@ public class Configuration {
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_presetName
+	 * Deletes an algorithm preset from the configuration. Changes will not be saved unless
+	 * saving is explicitly called.
+	 * @param p_presetName The name of the preset to delete
 	 */
 	public static void deleteAlgorithmPreset(String p_presetName)
 	{

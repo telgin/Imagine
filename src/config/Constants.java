@@ -8,7 +8,7 @@ import logging.LogLevel;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This class provides a central place to define program constants.
  */
 public abstract class Constants
 {

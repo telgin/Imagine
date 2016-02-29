@@ -4,8 +4,6 @@ import java.io.File;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
 import system.Imagine;
@@ -13,15 +11,15 @@ import util.ConfigUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Generates a default configuration file which includes default presets.
  */
 public abstract class DefaultConfigGenerator
 {
 	private static Document s_document;
 
 	/**
-	 * @update_comment
-	 * @param p_args
+	 * An entry point for creating the default config file. Used for testing.
+	 * @param p_args The command line arguments
 	 */
 	public static void main(String[] p_args)
 	{
@@ -30,8 +28,8 @@ public abstract class DefaultConfigGenerator
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_configFile
+	 * Saves a default configuration to the file specified.
+	 * @param p_configFile The file to save the default config in
 	 */
 	public static void create(File p_configFile)
 	{
@@ -55,8 +53,8 @@ public abstract class DefaultConfigGenerator
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Generates a blank default configuration without any listed presets
+	 * @return The xml document containing the blank config
 	 */
 	private static Document makeBasicConfig()
 	{
@@ -75,9 +73,9 @@ public abstract class DefaultConfigGenerator
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_tagName
-	 * @return
+	 * Utility function which creates an element with the specified tag name.
+	 * @param p_tagName The tag name
+	 * @return The element that was created
 	 */
 	private static Element mkElement(String p_tagName)
 	{
@@ -85,8 +83,8 @@ public abstract class DefaultConfigGenerator
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Utility function which makes a system element with a log folder.
+	 * @return The system element
 	 */
 	private static Element mkSystemNode()
 	{
@@ -99,12 +97,13 @@ public abstract class DefaultConfigGenerator
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_name
-	 * @param p_value
-	 * @return
+	 * Utility function which makes a path element node with the
+	 * specified name and value
+	 * @param p_name The name of the path
+	 * @param p_value The path string
+	 * @return The path element created
 	 */
-	private static Node mkPathNode(String p_name, String p_value)
+	private static Element mkPathNode(String p_name, String p_value)
 	{
 		Element element = mkElement("Path");
 		if (p_name != null)

@@ -15,7 +15,7 @@ import util.StandardUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This class is the main entry point for the software
  */
 public class Imagine
 {
@@ -33,7 +33,7 @@ public class Imagine
 	}
 	
 	/**
-	 * @param p_args
+	 * @param p_args The command line arguments
 	 */
 	public static void main(String[] p_args)
 	{
@@ -44,7 +44,7 @@ public class Imagine
 	/**
 	 * The main entry point, separated for automated
 	 * testing purposes.
-	 * @param p_args
+	 * @param p_args The command line arguments
 	 */
 	public static void run(String[] p_args)
 	{
@@ -81,9 +81,10 @@ public class Imagine
 	
 	
 	/**
-	 * @update_comment
-	 * @param p_args
-	 * @return
+	 * Processes command line arguments so that this kind of code is not
+	 * spread out everywhere.
+	 * @param p_args The command line arguments
+	 * @return The result of parsing the command line arguments
 	 */
 	private static ArgParseResult processArgs(List<String> p_args)
 	{
@@ -180,8 +181,8 @@ public class Imagine
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_message
+	 * Prints a usage statement with an optional message about a specific error
+	 * @param p_message The optional message about a specific error
 	 */
 	public static void usage(String p_message)
 	{

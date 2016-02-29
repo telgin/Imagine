@@ -16,7 +16,7 @@ public class ArchiveContents
 	private ArrayList<FileContents> f_files;
 
 	/**
-	 * @update_comment
+	 * Constructs a new archive contents object
 	 */
 	public ArchiveContents()
 	{
@@ -24,8 +24,8 @@ public class ArchiveContents
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_contents
+	 * Adds a file contents
+	 * @param p_contents The file contents to add
 	 */
 	public void addFileContents(FileContents p_contents)
 	{
@@ -97,8 +97,8 @@ public class ArchiveContents
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of file contents objects for this archive contents object.
+	 * @return The list of file contents objects
 	 */
 	public List<FileContents> getFileContents()
 	{

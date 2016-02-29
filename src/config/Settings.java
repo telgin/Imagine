@@ -4,7 +4,7 @@ import java.io.File;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This class contains settings for creation jobs
  */
 public class Settings
 {
@@ -14,7 +14,7 @@ public class Settings
 	private static boolean s_generateReport;
 	
 	/**
-	 * @update_comment
+	 * Resets the settings to the default values
 	 */
 	public static void reset()
 	{
@@ -25,8 +25,11 @@ public class Settings
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if archive files will be written in a special structured way
+	 * such that groups of consecutive archives are output in different index
+	 * folders. This is done because on many file systems, performance decreases
+	 * if there are too many files in one directory.
+	 * @return If structured output will be used
 	 */
 	public static boolean useStructuredOutput()
 	{
@@ -34,8 +37,11 @@ public class Settings
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_structured
+	 * Sets the flag for if this creation job should be using structured output.
+	 * If this is turned on, groups of consecutive archives are output in different index
+	 * folders. This is done because on many file systems, performance decreases
+	 * if there are too many files in one directory.
+	 * @param p_structured If structured output should be used
 	 */
 	public static void setUsingStructuredOutput(boolean p_structured)
 	{
@@ -43,8 +49,8 @@ public class Settings
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the output folder where archives should be written to
+	 * @return The output folder
 	 */
 	public static File getOutputFolder()
 	{
@@ -52,8 +58,8 @@ public class Settings
 	}
 
 	/**
-	 * @update_comment
-	 * @param s_outputFolder
+	 * Sets the output folder where archive files should be written to
+	 * @param s_outputFolder The output folder
 	 */
 	public static void setOutputFolder(File p_folder)
 	{

@@ -2,18 +2,19 @@ package system;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This interface describes a way to shutdown the components of the system
+ * and verify that they have shutdown.
  */
 public interface ActiveComponent
 {
 	/**
-	 * @update_comment
+	 * Gives the signal for the active component to shutdown
 	 */
 	public void shutdown();
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if the active component is shutdown.
+	 * @return The shutdown state
 	 */
 	public boolean isShutdown();
 }

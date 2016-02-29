@@ -23,14 +23,15 @@ import util.Hashing;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A test support class which compares various data  and file structures
+ * for archive creation and parsing.
  */
 public class Comparisons
 {
 	/**
-	 * @update_comment
-	 * @param p_metadata1
-	 * @param p_metadata2
+	 * Compares the fields of two metadata objects
+	 * @param p_metadata1 The first metadata object
+	 * @param p_metadata2 The second metadata object
 	 */
 	public static void compareMetadata(Metadata p_metadata1, Metadata p_metadata2)
 	{
@@ -52,9 +53,10 @@ public class Comparisons
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_file
-	 * @param p_metadata
+	 * Compares data that can be found within the file system for some file to the
+	 * data contained in a metadata object.
+	 * @param p_file The file
+	 * @param p_metadata The metadata object
 	 */
 	public static void compareMetadataFile(File p_file, Metadata p_metadata)
 	{
@@ -66,9 +68,9 @@ public class Comparisons
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_algorithm1
-	 * @param p_algorithm2
+	 * Compares the first algorithm
+	 * @param p_algorithm1 The first algorithm
+	 * @param p_algorithm2 The second algorithm
 	 */
 	public static void compareAlgorithms(Algorithm p_algorithm1, Algorithm p_algorithm2)
 	{
@@ -96,9 +98,9 @@ public class Comparisons
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_set1
-	 * @param p_set2
+	 * Compares two sets of files to see if they both contain files with the same paths
+	 * @param p_set1 The first set
+	 * @param p_set2 The second set
 	 */
 	public static void compareFileSets(Set<File> p_set1, Set<File> p_set2)
 	{
@@ -120,10 +122,11 @@ public class Comparisons
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_originalRoot
-	 * @param p_extractedRoot
-	 * @param p_absolutePaths
+	 * Compares the extracted file structure with the file structure before the inputs were
+	 * added to an archive. Used to test if file structures are being properly written and read.
+	 * @param p_originalRoot The original root folder of the input files
+	 * @param p_extractedRoot The folder the extracted files were output to
+	 * @param p_absolutePaths If absolute paths should be used
 	 */
 	public static void compareExtractedFileStructure(File p_originalRoot, File p_extractedRoot, boolean p_absolutePaths)
 	{
@@ -168,9 +171,9 @@ public class Comparisons
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_root
-	 * @return
+	 * Counts the number of files in some folder (recursive count)
+	 * @param p_root The root folder to count from
+	 * @return The number of files in this folder
 	 */
 	private static int countFiles(File p_root)
 	{
@@ -203,12 +206,12 @@ public class Comparisons
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_originalRoot
-	 * @param p_extractedRoot
-	 * @param p_originalFile
-	 * @param p_absolutePaths
-	 * @return
+	 * Gets the expected extraction file location based on a number of parameters.
+	 * @param p_originalRoot The original file root
+	 * @param p_extractedRoot The extraction root folder
+	 * @param p_originalFile The original file
+	 * @param p_absolutePaths If absolute paths should be enforced
+	 * @return The expected file location when a file is extracted
 	 */
 	public static File getExpectedExtractionFile(File p_originalRoot, File p_extractedRoot,
 					File p_originalFile, boolean p_absolutePaths)
@@ -224,9 +227,9 @@ public class Comparisons
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_file1
-	 * @param p_file2
+	 * Compares two files by hashing both and comparing the hashes
+	 * @param p_file1 The first file
+	 * @param p_file2 The second file
 	 */
 	public static void compareFileHashes(File p_file1, File p_file2)
 	{
@@ -238,9 +241,9 @@ public class Comparisons
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_file1
-	 * @param p_file2
+	 * Compares the file paths of two files
+	 * @param p_file1 The first file
+	 * @param p_file2 The second file
 	 */
 	public static void compareFilePaths(File p_file1, File p_file2)
 	{
@@ -248,9 +251,9 @@ public class Comparisons
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_key1
-	 * @param p_key2
+	 * Compares keys to see if their subclasses and hashes are the same
+	 * @param p_key1 The first key
+	 * @param p_key2 The second key
 	 */
 	public static void compareKeys(Key p_key1, Key p_key2)
 	{

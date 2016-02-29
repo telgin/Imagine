@@ -18,8 +18,9 @@ public class ImagePanel extends JPanel
 	private Color f_bgColor;
 
 	/**
-	 * @update_comment
-	 * @param p_backgroundColor
+	 * Constructs an image panel
+	 * @param p_backgroundColor The background color if the image does not
+	 * fully fit or if it contains alpha.
 	 */
 	public ImagePanel(Color p_backgroundColor)
 	{
@@ -28,8 +29,8 @@ public class ImagePanel extends JPanel
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_image
+	 * Sets the image for this panel
+	 * @param p_image The image to set
 	 */
 	public void setImage(Image p_image)
 	{
@@ -37,7 +38,7 @@ public class ImagePanel extends JPanel
 	}
 
 	/**
-	 * @update_comment
+	 * Repaints the panel
 	 */
 	public void drawing()
 	{

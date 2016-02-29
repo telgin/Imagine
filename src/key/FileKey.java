@@ -9,7 +9,8 @@ import util.Hashing;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The file key hashes a file to be used as a seed for
+ * the algorithms.
  */
 public class FileKey implements Key
 {
@@ -17,8 +18,9 @@ public class FileKey implements Key
 	private byte[] f_keyHash;
 
 	/**
-	 * @update_comment
-	 * @param p_keyLocation
+	 * Constructs a file key for some specified file. The hashing is
+	 * done at the first time the hash is requested, not during construction.
+	 * @param p_keyLocation The key file location
 	 */
 	public FileKey(File p_keyLocation)
 	{
@@ -40,8 +42,8 @@ public class FileKey implements Key
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the file this key is using
+	 * @return The key file location
 	 */
 	public File getKeyFile()
 	{
@@ -49,7 +51,8 @@ public class FileKey implements Key
 	}
 
 	/**
-	 * @update_comment
+	 * Gets the key file location if it is not specified and then
+	 * hashes the file.
 	 */
 	private void fetchKey()
 	{

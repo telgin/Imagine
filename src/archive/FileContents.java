@@ -4,7 +4,7 @@ import data.Metadata;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This class describes a file record which was parsed from an archive.
  */
 public class FileContents
 {

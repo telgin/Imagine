@@ -6,7 +6,7 @@ import system.Imagine;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Runs the gui. Used for testing purposes.
  */
 public class GUITest
 {

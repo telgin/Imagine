@@ -18,7 +18,9 @@ import util.FileSystemUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Manages the extraction of files and where copy them to when they
+ * are fully extracted. Also caches archive uuids and explored files for
+ * more efficient extracting.
  */
 public class ExtractionManager
 {
@@ -27,7 +29,7 @@ public class ExtractionManager
 	private File f_enclosingFolder;
 	
 	/**
-	 * @update_comment
+	 * Constructs an extraction manager
 	 */
 	public ExtractionManager()
 	{
@@ -36,8 +38,9 @@ public class ExtractionManager
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_folder
+	 * Sets the enclosing folder which contains the archive files for this
+	 * extraction job.
+	 * @param p_folder The enclosing folder
 	 */
 	public void setEnclosingFolder(File p_folder)
 	{
@@ -45,8 +48,8 @@ public class ExtractionManager
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_archiveFile
+	 * Set an archive file as explored
+	 * @param p_archiveFile The archive file
 	 */
 	public void setExplored(File p_archiveFile)
 	{
@@ -54,9 +57,9 @@ public class ExtractionManager
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_archiveFile
-	 * @return
+	 * Tells if the given archive file was already explored
+	 * @param p_archiveFile The archive file
+	 * @return If the archive file was previously visited
 	 */
 	public boolean isExplored(File p_archiveFile)
 	{
@@ -64,9 +67,10 @@ public class ExtractionManager
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_fileName
-	 * @param p_archiveFile
+	 * Caches the location of a file header (archive uuid) with a file. This
+	 * is useful if the archive files were renamed.
+	 * @param p_fileName The original name of the archive file (archive uuid)
+	 * @param p_archiveFile The archive file
 	 */
 	public void cacheHeaderLocation(String p_fileName, File p_archiveFile)
 	{
@@ -74,9 +78,9 @@ public class ExtractionManager
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_fileName
-	 * @return
+	 * Gets the cached file location based on the archive name
+	 * @param p_fileName The archive file name
+	 * @return The cached archive file
 	 */
 	public File getCachedFile(String p_fileName)
 	{
@@ -84,10 +88,13 @@ public class ExtractionManager
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_archiveSearchName
-	 * @param p_curArchiveFolder
-	 * @return
+	 * Finds an archive file given what would have been the original name of
+	 * the archive file (uuid) and the current archive folder
+	 * @param p_archiveSearchName The original archive file name to search for. If archives
+	 * were renamed, this information can still be found by checking the headers (which were probably
+	 * mapped already)
+	 * @param p_curArchiveFolder The folder containing the current archive file
+	 * @return The archive file we're looking for, or null if it could not be found
 	 */
 	public File findArchiveFile(String p_archiveSearchName, File p_curArchiveFolder)
 	{
@@ -156,10 +163,10 @@ public class ExtractionManager
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_assembled
-	 * @param p_fileContents
-	 * @param p_extractionFolder
+	 * Moves a file from its current location to the correct place in the extraction folder.
+	 * @param p_assembled The assembled file to be moved
+	 * @param p_fileContents The contents of the file being moved
+	 * @param p_extractionFolder The top level extraction folder
 	 */
 	public void moveFileToExtractionFolder(File p_assembled, FileContents p_fileContents,
 					File p_extractionFolder)
@@ -185,13 +192,12 @@ public class ExtractionManager
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_source
-	 * @param p_fileContents
-	 * @param p_extractionFolder
+	 * Copies a file to its correct place in the extraction folder
+	 * @param p_source The file to copy
+	 * @param p_fileContents The file contents which which contains the original metadata for this file
+	 * @param p_extractionFolder The top level extraction folder
 	 */
-	public void copyFileToExtractionFolder(File p_source, FileContents p_fileContents,
-					File p_extractionFolder)
+	public void copyFileToExtractionFolder(File p_source, FileContents p_fileContents, File p_extractionFolder)
 	{
 		File created = new File(p_extractionFolder, p_fileContents.getMetadata().getFile().getPath());
 		
@@ -221,12 +227,11 @@ public class ExtractionManager
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_fileContents
-	 * @param p_extractionFolder
+	 * Moves a folder to the extraction folder in its correct place
+	 * @param p_fileContents The file contents which describe a folder
+	 * @param p_extractionFolder The top level extraction folder
 	 */
-	public void moveFolderToExtractionFolder(FileContents p_fileContents,
-					File p_extractionFolder)
+	public void moveFolderToExtractionFolder(FileContents p_fileContents, File p_extractionFolder)
 	{
 		File created = new File(p_extractionFolder, p_fileContents.getMetadata().getFile().getPath());
 		
@@ -234,7 +239,7 @@ public class ExtractionManager
 	}
 
 	/**
-	 * @update_comment
+	 * Resets the cache of explored files
 	 */
 	public void resetExploredFiles()
 	{

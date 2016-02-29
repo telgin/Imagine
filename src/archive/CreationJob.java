@@ -19,7 +19,7 @@ import logging.Logger;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Handles the high level process of loading input files and writing them to archives.
  */
 public class CreationJob implements Runnable
 {
@@ -37,13 +37,15 @@ public class CreationJob implements Runnable
 	private ArchiveWriterFactory<? extends ArchiveWriter> f_factory;
 
 	/**
-	 * @update_comment
-	 * @param p_inputFiles
-	 * @param p_algorithm
-	 * @param p_key
-	 * @param p_archiveWorkerCount
+	 * Constructs a creation job
+	 * @param p_inputFiles The list of input files and folders
+	 * @param p_algorithm The algorithm to use
+	 * @param p_key The key to use
+	 * @param p_archiveWorkerCount The number of archive workers to use. 
+	 * Each will run on its own thread
 	 */
-	public CreationJob(List<File> p_inputFiles, Algorithm p_algorithm, Key p_key, int p_archiveWorkerCount)
+	public CreationJob(List<File> p_inputFiles, Algorithm p_algorithm, 
+		Key p_key, int p_archiveWorkerCount)
 	{
 		f_inputFiles = p_inputFiles;
 		f_archiveWorkerCount = p_archiveWorkerCount;
@@ -61,7 +63,8 @@ public class CreationJob implements Runnable
 	}
 
 	/**
-	 * @update_comment
+	 * Adds the number of archive workers specified. One will be added for every
+	 * thread that is specified.
 	 */
 	private void addArchiveWorkers()
 	{
@@ -73,8 +76,8 @@ public class CreationJob implements Runnable
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if the job is finished running.
+	 * @return If the job is finished running
 	 */
 	public boolean isFinished()
 	{
@@ -82,7 +85,8 @@ public class CreationJob implements Runnable
 	}
 
 	/**
-	 * @update_comment
+	 * Starts the archive creation job. (Starts filling archives with
+	 * input files.)
 	 */
 	public void start()
 	{
@@ -111,7 +115,7 @@ public class CreationJob implements Runnable
 	}
 
 	/**
-	 * @update_comment
+	 * Shuts the creation job down. Used for stopping a job before it is finished.
 	 */
 	public void shutdown()
 	{
@@ -165,8 +169,8 @@ public class CreationJob implements Runnable
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if both the index worker and all archive workers are inactive.
+	 * @return If everything is inactive
 	 */
 	private boolean allWorkersInactive()
 	{
@@ -174,8 +178,8 @@ public class CreationJob implements Runnable
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Tells if all archive workers are inactive
+	 * @return If all archive workers are inactive
 	 */
 	private boolean archiveWorkersInactive()
 	{
@@ -187,8 +191,9 @@ public class CreationJob implements Runnable
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the assigned maximum number of waiting files in the queue before
+	 * the index worker pauses to let some be written.
+	 * @return The maximum number of waiting files.
 	 */
 	public int getMaxWaitingFiles()
 	{
@@ -196,8 +201,8 @@ public class CreationJob implements Runnable
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_maxWaitingFiles
+	 * Sets the maximum queue size for files waiting to be loaded into archives.
+	 * @param p_maxWaitingFiles The maximum number of waiting files
 	 */
 	public void setMaxWaitingFiles(int p_maxWaitingFiles)
 	{

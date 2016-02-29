@@ -8,7 +8,7 @@ import logging.Logger;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The menu class allows a user to pick from a formatted list of options.
  */
 public class Menu
 {
@@ -19,8 +19,8 @@ public class Menu
 	private boolean f_canceled;
 	
 	/**
-	 * @update_comment
-	 * @param p_title
+	 * Constructs a menu object
+	 * @param p_title The title of the menu
 	 */
 	public Menu(String p_title)
 	{
@@ -31,8 +31,8 @@ public class Menu
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the index of the option which was chosen by the user
+	 * @return The index of the option chosen
 	 */
 	public int getChosenIndex()
 	{
@@ -40,17 +40,8 @@ public class Menu
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
-	 */
-	public String getChosenOption()
-	{
-		return f_options.get(f_currentChoice);
-	}
-	
-	/**
-	 * @update_comment
-	 * @param p_option
+	 * Adds an option to this menu
+	 * @param p_option The text of the option
 	 */
 	public void addOption(String p_option)
 	{
@@ -58,8 +49,8 @@ public class Menu
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_text
+	 * Sets the subtext for this menu
+	 * @param p_text The subtext
 	 */
 	public void setSubtext(String p_text)
 	{
@@ -67,17 +58,7 @@ public class Menu
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_option
-	 * @return
-	 */
-	public int getIndexOfOption(String p_option)
-	{
-		return f_options.indexOf(p_option);
-	}
-	
-	/**
-	 * @update_comment
+	 * Displays the menu and allows the user to input a choice
 	 */
 	protected void display()
 	{
@@ -95,7 +76,7 @@ public class Menu
 	}	
 	
 	/**
-	 * @update_comment
+	 * Allows the user to pick an option from the menu
 	 */
 	public void inputChoice()
 	{
@@ -131,9 +112,8 @@ public class Menu
 		f_canceled = false;
 	}
 	
-	
 	/**
-	 * @update_comment
+	 * Cancel this menu
 	 */
 	protected void cancel()
 	{
@@ -141,14 +121,14 @@ public class Menu
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_choice
+	 * Called when an option is chosen by the user
+	 * @param p_choice The index of the user's choice
 	 */
 	protected void optionChosen(int p_choice){}
 	
 	/**
-	 * @update_comment
-	 * @param p_what
+	 * Notifies the user of incorrect input
+	 * @param p_what What the specific problem or input was
 	 */
 	protected void incorrectInput(String p_what)
 	{

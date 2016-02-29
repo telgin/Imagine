@@ -2,14 +2,14 @@ package archive;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Creates archive writers for various algorithms
  * @param <T> The archive mode
  */
 public interface ArchiveWriterFactory<T extends ArchiveWriter>
 {
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates an archive writer
+	 * @return The archive writer
 	 */
 	T createWriter();
 }
