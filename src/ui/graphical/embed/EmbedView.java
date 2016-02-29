@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +11,6 @@ import java.util.Set;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -22,8 +20,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
@@ -44,7 +40,6 @@ import ui.ArgParseResult;
 import ui.graphical.BooleanModule;
 import ui.graphical.FileModule;
 import ui.graphical.View;
-import ui.graphical.archiveviewer.FileContentsTableRecord;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -505,10 +500,11 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_indent
-	 * @param p_element
-	 * @return
+	 * Indents an element by wrapping it in an hbox off center. Utility method
+	 * used to give a constant indent to everything.
+	 * @param p_indent The indent to use
+	 * @param p_element The element to wrap
+	 * @return The hbox containing the method
 	 */
 	private HBox indentElement(int p_indent, Node p_element)
 	{
@@ -522,8 +518,8 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the key section
+	 * @param p_enabled The enabled state
 	 */
 	void setKeySectionEnabled(boolean p_enabled)
 	{
@@ -571,11 +567,11 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_value
-	 * @param p_oldSelection
-	 * @param p_newSelection
-	 * @return
+	 * Enables/disables the correct sections when the key type. Called by javafx
+	 * when the selection changes.
+	 * @param p_value the observable value
+	 * @param p_oldSelection The old toggle selection
+	 * @param p_newSelection The new toggle selection
 	 */
 	private void keyTypeSelected(ObservableValue<? extends Toggle> p_value,
 					Toggle p_oldSelection, Toggle p_newSelection)
@@ -598,8 +594,8 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the key file selection
+	 * @param p_enabled The enabled state
 	 */
 	private void setKeyFileSectionEnabled(boolean p_enabled)
 	{
@@ -623,8 +619,8 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_enabled
+	 * Sets the enabled state of the password section
+	 * @param p_enabled The enabled state
 	 */
 	private void setPasswordSectionEnabled(boolean p_enabled)
 	{
@@ -669,8 +665,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_presetName
+	 * Sets the selected algorithm preset
+	 * @param p_presetName The preset name to select
 	 */
 	public void setAlgorithmSelection(String p_presetName)
 	{
@@ -678,8 +674,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_presetNames
+	 * Sets the list of algorithm presets
+	 * @param p_presetNames The list of preset names
 	 */
 	public void setAlgorithmPresets(List<String> p_presetNames)
 	{
@@ -821,8 +817,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the key file path entered in the key file text field
+	 * @return The key file path
 	 */
 	public String getKeyFilePath()
 	{
@@ -838,8 +834,9 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the map of tree cells to tree items which are the active
+	 * input cells/items in the view
+	 * @return The map of active input files
 	 */
 	public Map<TreeCell<String>, InputFileTreeItem> getActiveInputItems()
 	{
@@ -847,8 +844,9 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the map of tree cells to tree items which are the active
+	 * target cells/items in the view
+	 * @return The map of active target files
 	 */
 	public Map<TreeCell<String>, TargetFileTreeItem> getActiveTargetItems()
 	{
@@ -856,8 +854,8 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_number
+	 * Sets the number of files created
+	 * @param p_number The number of files created
 	 */
 	public void setFilesCreated(int p_number)
 	{
@@ -865,12 +863,12 @@ public class EmbedView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param progress
+	 * Sets the creation progress bar to a new value
+	 * @param p_progress The progress of the creation job [0, 1]
 	 */
-	public void setCreationProgress(double progress)
+	public void setCreationProgress(double p_progress)
 	{
-		Platform.runLater(() -> f_creationProgress.setProgress(progress));
+		Platform.runLater(() -> f_creationProgress.setProgress(p_progress));
 	}
 
 	/* (non-Javadoc)
@@ -884,8 +882,8 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_folder
+	 * Sets the output folder displayed in the gui
+	 * @param p_folder The output folder
 	 */
 	public void setOutputFolder(File p_folder)
 	{
@@ -893,8 +891,8 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the output folder as displayed in the output folder field
+	 * @return The current output folder path
 	 */
 	public File getOutputFolder()
 	{
@@ -907,7 +905,8 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
+	 * Removes the selected input from the list of inputs. The selected input must
+	 * be a top level entry.
 	 */
 	public void removeSelectedInput()
 	{
@@ -927,8 +926,9 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of input files derived from the input file tree
+	 * and the checked state of the tree items.
+	 * @return The list of input files
 	 */
 	public List<File> getInputFileList()
 	{
@@ -943,9 +943,12 @@ public class EmbedView extends View
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_files
-	 * @param p_parent
+	 * Collects the set of input files by traversing the input file tree and
+	 * paying attention to the checked state of each node. Since folders are
+	 * allowed in the input file list, you only need to traverse the tree until you
+	 * find something checked or not checked.
+	 * @param p_files The set of files to add to
+	 * @param p_parent The current tree item representing a parent file
 	 */
 	private void collectInputFiles(Set<File> p_files, InputFileTreeItem p_parent)
 	{

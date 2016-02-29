@@ -13,7 +13,7 @@ import javafx.scene.control.TreeItem;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A tree item class for a target file
  */
 public class TargetFileTreeItem extends TreeItem<String>
 {
@@ -42,8 +42,8 @@ public class TargetFileTreeItem extends TreeItem<String>
 	}
 
 	/**
-	 * @update_comment
-	 * @param string
+	 * Constructs a target file tree item for some file
+	 * @param p_file The target file this item is representing
 	 */
 	public TargetFileTreeItem(File p_file)
 	{
@@ -66,8 +66,8 @@ public class TargetFileTreeItem extends TreeItem<String>
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_display
+	 * Constructs a target file tree item for some display string
+	 * @param p_display The display string for this item
 	 */
 	public TargetFileTreeItem(String p_display)
 	{
@@ -106,13 +106,11 @@ public class TargetFileTreeItem extends TreeItem<String>
 	{
 		this.f_status = p_status;
 	}
-	
+
 	/**
-	 * @param item 
-	 * @update_comment
-	 * @param booleanValue
-	 * @param inputFile
-	 * @return
+	 * Update the target file with its children when an item is expanded. This is done
+	 * so things can be loaded when they are needed instead of all at once.
+	 * @param p_expanded The expanded state of the item
 	 */
 	private void folderEntryExpanded(boolean p_expanded)
 	{
@@ -137,8 +135,8 @@ public class TargetFileTreeItem extends TreeItem<String>
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_cell
+	 * Sets the style of a cell according to the state of this target item
+	 * @param p_cell The cell to set the style of
 	 */
 	public void setCellStyle(TreeCell<?> p_cell)
 	{

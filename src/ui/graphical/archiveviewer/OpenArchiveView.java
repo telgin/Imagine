@@ -388,11 +388,11 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_value
-	 * @param p_oldSelection
-	 * @param p_newSelection
-	 * @return
+	 * Enables/disables the correct sections when the key type. Called by javafx
+	 * when the selection changes.
+	 * @param p_value the observable value
+	 * @param p_oldSelection The old toggle selection
+	 * @param p_newSelection The new toggle selection
 	 */
 	private void keyTypeSelected(ObservableValue<? extends Toggle> p_value,
 					Toggle p_oldSelection, Toggle p_newSelection)
@@ -406,19 +406,17 @@ public class OpenArchiveView extends View
 		{
 			setPasswordSectionEnabled(true);
 			setKeyFileSectionEnabled(false);
-			//clearKeyFileSection();
 		}
 		else //assumed file toggled
 		{
 			setPasswordSectionEnabled(false);
 			setKeyFileSectionEnabled(true);
-			//clearPasswordSection();
 		}
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_data
+	 * Sets the table data from the list of file contents
+	 * @param p_data The list of file contents read from an archive file
 	 */
 	public void setTableData(List<FileContents> p_data)
 	{
@@ -440,7 +438,7 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
+	 * Clears the table of all items
 	 */
 	void clearTable()
 	{
@@ -448,7 +446,7 @@ public class OpenArchiveView extends View
 	}
 
 	/**
-	 * @update_comment
+	 * Sets the enabled state of the key file section
 	 * @param p_enabled The enabled state
 	 */
 	private void setKeyFileSectionEnabled(boolean p_enabled)
@@ -473,7 +471,7 @@ public class OpenArchiveView extends View
 	}
 
 	/**
-	 * @update_comment
+	 * Sets the enabled state of the password section
 	 * @param p_enabled The enabled state
 	 */
 	private void setPasswordSectionEnabled(boolean p_enabled)
@@ -494,7 +492,7 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
+	 * Clears the password section of all input
 	 */
 	public void clearPasswordSection()
 	{
@@ -502,7 +500,7 @@ public class OpenArchiveView extends View
 	}
 
 	/**
-	 * @update_comment
+	 * Clears the key file section of all input
 	 */
 	public void clearKeyFileSection()
 	{
@@ -510,16 +508,16 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
+	 * Clears the key section (password + key file sections)
 	 */
-	void clearKeySection()
+	public void clearKeySection()
 	{
 		clearPasswordSection();
 		clearKeyFileSection();
 	}
 
 	/**
-	 * @update_comment
+	 * Sets the enabled state of the open archive button
 	 * @param p_enabled The enabled state
 	 */
 	public void setOpenButtonEnabled(boolean p_enabled)
@@ -558,8 +556,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_presetName
+	 * Sets the algorithm selection to the specified string
+	 * @param p_presetName The algorithm preset name to select
 	 */
 	public void setAlgorithmSelection(String p_presetName)
 	{
@@ -567,8 +565,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_presetNames
+	 * Sets the list of algorithms to the specified list of preset names
+	 * @param p_presetNames The list of algorithm preset names
 	 */
 	public void setAlgorithmPresets(List<String> p_presetNames)
 	{
@@ -576,8 +574,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the selected algorithm
+	 * @return The selected algorithm preset name
 	 */
 	public String getAlgorithmSelection()
 	{
@@ -646,8 +644,8 @@ public class OpenArchiveView extends View
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the output folder path as specified in the output folder text field
+	 * @return The output folder path
 	 */
 	public String getOutputFolderPath()
 	{

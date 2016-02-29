@@ -12,7 +12,7 @@ import ui.graphical.top.TopView;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The superclass for the graphical interface.
  */
 public class GUI extends UI
 {
@@ -21,8 +21,8 @@ public class GUI extends UI
 	private ArgParseResult f_args;
 	
 	/**
-	 * @update_comment
-	 * @param p_args
+	 * Constructs a gui object
+	 * @param p_args The parsed command line arguments
 	 */
 	public GUI(ArgParseResult p_args)
 	{

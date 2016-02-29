@@ -15,7 +15,7 @@ import ui.graphical.GUI;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * Controller for the algorithm editor tab
  */
 public class AlgorithmEditorController
 {
@@ -28,8 +28,8 @@ public class AlgorithmEditorController
 	private String f_optionValue;
 	
 	/**
-	 * @update_comment
-	 * @param p_view
+	 * Constructs an algorithm controller for some view
+	 * @param p_view The algorithm editor view
 	 */
 	public AlgorithmEditorController(AlgorithmEditorView p_view)
 	{
@@ -38,8 +38,8 @@ public class AlgorithmEditorController
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of preset names available
+	 * @return The list of preset names
 	 */
 	public List<String> getPresetNames()
 	{
@@ -47,8 +47,8 @@ public class AlgorithmEditorController
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_index
+	 * Handles updating gui elements when the preset selection changes.
+	 * @param p_index The index of the selected preset
 	 */
 	public void presetSelected(int p_index)
 	{
@@ -87,8 +87,8 @@ public class AlgorithmEditorController
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_index
+	 * Handles updating the gui when the parameter selection changes
+	 * @param p_index The index of the selected parameter
 	 */
 	public void parameterSelected(int p_index)
 	{
@@ -113,7 +113,8 @@ public class AlgorithmEditorController
 	}
 
 	/**
-	 * @update_comment
+	 * Creates a new preset which will start out as the default
+	 * algorithm, updates gui elements
 	 */
 	public void createNewPressed()
 	{
@@ -146,7 +147,7 @@ public class AlgorithmEditorController
 	}
 
 	/**
-	 * @update_comment
+	 * Saves the algorithm preset that is selected
 	 */
 	public void savePressed()
 	{
@@ -209,8 +210,8 @@ public class AlgorithmEditorController
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of algorithm definition names
+	 * @return The list of algorithm definition names
 	 */
 	public List<String> getAlgorithmNames()
 	{
@@ -218,8 +219,9 @@ public class AlgorithmEditorController
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_index
+	 * Updates the gui elements (parameters, description, etc) when a new
+	 * algorithm is selected
+	 * @param p_index The index of the selected algorithm
 	 */
 	public void algorithmSelected(int p_index)
 	{
@@ -266,8 +268,8 @@ public class AlgorithmEditorController
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Gets the list of parameter names for the selected preset
+	 * @return The list of parameter names
 	 */
 	public List<String> getParameterNames()
 	{
@@ -284,8 +286,8 @@ public class AlgorithmEditorController
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_checked
+	 * Enables and disables the parameter when enabled checkbox changes state.
+	 * @param p_checked The checked state of the enabled checkbox
 	 */
 	public void parameterEnabledChecked(boolean p_checked)
 	{
@@ -306,8 +308,8 @@ public class AlgorithmEditorController
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_index
+	 * Validates the option choice and updates the gui
+	 * @param p_index The index of the option choice selected
 	 */
 	public void optionSelected(int p_index)
 	{
@@ -316,8 +318,8 @@ public class AlgorithmEditorController
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_value
+	 * Validates the option choice and updates the gui
+	 * @param p_value The option choice selected
 	 */
 	public void optionSelected(String p_value)
 	{
@@ -326,8 +328,9 @@ public class AlgorithmEditorController
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_checked
+	 * Updates the gui based on whether or not the 'prompt for value' option
+	 * is selected
+	 * @param p_checked The checked state
 	 */
 	public void promptOptionSelected(boolean p_checked)
 	{

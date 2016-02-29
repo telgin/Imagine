@@ -30,7 +30,7 @@ import util.FileSystemUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The controller class for the archive creator tab
  */
 public class EmbedController implements ActiveComponent
 {
@@ -112,8 +112,9 @@ public class EmbedController implements ActiveComponent
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_index
+	 * Updates the view to enable the correct components when a new
+	 * algorithm is selected
+	 * @param p_index The index of the algorithm selected
 	 */
 	public void algorithmSelected(int p_index)
 	{
@@ -172,7 +173,7 @@ public class EmbedController implements ActiveComponent
 	}
 
 	/**
-	 * @return the algorithms
+	 * @return the list of preset names
 	 */
 	public List<String> getPresetNames()
 	{
@@ -180,9 +181,8 @@ public class EmbedController implements ActiveComponent
 	}
 
 	/**
-	 * @update_comment
-	 * @param b
-	 * @return
+	 * Updates the list of presets if they have changed since the initial loading.
+	 * @param p_focused The focused state of the algorithm preset selection choicebox
 	 */
 	public void algorithmSelectFocus(boolean p_focused)
 	{
@@ -228,8 +228,7 @@ public class EmbedController implements ActiveComponent
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Allows the user to browse for an input file and updates the gui
 	 */
 	public void inputAddFilePressed()
 	{
@@ -242,8 +241,7 @@ public class EmbedController implements ActiveComponent
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Allows the user to browse for an input folder and updates the gui
 	 */
 	public void inputAddFolderPressed()
 	{
@@ -256,8 +254,7 @@ public class EmbedController implements ActiveComponent
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Removes the selected input
 	 */
 	public void removeInputPressed()
 	{
@@ -271,8 +268,7 @@ public class EmbedController implements ActiveComponent
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Allows the user to browse for an output folder and updates the gui
 	 */
 	public void browseOutputFolder()
 	{
@@ -283,11 +279,10 @@ public class EmbedController implements ActiveComponent
 			f_view.setOutputFolder(folder);
 		}
 	}
-
+	
 	/**
-	 * @update_comment
-	 * @param b
-	 * @return
+	 * Updates the structured output preference
+	 * @param p_checked The checked state
 	 */
 	public void structuredOutputChecked(boolean p_checked)
 	{
@@ -295,8 +290,7 @@ public class EmbedController implements ActiveComponent
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Checks if parameters are ok and starts a creation job
 	 */
 	public void createArchivesPressed()
 	{
@@ -375,21 +369,20 @@ public class EmbedController implements ActiveComponent
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_job
+	 * Updates the css of the input and target files until the job is finished
+	 * @param p_job The current creation job
 	 */
-	public void updateCSS(CreationJob p_job)
+	private void updateCSS(CreationJob p_job)
 	{
-		int run = 0;
 		while (!f_shuttingDown && !p_job.isFinished())
 		{
-			cssUpdateLoop(run++);
+			cssUpdateLoop();
 		}
 		
 		//finalize any progress that was made one last time
 		if (!f_shuttingDown && p_job.isFinished())
 		{
-			cssUpdateLoop(run++);
+			cssUpdateLoop();
 		}
 		
 		if (f_gui.hasErrors())
@@ -403,10 +396,10 @@ public class EmbedController implements ActiveComponent
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_run
+	 * Updates the gui elements based on the current state of the creation job
+	 * as obtained from the JobStatus class.
 	 */
-	public void cssUpdateLoop(int p_run)
+	public void cssUpdateLoop()
 	{
 		//update things if they're different
 		
@@ -452,8 +445,8 @@ public class EmbedController implements ActiveComponent
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_item
+	 * Updates an input item from the associated file status
+	 * @param p_item The item to update
 	 */
 	public synchronized void updateInputItem(InputFileTreeItem p_item)
 	{
@@ -466,8 +459,8 @@ public class EmbedController implements ActiveComponent
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_item
+	 * Updates a target item from the associated file status
+	 * @param p_item The item to update
 	 */
 	public synchronized void updateTargetItem(TargetFileTreeItem p_item)
 	{
@@ -479,8 +472,7 @@ public class EmbedController implements ActiveComponent
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Allows the user to selected a new target folder and changes the file tree
 	 */
 	public void targetSelectFolderPressed()
 	{

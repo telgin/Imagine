@@ -13,7 +13,8 @@ import javafx.scene.control.TreeCell;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * A tree item class for an input item. These are checkbox tree items to
+ * allow for dynamic selection of inputs with minimal clicks.
  */
 public class InputFileTreeItem extends CheckBoxTreeItem<String>
 {
@@ -43,8 +44,8 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_file
+	 * Constructs an input file tree item for a given input file
+	 * @param p_file The input file
 	 */
 	public InputFileTreeItem(File p_file)
 	{
@@ -66,6 +67,10 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 		}
 	}
 	
+	/**
+	 * Creates an input file tree item with the given display text
+	 * @param p_display The display text
+	 */
 	public InputFileTreeItem(String p_display)
 	{
 		super(p_display);
@@ -121,8 +126,9 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_expanded
+	 * Adds children items to the tree when an item is expanded. This is done
+	 * so all the items don't need to be loaded at the beginning.
+	 * @param p_expanded The expanded state of the item
 	 */
 	private void folderEntryExpanded(boolean p_expanded)
 	{
@@ -148,8 +154,8 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_cell
+	 * Sets the style of a cell according to the state/progress of this item
+	 * @param p_cell The cell to set the style of
 	 */
 	public void setCellStyle(TreeCell<?> p_cell)
 	{

@@ -20,7 +20,7 @@ import ui.graphical.GUI;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * The controller class for the archive viewer tab
  */
 public class OpenArchiveController
 {
@@ -33,8 +33,8 @@ public class OpenArchiveController
 	private boolean f_nonInitialFragment;
 		
 	/**
-	 * @update_comment
-	 * @param file
+	 * Constructs an open archive controller for a given view
+	 * @param p_view The open archive view
 	 */
 	public OpenArchiveController(OpenArchiveView p_view)
 	{
@@ -61,7 +61,7 @@ public class OpenArchiveController
 	}
 	
 	/**
-	 * @update_comment
+	 * Tries to open the specified archive and displays its contents in the table
 	 */
 	void openArchive()
 	{
@@ -98,9 +98,9 @@ public class OpenArchiveController
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
-	 * @throws UsageException
+	 * Gets the input file from the gui
+	 * @return The input file location
+	 * @throws UsageException If the input file is not defined
 	 */
 	private File getInputFile() throws UsageException
 	{
@@ -115,9 +115,9 @@ public class OpenArchiveController
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
-	 * @throws UsageException
+	 * Gets the output folder from the gui
+	 * @return The file location of the output folder
+	 * @throws UsageException If the output folder is not defined
 	 */
 	private File getOutputFolder() throws UsageException
 	{
@@ -132,10 +132,9 @@ public class OpenArchiveController
 	}
 	
 	/**
-	 * @update_comment
-	 * @return
+	 * Allows the user to select a key file and updates the gui
 	 */
-	void chooseKeyFile()
+	public void chooseKeyFile()
 	{
 		File chosen = f_view.chooseFile();
 		if (chosen != null)
@@ -145,8 +144,7 @@ public class OpenArchiveController
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Extracts all items regardless of selection state
 	 */
 	public void extractAll()
 	{
@@ -175,8 +173,8 @@ public class OpenArchiveController
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Creates a key object based on the key selection in the gui
+	 * @return The derived key object
 	 */
 	private Key getKey()
 	{
@@ -198,8 +196,7 @@ public class OpenArchiveController
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Attempts to extract the selected files
 	 */
 	public void extractSelected()
 	{
@@ -245,8 +242,9 @@ public class OpenArchiveController
 	}
 	
 	/**
-	 * @update_comment
-	 * @param p_index
+	 * Updates the view to enable the correct components when a new
+	 * algorithm is selected
+	 * @param p_index The index of the algorithm selected
 	 */
 	public void algorithmSelected(int p_index)
 	{
@@ -289,9 +287,8 @@ public class OpenArchiveController
 	}
 
 	/**
-	 * @update_comment
-	 * @param p_focused
-	 * @return
+	 * Updates the list of presets if they have changed since the initial loading.
+	 * @param p_focused The focused state of the algorithm preset selection choicebox
 	 */
 	public void algorithmSelectFocus(boolean p_focused)
 	{
@@ -325,8 +322,7 @@ public class OpenArchiveController
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Lets the user browse for an input file and updates the gui
 	 */
 	public void browseInputFile()
 	{
@@ -345,8 +341,7 @@ public class OpenArchiveController
 	}
 
 	/**
-	 * @update_comment
-	 * @return
+	 * Lets the user select an output folder and updates the gui
 	 */
 	public void browseOutputFolder()
 	{
