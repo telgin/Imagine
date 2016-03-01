@@ -54,11 +54,18 @@ public class CmdUI extends UI
 	@Override
 	public void init()
 	{
-		if (f_args.getAction() != CmdAction.k_install && f_args.getPresetName() == null)
+		//check some basic cases first
+		if (f_args.getAction() != CmdAction.k_help && 
+			f_args.getAction() != CmdAction.k_install && 
+			f_args.getAction() != CmdAction.k_editor &&
+			f_args.getPresetName() == null)
 		{
 			Logger.log(LogLevel.k_fatal, "An algorithm preset name must be specified.");
 		}
-		else if (f_args.getAction() != CmdAction.k_install && f_args.getInputFiles().isEmpty())
+		else if (f_args.getAction() != CmdAction.k_help && 
+			f_args.getAction() != CmdAction.k_install && 
+			f_args.getAction() != CmdAction.k_editor &&
+			f_args.getInputFiles().isEmpty())
 		{
 			Logger.log(LogLevel.k_fatal, "Input files must be specified.");
 		}
@@ -66,7 +73,7 @@ public class CmdUI extends UI
 		{
 			Logger.log(LogLevel.k_fatal, "You cannot use both a key file (-k) and a password (-p).");
 		}
-		else
+		else //process the action
 		{
 			//reset static components
 			SystemManager.reset();
@@ -114,8 +121,8 @@ public class CmdUI extends UI
 		p("done through the GUI.\n");
 		
 		p("Command Syntax:");
-		p("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k [keyfile]]\n");
-		p("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]\n");
+		p("imagine --open -a <algorithm> -i <file> [-o <folder>] [-k [keyfile]]");
+		p("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]");
 		p("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]\n");
 		
 		p("--open");
@@ -123,9 +130,9 @@ public class CmdUI extends UI
 		p("--embed");
 		p("    embed data into a supported format (create archives)");
 		p("--extract");
-		p("    extract all data from an archive file or folder of multiple archives\n");
+		p("    extract all data from an archive file or folder of multiple archives");
 		p("--gui");
-		p("    open the gui (default) (not all flags supported)");
+		p("    open the gui (default) (not all flags supported)\n");
 		
 		p("-a <algorithm>");
 		p("    algorithm preset name");

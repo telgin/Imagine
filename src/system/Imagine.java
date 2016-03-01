@@ -104,6 +104,8 @@ public class Imagine
 			result.setAction(CmdAction.k_extract);
 		else if (p_args.contains("--install"))
 			result.setAction(CmdAction.k_install);
+		else if (p_args.contains("--editor"))
+			result.setAction(CmdAction.k_editor);
 		else
 			result.setAction(CmdAction.k_unspecified);
 		
