@@ -8,11 +8,11 @@
 
 Creating Archives:
 
-![alt text](https://github.com/telgin/Imagine/documentation/create_archive.png "Create Archives")
+![alt text](https://github.com/telgin/Imagine/blob/master/documentation/create_archive.png?raw=true "Create Archives")
 
 Viewing / Extracting From Archives:
 
-![alt text](https://github.com/telgin/Imagine/documentation/view_archive.png "View Archives")
+![alt text](https://github.com/telgin/Imagine/blob/master/documentation/view_archive.png?raw=true "View Archives")
 
 ### Dependencies
 * Java 8
