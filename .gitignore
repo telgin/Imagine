@@ -10,3 +10,8 @@
 /specs/
 /testGroupInput/
 /FileIndex.sqlite
+/hashdb/
+/mappings/
+/databases/
+/trees/
+/config.xml

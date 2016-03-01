@@ -21,7 +21,7 @@ Since you don't need to install this for the time being, you can just run the gu
 
 ### CLI Usage (also available through '--help')
 ```text
-Command Syntax</pre>
+Command Syntax
 imagine --open -a <algorithm> -i <file> [-o <folder>] [-k [keyfile]]
 imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]
 imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]
