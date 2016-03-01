@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Configuration>
+    <AlgorithmPresets>
+        <Algorithm name="Image" presetName="image_default" version="1">
+            <Parameter description="The file format to output images in." enabled="true" name="ImageType" optional="false" type="string" value="png">
+                <Option value="png"/>
+            </Parameter>
+            <Parameter description="The width of the output image." enabled="true" name="Width" optional="false" type="int" value="1820">
+                <Option endRange="10000" startRange="1"/>
+            </Parameter>
+            <Parameter description="The way to represent colors in the output image." enabled="true" name="Colors" optional="false" type="string" value="rgb">
+                <Option value="rgb"/>
+            </Parameter>
+            <Parameter description="The height of the output image." enabled="true" name="Height" optional="false" type="int" value="980">
+                <Option endRange="10000" startRange="1"/>
+            </Parameter>
+        </Algorithm>
+        <Algorithm name="ImageOverlay" presetName="image_overlay_light" version="1">
+            <Parameter description="How to deal with used input images once an overlay is applied.&#10;&#10;Cycle:  Cycle through input images in the input folder. Start from the beginning once the last one is used.&#10;&#10;Move:  Move used images to a subfolder within the image input folder.&#10;&#10;Delete:  Delete images from the input folder once an overlay is applied." enabled="true" name="ImageConsumptionMode" optional="false" type="string" value="cycle">
+                <Option value="cycle"/>
+                <Option value="move"/>
+                <Option value="delete"/>
+            </Parameter>
+            <Parameter description="The file format to output images in." enabled="true" name="ImageType" optional="false" type="string" value="png">
+                <Option value="png"/>
+            </Parameter>
+            <Parameter description="A folder of images to apply the overlay to. Supported input types include png, jpg, jpeg, gif, bmp, and wbmp." enabled="true" name="ImageFolder" optional="false" type="file" value="Prompt For Value">
+                <Option value="*"/>
+                <Option value="Prompt For Value"/>
+            </Parameter>
+            <Parameter description="The percentage of data in the input image to be overwritten with embedded data. At 25%, the visual difference with be unnoticeable for most images. At 50%, some artifacts will be noticeable in smaller images or when looking at an image zoomed in. Specifically, these are percents of bits per byte to use for file data. So, at 25%, two bits are file data and six are image data. At 50%, four bits are file data and four bits are image data." enabled="true" name="InsertionDensity" optional="false" type="string" value="25%">
+                <Option value="25%"/>
+                <Option value="50%"/>
+            </Parameter>
+        </Algorithm>
+        <Algorithm name="ImageOverlay" presetName="image_overlay_heavy" version="1">
+            <Parameter description="How to deal with used input images once an overlay is applied.&#10;&#10;Cycle:  Cycle through input images in the input folder. Start from the beginning once the last one is used.&#10;&#10;Move:  Move used images to a subfolder within the image input folder.&#10;&#10;Delete:  Delete images from the input folder once an overlay is applied." enabled="true" name="ImageConsumptionMode" optional="false" type="string" value="cycle">
+                <Option value="cycle"/>
+                <Option value="move"/>
+                <Option value="delete"/>
+            </Parameter>
+            <Parameter description="The file format to output images in." enabled="true" name="ImageType" optional="false" type="string" value="png">
+                <Option value="png"/>
+            </Parameter>
+            <Parameter description="A folder of images to apply the overlay to. Supported input types include png, jpg, jpeg, gif, bmp, and wbmp." enabled="true" name="ImageFolder" optional="false" type="file" value="Prompt For Value">
+                <Option value="*"/>
+                <Option value="Prompt For Value"/>
+            </Parameter>
+            <Parameter description="The percentage of data in the input image to be overwritten with embedded data. At 25%, the visual difference with be unnoticeable for most images. At 50%, some artifacts will be noticeable in smaller images or when looking at an image zoomed in. Specifically, these are percents of bits per byte to use for file data. So, at 25%, two bits are file data and six are image data. At 50%, four bits are file data and four bits are image data." enabled="true" name="InsertionDensity" optional="false" type="string" value="50%">
+                <Option value="25%"/>
+                <Option value="50%"/>
+            </Parameter>
+        </Algorithm>
+        <Algorithm name="Text" presetName="text_default" version="1">
+            <Parameter description="The number of bytes of input data to put in each output file." enabled="true" name="blockSize" optional="false" type="int" value="102400">
+                <Option endRange="2147483647" startRange="500"/>
+            </Parameter>
+            <Parameter description="The encoding of bytes to output text as." enabled="true" name="encoding" optional="false" type="string" value="Base64">
+                <Option value="Base64"/>
+                <Option value="Hex"/>
+            </Parameter>
+        </Algorithm>
+    </AlgorithmPresets>
+    <System>
+        <Path name="LogFolder" value="logs"/>
+    </System>
+</Configuration>

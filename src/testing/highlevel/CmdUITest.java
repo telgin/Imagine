@@ -79,19 +79,19 @@ public class CmdUITest
 	}
 	
 	//test all for start
-	//@Test
+	@Test
 	public void image_1_et() { image_1(EMPTY_FOLDER); }
 	
-	//@Test
+	@Test
 	public void image_1_sf() { image_1(SMALL_FILE); }
 	
 	@Test
 	public void image_1_st() { image_1(SMALL_TREE); }
 	
-	//@Test
+	@Test
 	public void image_1_bf() { image_1(BIG_FILE); }
 	
-	//@Test
+	@Test
 	public void image_1_bt() { image_1(BIG_TREE); }
 	
 	
@@ -126,7 +126,7 @@ public class CmdUITest
 	@Test
 	public void image_2_bf() { image_2(BIG_FILE); }
 	
-	//@Test
+	@Test
 	public void image_2_bt() { image_2(BIG_TREE); }
 	
 	/**
@@ -155,7 +155,7 @@ public class CmdUITest
 		assertEquals(expectedLines, actualLines);
 	}
 	
-	//@Test
+	@Test
 	public void image_3_bt() throws IOException { image_3(BIG_TREE); }
 	
 	/**
@@ -186,7 +186,7 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, true);
 	}
 	
-	//@Test
+	@Test
 	public void image_4_bt() throws IOException { image_4(BIG_TREE, BIG_TREE_FILE_LIST); }
 	
 	/**
@@ -214,7 +214,7 @@ public class CmdUITest
 		assertEquals(500, img.getHeight());
 	}
 	
-	//@Test
+	@Test
 	public void image_5_st() throws IOException { image_5(SMALL_TREE); }
 	
 	/**
@@ -271,7 +271,7 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, true);
 	}
 	
-	//@Test
+	@Test
 	public void image_6_st() throws IOException { image_6(); }
 	
 	/**
@@ -302,7 +302,7 @@ public class CmdUITest
 		assertEquals(0, EXTRACTION_FOLDER.listFiles().length);
 	}
 	
-	//@Test
+	@Test
 	public void image_7_bt() { image_7(BIG_TREE); }
 	
 	//----------------------------------------
@@ -337,19 +337,19 @@ public class CmdUITest
 	}
 	
 	//test all for start
-	//@Test
+	@Test
 	public void image_overlay_1_et() { image_overlay_1(EMPTY_FOLDER); }
 	
-	//@Test
+	@Test
 	public void image_overlay_1_sf() { image_overlay_1(SMALL_FILE); }
 	
 	@Test
 	public void image_overlay_1_st() { image_overlay_1(SMALL_TREE); }
 	
-	//@Test
+	@Test
 	public void image_overlay_1_bf() { image_overlay_1(BIG_FILE); }
 	
-	//@Test
+	@Test
 	public void image_overlay_1_bt() { image_overlay_1(BIG_TREE); }
 	
 	
@@ -383,10 +383,10 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
-	//@Test
+	@Test
 	public void image_overlay_2_bf() { image_overlay_2(BIG_FILE); }
 	
-	//@Test
+	@Test
 	public void image_overlay_2_bt() { image_overlay_2(BIG_TREE); }
 	
 	/**
@@ -419,10 +419,10 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
-	//@Test
+	@Test
 	public void image_overlay_3_bf() { image_overlay_3(BIG_FILE); }
 	
-	//@Test
+	@Test
 	public void image_overlay_3_bt() { image_overlay_3(BIG_TREE); }
 	
 	/**
@@ -453,7 +453,7 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
-	//@Test
+	@Test
 	public void image_overlay_4_st() { image_overlay_4(SMALL_TREE); }
 	
 	/**
@@ -479,7 +479,7 @@ public class CmdUITest
 		assertEquals(0, OUTPUT_FOLDER.listFiles().length);
 	}
 	
-	//@Test
+	@Test
 	public void image_overlay_5_st() { image_overlay_5(SMALL_TREE); }
 	
 	/**
@@ -517,7 +517,7 @@ public class CmdUITest
 		assertEquals(1, doneFolder.listFiles().length);
 	}
 	
-	//@Test
+	@Test
 	public void image_overlay_6_st() { image_overlay_6(SMALL_TREE); }
 	
 	/**
@@ -551,7 +551,7 @@ public class CmdUITest
 		assertEquals(0, IMAGE_FOLDER.listFiles().length);
 	}
 	
-	//@Test
+	@Test
 	public void image_overlay_7_st() { image_overlay_7(SMALL_TREE); }
 
 	//----------------------------------------
@@ -585,16 +585,16 @@ public class CmdUITest
 	}
 	
 	//test all for start
-	//@Test
+	@Test
 	public void text_1_et() { text_1(EMPTY_FOLDER); }
 	
-	//@Test
+	@Test
 	public void text_1_sf() { text_1(SMALL_FILE); }
 	
-	//@Test
+	@Test
 	public void text_1_st() { text_1(SMALL_TREE); }
 	
-	//@Test
+	@Test
 	public void text_1_bf() { text_1(BIG_FILE); }
 	
 	@Test
@@ -629,10 +629,10 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, false);
 	}
 	
-	//@Test
+	@Test
 	public void text_2_bf() { text_2(BIG_FILE); }
 	
-	//@Test
+	@Test
 	public void text_2_bt() { text_2(BIG_TREE); }
 		
 

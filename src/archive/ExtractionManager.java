@@ -180,7 +180,7 @@ public class ExtractionManager
 		try
 		{
 			Files.move(p_assembled.toPath(), created.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			Logger.log(LogLevel.k_info, "Assembled file moved to: "
+			Logger.log(LogLevel.k_debug, "Assembled file moved to: "
 							+ created.getAbsolutePath());
 		}
 		catch (IOException e)
@@ -208,7 +208,7 @@ public class ExtractionManager
 		try
 		{
 			Files.copy(p_source.toPath(), created.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			Logger.log(LogLevel.k_info, "Assembled file moved to: "
+			Logger.log(LogLevel.k_debug, "Assembled file moved to: "
 							+ created.getAbsolutePath());
 			
 			//set permissions of file
