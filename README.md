@@ -6,6 +6,14 @@
 * GUI or Command Line
 * Tested on Ubuntu 14, planned support for Windows in near future
 
+Creating Archives:
+
+![alt text](https://github.com/telgin/Imagine/documentation/create_archive.png "Create Archives")
+
+Viewing / Extracting From Archives:
+
+![alt text](https://github.com/telgin/Imagine/documentation/view_archive.png "View Archives")
+
 ### Dependencies
 * Java 8
 
