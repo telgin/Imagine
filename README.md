@@ -8,11 +8,21 @@
 
 Creating Archives:
 
-![alt text](https://github.com/telgin/Imagine/blob/master/documentation/create_archive.png?raw=true "Create Archives")
+![image](https://github.com/telgin/Imagine/blob/master/documentation/create_archive.png?raw=true "Create Archives")
 
 Viewing / Extracting From Archives:
 
-![alt text](https://github.com/telgin/Imagine/blob/master/documentation/view_archive.png?raw=true "View Archives")
+![image](https://github.com/telgin/Imagine/blob/master/documentation/view_archive.png?raw=true "View Archives")
+
+What's the difference between these two 545 x 445 pixel images? 
+
+![image](https://github.com/telgin/Imagine/blob/master/documentation/original_gull.png?raw=true "Original Gull")
+
+![image](https://github.com/telgin/Imagine/blob/master/documentation/bnw_gull.png?raw=true "Brave New World Gull")
+
+The difference is, you can extract the full text of "Brave New World" by Aldous Huxley from the second image.
+
+(Brave New World is freely available at http://huxley.net/bnw/index.html)
 
 ### Dependencies
 * Java 8
@@ -62,7 +72,7 @@ imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]
 ```
 
 ### Psuedo-Security Disclaimer/Warning:
-While the security within this program should be good enough to keep your friends out of your archives, I have not hired security specialists to look at this software and as such I make no claims or promises about how secure it is. This was just a casual fun project for me. Could I break the security? No. Could a team of security researchers break it? Possibly. I don't know how they would, but that doesn't mean anything. **If you want your files to cryptographically secure, encrypt them before adding them to archives with this software!** The primary usefulness of this software should come from the ability to hide files, not to secure them outright.
+While the security within this program should be good enough to keep your friends out of your archives, I have not hired security specialists to look at this software and as such I make no claims or promises about how secure it is. This was just a casual fun project for me. Could I break the security? No. Could a team of security researchers break it? Possibly. I don't know how they would, but that doesn't mean anything. **If you want your files to be cryptographically secure, encrypt them before adding them to archives with this software!** The primary usefulness of this software should come from the ability to hide files, not to secure them outright.
 
 ### Planned Features (in rough order of priority) (also open to suggestions)
 * Official Windows support (It's java so it might already work?)
