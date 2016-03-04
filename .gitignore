@@ -15,3 +15,7 @@
 /databases/
 /trees/
 /config.xml
+/.classpath
+/.settings
+/.project
+/README.md
