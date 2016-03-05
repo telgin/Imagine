@@ -50,7 +50,7 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent, "emptyFolder/");
+				return new File(parent, "emptyFolder");
 			}
 
 			@Override
@@ -73,7 +73,7 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent, "smallFile/");
+				return new File(parent, "smallFile");
 			}
 
 			@Override
@@ -97,13 +97,13 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent, "smallTree/");
+				return new File(parent, "smallTree");
 			}
 
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(s_bank, "tracked_topfolder_r/"),
+				addFile(new File(s_bank, "tracked_topfolder_r"),
 								getRoot(parent));
 			}
 		};
@@ -122,7 +122,7 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent, "bigFile/");
+				return new File(parent, "bigFile");
 			}
 
 			@Override
@@ -146,13 +146,13 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent, "bigTree/");
+				return new File(parent, "bigTree");
 			}
 
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(s_bank, "testGroupInput/"), getRoot(parent));
+				addFile(new File(s_bank, "testGroupInput"), getRoot(parent));
 			}
 		};
 
@@ -170,13 +170,13 @@ public class TestFileTrees
 			@Override
 			public File getRoot(File parent)
 			{
-				return new File(parent, "inputImages/");
+				return new File(parent, "inputImages");
 			}
 
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(s_bank, "input_images/"), getRoot(parent));
+				addFile(new File(s_bank, "input_images"), getRoot(parent));
 			}
 		};
 

@@ -27,14 +27,17 @@ import util.StandardUtil;
  */
 public class CmdUITest
 {
-	private static final File HOME_FOLDER = new File("testing/highlevel/");
-	private static final File OUTPUT_FOLDER = new File("testing/output/");
-	private static final File EXTRACTION_FOLDER = new File("testing/extraction/");
-	private static final File IMAGE_FOLDER = new File("testing/input_images/");
-	private static final File KEY_FILE = new File("testing/keys/key1.txt");
-	private static final File REPORT_FOLDER = new File("testing/reports/");
+	private static final File TESTING_FOLDER = new File("testing");
+	private static final File HOME_FOLDER = new File(TESTING_FOLDER, "highlevel");
+	private static final File OUTPUT_FOLDER = new File(TESTING_FOLDER, "output");
+	private static final File EXTRACTION_FOLDER = new File(TESTING_FOLDER, "extraction");
+	private static final File IMAGE_FOLDER = new File(TESTING_FOLDER, "input_images");
+	private static final File KEY_FOLDER = new File(TESTING_FOLDER, "keys");
+	private static final File KEY_FILE = new File(KEY_FOLDER, "key1.txt");
+	private static final File REPORT_FOLDER = new File(TESTING_FOLDER, "reports");
 	private static final File REPORT_FILE = new File(REPORT_FOLDER, "report.txt");
-	private static final File BIG_TREE_FILE_LIST = new File("testing/file_lists/bigTree.txt");
+	private static final File FILE_LISTS_FOLDER = new File(TESTING_FOLDER, "file_lists");
+	private static final File BIG_TREE_FILE_LIST = new File(FILE_LISTS_FOLDER, "bigTree.txt");
 	private static ArrayList<CreationJob> s_jobs = new ArrayList<CreationJob>();
 	
 	private static final String EMPTY_FOLDER = "emptyFolder";
@@ -271,7 +274,7 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, true);
 	}
 	
-	@Test
+	//@Test
 	public void image_6_st() throws IOException { image_6(); }
 	
 	/**

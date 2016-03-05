@@ -49,6 +49,11 @@ public class FileSystemUtil
 			Logger.log(LogLevel.k_error, e, false);
 			return 444; // you got a better idea?
 		}
+		catch (UnsupportedOperationException e)
+		{
+			//TODO support file permissions in windows
+			return 444;
+		}
 	}
 	
 	/**

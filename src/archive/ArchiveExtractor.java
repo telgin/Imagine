@@ -231,6 +231,14 @@ public class ArchiveExtractor {
 			
 			return null;
 		}
+		finally
+		{
+			try
+			{
+				outStream.close();
+			} 
+			catch (IOException | NullPointerException e) {} //nothing to do
+		}
 	}
 
 	/**
