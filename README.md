@@ -4,7 +4,7 @@
   * 25% & 50% Modes (File Data / Image Data Ratio)
 * Single/Multi-File Support
 * GUI or Command Line
-* Tested on Ubuntu 14, planned support for Windows in near future
+* Tested on Ubuntu 14 and Windows 10
 
 Creating Archives:
 
@@ -75,7 +75,6 @@ imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]
 While the security within this program should be good enough to keep your friends out of your archives, I have not hired security specialists to look at this software and as such I make no claims or promises about how secure it is. This was just a casual fun project for me. Could I break the security? No. Could a team of security researchers break it? Possibly. I don't know how they would, but that doesn't mean anything. **If you want your files to be cryptographically secure, encrypt them before adding them to archives with this software!** The primary usefulness of this software should come from the ability to hide files, not to secure them outright.
 
 ### Planned Features (in rough order of priority) (also open to suggestions)
-* Official Windows support (It's java so it might already work?)
 * Bulk extraction from files using GUI (currently only supported in cli)
 * Right click menus (e.g. right click file from os, select extract, select create archive)
 * Open archive given a url
