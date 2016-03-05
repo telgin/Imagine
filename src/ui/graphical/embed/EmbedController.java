@@ -13,6 +13,7 @@ import api.ConversionAPI;
 import api.UsageException;
 import archive.CreationJob;
 import config.Settings;
+import data.ArchiveFile;
 import javafx.application.Platform;
 import key.FileKey;
 import key.Key;
@@ -236,7 +237,12 @@ public class EmbedController implements ActiveComponent
 
 		if (file != null)
 		{
-			f_view.addInput(FileSystemUtil.relativizeByCurrentLocation(file));
+			ArchiveFile archiveFile = new ArchiveFile(file.getPath());
+			
+			//we don't want all absolute path folders to be extracted,
+			//we just want to get this file
+			archiveFile.setRelativePath(file.getName());
+			f_view.addInput(archiveFile);
 		}
 	}
 
@@ -249,7 +255,12 @@ public class EmbedController implements ActiveComponent
 
 		if (folder != null)
 		{
-			f_view.addInput(FileSystemUtil.relativizeByCurrentLocation(folder));
+			ArchiveFile archiveFile = new ArchiveFile(folder.getPath());
+			
+			//we don't want all absolute path folders to be extracted,
+			//we just want to start with this folder
+			archiveFile.setRelativePath(folder.getName());
+			f_view.addInput(archiveFile);
 		}
 	}
 
@@ -310,7 +321,7 @@ public class EmbedController implements ActiveComponent
 			else
 			{
 				//collect the input files
-				List<File> inputFiles = f_view.getInputFileList();
+				List<ArchiveFile> inputFiles = f_view.getInputFileList();
 				f_totalFilesThisRun = 0;
 				try
 				{

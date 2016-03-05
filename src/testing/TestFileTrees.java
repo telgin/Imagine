@@ -152,7 +152,7 @@ public class TestFileTrees
 			@Override
 			public void create(File parent)
 			{
-				addFile(new File(s_bank, "eclipse-installer/"), getRoot(parent));
+				addFile(new File(s_bank, "testGroupInput/"), getRoot(parent));
 			}
 		};
 

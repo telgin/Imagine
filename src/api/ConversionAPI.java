@@ -7,6 +7,7 @@ import java.util.List;
 import algorithms.Algorithm;
 import archive.ArchiveContents;
 import archive.CreationJob;
+import data.ArchiveFile;
 import archive.ArchiveExtractor;
 import key.Key;
 import logging.LogLevel;
@@ -26,7 +27,7 @@ public abstract class ConversionAPI
 	 * @param p_threads The number of archive writer threads to use
 	 * @return The job which will be running the archive creation
 	 */
-	public static CreationJob createArchives(List<File> p_inputFiles, Algorithm p_algo, 
+	public static CreationJob createArchives(List<ArchiveFile> p_inputFiles, Algorithm p_algo, 
 		Key p_key, int p_threads)
 	{
 		Logger.log(LogLevel.k_general, "Running creation...");

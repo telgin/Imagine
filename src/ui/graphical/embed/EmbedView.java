@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import data.ArchiveFile;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -114,7 +115,7 @@ public class EmbedView extends View
 		{
 			for (File input : f_args.getInputFiles())
 				if (input.exists())
-					addInput(input);
+					addInput(new ArchiveFile(input.getPath()));
 			
 			if (f_args.getPresetName() != null && f_controller.getPresetNames().contains(f_args.getPresetName()))
 			{
@@ -704,7 +705,7 @@ public class EmbedView extends View
 	 * Adds an input file or folder
 	 * @param p_inputFile The input file or folder
 	 */
-	public void addInput(File p_inputFile)
+	public void addInput(ArchiveFile p_inputFile)
 	{
 		final InputFileTreeItem item = new InputFileTreeItem(p_inputFile);
 		item.setSelected(true);
@@ -930,16 +931,16 @@ public class EmbedView extends View
 	 * and the checked state of the tree items.
 	 * @return The list of input files
 	 */
-	public List<File> getInputFileList()
+	public List<ArchiveFile> getInputFileList()
 	{
-		Set<File> files = new HashSet<File>();
+		Set<ArchiveFile> files = new HashSet<ArchiveFile>();
 		
 		for (TreeItem<String> child : f_inputFileRoot.getChildren())
 		{
 			collectInputFiles(files, (InputFileTreeItem) child);
 		}
 		
-		return new ArrayList<File>(files);
+		return new ArrayList<ArchiveFile>(files);
 	}
 
 	/**
@@ -950,7 +951,7 @@ public class EmbedView extends View
 	 * @param p_files The set of files to add to
 	 * @param p_parent The current tree item representing a parent file
 	 */
-	private void collectInputFiles(Set<File> p_files, InputFileTreeItem p_parent)
+	private void collectInputFiles(Set<ArchiveFile> p_files, InputFileTreeItem p_parent)
 	{
 		if (p_parent.isIndeterminate())
 		{

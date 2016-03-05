@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import archive.CreationJobFileState;
+import data.ArchiveFile;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeCell;
@@ -19,7 +20,7 @@ import javafx.scene.control.TreeCell;
 public class InputFileTreeItem extends CheckBoxTreeItem<String>
 {
 	private double f_progress;
-	private File f_file;
+	private ArchiveFile f_file;
 	private CreationJobFileState f_status;
 	private boolean f_focused;
 	
@@ -47,7 +48,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	 * Constructs an input file tree item for a given input file
 	 * @param p_file The input file
 	 */
-	public InputFileTreeItem(File p_file)
+	public InputFileTreeItem(ArchiveFile p_file)
 	{
 		super(p_file.getName());
 		this.f_file = p_file;
@@ -95,7 +96,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	/**
 	 * @return the file
 	 */
-	public File getFile()
+	public ArchiveFile getFile()
 	{
 		return f_file;
 	}
@@ -103,7 +104,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 	/**
 	 * @param p_file the file to set
 	 */
-	public void setFile(File p_file)
+	public void setFile(ArchiveFile p_file)
 	{
 		this.f_file = p_file;
 		setValue(p_file.getName());
@@ -140,7 +141,7 @@ public class InputFileTreeItem extends CheckBoxTreeItem<String>
 			//load entries
 			for (File child : getFile().listFiles())
 			{
-				InputFileTreeItem item = new InputFileTreeItem(child);
+				InputFileTreeItem item = new InputFileTreeItem(new ArchiveFile(f_file, child));
 				item.setSelected(isSelected());
 				loadedItems.add(item);
 			}

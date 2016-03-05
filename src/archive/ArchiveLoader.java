@@ -283,17 +283,17 @@ public class ArchiveLoader
 		if (!writeFull(ByteConversion.intToByte(p_fileMetadata.getType().toInt())))
 			return false;
 		
+		// file name length
+		byte[] filePathBytes = p_fileMetadata.getFile().getArchivePath().getBytes(Constants.CHARSET);
+		if (!writeFull(ByteConversion.shortToBytes((short) filePathBytes.length)))
+			return false;
+
+		// file name
+		if (!writeFull(filePathBytes))
+			return false;
+		
 		if (p_fileMetadata.getType().equals(FileType.k_file))
 		{
-			// file name length
-			if (!writeFull(ByteConversion
-							.shortToBytes((short) p_fileMetadata.getFile().getPath().length())))
-				return false;
-	
-			// file name
-			if (!writeFull(p_fileMetadata.getFile().getPath().getBytes(Constants.CHARSET)))
-				return false;
-	
 			// date created
 			if (!writeFull(ByteConversion.longToBytes(p_fileMetadata.getDateCreated())))
 				return false;
@@ -308,19 +308,6 @@ public class ArchiveLoader
 	
 			// length of data that still needs to be written
 			if (!writeFull(ByteConversion.longToBytes(p_fileLengthRemaining)))
-				return false;
-		}
-		else
-		{
-			//folder type:
-			
-			// file name length
-			if (!writeFull(ByteConversion
-							.shortToBytes((short) p_fileMetadata.getFile().getPath().length())))
-				return false;
-	
-			// file name
-			if (!writeFull(p_fileMetadata.getFile().getPath().getBytes(Constants.CHARSET)))
 				return false;
 		}
 

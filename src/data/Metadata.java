@@ -1,7 +1,5 @@
 package data;
 
-import java.io.File;
-
 /**
  * @author Thomas Elgin (https://github.com/telgin)
  * Holds the metadata of a file so that it can be written to
@@ -9,7 +7,7 @@ import java.io.File;
  */
 public class Metadata
 {
-	private File f_file;
+	private ArchiveFile f_file;
 	private long f_dateCreated;
 	private long f_dateModified;
 	private short f_permissions;
@@ -92,7 +90,7 @@ public class Metadata
 	 * are being read.
 	 * @return The file this metadata is about.
 	 */
-	public File getFile()
+	public ArchiveFile getFile()
 	{
 		return f_file;
 	}
@@ -101,7 +99,7 @@ public class Metadata
 	 * Sets the file this metadata is about
 	 * @param p_file The file to set
 	 */
-	public void setFile(File p_file)
+	public void setFile(ArchiveFile p_file)
 	{
 		this.f_file = p_file;
 	}

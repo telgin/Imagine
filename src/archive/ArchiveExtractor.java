@@ -12,6 +12,7 @@ import java.util.Queue;
 import algorithms.Algorithm;
 import algorithms.AlgorithmRegistry;
 import config.Constants;
+import data.ArchiveFile;
 import data.FileType;
 import data.Metadata;
 import key.Key;
@@ -733,27 +734,29 @@ public class ArchiveExtractor {
 			
 			contents.getMetadata().setType(fileType);
 			
+			//file name length
+			if (!readFull(Constants.FILE_NAME_LENGTH_SIZE))
+				return null;
+			short fileNameLength = ByteConversion.bytesToShort(f_buffer, 0);
+
+			//file name
+			if (p_parseData)
+			{
+				if (!readFull(fileNameLength))
+					return null;
+				
+				String filePath = new String(f_buffer, 0, fileNameLength, Constants.CHARSET);
+				contents.getMetadata().setFile(new ArchiveFile(filePath));
+			}
+			else
+			{
+				if (!skipFull(fileNameLength))
+					return null;
+			}
+				
 			//file type:
 			if (fileType.equals(FileType.k_file))
-			{
-				//file name length
-				if (!readFull(Constants.FILE_NAME_LENGTH_SIZE))
-					return null;
-				short fileNameLength = ByteConversion.bytesToShort(f_buffer, 0);
-
-				//file name
-				if (p_parseData)
-				{
-					if (!readFull(fileNameLength))
-						return null;
-					contents.getMetadata().setFile(new File(new String(f_buffer, 0, fileNameLength, Constants.CHARSET)));
-				}
-				else
-				{
-					if (!skipFull(fileNameLength))
-						return null;
-				}
-				
+			{	
 				//date created
 				if (p_parseData)
 				{
@@ -797,28 +800,6 @@ public class ArchiveExtractor {
 				if (!readFull(Constants.FILE_LENGTH_REMAINING_SIZE))
 					return null;
 				contents.setRemainingData(ByteConversion.bytesToLong(f_buffer, 0));
-			}
-			else
-			{
-				//folder type:
-				
-				//file name length
-				if (!readFull(Constants.FILE_NAME_LENGTH_SIZE))
-					return null;
-				short fileNameLength = ByteConversion.bytesToShort(f_buffer, 0);
-
-				//file name
-				if (p_parseData)
-				{
-					if (!readFull(fileNameLength))
-						return null;
-					contents.getMetadata().setFile(new File(new String(f_buffer, 0, fileNameLength, Constants.CHARSET)));
-				}
-				else
-				{
-					if (!skipFull(fileNameLength))
-						return null;
-				}
 			}
 			
 			return contents;

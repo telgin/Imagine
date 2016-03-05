@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import logging.LogLevel;
+import util.FileSystemUtil;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
@@ -13,7 +14,7 @@ import logging.LogLevel;
 public abstract class Constants
 {
 	// program names
-	public static final String APPLICATION_NAME_FULL = "Imagine Obfuscation Utility";
+	public static final String APPLICATION_NAME_FULL = "Imagine Data Conversion & Obfuscation Utility";
 	public static final String APPLICATION_NAME_SHORT = "Imagine";
 
 	// program version
@@ -21,14 +22,14 @@ public abstract class Constants
 	public static final int APPLICATION_MINOR_VERSION = 0;
 	public static final int APPLICATION_UPDATE_VERSION = 0;
 	public static final String APPLICATION_FORMATTED_VERSION =
-					Integer.toString(APPLICATION_MAJOR_VERSION) + "."
-									+ Integer.toString(APPLICATION_MINOR_VERSION) + "."
-									+ Integer.toString(APPLICATION_UPDATE_VERSION);
+		Integer.toString(APPLICATION_MAJOR_VERSION) + "."
+		+ Integer.toString(APPLICATION_MINOR_VERSION) + "."
+		+ Integer.toString(APPLICATION_UPDATE_VERSION);
 
 	// file names
-	public static final File CONFIG_FILE = new File("config.xml");
+	public static final File CONFIG_FILE = new File(FileSystemUtil.getJarHome(), "config.xml");
 	public static final String ASSEMBLY_FOLDER_NAME = "." +
-					APPLICATION_NAME_SHORT.toLowerCase() + "_assembly";
+		APPLICATION_NAME_SHORT.toLowerCase() + "_assembly";
 	
 	// misc system configuration
 	public static final int DEFAULT_THREAD_COUNT = 1;
@@ -46,15 +47,15 @@ public abstract class Constants
 	public static final long END_CODE = Long.MAX_VALUE;
 	public static final long END_CODE_SIZE = 8;
 	public static final String INDEX_FOLDER_NAME =
-					"." + Constants.APPLICATION_NAME_SHORT.toLowerCase();
+		"." + Constants.APPLICATION_NAME_SHORT.toLowerCase();
 	public static final long FIRST_FRAGMENT_CODE = 1;
 	public static final long NOT_FRAGMENT_CODE = -1;
 
 	// io data field lengths
 	public static final int STREAM_UUID_SIZE = 8;
 	public static final int ARCHIVE_SEQUENCE_NUMBER_SIZE = 4;
-	public static final int ARCHIVE_UUID_SIZE =
-					STREAM_UUID_SIZE + ARCHIVE_SEQUENCE_NUMBER_SIZE;
+	public static final int ARCHIVE_UUID_SIZE = STREAM_UUID_SIZE +
+		ARCHIVE_SEQUENCE_NUMBER_SIZE;
 	public static final int ARCHIVE_VERSION_NUMBER_SIZE = 1;
 	public static final int FILE_HEADER_LENGTH_SIZE = 4;
 	public static final int ALGORITHM_NAME_LENGTH_SIZE = 2;

@@ -186,7 +186,7 @@ public class CmdUITest
 		Comparisons.compareExtractedFileStructure(inputFolder, EXTRACTION_FOLDER, true);
 	}
 	
-	@Test
+	//@Test
 	public void image_4_bt() throws IOException { image_4(BIG_TREE, BIG_TREE_FILE_LIST); }
 	
 	/**

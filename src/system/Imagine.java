@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import data.ArchiveFile;
 import logging.LogLevel;
 import logging.Logger;
 import ui.ArgParseResult;
@@ -119,7 +120,11 @@ public class Imagine
 			while (p_args.contains("-i"))
 			{
 				int flagIndex = p_args.indexOf("-i");
-				result.addInputFile(new File(p_args.get(flagIndex+1)));
+				File inputFile = new File(p_args.get(flagIndex+1));
+				ArchiveFile file = new ArchiveFile(inputFile.getAbsolutePath());
+				if (!inputFile.isAbsolute())
+					file.setRelativePath(inputFile.getPath());
+				result.addInputFile(file);
 				p_args.remove(flagIndex+1);
 				p_args.remove(flagIndex);
 			}
@@ -131,7 +136,7 @@ public class Imagine
 				{
 					path = path.trim();
 					if (path.length() > 0)
-						result.addInputFile(new File(path));
+						result.addInputFile(new ArchiveFile(path));
 				}
 			}
 			

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import data.ArchiveFile;
 import system.CmdAction;
 
 /**
@@ -14,7 +15,7 @@ import system.CmdAction;
 public class ArgParseResult
 {
 	private String f_presetName;
-	private List<File> f_inputFiles;
+	private List<ArchiveFile> f_inputFiles;
 	private List<String[]> f_parameters;
 	private File f_outputFolder;
 	private File f_keyFile;
@@ -29,7 +30,7 @@ public class ArgParseResult
 	public ArgParseResult()
 	{
 		f_presetName = null;
-		f_inputFiles = new ArrayList<File>();
+		f_inputFiles = new ArrayList<ArchiveFile>();
 		f_parameters = new ArrayList<String[]>();
 		f_outputFolder = null;
 		f_keyFile = null;
@@ -50,7 +51,7 @@ public class ArgParseResult
 	/**
 	 * @return the inputFiles
 	 */
-	public List<File> getInputFiles()
+	public List<ArchiveFile> getInputFiles()
 	{
 		return f_inputFiles;
 	}
@@ -172,7 +173,7 @@ public class ArgParseResult
 	 * exist; it is just whatever got parsed.
 	 * @param file The input file.
 	 */
-	public void addInputFile(File file)
+	public void addInputFile(ArchiveFile file)
 	{
 		f_inputFiles.add(file);
 	}

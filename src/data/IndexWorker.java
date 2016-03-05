@@ -19,14 +19,14 @@ public class IndexWorker implements Runnable
 	private BlockingQueue<Metadata> f_queue;
 	private boolean f_shuttingDown;
 	private boolean f_active;
-	private List<File> f_inputFiles;
+	private List<ArchiveFile> f_inputFiles;
 
 	/**
 	 * Constructs an index worker
 	 * @param p_queue The queue to load input file metadata into
 	 * @param p_inputFiles The list of input files and folders to be added to archives.
 	 */
-	public IndexWorker(BlockingQueue<Metadata> p_queue, List<File> p_inputFiles)
+	public IndexWorker(BlockingQueue<Metadata> p_queue, List<ArchiveFile> p_inputFiles)
 	{
 		f_queue = p_queue;
 		f_inputFiles = p_inputFiles;
@@ -54,7 +54,7 @@ public class IndexWorker implements Runnable
 			f_inputFiles.size() + " initial files/folders");
 
 		// index all top level folders
-		for (File inputFile : f_inputFiles)
+		for (ArchiveFile inputFile : f_inputFiles)
 		{
 			if (!f_shuttingDown)
 				crawl(inputFile);
@@ -71,7 +71,7 @@ public class IndexWorker implements Runnable
 	 * @param p_currentFile The file to crawl through. If it is a file or an empty folder,
 	 * it will simply be added to the queue, if it is a folder, it will be recursed through.
 	 */
-	private void crawl(File p_currentFile)
+	private void crawl(ArchiveFile p_currentFile)
 	{
 		//wait if the queue is too full
 		while (!f_shuttingDown && f_queue.size() >= Constants.MAX_FILE_QUEUE_SIZE)
@@ -103,7 +103,7 @@ public class IndexWorker implements Runnable
 					//recurse through the folder contents
 					for (File child : p_currentFile.listFiles())
 					{
-						crawl(child);
+						crawl(new ArchiveFile(p_currentFile, child));
 					}
 				}
 			}

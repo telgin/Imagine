@@ -1,6 +1,5 @@
 package archive;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +11,7 @@ import algorithms.AlgorithmRegistry;
 import config.Settings;
 import data.IndexWorker;
 import data.Metadata;
+import data.ArchiveFile;
 import data.ArchiveWorker;
 import key.Key;
 import logging.LogLevel;
@@ -32,7 +32,7 @@ public class CreationJob implements Runnable
 	private List<ArchiveWorker> f_archiveWorkers;
 	private Thread[] f_workerThreads;
 	private int f_archiveWorkerCount;
-	private List<File> f_inputFiles;
+	private List<ArchiveFile> f_inputFiles;
 	private FileOutputManager f_manager;
 	private ArchiveWriterFactory<? extends ArchiveWriter> f_factory;
 
@@ -44,7 +44,7 @@ public class CreationJob implements Runnable
 	 * @param p_archiveWorkerCount The number of archive workers to use. 
 	 * Each will run on its own thread
 	 */
-	public CreationJob(List<File> p_inputFiles, Algorithm p_algorithm, 
+	public CreationJob(List<ArchiveFile> p_inputFiles, Algorithm p_algorithm, 
 		Key p_key, int p_archiveWorkerCount)
 	{
 		f_inputFiles = p_inputFiles;

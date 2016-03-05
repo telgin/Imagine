@@ -2,7 +2,9 @@ package util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -17,6 +19,7 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import data.ArchiveFile;
 import data.FileType;
 import data.Metadata;
 import logging.LogLevel;
@@ -28,30 +31,6 @@ import logging.Logger;
  */
 public class FileSystemUtil
 {
-	/**
-	 * Loads a metadata object from a file, filling in any missing elements
-	 * @param p_metadata A partially constructed metadata object
-	 * @param p_file The file to get the metadata from
-	 */
-	public static void loadMetadataFromFile(Metadata p_metadata, File p_file)
-	{
-		// check every field, only add if it's not set already
-		if (p_metadata.getDateCreated() == -1)
-			p_metadata.setDateCreated(getDateCreated(p_file));
-
-		if (p_metadata.getDateModified() == -1)
-			p_metadata.setDateModified(getDateModified(p_file));
-
-		if (p_metadata.getFile() == null)
-			p_metadata.setFile(p_file);
-
-		if (p_metadata.getPermissions() == -1)
-			p_metadata.setPermissions(getNumericFilePermissions(p_file));
-		
-		if (p_metadata.getType() == null)
-			p_metadata.setType(p_file.isDirectory() ? FileType.k_folder : FileType.k_file);
-	}
-
 	/**
 	 * Gets the posix numeric file permissions
 	 * @param p_file The file to get the permissions of
@@ -261,14 +240,20 @@ public class FileSystemUtil
 	}
 
 	/**
-	 * Loads a metadata object from a file
+	 * Loads a metadata object from a file in the file system
 	 * @param p_file The file
 	 * @return The file metadata
 	 */
-	public static Metadata loadMetadataFromFile(File p_file)
+	public static Metadata loadMetadataFromFile(ArchiveFile p_file)
 	{
 		Metadata metadata = new Metadata();
-		loadMetadataFromFile(metadata, p_file);
+
+		metadata.setDateCreated(getDateCreated(p_file));
+		metadata.setDateModified(getDateModified(p_file));
+		metadata.setFile(p_file);
+		metadata.setPermissions(getNumericFilePermissions(p_file));
+		metadata.setType(p_file.isDirectory() ? FileType.k_folder : FileType.k_file);
+					
 		return metadata;
 	}
 
@@ -438,6 +423,29 @@ public class FileSystemUtil
 			//a directory which doesn't exist doesn't have files in it.
 			//TODO this works now, but handle this situation outside here
 			return true;
+		}
+	}
+	
+	/**
+	 * Gets the home folder of the jar file
+	 * @return The home folder
+	 * @credit http://stackoverflow.com/questions/320542/how-to-get-the-path-of-a-running-jar-file
+	 */
+	public static File getJarHome()
+	{
+		String path = FileSystemUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		try
+		{
+			File home = new File(URLDecoder.decode(path, "UTF-8"));
+			if (home.isDirectory())
+				return home;
+			else
+				return home.getParentFile();
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			Logger.log(LogLevel.k_fatal, "Cannot resolve location of configuration file.");
+			return null;
 		}
 	}
 }
