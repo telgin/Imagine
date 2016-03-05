@@ -4,45 +4,53 @@ import java.io.File;
 
 /**
  * @author Thomas Elgin (https://github.com/telgin)
- * @update_comment
+ * This class allows the absolute path of a file to be kept track of
+ * while still using the path the user specified when writing an archive.
  */
 public class ArchiveFile extends File
 {
 	private static final long serialVersionUID = 982302354356341952L;
-	
-	private File relativeFile;
+	private File f_relativeFile;
 
 	/**
-	 * @update_comment
-	 * @param pathname
+	 * Constructs an archive file from a path string. This is equivalent to
+	 * the same constructor in File
+	 * @param p_pathString The path
 	 */
-	public ArchiveFile(String pathname)
+	public ArchiveFile(String p_pathString)
 	{
-		super(pathname);
+		super(p_pathString);
 	}
 	
-	public ArchiveFile(ArchiveFile parent, File child)
+	/**
+	 * Constructs an archive file from a parent archive file
+	 * and a child file.
+	 * @param p_parent The parent archive file
+	 * @param p_child The child file
+	 */
+	public ArchiveFile(ArchiveFile p_parent, File p_child)
 	{
-		super(child.getPath());
+		super(p_child.getPath());
 		
-		if (parent.getRelativeFile() != null)
-			setRelativeFile(new File(parent.getRelativeFile(), getName()));
+		if (p_parent.getRelativeFile() != null)
+			setRelativeFile(new File(p_parent.getRelativeFile(), getName()));
 	}
 
 	/**
-	 * @return the relativePath
+	 * Gets the path to use in an archive file
+	 * @return the path
 	 */
 	public String getArchivePath()
 	{
-		return relativeFile == null ? getPath() : relativeFile.getPath();
+		return f_relativeFile == null ? getPath() : f_relativeFile.getPath();
 	}
 
 	/**
-	 * @param relativePath the relativePath to set
+	 * @param p_relativePath the relativePath to set
 	 */
-	public void setRelativePath(String relativePath)
+	public void setRelativePath(String p_relativePath)
 	{
-		relativeFile = new File(relativePath);
+		f_relativeFile = new File(p_relativePath);
 	}
 	
 	/**
@@ -50,24 +58,26 @@ public class ArchiveFile extends File
 	 */
 	public File getRelativeFile()
 	{
-		return relativeFile;
+		return f_relativeFile;
 	}
 
 	/**
-	 * @param relativeFile the relativeFile to set
+	 * @param p_relativeFile the relativeFile to set
 	 */
-	public void setRelativeFile(File relativeFile)
+	public void setRelativeFile(File p_relativeFile)
 	{
-		this.relativeFile = relativeFile;
+		this.f_relativeFile = p_relativeFile;
 	}
 	
 	/**
-	 * @update_comment
-	 * @param parent
+	 * Appends a parent file to this file's relative path.
+	 * For instance, if the relative path was "file.txt" and the new parent file
+	 * path was "folder", the relative path would be changed to "folder/file.txt".
+	 * @param p_parent The parent file to append
 	 */
-	public void appendRelativeParent(File parent)
+	public void appendRelativeParent(File p_parent)
 	{
-		relativeFile = new File(parent, relativeFile.getPath());
+		f_relativeFile = new File(p_parent, f_relativeFile.getPath());
 	}
 
 }
