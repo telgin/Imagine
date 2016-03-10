@@ -41,6 +41,7 @@ public abstract class Constants
 	public static final LogLevel DEFAULT_MESSAGE_LEVEL = LogLevel.k_info;
 	public static final LogLevel DEFAULT_EXCEPTION_LEVEL = LogLevel.k_info;
 	public static final int MAX_FILE_QUEUE_SIZE = 2000;
+	public static final File LOG_FOLDER = new File(FileSystemUtil.getJarHome(), "logs");
 	
 	// io system configuration
 	public static final int MAX_READ_BUFFER_SIZE = 50000000;

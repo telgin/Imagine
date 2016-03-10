@@ -65,7 +65,6 @@ public abstract class DefaultConfigGenerator
 		Element root = mkElement("Configuration");
 
 		root.appendChild(mkElement("AlgorithmPresets"));
-		root.appendChild(mkSystemNode());
 
 		s_document.appendChild(root);
 
@@ -81,35 +80,4 @@ public abstract class DefaultConfigGenerator
 	{
 		return s_document.createElement(p_tagName);
 	}
-
-	/**
-	 * Utility function which makes a system element with a log folder.
-	 * @return The system element
-	 */
-	private static Element mkSystemNode()
-	{
-		Element system = mkElement("System");
-		
-		//folders
-		system.appendChild(mkPathNode("LogFolder", "logs"));
-		
-		return system;
-	}
-
-	/**
-	 * Utility function which makes a path element node with the
-	 * specified name and value
-	 * @param p_name The name of the path
-	 * @param p_value The path string
-	 * @return The path element created
-	 */
-	private static Element mkPathNode(String p_name, String p_value)
-	{
-		Element element = mkElement("Path");
-		if (p_name != null)
-			element.setAttribute("name", p_name);
-		element.setAttribute("value", p_value);
-		return element;
-	}
-
 }

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
-import config.Configuration;
 import config.Constants;
 import system.SystemManager;
 import ui.UIContext;
@@ -26,7 +25,9 @@ public class Logger
 		s_messageLevel = Constants.DEFAULT_MESSAGE_LEVEL;
 		s_exceptionLevel = Constants.DEFAULT_EXCEPTION_LEVEL;
 		
-		s_logFile = new File(Configuration.getLogFolder(), System.currentTimeMillis() + ".log");
+		s_logFile = new File(Constants.LOG_FOLDER, System.currentTimeMillis() + ".log");
+		if (!s_logFile.getParentFile().exists())
+			s_logFile.getParentFile().mkdirs();
 		s_logFile.getAbsoluteFile().getParentFile().mkdirs();
 
 		try

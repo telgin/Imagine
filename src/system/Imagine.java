@@ -196,10 +196,6 @@ public class Imagine
 		if (p_message != null)
 			System.err.println(p_message);
 		
-		System.err.println("Example Usage: (See 'imagine --help' for more details.)");
-		System.err.println("imagine --gui\n");
-		System.err.println("imagine --open -a <algorithm> -i <file> [-o <folder>] [-p]\n");
-		System.err.println("imagine --embed -a <algorithm> -i <file/folder> [-o <folder>] [-p]\n");
-		System.err.println("imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-p]");
+		System.err.println("(See '--help' for usage.)");
 	}
 }

@@ -1,6 +1,5 @@
 package config;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,7 +19,6 @@ import util.ConfigUtil;
 public class Configuration {
 	private static Document s_document;
 	private static Element s_root;
-	private static File s_logFolder;
 
 	static
 	{
@@ -36,9 +34,6 @@ public class Configuration {
 		s_document.getDocumentElement().normalize();
 		
 		s_root = s_document.getDocumentElement();
-		
-		//everything will be reloaded when needed
-		s_logFolder = null;
 	}
 	
 	/**
@@ -58,28 +53,6 @@ public class Configuration {
 	{
 		ConfigUtil.saveConfig(s_document, Constants.CONFIG_FILE);
 		Logger.log(LogLevel.k_info, "Configuration saved to file: " + Constants.CONFIG_FILE.getAbsolutePath());
-	}
-	
-	/**
-	 * Gets the log folder location from the configuration
-	 * @return The log folder location
-	 */
-	public static File getLogFolder()
-	{
-		if (s_logFolder == null)
-		{
-			Element fileSystemNode = ConfigUtil.first(ConfigUtil.children(s_root, "System"));
-			if (fileSystemNode != null)
-			{
-				Element logFoldNode = ConfigUtil.first(
-						ConfigUtil.filterByAttribute(ConfigUtil.children(fileSystemNode, "Path"),
-								"name", "LogFolder"));
-				
-				s_logFolder = new File(logFoldNode.getAttribute("value"));	
-			}
-		}
-
-		return s_logFolder;
 	}
 	
 	/**
