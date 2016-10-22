@@ -83,6 +83,19 @@ public class ImageUtil
 	}
 	
 	/**
+	 * Creates an rgb int from three bytes
+	 * @param p_red The red byte
+	 * @param p_green The green byte
+	 * @param p_blue The blue byte
+	 * @return The new rgb
+	 */
+	public static int toRGB(byte p_red, byte p_green, byte p_blue)
+	{
+		return 0xFF000000 | ((p_red << 16) & 0x00FF0000)
+						| ((p_green << 8) & 0x0000FF00) | (p_blue & 0x000000FF);
+	}
+	
+	/**
 	 * Compares images to see if each pixel has the same colors. Used for testing purposes only.
 	 * @param p_img1 The first image
 	 * @param p_img2 The second image

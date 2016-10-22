@@ -22,6 +22,7 @@ import util.algorithms.ImageUtil;
  */
 public class ImageWriter extends Image implements ArchiveWriter
 {
+	private byte[][] f_imgBytes;
 
 	/**
 	 * Constructs an image writer
@@ -32,6 +33,8 @@ public class ImageWriter extends Image implements ArchiveWriter
 	public ImageWriter(Algorithm p_algo, Key p_key)
 	{
 		super(p_algo, p_key);
+		
+		f_imgBytes = new byte[3][f_width * f_height];
 	}
 
 	/* (non-Javadoc)
@@ -42,7 +45,7 @@ public class ImageWriter extends Image implements ArchiveWriter
 	{
 		// should really use the rgb configuration parameter somehow
 		f_img = new BufferedImage(f_width, f_height, BufferedImage.TYPE_INT_RGB);
-
+		
 		reset();
 	}
 
@@ -86,6 +89,13 @@ public class ImageWriter extends Image implements ArchiveWriter
 	@Override
 	public void saveFile(File p_archiveStagingFolder, String p_fileName)
 	{
+		//compute rgb's
+		for (int i = 0; i < f_width * f_height; ++i)
+			f_rgbs[i] = ImageUtil.toRGB(f_imgBytes[0][i], f_imgBytes[1][i], f_imgBytes[2][i]);
+		
+		//assign imgData to image
+		f_img.setRGB(0, 0, f_width, f_height, f_rgbs, 0, f_width);
+		
 		try
 		{
 			File imgFile = new File(p_archiveStagingFolder.getAbsolutePath(), p_fileName + ".png");
@@ -113,20 +123,7 @@ public class ImageWriter extends Image implements ArchiveWriter
 	{
 		int color = p_index % 3;
 		int pixel = p_index / 3;
-		int y = pixel / f_img.getWidth();
-		int x = pixel % f_img.getWidth();
-
-		if (color == 0)
-		{
-			f_img.setRGB(x, y, ImageUtil.setRed(f_img.getRGB(x, y), p_data));
-		}
-		else if (color == 1)
-		{
-			f_img.setRGB(x, y, ImageUtil.setGreen(f_img.getRGB(x, y), p_data));
-		}
-		else
-		{
-			f_img.setRGB(x, y, ImageUtil.setBlue(f_img.getRGB(x, y), p_data));
-		}
+		
+		f_imgBytes[color][pixel] = p_data;
 	}
 }

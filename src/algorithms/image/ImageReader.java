@@ -72,20 +72,18 @@ public class ImageReader extends Image implements ArchiveReader
 	{
 		int color = p_index % 3;
 		int pixel = p_index / 3;
-		int y = pixel / f_img.getWidth();
-		int x = pixel % f_img.getWidth();
 
 		if (color == 0)
 		{
-			return ImageUtil.getRed(f_img.getRGB(x, y));
+			return ImageUtil.getRed(f_rgbs[pixel]);
 		}
 		else if (color == 1)
 		{
-			return ImageUtil.getGreen(f_img.getRGB(x, y));
+			return ImageUtil.getGreen(f_rgbs[pixel]);
 		}
 		else
 		{
-			return ImageUtil.getBlue(f_img.getRGB(x, y));
+			return ImageUtil.getBlue(f_rgbs[pixel]);
 		}
 	}
 
@@ -96,6 +94,8 @@ public class ImageReader extends Image implements ArchiveReader
 	public void loadFile(File p_file) throws IOException
 	{
 		f_img = ImageIO.read(p_file);
+		f_img.getRGB(0, 0, f_width, f_height, f_rgbs, 0, f_width);
+
 		reset();
 	}
 

@@ -26,6 +26,7 @@ public class Image implements Archive
 	protected byte[] f_uuid;
 	protected int f_width;
 	protected int f_height;
+	protected int[] f_rgbs;
 
 	/**
 	 * Creates an image archive interpreter instance
@@ -40,6 +41,7 @@ public class Image implements Archive
 		f_width = Integer.parseInt(p_algo.getParameterValue(Definition.WIDTH_PARAM));
 		f_height = Integer.parseInt(p_algo.getParameterValue(Definition.HEIGHT_PARAM));
 		f_maxWriteSize = f_width * f_height * 3;
+		f_rgbs = new int[f_width * f_height];
 	}
 
 	/**
