@@ -1,3 +1,9 @@
+# Upcoming Project EOL
+Courtesy Notice: I'll be removing this project from github within the upcoming months for :reasons:
+
+If anyone has this checked out, obviously it will continue to work, it just won't be hosted on github anymore.
+There are better ways to do this kind of thing which I'll be exploring in the future.
+
 # Imagine Data Conversion & Obfuscation Utility
 * Encode Data as Images
 * Encode Data into Existing Images with Little to No Visible Difference
@@ -74,19 +80,11 @@ imagine --extract -a <algorithm> -i <file/folder> [-o <folder>] [-k [keyfile]]
 ### Psuedo-Security Disclaimer/Warning:
 While the security within this program should be good enough to keep your friends out of your archives, I have not hired security specialists to look at this software and as such I make no claims or promises about how secure it is. This was just a casual fun project for me. Could I break the security? No. Could a team of security researchers break it? Possibly. I don't know how they would, but that doesn't mean anything. **If you want your files to be cryptographically secure, encrypt them before adding them to archives with this software!** The primary usefulness of this software should come from the ability to hide files, not to secure them outright.
 
-### Planned Features (in rough order of priority) (also open to suggestions)
-* Bulk extraction from files using GUI (currently only supported in cli)
-* Right click menus (e.g. right click file from os, select extract, select create archive)
-* Open archive given a url
-* Open archive from a screenshot
-* Lossy output format support (jpeg?)
-* Alternative media output (videos, music?)
-
 ### Documentation
 Before everyone yells at me because "obfuscation is not a superior paradigm to encryption", don't worry, I agree. BUT... obfuscation can be really cool and there's nothing stopping anyone from using it in conjunction with encryption, so there!
 
 #### Algorithms:
-Currently I have three algorithms, with plans to add more. My expectation is that "Image Overlay" will be the most useful to everyone, but I've included the others because why not?
+Currently I have three algorithms. My expectation is that "Image Overlay" will be the most useful to everyone, but I've included the others because why not?
 
 ##### Image Overlay
 
