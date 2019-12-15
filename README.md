@@ -1,9 +1,3 @@
-# Upcoming Project EOL
-Courtesy Notice: I'll be removing this project from github within the upcoming months for :reasons:
-
-If anyone has this checked out, obviously it will continue to work, it just won't be hosted on github anymore.
-There are better ways to do this kind of thing which I'll be exploring in the future.
-
 # Imagine Data Conversion & Obfuscation Utility
 * Encode Data as Images
 * Encode Data into Existing Images with Little to No Visible Difference
